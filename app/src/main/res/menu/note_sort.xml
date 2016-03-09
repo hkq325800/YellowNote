@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--<item android:id="@+id/name"-->
+    <!--android:title="按标题排序"-->
+    <!--android:orderInCategory="1" />-->
+
+    <item android:id="@+id/dateDesc"
+        android:title="按日期降序"
+        android:orderInCategory="1"/>
+
+    <item android:id="@+id/dateAsc"
+        android:title="按日期升序"
+        android:orderInCategory="1"/>
+
+    <item android:id="@+id/catalog"
+        android:title="按目录排序"
+        android:orderInCategory="1"/>
+</menu>

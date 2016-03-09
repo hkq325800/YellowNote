@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">YellowNote</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!--<string name="action_settings">Settings</string>-->
+
+    <!--waterdroplistview-->
+    <string name="listfooterview_normal">查看更多</string>
+    <string name="listfooterview_ready">松开载入更多</string>
+    <string name="uri_download">https://github.com/hkq325800/AppRelease/blob/master/YellowNote.apk?raw=true</string>
+</resources>

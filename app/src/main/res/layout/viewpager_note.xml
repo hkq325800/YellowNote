@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/textBackgroundColor"
+    android:orientation="vertical">
+    <!--<ListView
+        android:id="@+id/list_note"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:cacheColorHint="@color/light_purple"
+        android:listSelector="@color/light_purple"
+        android:dividerHeight="0.6px"/>-->
+    <TextView
+        android:id="@+id/mNoteEmptyTxt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="现在这里空空如也~"
+        android:visibility="gone" />
+
+    <ProgressBar
+        android:id="@+id/mNoteProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" />
+
+    <com.kerchin.yellownote.waterdrop.WaterDropListView
+        android:id="@+id/mNoteWDList"
+        android:layout_width="match_parent"
+        android:paddingTop="0.5dp"
+        android:layout_height="match_parent"
+        android:divider="@color/transparent"
+        android:footerDividersEnabled="false" />
+
+    <!--<android.support.design.widget.FloatingActionButton
+        android:id="@+id/btn_addNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:src="@mipmap/btn_menu"
+        app:borderWidth="0dp"
+        app:fabSize="normal" />-->
+    <!--android:src="@drawable/btn_menu"-->
+</RelativeLayout>

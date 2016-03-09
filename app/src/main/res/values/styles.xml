@@ -1,0 +1,90 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <!--@color/colorPrimary-->
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!--@color/colorPrimaryDark-->
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimaryPressed</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:popupMenuStyle">@style/Theme.PopupMenu</item>
+    </style>
+
+    <style name="FloatingStyle" parent="@android:style/TextAppearance">
+        <!-- 字体颜色 -->
+        <item name="android:textColor">#AA00FF</item>
+        <!-- 字体大小 -->
+        <item name="android:textSize">16sp</item>
+        <item name="colorAccent">@color/black</item>
+    </style>
+    <!--AppBarLayout-->
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="LYJMenuStyle" parent="@style/Widget.AppCompat.Light.PopupMenu.Overflow">
+        <item name="overlapAnchor">false</item>
+    </style>
+
+    <style name="Theme.PopupMenu" parent="@android:style/Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">@color/lightSkyBlue</item>
+    </style>
+    <!--使得popMenu不遮挡-->
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >
+        <item name="actionOverflowMenuStyle">@style/LYJMenuStyle</item>
+        <item name="android:popupBackground">@color/lightSkyBlue</item>
+        </style>
+    <!--分割线-->
+    <style name="horizontal_line_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0.5dp</item>
+        <item name="android:background">@color/light_gray</item>
+    </style>
+
+    <style name="tab_txt_style">
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_weight">1.0</item>
+        <item name="android:layout_width">0dip</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/minionYellow_pressed</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+
+    <!--SlideActivity-->
+    <style name="JK.SwipeBack.Transparent.Theme" parent="AppTheme.NoActionBar">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@style/JK.Animation.SlidingBack</item>
+        <!--<item name="android:actionBarStyle">@style/JKActionBar.Custom</item>-->
+    </style>
+
+    <!--<style name="JKActionBar.Custom" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="displayOptions">showCustom</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="background">@android:color/transparent</item>
+        <item name="android:displayOptions" tools:ignore="NewApi">showCustom</item>
+        <item name="android:height">?actionBarSize</item>
+    </style>-->
+
+    <style name="JK.Animation.SlidingBack" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_right</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+        <item name="android:wallpaperOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:wallpaperOpenExitAnimation">@anim/slide_out_right</item>
+        <item name="android:wallpaperCloseEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:wallpaperCloseExitAnimation">@anim/slide_out_right</item>
+        <item name="android:wallpaperIntraOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:wallpaperIntraOpenExitAnimation">@anim/slide_out_right</item>
+        <item name="android:wallpaperIntraCloseEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:wallpaperIntraCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+    <!--SlideActivity-->
+</resources>

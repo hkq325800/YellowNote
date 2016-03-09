@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mRecycleView"
+        android:paddingTop="0.5dp"
+        android:paddingBottom="8dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:background="@color/textBackgroundColor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <!--<com.kerchin.yellownote.waterdrop.WaterDropListView
+        android:id="@+id/waterdrop_folder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/transparent"
+        android:dividerHeight="0.5dp"
+        android:visibility="gone"
+        android:footerDividersEnabled="false"/>-->
+</RelativeLayout>

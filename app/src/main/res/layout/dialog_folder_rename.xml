@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <!--<ImageView
+        android:id="@+id/mRenameImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:src="@mipmap/delete" />-->
+
+    <EditText
+        android:id="@+id/mRenameEdt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:drawableRight="@mipmap/delete"
+        android:hint="请输入名称"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:inputType="text"
+        android:textColorHint="@color/backgroundFunctionBar"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/mRenameBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/mRenameEdt"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/selector_navigation_button"
+        android:text="确认"
+        android:textSize="18sp"
+        android:textColor="@color/textColor" />
+</RelativeLayout>
