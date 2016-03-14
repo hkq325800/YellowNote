@@ -13,6 +13,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.base.BaseHasSwipActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;

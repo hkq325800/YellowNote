@@ -29,16 +29,16 @@ import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderAdapter;
+import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.helper.ItemDragHelperCallback;
+import com.kerchin.yellownote.helper.ItemDrag.ItemDragHelperCallback;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class FolderFragment extends BaseFragment {
@@ -203,7 +203,7 @@ public class FolderFragment extends BaseFragment {
                     return false;
                 if (event.getX() > mRenameEdt.getWidth()
                         - mRenameEdt.getPaddingRight()
-                        - drawable.getIntrinsicWidth()){
+                        - drawable.getIntrinsicWidth()) {
                     mRenameEdt.setText("");
                 }
                 return false;
@@ -394,7 +394,47 @@ public class FolderFragment extends BaseFragment {
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRecycleView = (RecyclerView) view.findViewById(R.id.mRecycleView);
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+//                Trace.d("newState" + newState);
+            }
 
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                MainActivity m = (MainActivity) getActivity();
+//                Trace.d("isHide" + m.isHide + " dy" + dy);
+                if (!m.isHide && dy > 0) {
+                    m.hideBtnAdd();
+                } else if(m.isHide && dy < 0) {
+                    m.showBtnAdd();
+                }
+//                if (firstVisibleItem > lastVisibleItemPosition) {// 上滑
+//                    if (firstVisibleItem + visibleItemCount > totalItemCount) {//到底
+//                        Trace.d("end");
+//                        MainActivity m = (MainActivity) getActivity();
+//                        if (m.isHide) {
+//                            m.showBtnAdd();
+//                        }
+//                    } else {//未到底
+//                        MainActivity m = (MainActivity) getActivity();
+//                        if (!m.isHide) {
+//                            m.hideBtnAdd();
+//                        }
+//                    }
+//                } else if (firstVisibleItem < lastVisibleItemPosition) {// 下滑
+//                    MainActivity m = (MainActivity) getActivity();
+//                    if (m.isHide) {
+//                        m.showBtnAdd();
+//                    }
+//                } else {
+//                    return;
+//                }
+//                lastVisibleItemPosition = firstVisibleItem;
+            }
+        });
         MyApplication.listFolder = new ArrayList<>();
         status = statusDataGot;
         statusName = "dataGot";

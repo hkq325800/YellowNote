@@ -1,5 +1,7 @@
 package com.kerchin.yellownote.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,24 +12,25 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
+import com.bigkoo.snappingstepper.SnappingStepper;
+import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.base.BaseHasSwipActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.model.Note;
 import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.widget.MyScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,20 +58,28 @@ public class EditActivity extends BaseHasSwipActivity {
     private Folder thisFolder;
     private String[] mFolder;
     private AlertDialog ad;
+    CountDownTimer timer;
+    int lastStepperValue = 0;//用来控制stepper
     private List<String> aText = new ArrayList<String>();//记录输入的顺序
-    private List<Integer> aTextSelection = new ArrayList<Integer>();
-    @Bind(R.id.mNavigationTitleLinear) LinearLayout mNavigationTitleLinear;
-    @Bind(R.id.mEditRedoLinear) LinearLayout mEditRedoLinear;
-    @Bind(R.id.mEditUndoLinear) LinearLayout mEditUndoLinear;
-    @Bind(R.id.mEditDeleteLinear) LinearLayout mEditDeleteLinear;
-    @Bind(R.id.mEditMoveLinear) LinearLayout mEditMoveLinear;
-    @Bind(R.id.mEditRedoImg) ImageView mEditRedoImg;
-    @Bind(R.id.mEditUndoImg) ImageView mEditUndoImg;
-    @Bind(R.id.mNavigationTitleEdt) EditText mNavigationTitleEdt;
-    @Bind(R.id.mEditContentEdt) EditText mEditContentEdt;
-    @Bind(R.id.mNavigationPager) ViewPager mNavigationPager;
-    @Bind(R.id.mNavigationRightBtn) Button mNavigationRightBtn;
-    @Bind(R.id.mNavigationLeftBtn) Button mNavigationLeftBtn;
+    private List<Integer> aTextSelection = new ArrayList<Integer>();//记录目标步数时的selection
+    @Bind(R.id.mNavigationTitleLinear)
+    LinearLayout mNavigationTitleLinear;
+    @Bind(R.id.mEditReUnStepper)
+    SnappingStepper mEditReUnStepper;
+    @Bind(R.id.mEditNavLinear)
+    LinearLayout mEditNavLinear;
+    @Bind(R.id.mEditDeleteLinear)
+    LinearLayout mEditDeleteLinear;
+    @Bind(R.id.mEditMoveLinear)
+    LinearLayout mEditMoveLinear;
+    @Bind(R.id.mNavigationTitleEdt)
+    EditText mNavigationTitleEdt;
+    @Bind(R.id.mEditContentEdt)
+    EditText mEditContentEdt;
+    @Bind(R.id.mNavigationRightBtn)
+    Button mNavigationRightBtn;
+    @Bind(R.id.mNavigationLeftBtn)
+    Button mNavigationLeftBtn;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -86,7 +97,7 @@ public class EditActivity extends BaseHasSwipActivity {
                     timer.cancel();
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
-                    Toast.makeText(getApplicationContext(), "保存成功", Toast.LENGTH_SHORT).show();
+                    Trace.show(EditActivity.this, "保存成功");
                     mEditDeleteLinear.setVisibility(View.VISIBLE);
                     if (userConfirm) {
                         finish();
@@ -137,7 +148,7 @@ public class EditActivity extends BaseHasSwipActivity {
                 sum++;
             }
         }
-        mNavigationPager.setVisibility(View.GONE);
+//        mNavigationPager.setVisibility(View.GONE);
         mNavigationTitleLinear.setVisibility(View.VISIBLE);
         mNavigationRightBtn.setVisibility(View.VISIBLE);
         mEditContentEdt.setText(mNote.getContent());
@@ -159,7 +170,7 @@ public class EditActivity extends BaseHasSwipActivity {
                 mEditDeleteLinear.setVisibility(View.INVISIBLE);
         }
     }
-    CountDownTimer timer;
+
     @Override
     protected void initializeClick(Bundle savedInstanceState) {
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
@@ -237,10 +248,11 @@ public class EditActivity extends BaseHasSwipActivity {
                         || isFolderChanged) {
                     mNavigationRightBtn.setText("保存中..");
                     mNavigationRightBtn.setEnabled(false);
-                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod){
+                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod) {
                         @Override
                         public void onTick(long millisUntilFinished) {
                         }
+
                         @Override
                         public void onFinish() {
                             Trace.d("timer onFinish");
@@ -269,50 +281,49 @@ public class EditActivity extends BaseHasSwipActivity {
                 }
             }
         });
-        //恢复
-        mEditRedoLinear.setOnClickListener(new View.OnClickListener() {
+        mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (index + 1 <= aText.size()) {
-                    if (index + 1 == aText.size())
-                        mEditRedoImg.setImageResource(R.mipmap.ic_redo_gray);
-                    mEditUndoImg.setImageResource(R.mipmap.ic_undo);
-                    isRedo = true;
-                    index++;
-                    String text = aText.get(index - 1);
-                    mEditContentEdt.setText(text);
-                    mEditContentEdt.setSelection(aTextSelection.get(index - 1));
-                    isRedo = false;
-                }
-
-            }
-        });
-        //撤销
-        mEditUndoLinear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int old = isNew ? 1 : 2;
-                if (index > old) {
-                    mEditRedoImg.setImageResource(R.mipmap.ic_redo);
-                    isUndo = true;
-                    index--;
-                    String text = aText.get(index - 1);
-                    mEditContentEdt.setText(text);
-                    mEditContentEdt.setSelection(aTextSelection.get(index - 1));
-                    isUndo = false;
-                } else if (index == old) {
-                    mEditRedoImg.setImageResource(R.mipmap.ic_redo);
-                    mEditUndoImg.setImageResource(R.mipmap.ic_undo_gray);
-                    isUndo = true;
-                    index--;
-                    if (!isNew) {
+            public void onValueChange(View view, int value) {
+//                Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
+                if (value == 0 || value < lastStepperValue) {
+                    //撤销
+                    int old = isNew ? 1 : 2;
+                    if (index > old) {
+                        mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
+                        isUndo = true;
+                        index--;
                         String text = aText.get(index - 1);
                         mEditContentEdt.setText(text);
                         mEditContentEdt.setSelection(aTextSelection.get(index - 1));
-                    } else
-                        mEditContentEdt.setText("");
-                    isUndo = false;
+                        isUndo = false;
+                    } else if (index == old) {
+                        mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
+                        mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo_gray);
+                        isUndo = true;
+                        index--;
+                        if (!isNew) {
+                            String text = aText.get(index - 1);
+                            mEditContentEdt.setText(text);
+                            mEditContentEdt.setSelection(aTextSelection.get(index - 1));
+                        } else
+                            mEditContentEdt.setText("");
+                        isUndo = false;
+                    }
+                } else if (value > lastStepperValue) {
+                    //恢复
+                    if (index + 1 <= aText.size()) {//有可以恢复的内容
+                        if (index + 1 == aText.size())//aText的内容被读完了
+                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
+                        mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
+                        isRedo = true;
+                        index++;
+                        String text = aText.get(index - 1);
+                        mEditContentEdt.setText(text);
+                        mEditContentEdt.setSelection(aTextSelection.get(index - 1));
+                        isRedo = false;
+                    }
                 }
+                lastStepperValue = value;
             }
         });
         mEditContentEdt.addTextChangedListener(new TextWatcher() {
@@ -324,12 +335,13 @@ public class EditActivity extends BaseHasSwipActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!isUndo && !isRedo) {//被添加到aText中的部分
-                    mEditUndoImg.setImageResource(R.mipmap.ic_undo);
-                    mEditRedoImg.setImageResource(R.mipmap.ic_redo_gray);
+                    mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
+                    mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
                     aText.add(index, s.toString());
                     aTextSelection.add(index, start + count);
                     Trace.d("start:" + start + "before:" + before + "count:" + count);
                     index++;
+                    mEditReUnStepper.setValue(mEditReUnStepper.getValue() + 1);
                     if (aText.size() > index) {
                         final int all = aText.size();
                         for (int i = index; i < all; i++) {
@@ -412,12 +424,35 @@ public class EditActivity extends BaseHasSwipActivity {
 
     }
 
+    boolean isShown = true;
+
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                     || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                     || isFolderChanged) {
                 backConfirm();
+            }
+        } else if (keyCode == KeyEvent.KEYCODE_MENU) {
+            if (isShown) {
+                isShown = false;
+                mEditNavLinear.animate().alpha(0).translationY(-mEditNavLinear.getHeight()).setDuration(160)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mEditNavLinear.setVisibility(View.GONE);
+                            }
+                        }).start();
+            }
+            else{
+                isShown = true;
+                mEditNavLinear.animate().alpha(1).translationY(0).setDuration(160)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                mEditNavLinear.setVisibility(View.VISIBLE);
+                            }
+                        }).start();
             }
         }
         return super.onKeyDown(keyCode, event);

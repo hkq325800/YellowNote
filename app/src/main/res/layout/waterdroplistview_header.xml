@@ -46,7 +46,7 @@
         </LinearLayout>
     </LinearLayout>-->
 
-    <com.kerchin.yellownote.waterdrop.WaterDropView
+    <com.kerchin.yellownote.widget.waterdrop.WaterDropView
         android:id="@+id/waterdroplist_waterdrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

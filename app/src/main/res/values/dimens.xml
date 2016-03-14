@@ -6,8 +6,6 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <!--snappingstepper-->
     <dimen name="snappingstepper_width_button">60dp</dimen>
     <dimen name="snappingstepper_padding_button">0dp</dimen>
-    <dimen name="snappingstepper_textSize">15sp</dimen>
 </resources>

@@ -25,6 +25,7 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
+import com.kerchin.yellownote.base.BaseActivity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;

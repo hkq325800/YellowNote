@@ -10,7 +10,7 @@
         <attr name="bottomcircle_y" format="dimension"/>
     </declare-styleable>
 
-    <declare-styleable name="SnappingStepper">
+    <!--<declare-styleable name="SnappingStepper">
         <attr name="min" format="integer"/>
         <attr name="max" format="integer"/>
         <attr name="value" format="integer"/>
@@ -29,5 +29,5 @@
         <attr name="stepper_rightButtonBackground" format="color|reference"/>
         <attr name="stepper_leftButtonResources" format="color|reference"/>
         <attr name="stepper_rightButtonResources" format="color|reference"/>
-    </declare-styleable>
+    </declare-styleable>-->
 </resources>

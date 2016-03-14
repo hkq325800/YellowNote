@@ -2,7 +2,6 @@ package com.kerchin.yellownote.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -20,10 +19,7 @@ import android.widget.TextView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
-import com.kerchin.yellownote.helper.OnDragVHListener;
-import com.kerchin.yellownote.helper.OnItemMoveListener;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.helper.ItemDrag.OnDragVHListener;
 
 import java.util.ArrayList;
 import java.util.Collections;

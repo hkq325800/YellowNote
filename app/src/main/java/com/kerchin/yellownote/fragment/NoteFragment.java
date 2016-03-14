@@ -26,13 +26,13 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.NoteAdapter;
-import com.kerchin.yellownote.bean.SimpleNote;
+import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.model.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.waterdrop.WaterDropListView;
+import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +63,7 @@ public class NoteFragment extends BaseFragment
     private List<Note> list;
     public ToolbarStatus mainStatus;
     private String mSearchText;
+    private int lastVisibleItemPosition;
     //private int skip = 0;
     private byte status = 0;
     private final byte statusReturn = 2;//onResume getData getAdapter4 handle4return
@@ -345,8 +346,6 @@ public class NoteFragment extends BaseFragment
         return inflater.inflate(R.layout.viewpager_note, container, false);
     }
 
-    private int lastVisibleItemPosition;
-
     @Override
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -358,15 +357,6 @@ public class NoteFragment extends BaseFragment
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
-                switch (scrollState) {
-                    // 当不滚动时
-                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:// 是当屏幕停止滚动时
-//                        MainActivity m = (MainActivity) getActivity();
-//                        if (m.isHide) {
-//                            m.showBtnAddDelay();
-//                        }
-                        break;
-                }
             }
 
             @Override
@@ -452,7 +442,7 @@ public class NoteFragment extends BaseFragment
             mainStatus.setIsDeleteMode(true);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = mainStatus.isDeleteMode();
-                noteAdapter.notifyDataSetInvalidated();
+                noteAdapter.notifyDataSetChanged();
             }
         }
     }
@@ -475,7 +465,7 @@ public class NoteFragment extends BaseFragment
             mainStatus.setIsDeleteMode(false);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = mainStatus.isDeleteMode();
-                noteAdapter.notifyDataSetInvalidated();
+                noteAdapter.notifyDataSetChanged();
             }
         } else {
             Trace.d("deleteViewHideNote error");

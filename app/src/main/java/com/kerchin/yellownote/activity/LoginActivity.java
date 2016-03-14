@@ -29,7 +29,7 @@ import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.stract.User;
+import com.kerchin.yellownote.base.User;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
