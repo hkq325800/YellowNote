@@ -75,10 +75,10 @@ public class MainActivity extends BaseActivity
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                 // Translucent status bar
-                getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+//                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 //设置状态栏颜色
-                getWindow().setStatusBarColor(getResources().getColor(R.color.lightSkyBlue));
+//                getWindow().setStatusBarColor(getResources().getColor(R.color.lightSkyBlue));
                 //设置导航栏颜色
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
                 setStatusBarColor(R.color.lightSkyBlue);

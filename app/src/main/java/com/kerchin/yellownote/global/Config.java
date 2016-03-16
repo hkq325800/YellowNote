@@ -9,8 +9,8 @@ public class Config {
     /**
      * LeanCloud所需配置
      */
-    public static String APP_ID = "yourLeanCloud APP_ID";
-    public static String APP_KEY = "yourLeanCloud APP_KEY";
+    public static String APP_ID = "xSVBrQecrYEyaqMJm8fy6e9v";
+    public static String APP_KEY = "YCtqr4NxCfmxSGgE0DGhTWtj";
     /**
      * Settings
      */
