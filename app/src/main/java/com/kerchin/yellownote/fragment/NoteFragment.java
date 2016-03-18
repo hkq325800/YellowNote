@@ -365,7 +365,7 @@ public class NoteFragment extends BaseFragment
                     if (firstVisibleItem + visibleItemCount > totalItemCount) {//到底
                         Trace.d("end");
                         MainActivity m = (MainActivity) getActivity();
-                        if (m.isHide) {
+                        if (m.isHide && !mainStatus.isSearchMode()) {
                             m.showBtnAdd();
                         }
                     } else {//未到底
@@ -376,7 +376,7 @@ public class NoteFragment extends BaseFragment
                     }
                 } else if (firstVisibleItem < lastVisibleItemPosition) {// 下滑
                     MainActivity m = (MainActivity) getActivity();
-                    if (m.isHide) {
+                    if (m.isHide && !mainStatus.isSearchMode()){
                         m.showBtnAdd();
                     }
                 } else {

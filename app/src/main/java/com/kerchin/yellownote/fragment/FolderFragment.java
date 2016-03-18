@@ -523,6 +523,7 @@ public class FolderFragment extends BaseFragment {
         if (status == statusDataGot) {
             //相当于一直在每隔200ms判断isItemReady 为true时sendMessage
             if (MyApplication.isItemsReady) {
+                MyApplication.isItemsReady = false;
                 repeatCount = 0;
                 Trace.d("isItemsReady lisNoteSize:" + MyApplication.listNote.size());
                 handler.sendEmptyMessage(handle4newFolder);
