@@ -61,7 +61,7 @@ public class NoteFragment extends BaseFragment
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private NoteAdapter noteAdapter;
     private List<Note> list;
-    public ToolbarStatus mainStatus;
+    private ToolbarStatus mainStatus;
     private String mSearchText;
     private int lastVisibleItemPosition;
     //private int skip = 0;
@@ -376,7 +376,7 @@ public class NoteFragment extends BaseFragment
                     }
                 } else if (firstVisibleItem < lastVisibleItemPosition) {// 下滑
                     MainActivity m = (MainActivity) getActivity();
-                    if (m.isHide && !mainStatus.isSearchMode()){
+                    if (m.isHide && !mainStatus.isSearchMode()) {
                         m.showBtnAdd();
                     }
                 } else {
@@ -633,5 +633,11 @@ public class NoteFragment extends BaseFragment
     public void disableLoad() {
 //        mNoteWDList.setPullLoadEnable(false);
         mNoteWDList.setPullRefreshEnable(false);
+    }
+
+    public ToolbarStatus getMainStatus() {
+        if (mainStatus != null)
+            return mainStatus;
+        else return new ToolbarStatus();
     }
 }

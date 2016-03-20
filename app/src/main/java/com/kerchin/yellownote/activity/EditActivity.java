@@ -47,20 +47,20 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
     private static final int RESULT_LOAD_IMAGE = 100;
-    private static Long mEditTime = (long) 0;
     private static Note mNote;
-    private boolean isNew = false;
+    private boolean isNew = false;//是否为新笔记
+    private boolean isShown = true;//func条是否显示
     private boolean isFolderChanged = false;
     private boolean userConfirm = false;
-    private boolean isUndo, isRedo;
-    private int index = 0;// 用来记录当前在aText和aTextSelection中的位置
+    private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
+    private int index = 0;//用来记录当前在aText和aTextSelection中的位置
     private Folder thisFolder;
     private String[] mFolder;
     private AlertDialog ad;
-    CountDownTimer timer;
+    //    CountDownTimer timer;
     int lastStepperValue = 0;//用来控制stepper
-    private List<String> aText = new ArrayList<String>();//记录输入的顺序
-    private List<Integer> aTextSelection = new ArrayList<Integer>();//记录目标步数时的selection
+    private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
+    private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
     @Bind(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
     @Bind(R.id.mEditReUnStepper)
@@ -92,15 +92,18 @@ public class EditActivity extends BaseHasSwipeActivity {
                     Trace.show(EditActivity.this, "内容不应为空");
                     break;
                 case handle4saveChange:
-                    Trace.d("timer cancel");
-                    timer.cancel();
+//                    Trace.d("timer cancel");
+//                    timer.cancel();
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
-                    Trace.show(EditActivity.this, "保存成功");
-                    mEditDeleteLinear.setVisibility(View.VISIBLE);
-                    if (userConfirm) {
-                        finish();
-                    }
+                    if ((boolean) msg.obj) {
+                        Trace.show(EditActivity.this, "保存成功");
+                        mEditDeleteLinear.setVisibility(View.VISIBLE);
+                        if (userConfirm) {
+                            finish();
+                        }
+                    } else if (userConfirm)
+                        userConfirm = false;
                     break;
                 default:
                     break;
@@ -156,8 +159,8 @@ public class EditActivity extends BaseHasSwipeActivity {
             isNew = true;
         } else {
             isNew = false;
-            aText.add(mNote.getContent());
-            aTextSelection.add(index, 0);
+            textOrder.add(mNote.getContent());
+            textSelection.add(index, 0);
             index++;
             mNavigationTitleEdt.setText(mNote.getTitle());
             mNavigationTitleEdt.setSelection(mNote.getTitle().length());
@@ -195,7 +198,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                                 break;
                             }
                         }
-                        if (isNew) {//TODO
+                        if (isNew) {
                             mNote.setFolder(newName);
                             mNote.setFolderId(thisFolder.getObjectId());
                         }
@@ -234,7 +237,6 @@ public class EditActivity extends BaseHasSwipeActivity {
                 });
                 ad = builder.create();
                 ad.show();
-
             }
         });
         mNavigationRightBtn.setOnClickListener(new View.OnClickListener() {
@@ -247,21 +249,20 @@ public class EditActivity extends BaseHasSwipeActivity {
                         || isFolderChanged) {
                     mNavigationRightBtn.setText("保存中..");
                     mNavigationRightBtn.setEnabled(false);
-                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            Trace.d("timer onFinish");
-                            Trace.show(EditActivity.this, "网络开小差辣···");
-                            mNavigationRightBtn.setText("保存");
-                            mNavigationRightBtn.setEnabled(true);
-                        }
-                    }.start();
-
-                    Trace.d("timer start");
+//                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod) {
+//                        @Override
+//                        public void onTick(long millisUntilFinished) {
+//                        }
+//
+//                        @Override
+//                        public void onFinish() {
+//                            Trace.d("timer onFinish");
+//                            Trace.show(EditActivity.this, "网络开小差辣···");
+//                            mNavigationRightBtn.setText("保存");
+//                            mNavigationRightBtn.setEnabled(true);
+//                        }
+//                    }.start();
+//                    Trace.d("timer start");
                     saveDifference();
                 } else {
                     Trace.show(EditActivity.this, "内容未修改");
@@ -291,9 +292,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                         mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
                         isUndo = true;
                         index--;
-                        String text = aText.get(index - 1);
+                        String text = textOrder.get(index - 1);
                         mEditContentEdt.setText(text);
-                        mEditContentEdt.setSelection(aTextSelection.get(index - 1));
+                        mEditContentEdt.setSelection(textSelection.get(index - 1));
                         isUndo = false;
                     } else if (index == old) {
                         mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
@@ -301,34 +302,40 @@ public class EditActivity extends BaseHasSwipeActivity {
                         isUndo = true;
                         index--;
                         if (!isNew) {
-                            String text = aText.get(index - 1);
+                            String text = textOrder.get(index - 1);
                             mEditContentEdt.setText(text);
-                            mEditContentEdt.setSelection(aTextSelection.get(index - 1));
+                            mEditContentEdt.setSelection(textSelection.get(index - 1));
                         } else
                             mEditContentEdt.setText("");
                         isUndo = false;
                     }
                 } else if (value > lastStepperValue) {
                     //恢复
-                    if (index + 1 <= aText.size()) {//有可以恢复的内容
-                        if (index + 1 == aText.size())//aText的内容被读完了
+                    if (index + 1 <= textOrder.size()) {//有可以恢复的内容
+                        if (index + 1 == textOrder.size())//aText的内容被读完了
                             mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
                         mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
                         isRedo = true;
                         index++;
-                        String text = aText.get(index - 1);
+                        String text = textOrder.get(index - 1);
                         mEditContentEdt.setText(text);
-                        mEditContentEdt.setSelection(aTextSelection.get(index - 1));
+                        mEditContentEdt.setSelection(textSelection.get(index - 1));
                         isRedo = false;
                     }
                 }
                 lastStepperValue = value;
             }
         });
+        mEditContentEdt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditText et = (EditText) v;
+                textSelection.set(index - 1, et.getSelectionEnd());
+            }
+        });
         mEditContentEdt.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -336,17 +343,17 @@ public class EditActivity extends BaseHasSwipeActivity {
                 if (!isUndo && !isRedo) {//被添加到aText中的部分
                     mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
                     mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
-                    aText.add(index, s.toString());
-                    aTextSelection.add(index, start + count);
+                    textOrder.add(index, s.toString());
+                    textSelection.add(index, start + count);
                     Trace.d("start:" + start + "before:" + before + "count:" + count);
                     index++;
                     mEditReUnStepper.setValue(mEditReUnStepper.getValue() + 1);
-                    if (aText.size() > index) {
-                        final int all = aText.size();
+                    if (textOrder.size() > index) {
+                        final int all = textOrder.size();
                         for (int i = index; i < all; i++) {
-                            //Trace.d("remove" + aText.get(i - 1));
-                            aText.remove(index);//移除的都是第index个
-                            aTextSelection.remove(index);
+                            //Trace.d("remove" + textOrder.get(i - 1));
+                            textOrder.remove(index);//移除的都是第index个
+                            textSelection.remove(index);
                         }
                     }
                 }
@@ -354,18 +361,6 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-//                if (mEditTime == 0)
-//                    mEditTime = System.currentTimeMillis();
-//                if ((System.currentTimeMillis() - mEditTime) > 800) {
-//                    if (!isUndo && !isRedo) {
-//                        aText.add(s.toString());
-//                        Trace.d("afterTextChanged", s.toString());
-//                    } else {
-////                    aText.remove(aText.size() - 1);
-//                        Trace.d("afterTextChanged change", s.toString());
-//                    }
-//                    mEditTime = System.currentTimeMillis();
-//                }
             }
         });
     }
@@ -418,12 +413,8 @@ public class EditActivity extends BaseHasSwipeActivity {
             Uri selectedImage = data.getData();
 //            NormalUtils.setDrawableToWidget(this, selectedImage, ivMove);
 
-
         }
-
     }
-
-    boolean isShown = true;
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -442,8 +433,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                                 mEditNavLinear.setVisibility(View.GONE);
                             }
                         }).start();
-            }
-            else{
+            } else {
                 isShown = true;
                 mEditNavLinear.animate().alpha(1).translationY(0).setDuration(160)
                         .setListener(new AnimatorListenerAdapter() {

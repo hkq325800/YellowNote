@@ -146,7 +146,7 @@ public class MainActivity extends BaseActivity
 
                     if (getFragmentStatus().isDeleteMode())
                         noteFragment.deleteViewHide();
-                    if (noteFragment.mainStatus.isSearchMode())
+                    if (noteFragment.getMainStatus().isSearchMode())
                         noteFragment.restore();
                     showBtnAdd();
                 } else if (position == 1) {
@@ -245,11 +245,11 @@ public class MainActivity extends BaseActivity
         if (noteFragment != null && folderFragment != null) {
             switch (MyApplication.thisPosition) {//TODO null pointer
                 case 0:
-                    return noteFragment.mainStatus;
+                    return noteFragment.getMainStatus();
                 case 1:
-                    return folderFragment.mainStatus;
+                    return folderFragment.getMainStatus();
                 default:
-                    return noteFragment.mainStatus;
+                    return noteFragment.getMainStatus();
             }
         }
         return new ToolbarStatus();

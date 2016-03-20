@@ -49,7 +49,7 @@ public class FolderFragment extends BaseFragment {
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     public static boolean isChanged4folder = false;
     private byte status = 0;
-    public ToolbarStatus mainStatus;
+    private ToolbarStatus mainStatus;
     private String statusName = "dataGot";
     //private static final byte statusInit = 1;//onCreateView onViewCreated getData CountDownTimer getAdapter4 handle4new
     private final byte statusDataGot = 0;//重置listFolder
@@ -538,6 +538,12 @@ public class FolderFragment extends BaseFragment {
         } else if (status == statusRespond) {
             handler.sendEmptyMessage(handle4respond);
         }
+    }
+
+    public ToolbarStatus getMainStatus() {
+        if (mainStatus != null)
+            return mainStatus;
+        else return new ToolbarStatus();
     }
 
 //    @Override

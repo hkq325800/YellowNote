@@ -45,12 +45,12 @@
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>-->
-
+    <!--原来为marginTop=10dp-->
     <com.kerchin.yellownote.widget.waterdrop.WaterDropView
         android:id="@+id/waterdroplist_waterdrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp"
+        android:paddingTop="10dp"
         waterdrop:bottomcircle_x="20dp"
         waterdrop:bottomcircle_y="20dp"
         waterdrop:max_circle_radius="20dp"
