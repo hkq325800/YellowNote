@@ -46,8 +46,7 @@ public class NormalUtils {
             int j = md.length;
             char str[] = new char[j * 2];
             int k = 0;
-            for (int i = 0; i < j; i++) {
-                byte byte0 = md[i];
+            for (byte byte0 : md) {
                 str[k++] = hexDigits[byte0 >>> 4 & 0xf];
                 str[k++] = hexDigits[byte0 & 0xf];
             }
@@ -104,8 +103,8 @@ public class NormalUtils {
     /**
      * convert drawable to bitmap
      *
-     * @param drawable
-     * @return
+     * @param drawable source
+     * @return bitmap
      */
     public static Bitmap drawableToBitmap(Drawable drawable) {
         int width = drawable.getIntrinsicWidth();
@@ -132,9 +131,9 @@ public class NormalUtils {
      * Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
      * startActivityForResult(i, RESULT_LOAD_IMAGE);
      *
-     * @param context
-     * @param selectedImage
-     * @param widget
+     * @param context 上下文
+     * @param selectedImage 选择的图片的uri
+     * @param widget 控件
      */
     public static void setDrawableToWidget(Context context, Uri selectedImage, ImageView widget) {
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -154,5 +153,11 @@ public class NormalUtils {
         BitmapFactory.Options option = new BitmapFactory.Options();
         option.inSampleSize = 8;
         return BitmapFactory.decodeFile(picturePath, option);
+    }
+
+    public static String getNowDate(String matchstr) {
+        SimpleDateFormat formatter = new SimpleDateFormat(matchstr, Locale.CHINA);
+        Date curDate = new Date(System.currentTimeMillis());// 获取当前时间
+        return formatter.format(curDate);
     }
 }

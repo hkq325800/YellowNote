@@ -9,6 +9,7 @@ import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.utilities.CrashHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.securepreferences.SecurePreferences;
 
@@ -50,9 +51,11 @@ public class MyApplication extends Application {
 
     @Override
     public void onCreate() {
-        AVOSCloud.initialize(getApplicationContext(),
-                Config.APP_ID, Config.APP_KEY);
         context = getApplicationContext();
+        AVOSCloud.initialize(context,
+                Config.APP_ID, Config.APP_KEY);
+        CrashHandler crashHandler = CrashHandler.getInstance();
+        crashHandler.init(context);
         shared = new SecurePreferences(context);
         user = shared.getString(Config.KEY_User, "");
         if (!user.equals(""))

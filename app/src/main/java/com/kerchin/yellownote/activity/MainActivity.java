@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity
                 //设置导航栏颜色
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
                 setStatusBarColor(R.color.lightSkyBlue);
-            } else {
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 //透明状态栏
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
                 //透明导航栏
@@ -112,11 +112,15 @@ public class MainActivity extends BaseActivity
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
+            Trace.d("initializeData null");
             noteFragment = NoteFragment.newInstance(null);
             folderFragment = FolderFragment.newInstance(null);
         } else {
-            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
-            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
+            Trace.d("initializeData else");
+            noteFragment = NoteFragment.newInstance(null);
+            folderFragment = FolderFragment.newInstance(null);
+//            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
+//            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
         }
         fragments.add(noteFragment);
         fragments.add(folderFragment);
@@ -202,7 +206,7 @@ public class MainActivity extends BaseActivity
                 }
             }
         });
-        mMainDrawer.setDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+        mMainDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerSlide(View drawerView, float slideOffset) {
                 toggle.onDrawerSlide(drawerView, slideOffset);
@@ -216,6 +220,7 @@ public class MainActivity extends BaseActivity
                 btnDelete.setVisible(false);
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager.isActive()) {
+                    //noinspection ConstantConditions
                     inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
                 }
 //                mSearchView.onActionViewCollapsed();
@@ -243,7 +248,7 @@ public class MainActivity extends BaseActivity
 
     private ToolbarStatus getFragmentStatus() {
         if (noteFragment != null && folderFragment != null) {
-            switch (MyApplication.thisPosition) {//TODO null pointer
+            switch (MyApplication.thisPosition) {
                 case 0:
                     return noteFragment.getMainStatus();
                 case 1:
@@ -276,6 +281,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        Trace.d("onCreateOptionsMenu" + noteFragment.toString());
         getMenuInflater().inflate(R.menu.main, menu);
         btnSearch = mMainToolbar.getMenu().getItem(0);
         btnSort = mMainToolbar.getMenu().getItem(1);
@@ -375,13 +381,13 @@ public class MainActivity extends BaseActivity
     public boolean isHide = false;
 
     public void showBtnAdd() {
-        Trace.d("showBtnAddDelay");
+//        Trace.d("showBtnAddDelay");
         isHide = false;
         handler.sendEmptyMessage(showBtnAdd);
     }
 
     public void hideBtnAdd() {
-        Trace.d("hideBtnAdd");
+//        Trace.d("hideBtnAdd");
         isHide = true;
         handler.sendEmptyMessage(hideBtnAdd);
     }
@@ -454,6 +460,7 @@ public class MainActivity extends BaseActivity
             /*隐藏软键盘*/
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager.isActive()) {
+                //noinspection ConstantConditions
                 inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
             return true;

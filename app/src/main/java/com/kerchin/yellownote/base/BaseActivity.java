@@ -24,15 +24,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //重启
 //        Intent i = getBaseContext().getPackageManager()
 //                .getLaunchIntentForPackage(getBaseContext().getPackageName());
 //        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //        startActivity(i);
-
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

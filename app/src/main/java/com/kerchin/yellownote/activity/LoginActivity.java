@@ -11,7 +11,6 @@ import android.text.InputFilter;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -451,7 +450,7 @@ public class LoginActivity extends User {
                     new CountDownTimer(count * 60 * 1000, 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
-                            mLoginSendProvBtn.setText("发送成功" + (millisUntilFinished) / 1000);
+                            mLoginSendProvBtn.setText("发送成功" + ((millisUntilFinished) / 1000));
                         }
 
                         @Override
