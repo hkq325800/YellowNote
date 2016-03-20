@@ -52,6 +52,7 @@ public class Note {
         this.content = content;
         this.folder = folder;
         this.folderId = folderId;
+        preview = content.replace("\n", " ");
         this.type = type;
     }
 
@@ -77,7 +78,6 @@ public class Note {
     }
 
     public String getPreview() {
-        preview = NormalUtils.getStringPreview(content);
         return preview;
     }
 

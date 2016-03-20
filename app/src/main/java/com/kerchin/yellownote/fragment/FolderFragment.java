@@ -435,10 +435,10 @@ public class FolderFragment extends BaseFragment {
 //                lastVisibleItemPosition = firstVisibleItem;
             }
         });
-        MyApplication.listFolder = new ArrayList<>();
+        MyApplication.listFolder = new ArrayList<>();//初始化列表
         status = statusDataGot;
         statusName = "dataGot";
-        getData(statusDataGot);
+        getData(statusDataGot);//首次加载数据
     }
 
     private void getData(byte statusCode) {

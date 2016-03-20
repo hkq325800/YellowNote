@@ -24,6 +24,12 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    /**
+     * 跳转activity
+     *
+     * @param context  上下文
+     * @param activity 目标activity
+     */
     public static void goToActivity(Activity context, Class activity) {
         Intent intent = new Intent();
         intent.setClass(context, activity);
@@ -32,6 +38,12 @@ public class NormalUtils {
                 R.anim.push_left_out);*/
     }
 
+    /**
+     * 计算md5值
+     *
+     * @param val 源
+     * @return String
+     */
     public static String md5(String val) {
         char hexDigits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         try {
@@ -57,11 +69,17 @@ public class NormalUtils {
         }
     }
 
+    /**
+     * 返回Note中的日期字符串
+     *
+     * @param date Date类型
+     * @return String
+     */
     public static String getDateString(Date date) {
         Calendar now = Calendar.getInstance();
         Calendar c = Calendar.getInstance();
         c.setTime(date);
-        SimpleDateFormat formatter = new SimpleDateFormat(" HH:mm:ss", Locale.CHINA);/* HH:mm:ss*/
+        SimpleDateFormat formatter = new SimpleDateFormat(" HH:mm:ss", Locale.CHINA);
         if (c.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
             int d1 = c.get(Calendar.DAY_OF_YEAR);
             int d2 = now.get(Calendar.DAY_OF_YEAR);
@@ -79,6 +97,7 @@ public class NormalUtils {
     }
 
     /**
+     * WaterDropListViewHeader——
      * Map a value within a given range to another range.
      *
      * @param value    the value to map
@@ -101,6 +120,7 @@ public class NormalUtils {
     }
 
     /**
+     * WaterDropListView——
      * convert drawable to bitmap
      *
      * @param drawable source
@@ -116,24 +136,14 @@ public class NormalUtils {
         return bitmap;
     }
 
-    public static String getStringPreview(String str) {
-        String preview;
-//        if (str.length() < 50) {
-        preview = str.replace("\n", " ");
-//        } else {
-//            preview = str.replace("\n", " ").substring(0, 50) + "...";
-//        }
-        return preview;
-    }
-
     /**
      * Intent i = new Intent(
      * Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
      * startActivityForResult(i, RESULT_LOAD_IMAGE);
      *
-     * @param context 上下文
+     * @param context       上下文
      * @param selectedImage 选择的图片的uri
-     * @param widget 控件
+     * @param widget        控件
      */
     public static void setDrawableToWidget(Context context, Uri selectedImage, ImageView widget) {
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
@@ -155,8 +165,13 @@ public class NormalUtils {
         return BitmapFactory.decodeFile(picturePath, option);
     }
 
-    public static String getNowDate(String matchstr) {
-        SimpleDateFormat formatter = new SimpleDateFormat(matchstr, Locale.CHINA);
+    /**
+     * 获取匹配字符串格式的日期字符串
+     * @param matchStr 匹配字符串
+     * @return String
+     */
+    public static String getNowDate(String matchStr) {
+        SimpleDateFormat formatter = new SimpleDateFormat(matchStr, Locale.CHINA);
         Date curDate = new Date(System.currentTimeMillis());// 获取当前时间
         return formatter.format(curDate);
     }

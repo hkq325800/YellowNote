@@ -1,5 +1,7 @@
 package com.kerchin.yellownote.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -362,6 +364,14 @@ public class MainActivity extends BaseActivity
                             .alpha(1)
                             .scaleX(1)
                             .scaleY(1)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationStart(Animator animation) {
+                                    super.onAnimationStart(animation);
+                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+                                        mMainFab.setVisibility(View.VISIBLE);
+                                }
+                            })
                             .setDuration(300).start();
                     break;
                 case hideBtnAdd:
@@ -369,6 +379,14 @@ public class MainActivity extends BaseActivity
                             .scaleX(0)
                             .scaleY(0)
                             .alpha(0)
+                            .setListener(new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    super.onAnimationEnd(animation);
+                                    if (mMainFab.getVisibility() == View.VISIBLE)
+                                        mMainFab.setVisibility(View.INVISIBLE);
+                                }
+                            })
                             .setDuration(200).start();
                     break;
                 default:

@@ -10,6 +10,7 @@ public class SimpleNote {
     private String folderId;
     private int folderPosition;
     private boolean isShown;
+    private int brotherCount;
 
     public SimpleNote(int id,String name,String folderId){
         this.id = id;
@@ -64,5 +65,13 @@ public class SimpleNote {
 
     public void setFolderPosition(int folderPosition) {
         this.folderPosition = folderPosition;
+    }
+
+    public int getBrotherCount() {
+        return brotherCount;
+    }
+
+    public void setBrotherCount(int brotherCount) {
+        this.brotherCount = brotherCount;
     }
 }
