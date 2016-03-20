@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -380,6 +381,13 @@ public class EditActivity extends BaseHasSwipeActivity {
                     isNew = false;
                     isFolderChanged = false;
                 } catch (AVException e) {
+                    Message msg = Message.obtain();
+                    msg.obj = false;
+                    msg.what = handle4saveChange;
+                    handler.sendMessage(msg);
+                    Looper.prepare();
+                    Trace.show(EditActivity.this, "保存更改失败" + Trace.getErrorMsg(e));
+                    Looper.loop();
                     e.printStackTrace();
                 }
             }

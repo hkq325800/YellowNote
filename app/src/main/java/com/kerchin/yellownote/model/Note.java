@@ -185,6 +185,8 @@ public class Note {
                                 avObject.saveInBackground(new SaveCallback() {
                                     @Override
                                     public void done(AVException e) {
+                                        Message msg = Message.obtain();
+                                        msg.what = handle4saveChange;
                                         if (e == null) {
                                             NoteFragment.isChanged4note = true;
                                             title = newTitle;
@@ -193,14 +195,11 @@ public class Note {
                                             objectId = newNote.getObjectId();
 
                                             Log.d("saveFolderNum+1", "成功");
-                                            Message msg = Message.obtain();
                                             msg.obj = true;
-                                            msg.what = handle4saveChange;
                                             handler.sendMessage(msg);
                                         } else {
-                                            Message msg = Message.obtain();
                                             msg.obj = false;
-                                            msg.what = handle4saveChange;
+                                            handler.sendMessage(msg);
                                             Trace.show(context, "folderNum+1失败" + Trace.getErrorMsg(e));
                                             e.printStackTrace();
                                         }
@@ -227,19 +226,17 @@ public class Note {
             Note.saveInBackground(new SaveCallback() {
                 @Override
                 public void done(AVException e) {
+                    Message msg = Message.obtain();
+                    msg.what = handle4saveChange;
                     if (e == null) {
                         title = newTitle;
                         content = newContent;
                         NoteFragment.isChanged4note = true;
                         Log.d("saveModifyNote", "成功");
-                        Message msg = Message.obtain();
                         msg.obj = true;
-                        msg.what = handle4saveChange;
                         handler.sendMessage(msg);
                     } else {
-                        Message msg = Message.obtain();
                         msg.obj = false;
-                        msg.what = handle4saveChange;
                         handler.sendMessage(msg);
                         Trace.show(context, "保存更改失败" + Trace.getErrorMsg(e));
                         e.printStackTrace();

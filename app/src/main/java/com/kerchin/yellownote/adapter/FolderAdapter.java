@@ -605,15 +605,15 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 mFolderItemRelative.setAlpha(0);
                 mFolderItemRelative.animate()
                         .alpha(1)
-                        .setDuration(400).start();
+                        .setDuration(300).start();
                 valueAnimator = ValueAnimator.ofFloat(0, context.getResources().getDimension(R.dimen.folder_item_height));
-                valueAnimator.setDuration(400);
+                valueAnimator.setDuration(350);
             } else {
                 status = false;
                 mFolderItemRelative.setAlpha(1);
                 mFolderItemRelative.animate()
                         .alpha(0)
-                        .setDuration(250).start();
+                        .setDuration(300).start();
                 valueAnimator = ValueAnimator.ofFloat(context.getResources().getDimension(R.dimen.folder_item_height), 0);
                 valueAnimator.setDuration(250);
             }
