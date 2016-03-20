@@ -1,19 +1,24 @@
-package com.kerchin.yellownote.activity;
+package com.kerchin.yellownote.base;
 
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.WindowManager;
 
+import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
- * Created by Administrator on 2016/3/6 0006.
+ * Created by hailonghan on 15/6/9.
  */
-public abstract class BaseActivity extends AppCompatActivity {
-    public final static String TAG = BaseActivity.class.getCanonicalName();
+public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity /*implements SlidingPaneLayout.PanelSlideListener*/ {
+
+    //    public boolean isExisTitle = true;
+    //是否支持滑动返回
+//    public boolean isSupportSwipeBack = true;
+    public final static String TAG = BaseHasSwipeActivity.class.getCanonicalName();
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -34,18 +39,35 @@ public abstract class BaseActivity extends AppCompatActivity {
 //                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 //        }
 
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//        }
+        setContentView(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                // Translucent status bar
+//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+//                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+                //设置状态栏颜色
+//                getWindow().setStatusBarColor(getResources().getColor(R.color.lightSkyBlue));
+                //设置导航栏颜色
+                getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
+                setStatusBarColor(R.color.lightSkyBlue);
+            }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            }
+        }
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
 //            contentView.setBackgroundColor(getResources().getColor(R.color.lightSkyBlue));
-//            contentView.setPadding(0, 30, 0 ,0);
+//            contentView.setPadding(0, getStatusBarHeight(this), 0 ,0);
 //        }
 
-        setContentView(savedInstanceState);
         //initTitleView();
         //onTitleClick();
         initializeView(savedInstanceState);

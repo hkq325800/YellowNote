@@ -24,13 +24,12 @@ import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipActivity;
+import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.model.Note;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.MyScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Administrator on 2015/9/30 0030.
  */
-public class EditActivity extends BaseHasSwipActivity {
+public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4noTitle = 0;
     private static final byte handle4finish = 1;
     private static final byte handle4noContent = 2;

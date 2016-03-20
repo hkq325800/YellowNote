@@ -18,7 +18,7 @@ import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipActivity;
+import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -33,7 +33,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Administrator on 2016/3/5 0005.
  */
-public class SettingActivity extends BaseHasSwipActivity {
+public class SettingActivity extends BaseHasSwipeActivity {
     @Bind(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
     @Bind(R.id.mNavigationLeftBtn)
