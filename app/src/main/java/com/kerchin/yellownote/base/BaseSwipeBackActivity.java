@@ -19,6 +19,14 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity implements
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
 
+    public void closeSliding(){
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
+    }
+
+    public void openSliding(){
+        mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         mHelper = new SlidingActivityHelper(this);

@@ -97,6 +97,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 //                    timer.cancel();
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
+                    openSliding();
                     if ((boolean) msg.obj) {
                         Trace.show(EditActivity.this, "保存成功");
                         mEditDeleteLinear.setVisibility(View.VISIBLE);
@@ -249,6 +250,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                         || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                         || isFolderChanged) {
                     mNavigationRightBtn.setText("保存中..");
+                    closeSliding();
                     mNavigationRightBtn.setEnabled(false);
 //                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod) {
 //                        @Override
@@ -331,7 +333,8 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onClick(View v) {
                 EditText et = (EditText) v;
-                textSelection.set(index - 1, et.getSelectionEnd());
+                if (textSelection.size() != 0)
+                    textSelection.set(index == 0 ? 0 : index - 1, et.getSelectionEnd());
             }
         });
         mEditContentEdt.addTextChangedListener(new TextWatcher() {

@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
@@ -36,6 +38,7 @@ import butterknife.ButterKnife;
  * Created by KerchinHuang on 2016/1/31 0031.
  */
 public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> /*implements OnItemMoveListener*/ {
+    public static int animDuration = 450;
     private Context context;
     // 笔记夹名
     public static final int TYPE_HEADER = 0;
@@ -126,16 +129,12 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         final View view;
-//        final int position;
         switch (viewType) {
             case TYPE_HEADER:
                 view = mInflater.inflate(R.layout.item_folder_header, parent, false);
-//                position = headersNum;
-//                headersNum++;
                 return new HeaderViewHolder(view);
             case TYPE_ITEM:
                 view = mInflater.inflate(R.layout.item_folder_item, parent, false);
-//                position = itemViewHolder.getAdapterPosition();
                 return new ItemViewHolder(view);
         }
         return null;
@@ -197,37 +196,45 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     break;
                 }
             }
-            if (thisItem != null && !thisItem.isShown()) {
-                //关闭动画
-                if (thisItem.getFolderPosition() == lastFolderPosition) {
-                    mHolder.runAnimator(false);
-                } else
-                    mHolder.mFolderItemRelative.getLayoutParams().height = 0;
-            } else if (thisItem != null) {
-                //开启动画
-                if (thisItem.getFolderPosition() == shownFolderPosition) {
-                    mHolder.runAnimator(true);
+            if (thisItem != null) {
+                //应当为isShown的状态 目前是mHolder.isShown的状态
+                Trace.d(thisItem.isShown()+"");
+                if (!thisItem.isShown()) {
+                    //关闭动画
+                    if (thisItem.getFolderPosition() == lastFolderPosition) {
+//                        Trace.d(thisItem.getFolderPosition()+"关闭1");
+                        mHolder.runAnimator(false);
+                    } else {
+//                        Trace.d(thisItem.getFolderPosition()+"关闭2");
+                        mHolder.mFolderItemRelative.getLayoutParams().height = 0;
+                    }
                 } else {
-                    mHolder.mFolderItemRelative.getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
-                }
-                if (isEditMode) {
-                    mHolder.mFolderItemImg.setVisibility(View.VISIBLE);
-                } else {
-                    mHolder.mFolderItemImg.setVisibility(View.GONE);
-                }
-                mHolder.mFolderItemTxt.setOnLongClickListener(new View.OnLongClickListener() {
-                    @Override
-                    public boolean onLongClick(final View v) {
+                    //开启动画
+                    if (thisItem.getFolderPosition() == shownFolderPosition) {
+//                        Trace.d(thisItem.getFolderPosition()+"开启1");
+                        mHolder.runAnimator(true);//后行 等待关闭动画结束
+                    } else {
+//                        Trace.d(thisItem.getFolderPosition()+"开启2");
+                        mHolder.mFolderItemRelative.getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
+                    }
+                    if (isEditMode) {
+                        mHolder.mFolderItemImg.setVisibility(View.VISIBLE);
+                    } else {
+                        mHolder.mFolderItemImg.setVisibility(View.GONE);
+                    }
+                    mHolder.mFolderItemTxt.setOnLongClickListener(new View.OnLongClickListener() {
+                        @Override
+                        public boolean onLongClick(final View v) {
 //                        if (!isEditMode) {
 //                            RecyclerView recyclerView = ((RecyclerView) parent);
 //                            startEditMode(recyclerView);
-                        // header 按钮文字 改成 "完成"
+                            // header 按钮文字 改成 "完成"
 //                            View view = recyclerView.getChildAt(0);
 //                            if (view == recyclerView.getLayoutManager().findViewByPosition(0)) {
 //                                TextView tvBtnEdit = (TextView) view.findViewById(R.id.tv_btn_edit);
 //                                tvBtnEdit.setText("完成");
 //                            }
-                        mItemTouchHelper.startDrag(mHolder);
+                            mItemTouchHelper.startDrag(mHolder);
 //                        } else {
 //                            RecyclerView recyclerView = ((RecyclerView) parent);
 //                            cancelEditMode(recyclerView);
@@ -237,32 +244,33 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 //                                tvBtnEdit.setText("编辑");
 //                            }
 //                        }
-                        return true;
-                    }
-                });
-
-                mHolder.mFolderItemTxt.setOnTouchListener(new View.OnTouchListener() {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event) {
-                        if (isEditMode) {
-                            switch (MotionEventCompat.getActionMasked(event)) {
-                                case MotionEvent.ACTION_DOWN:
-                                    startTime = System.currentTimeMillis();
-                                    break;
-                                case MotionEvent.ACTION_MOVE:
-                                    if (System.currentTimeMillis() - startTime > SPACE_TIME) {
-                                        mItemTouchHelper.startDrag(mHolder);
-                                    }
-                                    break;
-                                case MotionEvent.ACTION_CANCEL:
-                                case MotionEvent.ACTION_UP:
-                                    startTime = 0;
-                                    break;
-                            }
+                            return true;
                         }
-                        return false;
-                    }
-                });
+                    });
+
+                    mHolder.mFolderItemTxt.setOnTouchListener(new View.OnTouchListener() {
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            if (isEditMode) {
+                                switch (MotionEventCompat.getActionMasked(event)) {
+                                    case MotionEvent.ACTION_DOWN:
+                                        startTime = System.currentTimeMillis();
+                                        break;
+                                    case MotionEvent.ACTION_MOVE:
+                                        if (System.currentTimeMillis() - startTime > SPACE_TIME) {
+                                            mItemTouchHelper.startDrag(mHolder);
+                                        }
+                                        break;
+                                    case MotionEvent.ACTION_CANCEL:
+                                    case MotionEvent.ACTION_UP:
+                                        startTime = 0;
+                                        break;
+                                }
+                            }
+                            return false;
+                        }
+                    });
+                }
             }
         }
     }
@@ -368,6 +376,15 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             lastFolderPosition = shownFolderPosition;
             shownFolderPosition = position;
 //            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
+            notifyDataSetChanged();
+        } else {
+            for (int i = 0; i < mNotes.size(); i++) {
+                if (mNotes.get(i).getFolderPosition() == position) {
+                    mNotes.get(i).setIsShown(false);
+                }
+            }
+            lastFolderPosition = shownFolderPosition;
+            shownFolderPosition = -1;
             notifyDataSetChanged();
         }
     }
@@ -590,8 +607,10 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         ImageView mFolderItemImg;
         @Bind(R.id.mFolderItemRelative)
         RelativeLayout mFolderItemRelative;
-        private boolean status = false;
         private ValueAnimator valueAnimator;
+        public boolean isShown = false;
+        private DecelerateInterpolator di = new DecelerateInterpolator();
+        private AccelerateInterpolator ai = new AccelerateInterpolator();
 
         public ItemViewHolder(View itemView) {
             super(itemView);
@@ -601,23 +620,25 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void runAnimator(boolean isExpand) {
             if (isExpand) {
-                status = true;
+                isShown = true;
                 mFolderItemRelative.setAlpha(0);
                 mFolderItemRelative.animate()
                         .alpha(1)
-                        .setDuration(300).start();
+                        .setInterpolator(ai)
+                        .setDuration(animDuration).start();
                 valueAnimator = ValueAnimator.ofFloat(0, context.getResources().getDimension(R.dimen.folder_item_height));
-                valueAnimator.setDuration(350);
+                valueAnimator.setInterpolator(ai);
             } else {
-                status = false;
+                isShown = false;
                 mFolderItemRelative.setAlpha(1);
                 mFolderItemRelative.animate()
-                        .alpha(0)
-                        .setDuration(300).start();
+                        .alpha(0.2f)
+                        .setInterpolator(di)
+                        .setDuration(animDuration).start();
                 valueAnimator = ValueAnimator.ofFloat(context.getResources().getDimension(R.dimen.folder_item_height), 0);
-                valueAnimator.setDuration(250);
+                valueAnimator.setInterpolator(di);
             }
-            valueAnimator.setInterpolator(new LinearInterpolator());
+            valueAnimator.setDuration(animDuration);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 public void onAnimationUpdate(ValueAnimator animation) {
                     Float value = (Float) animation.getAnimatedValue();

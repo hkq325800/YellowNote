@@ -8,7 +8,7 @@ public class SimpleNote {
     private int headerBefore;
     private String name;
     private String folderId;
-    private int folderPosition;
+    private int folderPosition = 0;
     private boolean isShown;
     private int brotherCount;
 
