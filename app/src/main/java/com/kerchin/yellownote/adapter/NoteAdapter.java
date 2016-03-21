@@ -65,12 +65,13 @@ public class NoteAdapter extends BaseAdapter {
     }
 
     private void setValue(int position) {
-        holder.mNoteItemTitleTxt.setText(infos.get(position).getTitle());
-        holder.mNoteItemDateTxt.setText(infos.get(position).getShowDate());
-        holder.mNoteItemPreviewTxt.setText(infos.get(position).getPreview());
-        holder.mNoteItemFolderTxt.setText(infos.get(position).getFolder());
+        final Note note = infos.get(position);
+        holder.mNoteItemTitleTxt.setText(note.getTitle());
+        holder.mNoteItemDateTxt.setText(note.getShowDate());
+        holder.mNoteItemPreviewTxt.setText(note.getPreview());
+        holder.mNoteItemFolderTxt.setText(note.getFolder());
         if (isDelete) {
-            if (listDelete.contains(infos.get(position))) {
+            if (listDelete.contains(note)) {
                 holder.mNoteItemDeleteImg.setImageResource(R.mipmap.delete_true);
             } else {
                 holder.mNoteItemDeleteImg.setImageResource(R.mipmap.delete);
