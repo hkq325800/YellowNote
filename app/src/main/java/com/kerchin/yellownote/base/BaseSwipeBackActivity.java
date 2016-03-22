@@ -32,13 +32,12 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity implements
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);
 
-        setSlidingActionBarEnabled(true);
+        setSlidingActionBarEnabled(false);
         //这里借用了SlidingMenu的setBehindContentView方法来设置一个透明菜单
         View behindView = new View(this);
         behindView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         behindView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         setBehindContentView(behindView);
-
         mSlidingMenu = getSlidingMenu();
         //设置阴影宽度为10个px
         mSlidingMenu.setShadowWidth(10);

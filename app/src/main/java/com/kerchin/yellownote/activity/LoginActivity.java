@@ -84,12 +84,14 @@ public class LoginActivity extends User {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case wel:
+                    Trace.d("wel");
                     setContentView(R.layout.activity_login);
                     immerge(R.color.lightSkyBlue);
                     init();
                     System.gc();
                     break;
                 case reLog:
+                    Trace.d("reLog");
                     setContentView(R.layout.activity_login);
                     immerge(R.color.lightSkyBlue);
                     init();
@@ -133,6 +135,7 @@ public class LoginActivity extends User {
             logoutFlag = false;
             setContentView(R.layout.fragment_welcome);
             immerge(R.color.minionYellow);
+            Trace.d("onCreate");
             LinearLayout mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
             mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
                 @Override

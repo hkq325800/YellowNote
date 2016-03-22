@@ -12,7 +12,10 @@ import com.kerchin.yellownote.utilities.Trace;
 /**
  * Created by Administrator on 2016/3/6 0006.
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity /*implements SlidingPaneLayout.PanelSlideListener*/ {
+//    public boolean isExisTitle = true;
+    //是否支持滑动返回
+//    public boolean isSupportSwipeBack = true;
     public final static String TAG = BaseActivity.class.getCanonicalName();
 
     @Override

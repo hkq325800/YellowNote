@@ -198,7 +198,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             if (thisItem != null) {
                 //应当为isShown的状态 目前是mHolder.isShown的状态
-                Trace.d(thisItem.isShown()+"");
+//                Trace.d(thisItem.isShown()+"");
                 if (!thisItem.isShown()) {
                     //关闭动画
                     if (thisItem.getFolderPosition() == lastFolderPosition) {

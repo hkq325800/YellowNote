@@ -277,10 +277,13 @@ public class NoteFragment extends BaseFragment
         addClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity m = (MainActivity) getActivity();
-                m.hideBtnAdd();
-                EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , MyApplication.userDefaultFolderId, "text"));
+                if (MyApplication.listFolder.size() > 0) {
+                    MainActivity m = (MainActivity) getActivity();
+                    m.hideBtnAdd();
+                    EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
+                            , MyApplication.userDefaultFolderId, "text"));
+                } else
+                    Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
             }
         };
         queryTextListener = new SearchView.OnQueryTextListener() {

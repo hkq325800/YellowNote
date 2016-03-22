@@ -7,17 +7,15 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
  * Created by hailonghan on 15/6/9.
  */
-public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity /*implements SlidingPaneLayout.PanelSlideListener*/ {
+public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 
-    //    public boolean isExisTitle = true;
-    //是否支持滑动返回
-//    public boolean isSupportSwipeBack = true;
     public final static String TAG = BaseHasSwipeActivity.class.getCanonicalName();
 
     @Override
@@ -29,18 +27,10 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity /*imple
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Intent i = getBaseContext().getPackageManager()
-//                .getLaunchIntentForPackage(getBaseContext().getPackageName());
-//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(i);
-
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
 
         setContentView(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //Android5.0版本
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
                         | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -56,33 +46,28 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity /*imple
                 //设置导航栏颜色
                 getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
                 setStatusBarColor(R.color.lightSkyBlue);
-            }else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
                         WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             }
         }
 
+//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        }
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
 //            contentView.setBackgroundColor(getResources().getColor(R.color.lightSkyBlue));
-//            contentView.setPadding(0, getStatusBarHeight(this), 0 ,0);
+//            contentView.setPadding(0, NormalUtils.getStatusBarHeight(this), 0 ,0);
 //        }
 
-        //initTitleView();
-        //onTitleClick();
+//        initTitleView();
+//        onTitleClick();
         initializeView(savedInstanceState);
         initializeData(savedInstanceState);
         initializeClick(savedInstanceState);
 //        initSwipeBackFinish();
-    }
-
-    public static int getStatusBarHeight(Context context) {
-        int result = 0;
-        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            result = context.getResources().getDimensionPixelSize(resourceId);
-        }
-        return result;
     }
 
     protected abstract void setContentView(Bundle savedInstanceState);
