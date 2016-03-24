@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -152,7 +151,7 @@ public class SettingActivity extends BaseHasSwipeActivity {
         query.findInBackground(new FindCallback<AVObject>() {
             public void done(List<AVObject> avObjects, AVException e) {
                 if (e == null) {
-                    Log.d("查询isAbleToSuggest", "查询到" + avObjects.size() + " 条符合条件的数据");
+                    Trace.d("查询isAbleToSuggest 查询到" + avObjects.size() + " 条符合条件的数据");
                     if (avObjects.size() > 0) {
                         boolean flag = avObjects.get(0).getBoolean("isAbleToSuggest");
                         if (!flag) {

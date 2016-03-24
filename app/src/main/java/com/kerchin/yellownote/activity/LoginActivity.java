@@ -8,7 +8,6 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -300,7 +299,7 @@ public class LoginActivity extends User {
                             public void onTick(long millisUntilFinished) {
                                 if (registerStatus > statusInit) {
                                     cancel();
-                                    Log.d("CDTimer isRegisted", "server echo " + millisUntilFinished);
+                                    Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                                     if (registerStatus == statusTrue) {
                                         sendProv(false, txtUser, count);
                                     } else {
@@ -322,7 +321,7 @@ public class LoginActivity extends User {
                             public void onTick(long millisUntilFinished) {
                                 if (registerStatus > statusInit) {
                                     cancel();
-                                    Log.d("CDTimer isRegisted", "server echo " + millisUntilFinished);
+                                    Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                                     if (registerStatus == statusFalse) {
                                         sendProv(true, txtUser, count);
                                     } else {
@@ -362,10 +361,10 @@ public class LoginActivity extends User {
     protected void signUp() {
         final String txtUser = mLoginUserEdt.getText().toString();
         final String txtPass = mLoginPassEdt.getText().toString();
-        String txtRepass = mLoginRePassEdt.getText().toString();
+        String txtRePass = mLoginRePassEdt.getText().toString();
         final String txtProv = mLoginProveEdt.getText().toString();
         //表格检查
-        if (tableCheck(txtUser, txtPass, txtRepass, txtProv)) {
+        if (tableCheck(txtUser, txtPass, txtRePass, txtProv)) {
             //验证验证码成功则注册成功以该帐号登录
             if (Config.isDebugMode)
                 signUpVerify(txtUser, txtPass);
@@ -377,7 +376,7 @@ public class LoginActivity extends User {
                         if (smsStatus) {
                             cancel();
                             smsStatus = false;
-                            Log.d("CDTimer signUp", "server echo " + millisUntilFinished);
+                            Trace.d("CDTimer signUp server echo " + millisUntilFinished);
                             signUpVerify(txtUser, txtPass);
                         }
                     }
@@ -407,7 +406,7 @@ public class LoginActivity extends User {
                 public void onTick(long millisUntilFinished) {
                     if (registerStatus > statusInit) {
                         cancel();
-                        Log.d("CDTimer isRegisted", "server echo " + millisUntilFinished);
+                        Trace.d("CDTimer is registered server echo " + millisUntilFinished);
                         if (registerStatus == statusFalse) {
                             Trace.show(LoginActivity.this, "该帐号尚未注册");
                         } else {
@@ -419,7 +418,7 @@ public class LoginActivity extends User {
                                     if (smsStatus) {
                                         cancel();
                                         smsStatus = false;
-                                        Log.d("CDTimer SMSVerify", "server echo " + millisUntilFinished);
+                                        Trace.d("CDTimer SMSVerify server echo " + millisUntilFinished);
                                         forgetVerify(txtUser, txtPass);
                                     }
                                 }
@@ -479,7 +478,7 @@ public class LoginActivity extends User {
                     @Override
                     public void done(AVException ex) {
                         if (ex != null) {
-                            Log.e("验证验证码失败", ex.getMessage());
+                            Trace.e("验证验证码失败"+Trace.getErrorMsg(ex));
                             ex.printStackTrace();
                             Trace.show(LoginActivity.this, "验证码错误");
                         } else {
@@ -503,7 +502,7 @@ public class LoginActivity extends User {
                 query.findInBackground(new FindCallback<AVObject>() {
                     public void done(List<AVObject> avObjects, AVException e) {
                         if (e == null) {
-                            Log.d("查询缓存", "查询到" + avObjects.size() + " 条符合条件的数据");
+                            Trace.d("查询缓存 查询到" + avObjects.size() + " 条符合条件的数据");
                             if (avObjects.size() > 0) {
                                 boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
                                 Trace.d("isFrozen " + isFrozen);
@@ -546,7 +545,7 @@ public class LoginActivity extends User {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     if (registerStatus > statusInit) {
-                        Log.d("CDTimer isRegisted", "server echo " + millisUntilFinished);
+                        Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                         if (registerStatus == statusFalse) {
                             Trace.show(LoginActivity.this, "该帐号尚未注册");
                         } else {
@@ -557,7 +556,7 @@ public class LoginActivity extends User {
                             query.findInBackground(new FindCallback<AVObject>() {
                                 public void done(List<AVObject> avObjects, AVException e) {
                                     if (e == null) {
-                                        Log.d("登陆验证", "查询到" + avObjects.size() + " 条符合条件的数据");
+                                        Trace.d("登陆验证 查询到" + avObjects.size() + " 条符合条件的数据");
                                         if (avObjects.size() > 0) {
                                             boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
                                             Trace.d("isFrozen " + isFrozen);
@@ -601,7 +600,7 @@ public class LoginActivity extends User {
             @Override
             public void done(AVException e) {
                 if (e == null) {
-                    Log.d("signupVerify", "默认文件夹创建完成");
+                    Trace.d("signUpVerify 默认文件夹创建完成");
                     MyApplication.userDefaultFolderId = Folder.getObjectId();
                     AVObject User = new AVObject("mUser");
                     User.put("user_tel", txtUser);
@@ -611,7 +610,7 @@ public class LoginActivity extends User {
                         @Override
                         public void done(AVException exx) {
                             if (exx == null && mLoginUserEdt != null) {
-                                Log.d("signupVerify", "用户注册完成");
+                                Trace.d("signUpVerify 用户注册完成");
                                 Trace.show(LoginActivity.this, txtUser + "注册成功");
                                 goToMain();
                                 isEnter = false;
@@ -684,7 +683,7 @@ public class LoginActivity extends User {
         query.findInBackground(new FindCallback<AVObject>() {
             public void done(List<AVObject> avObjects, AVException e) {
                 if (e == null) {
-                    Log.d("验证是否已经注册", "查询到" + avObjects.size() + " 条符合条件的数据");
+                    Trace.d("验证是否已经注册 查询到" + avObjects.size() + " 条符合条件的数据");
                     if (avObjects.size() > 0) {
                         objectId = avObjects.get(0).getObjectId();
                         registerStatus = statusTrue;
@@ -740,7 +739,7 @@ public class LoginActivity extends User {
                 Trace.show(LoginActivity.this, "再点击一次退出应用");
                 mExitTime = System.currentTimeMillis();
             } else {
-                Log.i(LOG_TAG, "exit Main");
+                Trace.i(LOG_TAG, "exit Main");
                 finish();
             }
             return true;

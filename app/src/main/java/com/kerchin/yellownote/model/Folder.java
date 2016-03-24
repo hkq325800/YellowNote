@@ -2,7 +2,6 @@ package com.kerchin.yellownote.model;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -59,7 +58,7 @@ public class Folder {
                                 contain -= amount;
                                 //刷新note界面
                                 //handler.sendEmptyMessage(handle4reset);
-                                Log.d("saveFolderNum-" + amount, "成功");
+                                Trace.d("saveFolderNum-" + amount + "成功");
                             } else {
                                 e.printStackTrace();
                             }
@@ -104,7 +103,7 @@ public class Folder {
                 @Override
                 public void done(AVException e) {
                     if (e == null) {
-                        Log.d("reNameFolder", "成功");
+                        Trace.d("reNameFolder 成功");
                         //线下修改
                         name = newName;
                         Trace.show(context, "更名成功");

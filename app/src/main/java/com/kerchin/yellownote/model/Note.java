@@ -4,10 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -109,7 +105,7 @@ public class Note {
                 if (e == null) {
                     NoteFragment.isChanged4note = true;
                     //Toast.makeText(context, "移动成功", Toast.LENGTH_SHORT).show();
-                    Log.d("move2folder", "成功");
+                    Trace.d("move2folder 成功");
                     AVQuery<AVObject> query1 = new AVQuery<AVObject>("Folder");
                     query1.getInBackground(folderId, new GetCallback<AVObject>() {
                         @Override
@@ -120,7 +116,7 @@ public class Note {
                                 @Override
                                 public void done(AVException e) {
                                     if (e == null) {
-                                        Log.d("saveFolderNum-1", "成功");
+                                        Trace.d("saveFolderNum-1 成功");
                                     } else {
                                         e.printStackTrace();
                                     }
@@ -138,7 +134,7 @@ public class Note {
                                 @Override
                                 public void done(AVException e) {
                                     if (e == null) {
-                                        Log.d("saveFolderNum+1", "成功");
+                                        Trace.d("saveFolderNum+1 成功");
                                         folder = newOne.getName();
                                         folderId = newOne.getObjectId();
                                         FolderFragment.isChanged4folder = true;
@@ -174,7 +170,7 @@ public class Note {
                 @Override
                 public void done(AVException e) {
                     if (e == null) {
-                        Log.d("saveNewNote", "成功");
+                        Trace.d("saveNewNote 成功");
                         //folderNum+1
                         AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
                         query.getInBackground(folderId, new GetCallback<AVObject>() {
@@ -194,7 +190,7 @@ public class Note {
                                             //取回objectId
                                             objectId = newNote.getObjectId();
 
-                                            Log.d("saveFolderNum+1", "成功");
+                                            Trace.d("saveFolderNum+1 成功");
                                             msg.obj = true;
                                             handler.sendMessage(msg);
                                         } else {
@@ -232,7 +228,7 @@ public class Note {
                         title = newTitle;
                         content = newContent;
                         NoteFragment.isChanged4note = true;
-                        Log.d("saveModifyNote", "成功");
+                        Trace.d("saveModifyNote 成功");
                         msg.obj = true;
                         handler.sendMessage(msg);
                     } else {
@@ -255,7 +251,7 @@ public class Note {
             @Override
             public void done(AVException e) {
                 if (e == null) {
-                    Log.d("deleteNote", "成功");
+                    Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
                     if (handler != null) {
@@ -283,7 +279,7 @@ public class Note {
                         folder.dec(1);
                     }
                     Trace.show(context, "删除成功");
-                    Log.d("deleteNote", "成功");
+                    Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
                     if (handler != null) {
@@ -308,7 +304,7 @@ public class Note {
                     @Override
                     public void done(AVException e) {
                         if (e == null) {
-                            Log.d("move2folder", title + " 成功");
+                            Trace.d("move2folder" + title + " 成功");
                             //Toast.makeText(context, "移动成功", Toast.LENGTH_SHORT).show();
                             folder = newOne;
                             folderId = newFolderId;

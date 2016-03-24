@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.base.CommonViewHolder;
 import com.kerchin.yellownote.model.Note;
 
 import java.util.List;
@@ -23,11 +24,11 @@ import butterknife.ButterKnife;
 public class NoteAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
-    private ViewHolder holder;
     private List<Note> infos;
     public static List<Note> listDelete;
     public int[] listDeleteNum;
     public boolean isDelete = false;
+    private final int layoutId = R.layout.item_note;
 
     public NoteAdapter(Context context, List<Note> infos) {
         inflater = LayoutInflater.from(context);
@@ -52,47 +53,28 @@ public class NoteAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (null == convertView) {
-            convertView = inflater.inflate(R.layout.item_note,
-                    parent, false);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-        setValue(position);
-        return convertView;
+        CommonViewHolder holder = CommonViewHolder.get(context, convertView, parent, layoutId, position);
+        setValue(position, holder);
+        return holder.getConvertView();
     }
 
-    private void setValue(int position) {
+    private void setValue(int position, CommonViewHolder holder) {
         final Note note = infos.get(position);
-        holder.mNoteItemTitleTxt.setText(note.getTitle());
-        holder.mNoteItemDateTxt.setText(note.getShowDate());
-        holder.mNoteItemPreviewTxt.setText(note.getPreview());
-        holder.mNoteItemFolderTxt.setText(note.getFolder());
+        ((TextView)holder.getView(R.id.mNoteItemTitleTxt)).setText(note.getTitle());
+        ((TextView)holder.getView(R.id.mNoteItemDateTxt)).setText(note.getShowDate());
+        ((TextView)holder.getView(R.id.mNoteItemPreviewTxt)).setText(note.getPreview());
+        ((TextView)holder.getView(R.id.mNoteItemFolderTxt)).setText(note.getFolder());
         if (isDelete) {
             if (listDelete.contains(note)) {
-                holder.mNoteItemDeleteImg.setImageResource(R.mipmap.delete_true);
+                ((ImageView)holder.getView(R.id.mNoteItemDeleteImg)).setImageResource(R.mipmap.delete_true);
             } else {
-                holder.mNoteItemDeleteImg.setImageResource(R.mipmap.delete);
+                ((ImageView)holder.getView(R.id.mNoteItemDeleteImg)).setImageResource(R.mipmap.delete);
             }
-            holder.mNoteItemDateTxt.setVisibility(View.INVISIBLE);
-            holder.mNoteItemDeleteImg.setVisibility(View.VISIBLE);
+            (holder.getView(R.id.mNoteItemDateTxt)).setVisibility(View.INVISIBLE);
+            (holder.getView(R.id.mNoteItemDeleteImg)).setVisibility(View.VISIBLE);
         } else {
-            holder.mNoteItemDateTxt.setVisibility(View.VISIBLE);
-            holder.mNoteItemDeleteImg.setVisibility(View.INVISIBLE);
-        }
-    }
-
-    final class ViewHolder {
-        @Bind(R.id.mNoteItemTitleTxt) TextView mNoteItemTitleTxt;
-        @Bind(R.id.mNoteItemDateTxt) TextView mNoteItemDateTxt;
-        @Bind(R.id.mNoteItemPreviewTxt) TextView mNoteItemPreviewTxt;
-        @Bind(R.id.mNoteItemFolderTxt) TextView mNoteItemFolderTxt;
-        @Bind(R.id.mNoteItemDeleteImg) ImageView mNoteItemDeleteImg;
-
-        public ViewHolder(View view) {
-            ButterKnife.bind(this, view);
+            (holder.getView(R.id.mNoteItemDateTxt)).setVisibility(View.VISIBLE);
+            (holder.getView(R.id.mNoteItemDeleteImg)).setVisibility(View.INVISIBLE);
         }
     }
 }
