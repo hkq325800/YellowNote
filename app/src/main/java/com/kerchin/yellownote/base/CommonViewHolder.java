@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.base;
+package com.iue.pocketpat.common.adapter;
 
 import android.content.Context;
 import android.util.SparseArray;
@@ -16,36 +16,37 @@ public class CommonViewHolder {
 			int position) {
 		mPosition = position;
 		mViews = new SparseArray<View>();
-		mConvertView = LayoutInflater.from(context).inflate(layoutId, parent);
+		mConvertView = LayoutInflater.from(context).inflate(layoutId, parent,
+				false);
 		mConvertView.setTag(this);
 	}
 
 	public static CommonViewHolder get(Context context, View convertView,
 			ViewGroup parent, int layoutId, int position) {
-		if(convertView==null){
+		if (convertView == null) {
 			return new CommonViewHolder(context, parent, layoutId, position);
-		}else{
+		} else {
 			CommonViewHolder holder = (CommonViewHolder) convertView.getTag();
 			holder.mPosition = position;
 			return holder;
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
-	public <T extends View> T getView(int viewId){
+	public <T extends View> T getView(int viewId) {
 		View view = mViews.get(viewId);
-		if(view==null){
+		if (view == null) {
 			view = mConvertView.findViewById(viewId);
 			mViews.put(viewId, view);
 		}
 		return (T) view;
 	}
-	
-	public View getConvertView(){
+
+	public View getConvertView() {
 		return mConvertView;
 	}
-	
-	public CommonViewHolder setText(int viewId, String text){
+
+	public CommonViewHolder setText(int viewId, String text) {
 		((TextView) mViews.get(viewId)).setText(text);
 		return this;
 	}
