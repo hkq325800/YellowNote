@@ -150,8 +150,8 @@ public class MainActivity extends BaseActivity
                     mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
 
-                    if (getFragmentStatus().isDeleteMode())
-                        noteFragment.deleteViewHide();
+//                    if (getFragmentStatus().isDeleteMode())
+//                        noteFragment.deleteViewHide();
                     if (noteFragment.getMainStatus().isSearchMode())
                         noteFragment.restore();
                     showBtnAdd();

@@ -17,24 +17,17 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="150dp"
             android:src="@mipmap/icon" />
 
-        <!--<LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/corners_bg">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:text="小黄云笔记"
-                android:textColor="@color/aquamarine"
-                android:textSize="40sp"
+                android:layout_marginBottom="150dp"
+                android:text=""
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
                 android:typeface="monospace" />
-        </LinearLayout>-->
     </LinearLayout>
 </RelativeLayout>

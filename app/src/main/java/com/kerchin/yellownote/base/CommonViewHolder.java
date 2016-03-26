@@ -1,4 +1,4 @@
-package com.iue.pocketpat.common.adapter;
+package com.kerchin.yellownote.base;
 
 import android.content.Context;
 import android.util.SparseArray;

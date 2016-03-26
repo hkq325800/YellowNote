@@ -79,6 +79,7 @@ public class LoginActivity extends User {
     private static final byte wel = 0;
     private static final byte next = 1;
     private static final byte reLog = 2;
+    private static final byte withoutNet = 3;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -99,6 +100,9 @@ public class LoginActivity extends User {
                 case next:
                     NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                     finish();
+                    break;
+                case withoutNet:
+                    Trace.show(LoginActivity.this, "请检查网络后单击图标重试");
                     break;
                 default:
                     break;
@@ -528,7 +532,9 @@ public class LoginActivity extends User {
                         } else {
                             e.printStackTrace();
                             isNeedToRefresh = true;
-                            Trace.show(LoginActivity.this, "查询缓存失败" + Trace.getErrorMsg(e));
+                            Message message = new Message();//更新UI
+                            message.what = withoutNet;
+                            handler.sendMessageDelayed(message, 1000);
                         }
                     }
                 });

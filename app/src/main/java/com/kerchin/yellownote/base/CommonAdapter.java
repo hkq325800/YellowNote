@@ -1,4 +1,4 @@
-package com.iue.pocketpat.common.adapter;
+package com.kerchin.yellownote.base;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +7,8 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+
+import com.kerchin.yellownote.base.CommonViewHolder;
 
 /**
  * extends CommonAdapter<Bean>

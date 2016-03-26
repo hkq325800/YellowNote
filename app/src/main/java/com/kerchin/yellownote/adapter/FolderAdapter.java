@@ -3,6 +3,7 @@ package com.kerchin.yellownote.adapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.CountDownTimer;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -64,6 +65,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     SimpleNote toItem;
     // 我的频道点击事件
     private OnFolderItemClickListener mFolderItemClickListener;
+    boolean isAnimating = false;
 
     public FolderAdapter(Context context, ItemTouchHelper helper, List<SimpleFolder> mFoldersTrans, List<SimpleNote> mNotesTrans) {
         this.context = context;
@@ -362,30 +364,47 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void openFolder(int position) {
-        if (position != shownFolderPosition) {
-            for (int i = 0; i < mNotes.size(); i++) {
-                //-1
-                if (mNotes.get(i).getFolderPosition() == position) {
-                    mNotes.get(i).setIsShown(true);
+
+        if (!isAnimating) {
+            isAnimating = true;
+            if (position != shownFolderPosition) {
+                for (int i = 0; i < mNotes.size(); i++) {
+                    //-1
+                    if (mNotes.get(i).getFolderPosition() == position) {
+                        mNotes.get(i).setIsShown(true);
+                    }
+                    //+1
+                    if (mNotes.get(i).getFolderPosition() == shownFolderPosition) {
+                        mNotes.get(i).setIsShown(false);
+                    }
                 }
-                //+1
-                if (mNotes.get(i).getFolderPosition() == shownFolderPosition) {
-                    mNotes.get(i).setIsShown(false);
-                }
-            }
-            lastFolderPosition = shownFolderPosition;
-            shownFolderPosition = position;
+                lastFolderPosition = shownFolderPosition;
+                shownFolderPosition = position;
 //            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
-            notifyDataSetChanged();
-        } else {
-            for (int i = 0; i < mNotes.size(); i++) {
-                if (mNotes.get(i).getFolderPosition() == position) {
-                    mNotes.get(i).setIsShown(false);
+                notifyDataSetChanged();
+            } else {
+                for (int i = 0; i < mNotes.size(); i++) {
+                    if (mNotes.get(i).getFolderPosition() == position) {
+                        mNotes.get(i).setIsShown(false);
+                    }
                 }
+                lastFolderPosition = shownFolderPosition;
+                shownFolderPosition = -1;
+                notifyDataSetChanged();
             }
-            lastFolderPosition = shownFolderPosition;
-            shownFolderPosition = -1;
-            notifyDataSetChanged();
+            new CountDownTimer(animDuration,animDuration){
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+
+                    isAnimating = false;
+                }
+            }.start();
         }
     }
 
