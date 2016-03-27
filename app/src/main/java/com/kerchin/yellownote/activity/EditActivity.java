@@ -2,6 +2,7 @@ package com.kerchin.yellownote.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
@@ -48,6 +50,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
     private static final int RESULT_LOAD_IMAGE = 100;
+    private int navLinearHeight = 0;//导航条高度
     private static Note mNote;
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
@@ -80,6 +83,8 @@ public class EditActivity extends BaseHasSwipeActivity {
     Button mNavigationRightBtn;
     @Bind(R.id.mNavigationLeftBtn)
     Button mNavigationLeftBtn;
+    @Bind(R.id.mEditScroll)
+    ScrollView mEditScroll;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -437,22 +442,34 @@ public class EditActivity extends BaseHasSwipeActivity {
         } else if (keyCode == KeyEvent.KEYCODE_MENU) {
             if (isShown) {
                 isShown = false;
-                mEditNavLinear.animate().alpha(0).translationY(-mEditNavLinear.getHeight()).setDuration(160)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                mEditNavLinear.setVisibility(View.GONE);
-                            }
-                        }).start();
+                if (navLinearHeight == 0)
+                    navLinearHeight = mEditNavLinear.getHeight();
+                ValueAnimator a1 = ValueAnimator.ofInt(navLinearHeight, 0);
+                a1.setTarget(mEditNavLinear);
+                a1.setDuration(160);
+                a1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        mEditNavLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
+                        mEditNavLinear.requestLayout();
+                        mEditScroll.requestLayout();
+                    }
+                });
+                a1.start();
             } else {
                 isShown = true;
-                mEditNavLinear.animate().alpha(1).translationY(0).setDuration(160)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                mEditNavLinear.setVisibility(View.VISIBLE);
-                            }
-                        }).start();
+                ValueAnimator a1 = ValueAnimator.ofInt(0, navLinearHeight);
+                a1.setTarget(mEditNavLinear);
+                a1.setDuration(160);
+                a1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        mEditNavLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
+                        mEditNavLinear.requestLayout();
+                        mEditScroll.requestLayout();
+                    }
+                });
+                a1.start();
             }
         }
         return super.onKeyDown(keyCode, event);
