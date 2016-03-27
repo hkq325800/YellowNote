@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -28,7 +25,6 @@ import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
-import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.model.Note;
@@ -51,6 +47,10 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4saveChange = 3;
     private static final int RESULT_LOAD_IMAGE = 100;
     private int navLinearHeight = 0;//导航条高度
+    private int funcHeight = 0;//工具条高度
+    private Double b1, b2;//实践单动画修改两个属性
+    private static final int animDuration = 160;//动画的长度
+    private ValueAnimator animHide, animShow;
     private static Note mNote;
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
@@ -85,6 +85,8 @@ public class EditActivity extends BaseHasSwipeActivity {
     Button mNavigationLeftBtn;
     @Bind(R.id.mEditScroll)
     ScrollView mEditScroll;
+    @Bind(R.id.mEditFuncLinear)
+    LinearLayout mEditFuncLinear;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -444,32 +446,42 @@ public class EditActivity extends BaseHasSwipeActivity {
                 isShown = false;
                 if (navLinearHeight == 0)
                     navLinearHeight = mEditNavLinear.getHeight();
-                ValueAnimator a1 = ValueAnimator.ofInt(navLinearHeight, 0);
-                a1.setTarget(mEditNavLinear);
-                a1.setDuration(160);
-                a1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        mEditNavLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
-                        mEditNavLinear.requestLayout();
-                        mEditScroll.requestLayout();
-                    }
-                });
-                a1.start();
+                if (funcHeight == 0)
+                    funcHeight = mEditFuncLinear.getHeight();
+                if (animHide == null) {
+                    animHide = ValueAnimator.ofInt(animDuration, 0).setDuration(animDuration);
+                    animHide.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
+                            b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
+                            mEditNavLinear.getLayoutParams().height = b1.intValue();
+                            mEditFuncLinear.getLayoutParams().height = b2.intValue();
+                            mEditFuncLinear.requestLayout();
+                            mEditNavLinear.requestLayout();
+                            mEditScroll.requestLayout();
+                        }
+                    });
+                }
+                animHide.start();
             } else {
                 isShown = true;
-                ValueAnimator a1 = ValueAnimator.ofInt(0, navLinearHeight);
-                a1.setTarget(mEditNavLinear);
-                a1.setDuration(160);
-                a1.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        mEditNavLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
-                        mEditNavLinear.requestLayout();
-                        mEditScroll.requestLayout();
-                    }
-                });
-                a1.start();
+                if (animShow == null) {
+                    animShow = ValueAnimator.ofInt(0, animDuration).setDuration(animDuration);
+                    animShow.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
+                            b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
+                            mEditNavLinear.getLayoutParams().height = b1.intValue();
+                            mEditFuncLinear.getLayoutParams().height = b2.intValue();
+                            mEditFuncLinear.requestLayout();
+                            mEditNavLinear.requestLayout();
+                            mEditScroll.requestLayout();
+                        }
+                    });
+                }
+                animShow.start();
             }
         }
         return super.onKeyDown(keyCode, event);
