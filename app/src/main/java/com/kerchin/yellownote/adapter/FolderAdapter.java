@@ -640,20 +640,18 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public void runAnimator(boolean isExpand) {
             if (isExpand) {
                 isShown = true;
-                mFolderItemRelative.setAlpha(0);
-                mFolderItemRelative.animate()
-                        .alpha(1)
-                        .setInterpolator(ai)
-                        .setDuration(animDuration).start();
+//                mFolderItemRelative.setAlpha(0);
+//                mFolderItemRelative.animate()
+//                        .alpha(1)
+//                        .setDuration(animDuration).start();
                 valueAnimator = ValueAnimator.ofFloat(0, context.getResources().getDimension(R.dimen.folder_item_height));
                 valueAnimator.setInterpolator(ai);
             } else {
                 isShown = false;
-                mFolderItemRelative.setAlpha(1);
-                mFolderItemRelative.animate()
-                        .alpha(0.2f)
-                        .setInterpolator(di)
-                        .setDuration(animDuration).start();
+//                mFolderItemRelative.setAlpha(1);
+//                mFolderItemRelative.animate()
+//                        .alpha(0.2f)
+//                        .setDuration(animDuration).start();
                 valueAnimator = ValueAnimator.ofFloat(context.getResources().getDimension(R.dimen.folder_item_height), 0);
                 valueAnimator.setInterpolator(di);
             }
