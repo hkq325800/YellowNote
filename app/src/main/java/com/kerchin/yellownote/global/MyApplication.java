@@ -9,14 +9,24 @@ import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
 import com.kerchin.yellownote.model.Folder;
 import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.utilities.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.CrashHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MyApplication extends Application {
+    /**
+     * app在sd卡的主目录
+     */
+    private final static String APP_MAIN_FOLDER_NAME = "YellowNote";
+    /**
+     * 本地存放闪退日志的目录
+     */
+    private final static String CRASH_FOLDER_NAME = "crash";
     private static Context context;
     private static SharedPreferences shared;
     private static final String SaltKey = "xiaohuangj";
@@ -54,13 +64,24 @@ public class MyApplication extends Application {
         context = getApplicationContext();
         AVOSCloud.initialize(context,
                 Config.APP_ID, Config.APP_KEY);
-        CrashHandler crashHandler = CrashHandler.getInstance();
-        crashHandler.init(context);
+//        CrashHandler crashHandler = CrashHandler.getInstance();
+//        crashHandler.init(context);
+        configCollectCrashInfo();
         shared = new SecurePreferences(context);
         user = shared.getString(Config.KEY_User, "");
         if (!user.equals(""))
             isLogin = true;
         super.onCreate();
+    }
+
+    /**
+     * 配置崩溃信息的搜集
+     */
+    private void configCollectCrashInfo() {
+        CrashExceptionHandler crashExceptionHandler = new CrashExceptionHandler(this, APP_MAIN_FOLDER_NAME, CRASH_FOLDER_NAME);
+        CrashExceptionHandler.CrashExceptionRemoteReport remoteReport = new SimpleCrashReporter();
+        crashExceptionHandler.configRemoteReport(remoteReport); //设置友盟统计报错日志回传到远程服务器上
+        Thread.setDefaultUncaughtExceptionHandler(crashExceptionHandler);
     }
 
     public static SharedPreferences getDefaultShared() {//可在应用间共享数据

@@ -174,14 +174,102 @@ public class NoteFragment extends BaseFragment
     }
 
     public View.OnClickListener getAddClickListener() {
+        if (addClickListener == null)
+            addClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (MyApplication.listFolder.size() > 0) {
+                        MainActivity m = (MainActivity) getActivity();
+                        m.hideBtnAdd();
+                        EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
+                                , MyApplication.userDefaultFolderId, "text"));
+                    } else
+                        Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+                }
+            };
         return addClickListener;
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {
+        if (queryTextListener == null)
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    mSearchText = newText;
+                    doSearch();
+                    return true;
+                }
+            };
         return queryTextListener;
     }
 
     public Toolbar.OnMenuItemClickListener getToolbarItemClickListener() {
+        if (toolbarItemClickListener == null)
+            toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.action_sort:
+                            MainActivity main = (MainActivity) getActivity();
+                            showPop(main.getToolbar());
+                            break;
+                        case R.id.action_delete:
+                            if (!mainStatus.isDeleteMode()) {
+                                deleteViewShow();
+                            } else {
+                                deleteViewHide();
+                                //统计每个folder被删除了多少
+                                if (noteAdapter != null) {
+                                    noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
+                                    if (NoteAdapter.listDelete.size() > 0) {
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                for (int i = 0; i < NoteAdapter.listDelete.size(); i++) {
+                                                    //统计
+                                                    for (int j = 0; j < MyApplication.listFolder.size(); j++) {
+                                                        if (NoteAdapter.listDelete.get(i).getFolder().equals(MyApplication.listFolder.get(j).getName())) {
+                                                            noteAdapter.listDeleteNum[j]++;
+                                                            break;
+                                                        }
+                                                    }
+                                                    try {
+                                                        //线上删除
+                                                        Trace.d("delete", NoteAdapter.listDelete.get(i).getTitle());
+                                                        NoteAdapter.listDelete.get(i).delete(getActivity(), handler, handle4reset);
+                                                        MyApplication.listNote.remove(NoteAdapter.listDelete.get(i));
+                                                        Message msg = new Message();
+                                                        msg.obj = NoteAdapter.listDelete.get(i);
+                                                        msg.what = handle4explosion;
+                                                        handler.sendMessage(msg);
+                                                    } catch (AVException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                                //num-1
+                                                for (int i = 0; i < noteAdapter.listDeleteNum.length; i++) {
+                                                    if (noteAdapter.listDeleteNum[i] != 0) {
+                                                        MyApplication.listFolder.get(i).dec(noteAdapter.listDeleteNum[i]);
+                                                    }
+                                                }
+                                                //ui删除
+                                                status = statusDataGot;
+                                                getAdapter4note(800);
+                                            }
+                                        }).start();
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                    return true;
+                }
+            };
         return toolbarItemClickListener;
     }
 
@@ -214,91 +302,6 @@ public class NoteFragment extends BaseFragment
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
-        toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.action_sort:
-                        MainActivity main = (MainActivity) getActivity();
-                        showPop(main.getToolbar());
-                        break;
-                    case R.id.action_delete:
-                        if (!mainStatus.isDeleteMode()) {
-                            deleteViewShow();
-                        } else {
-                            deleteViewHide();
-                            //统计每个folder被删除了多少
-                            if (noteAdapter != null) {
-                                noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
-                                if (NoteAdapter.listDelete.size() > 0) {
-                                    new Thread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            for (int i = 0; i < NoteAdapter.listDelete.size(); i++) {
-                                                //统计
-                                                for (int j = 0; j < MyApplication.listFolder.size(); j++) {
-                                                    if (NoteAdapter.listDelete.get(i).getFolder().equals(MyApplication.listFolder.get(j).getName())) {
-                                                        noteAdapter.listDeleteNum[j]++;
-                                                        break;
-                                                    }
-                                                }
-                                                try {
-                                                    //线上删除
-                                                    Trace.d("delete", NoteAdapter.listDelete.get(i).getTitle());
-                                                    NoteAdapter.listDelete.get(i).delete(getActivity(), handler, handle4reset);
-                                                    MyApplication.listNote.remove(NoteAdapter.listDelete.get(i));
-                                                    Message msg = new Message();
-                                                    msg.obj = NoteAdapter.listDelete.get(i);
-                                                    msg.what = handle4explosion;
-                                                    handler.sendMessage(msg);
-                                                } catch (AVException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                            //num-1
-                                            for (int i = 0; i < noteAdapter.listDeleteNum.length; i++) {
-                                                if (noteAdapter.listDeleteNum[i] != 0) {
-                                                    MyApplication.listFolder.get(i).dec(noteAdapter.listDeleteNum[i]);
-                                                }
-                                            }
-                                            //ui删除
-                                            status = statusDataGot;
-                                            getAdapter4note(800);
-                                        }
-                                    }).start();
-                                }
-                            }
-                        }
-                        break;
-                }
-                return true;
-            }
-        };
-        addClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (MyApplication.listFolder.size() > 0) {
-                    MainActivity m = (MainActivity) getActivity();
-                    m.hideBtnAdd();
-                    EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
-                            , MyApplication.userDefaultFolderId, "text"));
-                } else
-                    Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
-            }
-        };
-        queryTextListener = new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                mSearchText = newText;
-                doSearch();
-                return true;
-            }
-        };
     }
 
     private void doSearch() {

@@ -278,107 +278,110 @@ public class FolderFragment extends BaseFragment {
     }
 
     public View.OnClickListener getAddClickListener() {
+        if (addClickListener == null)
+            addClickListener = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    LayoutInflater inflater = LayoutInflater.from(getActivity());
+                    @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
+                    final EditText mRenameEdt = (EditText) view.findViewById(R.id.mRenameEdt);
+                    final Button mRenameBtn = (Button) view.findViewById(R.id.mRenameBtn);
+                    final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                            .setTitle("新增笔记夹")
+                            .setView(view).create();
+                    mRenameBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (mRenameEdt.getText().toString().equals("默认")) {
+                                Trace.show(getActivity(), "不要与默认笔记夹重名");
+                            } else if (!mRenameEdt.getText().toString().equals("")) {
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //AVFile file = MyApplication.listFolder.get(0).getCover();
+                                        AVObject Folder = new AVObject("Folder");
+                                        Folder.put("user_tel", MyApplication.user);
+                                        //Folder.put("folder_cover", file);
+                                        Folder.put("folder_name", mRenameEdt.getText().toString());
+                                        Folder.put("folder_contain", 0);
+                                        Folder.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(AVException e) {
+                                                if (e == null) {
+                                                    Trace.show(getActivity(), "保存成功");
+                                                    Trace.d("saveNewFolder", "成功");
+                                                    status = statusDataGot;
+                                                    statusName = "dataGot";
+                                                    getData(statusDataGot);
+                                                } else {
+                                                    Trace.show(getActivity(), "操作失败,请检查网络");
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }).start();
+                                alertDialog.dismiss();
+                            } else {
+                                Trace.show(getActivity(), "笔记夹名不能为空");
+                            }
+                        }
+                    });
+                    mRenameEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                        @Override
+                        public void onFocusChange(View v, boolean hasFocus) {
+                            if (hasFocus) {
+                                alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                            }
+                        }
+                    });
+                    alertDialog.show();
+                }
+            };
         return addClickListener;
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {
+        if (queryTextListener == null)
+            queryTextListener = new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String newText) {
+                    Trace.show(getActivity(), "Folder+" + newText);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            };
         return queryTextListener;
     }
 
     public Toolbar.OnMenuItemClickListener getToolbarItemClickListener() {
+        if (toolbarItemClickListener == null)
+            toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    String msg = "";
+                    switch (item.getItemId()) {
+                        case R.id.action_delete:
+                            msg += "1Click delete";
+                            // TODO 删除
+                            break;
+                    }
+                    if (!msg.equals("")) {
+                        Trace.show(getActivity(), msg);
+                    }
+                    return true;
+                }
+            };
         return toolbarItemClickListener;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LayoutInflater inflater = LayoutInflater.from(getActivity());
-                @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
-                final EditText mRenameEdt = (EditText) view.findViewById(R.id.mRenameEdt);
-                final Button mRenameBtn = (Button) view.findViewById(R.id.mRenameBtn);
-                final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-                        .setTitle("新增笔记夹")
-                        .setView(view).create();
-                mRenameBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (mRenameEdt.getText().toString().equals("默认")) {
-                            Trace.show(getActivity(), "不要与默认笔记夹重名");
-                        } else if (!mRenameEdt.getText().toString().equals("")) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    //AVFile file = MyApplication.listFolder.get(0).getCover();
-                                    AVObject Folder = new AVObject("Folder");
-                                    Folder.put("user_tel", MyApplication.user);
-                                    //Folder.put("folder_cover", file);
-                                    Folder.put("folder_name", mRenameEdt.getText().toString());
-                                    Folder.put("folder_contain", 0);
-                                    Folder.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(AVException e) {
-                                            if (e == null) {
-                                                Trace.show(getActivity(), "保存成功");
-                                                Trace.d("saveNewFolder", "成功");
-                                                status = statusDataGot;
-                                                statusName = "dataGot";
-                                                getData(statusDataGot);
-                                            } else {
-                                                Trace.show(getActivity(), "操作失败,请检查网络");
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                    });
-                                }
-                            }).start();
-                            alertDialog.dismiss();
-                        } else {
-                            Trace.show(getActivity(), "笔记夹名不能为空");
-                        }
-                    }
-                });
-                mRenameEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                    @Override
-                    public void onFocusChange(View v, boolean hasFocus) {
-                        if (hasFocus) {
-                            alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                        }
-                    }
-                });
-                alertDialog.show();
-            }
-        };
-        toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                String msg = "";
-                switch (item.getItemId()) {
-                    case R.id.action_delete:
-                        msg += "1Click delete";
-                        // TODO 删除
-                        break;
-                }
-                if (!msg.equals("")) {
-                    Trace.show(getActivity(), msg);
-                }
-                return true;
-            }
-        };
-        queryTextListener = new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String newText) {
-                Trace.show(getActivity(), "Folder+" + newText);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        };
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
     }
@@ -408,7 +411,7 @@ public class FolderFragment extends BaseFragment {
 //                Trace.d("isHide" + m.isHide + " dy" + dy);
                 if (!m.isHide && dy > 0) {
                     m.hideBtnAdd();
-                } else if(m.isHide && dy < 0) {
+                } else if (m.isHide && dy < 0) {
                     m.showBtnAdd();
                 }
 //                if (firstVisibleItem > lastVisibleItemPosition) {// 上滑
