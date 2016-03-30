@@ -14,7 +14,7 @@
             android:id="@+id/mNavigationLeftBtn"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@drawable/selector_navigation_button"
+            android:background="@drawable/selector_button"
             android:text="后退"
             android:textColor="@color/textColor"
             android:textSize="12sp" />
@@ -24,7 +24,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
-            android:background="@drawable/selector_navigation_button"
+            android:background="@drawable/selector_button"
             android:text="保存"
             android:textColor="@color/textColor"
             android:textSize="12sp"

@@ -42,14 +42,8 @@ import butterknife.ButterKnife;
 public class LoginActivity extends User {
     boolean isEnter = false;
     boolean isNeedToRefresh = false;
-    //原来是为了横竖屏切换 现在固定是竖屏了
-    //    String cacheUser = "";
-//    String cachePass = "";
-//    String cacheRePass = "";
-//    String cacheProve = "";
     String pass;
     boolean logoutFlag = false;
-    //    boolean isCache = false;
     private static final String LOG_TAG = "YellowNote-" + LoginActivity.class.getSimpleName();
     private static Long mExitTime = (long) 0;//退出时间
     private String objectId;
@@ -109,21 +103,6 @@ public class LoginActivity extends User {
             }
         }
     };
-
-//    @Override
-//    public void onSaveInstanceState(Bundle savedInstanceState) {
-//        if (mLoginUserEdt != null && mLoginPassEdt != null && mLoginRePassEdt != null && mLoginProveEdt != null)
-//            if (!mLoginUserEdt.getText().toString().equals("")
-//                    || !mLoginPassEdt.getText().toString().equals("")
-//                    || !mLoginRePassEdt.getText().toString().equals("")
-//                    || !mLoginProveEdt.getText().toString().equals("")) {
-//                savedInstanceState.putString("user", mLoginUserEdt.getText().toString());
-//                savedInstanceState.putString("pass", mLoginPassEdt.getText().toString());
-//                savedInstanceState.putString("rePass", mLoginRePassEdt.getText().toString());
-//                savedInstanceState.putString("prove", mLoginProveEdt.getText().toString());
-//            }
-//        super.onSaveInstanceState(savedInstanceState);
-//    }
 
     @Override
     protected void onDestroy() {
@@ -202,7 +181,6 @@ public class LoginActivity extends User {
         } else
             mLoginUserEdt.requestFocus();
         //弹出软键盘
-
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -543,7 +521,7 @@ public class LoginActivity extends User {
                 Message message = new Message();//更新UI
                 message.what = wel;
                 //TODO delay时间随加载快慢变化
-                handler.sendMessageDelayed(message, /*isCache ||*/ logoutFlag ? 0 : 1500);
+                handler.sendMessageDelayed(message, logoutFlag ? 0 : 1500);
             }
         } else {//正常登录流程
             isRegisted(txtUser);//是否注册查询
