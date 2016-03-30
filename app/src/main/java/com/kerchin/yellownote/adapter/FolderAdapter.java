@@ -1,5 +1,7 @@
 package com.kerchin.yellownote.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -200,23 +202,22 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
             if (thisItem != null) {
                 //应当为isShown的状态 目前是mHolder.isShown的状态
-//                Trace.d(thisItem.isShown()+"");
                 if (!thisItem.isShown()) {
                     //关闭动画
                     if (thisItem.getFolderPosition() == lastFolderPosition) {
-//                        Trace.d(thisItem.getFolderPosition()+"关闭1");
+//                        Trace.d(thisItem.getFolderPosition() + "关闭1" + mHolder.isShown);
                         mHolder.runAnimator(false);
                     } else {
-//                        Trace.d(thisItem.getFolderPosition()+"关闭2");
+//                        Trace.d(thisItem.getFolderPosition() + "关闭2" + mHolder.isShown);
                         mHolder.mFolderItemRelative.getLayoutParams().height = 0;
                     }
                 } else {
                     //开启动画
-                    if (thisItem.getFolderPosition() == shownFolderPosition) {
-//                        Trace.d(thisItem.getFolderPosition()+"开启1");
+                    if (thisItem.getFolderPosition() == shownFolderPosition && !mHolder.isShown) {
+//                        Trace.d(thisItem.getFolderPosition() + "开启1" + mHolder.isShown);
                         mHolder.runAnimator(true);//后行 等待关闭动画结束
                     } else {
-//                        Trace.d(thisItem.getFolderPosition()+"开启2");
+//                        Trace.d(thisItem.getFolderPosition() + "开启2" + mHolder.isShown);
                         mHolder.mFolderItemRelative.getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
                     }
                     if (isEditMode) {
@@ -367,7 +368,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         if (!isAnimating) {
             isAnimating = true;
-            if (position != shownFolderPosition) {
+            if (position != shownFolderPosition) {//点击了其他目标
                 for (int i = 0; i < mNotes.size(); i++) {
                     //-1
                     if (mNotes.get(i).getFolderPosition() == position) {
@@ -382,7 +383,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 shownFolderPosition = position;
 //            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
                 notifyDataSetChanged();
-            } else {
+            } else {//点击开启着的自身
                 for (int i = 0; i < mNotes.size(); i++) {
                     if (mNotes.get(i).getFolderPosition() == position) {
                         mNotes.get(i).setIsShown(false);
@@ -392,7 +393,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 shownFolderPosition = -1;
                 notifyDataSetChanged();
             }
-            new CountDownTimer(animDuration,animDuration){
+            new CountDownTimer(animDuration + 150, animDuration + 150) {
 
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -619,6 +620,9 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
+    private DecelerateInterpolator di = new DecelerateInterpolator();
+    private AccelerateInterpolator ai = new AccelerateInterpolator();
+
     class ItemViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
         @Bind(R.id.mFolderItemTxt)
         TextView mFolderItemTxt;
@@ -627,17 +631,17 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Bind(R.id.mFolderItemRelative)
         RelativeLayout mFolderItemRelative;
         private ValueAnimator valueAnimator;
-        public boolean isShown = false;
-        private DecelerateInterpolator di = new DecelerateInterpolator();
-        private AccelerateInterpolator ai = new AccelerateInterpolator();
+        public boolean isShown = false;//是否应该显示
 
         public ItemViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
             mFolderItemRelative.getLayoutParams().height = 0;
+            mFolderItemRelative.setTag(false);
         }
 
-        public void runAnimator(boolean isExpand) {
+        public void runAnimator(final boolean isExpand) {
+            mFolderItemRelative.setTag(isExpand);
             if (isExpand) {
                 isShown = true;
 //                mFolderItemRelative.setAlpha(0);
@@ -648,12 +652,19 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 valueAnimator.setInterpolator(ai);
             } else {
                 isShown = false;
+//                mFolderItemRelative.setTag(false);
 //                mFolderItemRelative.setAlpha(1);
 //                mFolderItemRelative.animate()
 //                        .alpha(0.2f)
 //                        .setDuration(animDuration).start();
                 valueAnimator = ValueAnimator.ofFloat(context.getResources().getDimension(R.dimen.folder_item_height), 0);
                 valueAnimator.setInterpolator(di);
+                valueAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        lastFolderPosition = -1;
+                    }
+                });
             }
             valueAnimator.setDuration(animDuration);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {

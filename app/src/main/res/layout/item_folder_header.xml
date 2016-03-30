@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/folder_item_height"
     android:background="@color/lightSkyBlue"
+    android:layout_marginTop="1dp"
     android:orientation="horizontal">
 
     <!--<ImageView
