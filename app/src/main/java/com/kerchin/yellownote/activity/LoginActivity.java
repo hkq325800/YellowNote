@@ -491,27 +491,27 @@ public class LoginActivity extends User {
                                 Trace.d("isFrozen " + isFrozen);
                                 if (isFrozen) {
                                     Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
-                                    Message message = new Message();//更新UI
+                                    Message message = Message.obtain();//更新UI
                                     message.what = reLog;
                                     handler.sendMessageDelayed(message, 1000);
                                 } else {
                                     MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
                                     //缓存正确跳转
-                                    Message message = new Message();//更新UI
+                                    Message message = Message.obtain();//更新UI
                                     message.what = next;
                                     handler.sendMessageDelayed(message, 1000);
                                 }
                             } else {
                                 //缓存错误重新登录
                                 Trace.show(LoginActivity.this, "你的密码已被修改,请重新登录");
-                                Message message = new Message();//更新UI
+                                Message message = Message.obtain();//更新UI
                                 message.what = reLog;
                                 handler.sendMessageDelayed(message, 1000);
                             }
                         } else {
                             e.printStackTrace();
                             isNeedToRefresh = true;
-                            Message message = new Message();//更新UI
+                            Message message = Message.obtain();//更新UI
                             message.what = withoutNet;
                             handler.sendMessageDelayed(message, 1000);
                         }
@@ -519,7 +519,7 @@ public class LoginActivity extends User {
                 });
             } else {//无缓存显示界面
                 //注销时logoutFlag为true不显示welcome
-                Message message = new Message();//更新UI
+                Message message = Message.obtain();//更新UI
                 message.what = wel;
                 //TODO delay时间随加载快慢变化
                 handler.sendMessageDelayed(message, logoutFlag ? 0 : 1500);

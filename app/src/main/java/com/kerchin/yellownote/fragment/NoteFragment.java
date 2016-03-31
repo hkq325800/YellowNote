@@ -63,6 +63,7 @@ public class NoteFragment extends BaseFragment
     private NoteAdapter noteAdapter;
     private List<Note> list;
     private ToolbarStatus mainStatus;
+    //    private boolean isRefreshing = false;
     private String mSearchText;
     private int lastVisibleItemPosition;
     //private int skip = 0;
@@ -113,7 +114,7 @@ public class NoteFragment extends BaseFragment
                         mNoteWDList.setVisibility(View.VISIBLE);
                         mNoteEmptyTxt.setVisibility(View.GONE);
                         noteAdapter.notifyDataSetChanged();
-                        mNoteWDList.stopRefresh();
+                        stopRefresh();
                     }
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
                         mNoteProgress.setVisibility(View.GONE);
@@ -133,6 +134,7 @@ public class NoteFragment extends BaseFragment
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
                         mNoteProgress.setVisibility(View.GONE);
                     }
+                    stopRefresh();
                     break;
 //                case handle4reset:
 //                    if (isChanged4note) {
@@ -162,10 +164,9 @@ public class NoteFragment extends BaseFragment
                             }
                         }
                     }
-                    MyApplication.listNote.remove(note);//从数据源中删除
                     break;
                 case handle4AVException:
-                    Trace.show(getActivity(), "操作失败"+ Trace.getErrorMsg((Exception) msg.obj));
+                    Trace.show(getActivity(), "操作失败" + Trace.getErrorMsg((Exception) msg.obj));
                 default:
                     break;
             }
@@ -232,6 +233,7 @@ public class NoteFragment extends BaseFragment
                                 if (noteAdapter != null) {
                                     noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
                                     if (noteAdapter.getDeleteNum() > 0) {
+                                        //TODO 当前为双线程提交note的删除和folder数目的减法
                                         new Thread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -240,16 +242,17 @@ public class NoteFragment extends BaseFragment
                                                     try {
                                                         //线上删除
                                                         Trace.d("delete", delete.getTitle());
-                                                        delete.delete(getActivity(), handler/*, handle4reset*/);
-                                                        Message msg = new Message();
+                                                        delete.delete(getActivity());
+                                                        MyApplication.listNote.remove(delete);//从数据源中删除
+                                                        Message msg = Message.obtain();
                                                         msg.obj = delete;
                                                         msg.what = handle4explosion;//ui特效
                                                         handler.sendMessage(msg);
                                                     } catch (AVException e) {
                                                         e.printStackTrace();
-                                                        Message msg = new Message();
+                                                        Message msg = Message.obtain();
                                                         msg.obj = e;
-                                                        msg.what = handle4AVException;//ui特效
+                                                        msg.what = handle4AVException;
                                                         handler.sendMessage(msg);
                                                     }
                                                 }
@@ -410,11 +413,16 @@ public class NoteFragment extends BaseFragment
         mNoteEmptyTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //刷新界面
-                status = statusDataGot;
-                getData(statusDataGot);
                 mNoteProgress.setVisibility(View.VISIBLE);
                 mNoteEmptyTxt.setVisibility(View.GONE);
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //刷新界面
+                        status = statusDataGot;
+                        getData(statusDataGot);
+                    }
+                }, 600);
             }
         });
         mNoteWDList.setPullLoadEnable(false);
@@ -462,6 +470,7 @@ public class NoteFragment extends BaseFragment
             });
             //显示叉号
             mainStatus.setIsDeleteMode(true);
+            mNoteWDList.setPullRefreshEnable(false);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = mainStatus.isDeleteMode();
                 noteAdapter.notifyDataSetChanged();
@@ -485,6 +494,7 @@ public class NoteFragment extends BaseFragment
             });
             //叉号隐藏
             mainStatus.setIsDeleteMode(false);
+            mNoteWDList.setPullRefreshEnable(true);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = mainStatus.isDeleteMode();
                 noteAdapter.notifyDataSetChanged();
@@ -552,8 +562,7 @@ public class NoteFragment extends BaseFragment
                 } else {
                     e.printStackTrace();
                     Trace.show(getActivity(), "刷新失败" + Trace.getErrorMsg(e));
-                    if (statusEx == statusRefresh)
-                        mNoteWDList.stopRefresh();
+                    stopRefresh();
                 }
             }
         });
@@ -664,5 +673,10 @@ public class NoteFragment extends BaseFragment
         if (mainStatus != null)
             return mainStatus;
         else return new ToolbarStatus();
+    }
+
+    public void stopRefresh() {
+        if (status == statusRefresh)
+            mNoteWDList.stopRefresh();
     }
 }

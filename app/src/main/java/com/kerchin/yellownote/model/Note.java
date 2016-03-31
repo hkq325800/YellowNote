@@ -21,24 +21,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import tyrantgit.explosionfield.ExplosionField;
-
 
 /**
  * Created by Administrator on 2015/9/26 0026.
  */
 public class Note {
-    String objectId;
-    String title;
-    //String showDate;
-    Date date;
-    String content;
-    String preview;
-    String folder;
-    String folderId;
-    String type;
-//    private AVObject avObject;
-    AVObject newNote;
+    private String objectId;
+    private String title;
+    private Date date;
+    private String content;
+    private String preview;
+    private String folder;
+    private String folderId;
+    private String type;
 
     public Note(String objectId, String title, Long date, String content
             , String folder, String folderId, String type) {
@@ -50,6 +45,14 @@ public class Note {
         this.folderId = folderId;
         preview = content.replace("\n", " ");
         this.type = type;
+    }
+
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
+
+    public void setFolderId(String folderId) {
+        this.folderId = folderId;
     }
 
     public String getType() {
@@ -158,6 +161,7 @@ public class Note {
             , final Handler handler, final byte handle4saveChange) throws AVException {
         if (objectId.equals("")) {//新增
             FolderFragment.isChanged4folder = true;
+            final AVObject newNote;
             newNote = new AVObject("Note");
             newNote.put("user_tel", MyApplication.user);
             newNote.put("note_title", newTitle);
@@ -243,8 +247,7 @@ public class Note {
     }
 
     //主界面的删除
-    public void delete(final FragmentActivity context, final Handler handler
-            /*, final byte handle4reset*/) throws AVException {
+    public void delete(final FragmentActivity context) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject Note = query.get(objectId);
         Note.deleteInBackground(new DeleteCallback() {
@@ -254,9 +257,6 @@ public class Note {
                     Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
-//                    if (handler != null) {
-//                        handler.sendEmptyMessage(handle4reset);
-//                    }
                 } else {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -318,16 +318,4 @@ public class Note {
         });
     }
 
-    //
-//    public void setAvO(AVObject avObject) {
-//        this.avObject = avObject;
-//    }
-
-    public void setFolder(String folder) {
-        this.folder = folder;
-    }
-
-    public void setFolderId(String folderId) {
-        this.folderId = folderId;
-    }
 }

@@ -188,32 +188,49 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
-                builder.setTitle("选择移至笔记夹");
-                // 设置一个下拉的列表选择项
-                builder.setItems(mFolder, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, final int which) {
-                        isFolderChanged = true;
-                        Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
-                        //Folder newOne = null;
-                        final String oldName = thisFolder.getName();
-                        final String newName = mFolder[which];
-                        //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
-                        thisFolder = Folder.search4folder(mFolder[which]);
-                        //将现在的夹名添加到列表中供用户选择
-                        for (int i = 0; i < mFolder.length; i++) {
-                            if (mFolder[i].equals(newName)) {
-                                mFolder[i] = oldName;
-                                break;
+                if (mFolder.length == 0) {
+                    builder.setTitle("没有别的笔记夹可以选择\n是否新建？")
+                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //TODO 新建笔记夹
+                                    Trace.show(EditActivity.this, "确认");
+                                }
+                            }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Trace.show(EditActivity.this, "算了吧");
+                        }
+                    });
+                    builder.create().show();
+                } else {
+                    builder.setTitle("选择移至笔记夹");
+                    // 设置一个下拉的列表选择项
+                    builder.setItems(mFolder, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, final int which) {
+                            isFolderChanged = true;
+                            Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
+                            //Folder newOne = null;
+                            final String oldName = thisFolder.getName();
+                            final String newName = mFolder[which];
+                            //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
+                            thisFolder = Folder.search4folder(mFolder[which]);
+                            //将现在的夹名添加到列表中供用户选择
+                            for (int i = 0; i < mFolder.length; i++) {
+                                if (mFolder[i].equals(newName)) {
+                                    mFolder[i] = oldName;
+                                    break;
+                                }
+                            }
+                            if (isNew) {
+                                mNote.setFolder(newName);
+                                mNote.setFolderId(thisFolder.getObjectId());
                             }
                         }
-                        if (isNew) {
-                            mNote.setFolder(newName);
-                            mNote.setFolderId(thisFolder.getObjectId());
-                        }
-                    }
-                });
-                builder.show();
+                    });
+                    builder.show();
+                }
             }
         });
         mEditDeleteLinear.setOnClickListener(new View.OnClickListener() {

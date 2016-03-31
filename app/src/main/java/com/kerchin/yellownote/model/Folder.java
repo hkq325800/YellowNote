@@ -22,7 +22,6 @@ public class Folder {
     String objectId;
     String name;
     int contain;
-//    private AVObject avObject;//
 
     public Folder(String objectId, String name, int contain) {
         this.name = name;
@@ -56,11 +55,6 @@ public class Folder {
             }
         });
     }
-
-    //
-//    public void setAvO(AVObject avObject) {
-//        this.avObject = avObject;
-//    }
 
     public String getName() {
         return name;
