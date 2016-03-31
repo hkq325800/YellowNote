@@ -13,6 +13,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.CommonViewHolder;
 import com.kerchin.yellownote.model.Note;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -25,7 +26,7 @@ public class NoteAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
     private List<Note> infos;
-    public static List<Note> listDelete;
+    public List<Note> listDelete;
     public int[] listDeleteNum;
     public boolean isDelete = false;
     private final int layoutId = R.layout.item_note;
@@ -36,13 +37,29 @@ public class NoteAdapter extends BaseAdapter {
         this.infos = infos;
     }
 
+    public int getDeleteNum(){
+        return listDelete.size();
+    }
+
+    public Note getDeleteItem(int pos){
+        return listDelete.get(pos);
+    }
+
+    public List<Note> getListDelete(){
+        return listDelete;
+    }
+
+    public void initListDelete(){
+        listDelete = new ArrayList<>();
+    }
+
     @Override
     public int getCount() {
         return infos.size();
     }
 
     @Override
-    public Object getItem(int position) {
+    public Note getItem(int position) {
         return infos.get(position);
     }
 

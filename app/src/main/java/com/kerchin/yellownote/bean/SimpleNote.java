@@ -9,7 +9,8 @@ public class SimpleNote {
     private String name;
     private String folderId;
     private int folderPosition = 0;
-    private boolean isShown;
+    private boolean isShown;//是否应当显示
+    private boolean hasShownAnim;//是否已通过动画
     private int brotherCount;
 
     public SimpleNote(int id,String name,String folderId){
@@ -73,5 +74,13 @@ public class SimpleNote {
 
     public void setBrotherCount(int brotherCount) {
         this.brotherCount = brotherCount;
+    }
+
+    public boolean isHasShownAnim() {
+        return hasShownAnim;
+    }
+
+    public void setHasShownAnim(boolean hasShownAnim) {
+        this.hasShownAnim = hasShownAnim;
     }
 }

@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Message;
@@ -82,6 +83,8 @@ public class NoteFragment extends BaseFragment
     private final byte handle4reset = 4;//由于新增、删除、修改影响note视图
     private final byte handle4loadMore = 5;
     private final byte handle4explosion = 6;
+    private final byte handle4AVException = 40;
+    @SuppressLint("HandlerLeak")
     private SystemHandler handler = new SystemHandler(this) {
 
         @Override
@@ -131,16 +134,16 @@ public class NoteFragment extends BaseFragment
                         mNoteProgress.setVisibility(View.GONE);
                     }
                     break;
-                case handle4reset:
-                    if (isChanged4note) {
-                        getDataListFromNote(MyApplication.listNote);
-                        noteAdapter.notifyDataSetChanged();
-                        isChanged4note = false;
-                    }
-                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
-                        mNoteProgress.setVisibility(View.GONE);
-                    }
-                    break;
+//                case handle4reset:
+//                    if (isChanged4note) {
+//                        getDataListFromNote(MyApplication.listNote);
+//                        noteAdapter.notifyDataSetChanged();
+//                        isChanged4note = false;
+//                    }
+//                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
+//                        mNoteProgress.setVisibility(View.GONE);
+//                    }
+//                    break;
                 case handle4loadMore:
                     mNoteWDList.stopLoadMore();
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
@@ -149,18 +152,20 @@ public class NoteFragment extends BaseFragment
                     break;
                 case handle4explosion:
                     Note note = (Note) msg.obj;
-                    int position = 0;
                     if (note != null) {
                         for (int i = 0; i < mNoteWDList.getChildCount(); i++) {
                             TextView date = (TextView) mNoteWDList.getChildAt(i).findViewById(R.id.mNoteItemDateTxt);
-                            if (date != null && date.getText().toString().equals(note.getShowDate()))
-                                position = i;
+                            if (date != null && date.getText().toString().equals(note.getShowDate())) {
+                                //Explosion Animation
+                                ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
+                                mExplosionField.explode(mNoteWDList.getChildAt(i));
+                            }
                         }
-                        //Explosion Animation
-                        ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
-                        mExplosionField.explode(mNoteWDList.getChildAt(position));
                     }
+                    MyApplication.listNote.remove(note);//从数据源中删除
                     break;
+                case handle4AVException:
+                    Trace.show(getActivity(), "操作失败"+ Trace.getErrorMsg((Exception) msg.obj));
                 default:
                     break;
             }
@@ -226,29 +231,43 @@ public class NoteFragment extends BaseFragment
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
-                                    if (NoteAdapter.listDelete.size() > 0) {
+                                    if (noteAdapter.getDeleteNum() > 0) {
                                         new Thread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                for (int i = 0; i < NoteAdapter.listDelete.size(); i++) {
-                                                    //统计
-                                                    for (int j = 0; j < MyApplication.listFolder.size(); j++) {
-                                                        if (NoteAdapter.listDelete.get(i).getFolder().equals(MyApplication.listFolder.get(j).getName())) {
-                                                            noteAdapter.listDeleteNum[j]++;
-                                                            break;
-                                                        }
-                                                    }
+                                                for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                                    final Note delete = noteAdapter.getDeleteItem(i);
                                                     try {
                                                         //线上删除
-                                                        Trace.d("delete", NoteAdapter.listDelete.get(i).getTitle());
-                                                        NoteAdapter.listDelete.get(i).delete(getActivity(), handler, handle4reset);
-                                                        MyApplication.listNote.remove(NoteAdapter.listDelete.get(i));
+                                                        Trace.d("delete", delete.getTitle());
+                                                        delete.delete(getActivity(), handler/*, handle4reset*/);
                                                         Message msg = new Message();
-                                                        msg.obj = NoteAdapter.listDelete.get(i);
-                                                        msg.what = handle4explosion;
+                                                        msg.obj = delete;
+                                                        msg.what = handle4explosion;//ui特效
                                                         handler.sendMessage(msg);
                                                     } catch (AVException e) {
                                                         e.printStackTrace();
+                                                        Message msg = new Message();
+                                                        msg.obj = e;
+                                                        msg.what = handle4AVException;//ui特效
+                                                        handler.sendMessage(msg);
+                                                    }
+                                                }
+                                                //ui删除 从数据源中重新获取list并设置到adapter中
+                                                status = statusDataGot;
+                                                getAdapter4note(800);
+                                            }
+                                        }).start();
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                                    //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
+                                                    for (int j = 0; j < MyApplication.listFolder.size(); j++) {
+                                                        if (noteAdapter.getDeleteItem(i).getFolderId().equals(MyApplication.listFolder.get(j).getObjectId())) {
+                                                            noteAdapter.listDeleteNum[j]++;
+                                                            break;
+                                                        }
                                                     }
                                                 }
                                                 //num-1
@@ -257,9 +276,6 @@ public class NoteFragment extends BaseFragment
                                                         MyApplication.listFolder.get(i).dec(noteAdapter.listDeleteNum[i]);
                                                     }
                                                 }
-                                                //ui删除
-                                                status = statusDataGot;
-                                                getAdapter4note(800);
                                             }
                                         }).start();
                                     }
@@ -420,7 +436,7 @@ public class NoteFragment extends BaseFragment
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 MainActivity m = (MainActivity) getActivity();
                 m.hideBtnAdd();
-                EditActivity.startMe(getActivity(), (Note) noteAdapter.getItem(position - 1));
+                EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
             }
         });
     }
@@ -429,18 +445,18 @@ public class NoteFragment extends BaseFragment
         if (mainStatus.isDeleteMode()) {
             Trace.d("deleteViewShowNote error");
         } else {
-            NoteAdapter.listDelete = new ArrayList<>();
+            noteAdapter.initListDelete();
             //设置条目点击
             mNoteWDList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     ImageView delete = (ImageView) view.findViewById(R.id.mNoteItemDeleteImg);
-                    if (NoteAdapter.listDelete.contains(list.get(position - 1))) {
+                    if (noteAdapter.getListDelete().contains(list.get(position - 1))) {
                         delete.setImageResource(R.mipmap.delete);
-                        NoteAdapter.listDelete.remove(list.get(position - 1));
+                        noteAdapter.getListDelete().remove(list.get(position - 1));
                     } else {
                         delete.setImageResource(R.mipmap.delete_true);
-                        NoteAdapter.listDelete.add(list.get(position - 1));
+                        noteAdapter.getListDelete().add(list.get(position - 1));
                     }
                 }
             });
@@ -483,7 +499,6 @@ public class NoteFragment extends BaseFragment
         AVQuery<AVObject> query = new AVQuery<>("Note");
         query.whereEqualTo("user_tel", MyApplication.user);
         query.orderByDescending("note_editedAt");
-        MyApplication.listNote.clear();
 //        if (status == statusLoadMore) {
         //query.setSkip(skip);
         //query.setLimit(MyApplication.pageLimit);
@@ -501,6 +516,7 @@ public class NoteFragment extends BaseFragment
                     if (mNoteWDList != null) {
                         //skip += avObjects.size();
                         Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
+                        MyApplication.listNote.clear();
                         if (avObjects.size() != 0) {
 //                            if (avObjects.size() == MyApplication.pageLimit) {
 //                                mNoteWDList.setPullLoadEnable(true);
@@ -515,7 +531,7 @@ public class NoteFragment extends BaseFragment
                                         , avObjects.get(i).getString("folder_name")
                                         , avObjects.get(i).getString("folder_id")
                                         , avObjects.get(i).getString("note_type")));
-                                MyApplication.listNote.get(i).setAvO(avObjects.get(i));
+//                                MyApplication.listNote.get(i).setAvO(avObjects.get(i));
                             }
                             MyApplication.isItemsReady = true;
                             Trace.d("isItemsReady", "true");
@@ -535,6 +551,9 @@ public class NoteFragment extends BaseFragment
                     }
                 } else {
                     e.printStackTrace();
+                    Trace.show(getActivity(), "刷新失败" + Trace.getErrorMsg(e));
+                    if (statusEx == statusRefresh)
+                        mNoteWDList.stopRefresh();
                 }
             }
         });

@@ -76,6 +76,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.mFolders = mFoldersTrans;
         this.mNotes = mNotesTrans;
         initData(mFoldersTrans);
+        childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
     }
 
     private void initData(List<SimpleFolder> mFoldersTrans) {
@@ -204,18 +205,20 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 //应当为isShown的状态 目前是mHolder.isShown的状态
                 if (!thisItem.isShown()) {
                     //关闭动画
-                    if (thisItem.getFolderPosition() == lastFolderPosition) {
+                    if (thisItem.getFolderPosition() == lastFolderPosition && !thisItem.isHasShownAnim()) {
 //                        Trace.d(thisItem.getFolderPosition() + "关闭1" + mHolder.isShown);
                         mHolder.runAnimator(false);
+                        thisItem.setHasShownAnim(true);
                     } else {
 //                        Trace.d(thisItem.getFolderPosition() + "关闭2" + mHolder.isShown);
                         mHolder.mFolderItemRelative.getLayoutParams().height = 0;
                     }
                 } else {
                     //开启动画
-                    if (thisItem.getFolderPosition() == shownFolderPosition && !mHolder.isShown) {
+                    if (thisItem.getFolderPosition() == shownFolderPosition && !thisItem.isHasShownAnim()) {
 //                        Trace.d(thisItem.getFolderPosition() + "开启1" + mHolder.isShown);
                         mHolder.runAnimator(true);//后行 等待关闭动画结束
+                        thisItem.setHasShownAnim(true);
                     } else {
 //                        Trace.d(thisItem.getFolderPosition() + "开启2" + mHolder.isShown);
                         mHolder.mFolderItemRelative.getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
@@ -281,6 +284,162 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public int getItemCount() {
         return mNotes.size() + mFolders.size();
+    }
+
+    public void openFolder(int position) {
+
+        if (!isAnimating) {
+            isAnimating = true;
+            if (position != shownFolderPosition) {//点击了其他目标
+                for (int i = 0; i < mNotes.size(); i++) {
+                    //-1
+                    if (mNotes.get(i).getFolderPosition() == position) {
+                        mNotes.get(i).setIsShown(true);
+                        mNotes.get(i).setHasShownAnim(false);
+                    }
+                    //+1
+                    if (mNotes.get(i).getFolderPosition() == shownFolderPosition) {
+                        mNotes.get(i).setIsShown(false);
+                        mNotes.get(i).setHasShownAnim(false);
+                    }
+                }
+                lastFolderPosition = shownFolderPosition;
+                shownFolderPosition = position;
+//            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
+                notifyDataSetChanged();
+            } else {//点击开启着的自身
+                for (int i = 0; i < mNotes.size(); i++) {
+                    if (mNotes.get(i).getFolderPosition() == position) {
+                        mNotes.get(i).setIsShown(false);
+                        mNotes.get(i).setHasShownAnim(false);
+                    }
+                }
+                lastFolderPosition = shownFolderPosition;
+                shownFolderPosition = -1;
+                notifyDataSetChanged();
+            }
+            new CountDownTimer(animDuration + 150, animDuration + 150) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+
+                    isAnimating = false;
+                }
+            }.start();
+        }
+    }
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
+        @Bind(R.id.mFolderHeaderNameTxt)
+        TextView mFolderHeaderNameTxt;
+        @Bind(R.id.mFolderHeaderContainTxt)
+        TextView mFolderHeaderContainTxt;
+
+        public HeaderViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+
+        /**
+         * item 被选中时
+         */
+        @Override
+        public void onItemSelected() {
+            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel_p);
+        }
+
+        /**
+         * item 取消选中时
+         */
+        @Override
+        public void onItemFinish() {
+            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel);
+        }
+    }
+
+    private DecelerateInterpolator di = new DecelerateInterpolator();
+    private AccelerateInterpolator ai = new AccelerateInterpolator();
+    private float childHeight;
+
+    class ItemViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
+        @Bind(R.id.mFolderItemTxt)
+        TextView mFolderItemTxt;
+        @Bind(R.id.mFolderItemImg)
+        ImageView mFolderItemImg;
+        @Bind(R.id.mFolderItemRelative)
+        RelativeLayout mFolderItemRelative;
+        private ValueAnimator valueAnimator;
+
+        public ItemViewHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+            mFolderItemRelative.getLayoutParams().height = 0;
+        }
+
+        public void runAnimator(final boolean isExpand) {
+            if (isExpand) {
+//                mFolderItemRelative.setAlpha(0);
+//                mFolderItemRelative.animate()
+//                        .alpha(1)
+//                        .setDuration(200).start();
+                valueAnimator = ValueAnimator.ofFloat(0, childHeight);
+                valueAnimator.setInterpolator(ai);
+            } else {
+//                mFolderItemRelative.setAlpha(1);
+//                mFolderItemRelative.animate()
+//                        .alpha(0.2f)
+//                        .setDuration(200).start();
+                valueAnimator = ValueAnimator.ofFloat(childHeight, 0);
+                valueAnimator.setInterpolator(di);
+                valueAnimator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        lastFolderPosition = -1;
+                    }
+                });
+            }
+//            valueAnimator.setStartDelay(200);
+            valueAnimator.setDuration(animDuration);
+            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    Float value = (Float) animation.getAnimatedValue();
+                    mFolderItemRelative.getLayoutParams().height = value.intValue();
+                    mFolderItemRelative.requestLayout();
+                }
+            });
+            valueAnimator.start();
+        }
+
+        /**
+         * item 被选中时
+         */
+        @Override
+        public void onItemSelected() {
+            mFolderItemTxt.setBackgroundResource(R.drawable.bg_channel_p);
+        }
+
+        /**
+         * item 取消选中时
+         */
+        @Override
+        public void onItemFinish() {
+            mFolderItemTxt.setBackgroundResource(R.drawable.bg_channel);
+        }
+    }
+
+    public interface OnFolderItemClickListener {
+        void onItemClick(View v, int position, int viewType);
+
+        void onItemLongClick(View v, int position, int viewType);
+    }
+
+    public void setOnMyChannelItemClickListener(OnFolderItemClickListener listener) {
+        this.mFolderItemClickListener = listener;
     }
 
 //    @Override
@@ -362,61 +521,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                 toItem = mNotes.get(i);
             }
         }
-    }
-
-    public void openFolder(int position) {
-
-        if (!isAnimating) {
-            isAnimating = true;
-            if (position != shownFolderPosition) {//点击了其他目标
-                for (int i = 0; i < mNotes.size(); i++) {
-                    //-1
-                    if (mNotes.get(i).getFolderPosition() == position) {
-                        mNotes.get(i).setIsShown(true);
-                    }
-                    //+1
-                    if (mNotes.get(i).getFolderPosition() == shownFolderPosition) {
-                        mNotes.get(i).setIsShown(false);
-                    }
-                }
-                lastFolderPosition = shownFolderPosition;
-                shownFolderPosition = position;
-//            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
-                notifyDataSetChanged();
-            } else {//点击开启着的自身
-                for (int i = 0; i < mNotes.size(); i++) {
-                    if (mNotes.get(i).getFolderPosition() == position) {
-                        mNotes.get(i).setIsShown(false);
-                    }
-                }
-                lastFolderPosition = shownFolderPosition;
-                shownFolderPosition = -1;
-                notifyDataSetChanged();
-            }
-            new CountDownTimer(animDuration + 150, animDuration + 150) {
-
-                @Override
-                public void onTick(long millisUntilFinished) {
-
-                }
-
-                @Override
-                public void onFinish() {
-
-                    isAnimating = false;
-                }
-            }.start();
-        }
-    }
-
-    public interface OnFolderItemClickListener {
-        void onItemClick(View v, int position, int viewType);
-
-        void onItemLongClick(View v, int position, int viewType);
-    }
-
-    public void setOnMyChannelItemClickListener(OnFolderItemClickListener listener) {
-        this.mFolderItemClickListener = listener;
     }
 
     /**
@@ -590,107 +694,5 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         translateAnimation.setDuration(ANIM_TIME);
         translateAnimation.setFillAfter(true);
         return translateAnimation;
-    }
-
-    class HeaderViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
-        @Bind(R.id.mFolderHeaderNameTxt)
-        TextView mFolderHeaderNameTxt;
-        @Bind(R.id.mFolderHeaderContainTxt)
-        TextView mFolderHeaderContainTxt;
-
-        public HeaderViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
-
-        /**
-         * item 被选中时
-         */
-        @Override
-        public void onItemSelected() {
-            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel_p);
-        }
-
-        /**
-         * item 取消选中时
-         */
-        @Override
-        public void onItemFinish() {
-            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel);
-        }
-    }
-
-    private DecelerateInterpolator di = new DecelerateInterpolator();
-    private AccelerateInterpolator ai = new AccelerateInterpolator();
-
-    class ItemViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
-        @Bind(R.id.mFolderItemTxt)
-        TextView mFolderItemTxt;
-        @Bind(R.id.mFolderItemImg)
-        ImageView mFolderItemImg;
-        @Bind(R.id.mFolderItemRelative)
-        RelativeLayout mFolderItemRelative;
-        private ValueAnimator valueAnimator;
-        public boolean isShown = false;//是否应该显示
-
-        public ItemViewHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-            mFolderItemRelative.getLayoutParams().height = 0;
-            mFolderItemRelative.setTag(false);
-        }
-
-        public void runAnimator(final boolean isExpand) {
-            mFolderItemRelative.setTag(isExpand);
-            if (isExpand) {
-                isShown = true;
-//                mFolderItemRelative.setAlpha(0);
-//                mFolderItemRelative.animate()
-//                        .alpha(1)
-//                        .setDuration(animDuration).start();
-                valueAnimator = ValueAnimator.ofFloat(0, context.getResources().getDimension(R.dimen.folder_item_height));
-                valueAnimator.setInterpolator(ai);
-            } else {
-                isShown = false;
-//                mFolderItemRelative.setTag(false);
-//                mFolderItemRelative.setAlpha(1);
-//                mFolderItemRelative.animate()
-//                        .alpha(0.2f)
-//                        .setDuration(animDuration).start();
-                valueAnimator = ValueAnimator.ofFloat(context.getResources().getDimension(R.dimen.folder_item_height), 0);
-                valueAnimator.setInterpolator(di);
-                valueAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        lastFolderPosition = -1;
-                    }
-                });
-            }
-            valueAnimator.setDuration(animDuration);
-            valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                public void onAnimationUpdate(ValueAnimator animation) {
-                    Float value = (Float) animation.getAnimatedValue();
-                    mFolderItemRelative.getLayoutParams().height = value.intValue();
-                    mFolderItemRelative.requestLayout();
-                }
-            });
-            valueAnimator.start();
-        }
-
-        /**
-         * item 被选中时
-         */
-        @Override
-        public void onItemSelected() {
-            mFolderItemTxt.setBackgroundResource(R.drawable.bg_channel_p);
-        }
-
-        /**
-         * item 取消选中时
-         */
-        @Override
-        public void onItemFinish() {
-            mFolderItemTxt.setBackgroundResource(R.drawable.bg_channel);
-        }
     }
 }

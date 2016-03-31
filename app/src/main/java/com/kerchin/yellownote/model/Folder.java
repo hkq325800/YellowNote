@@ -22,24 +22,12 @@ public class Folder {
     String objectId;
     String name;
     int contain;
-    private AVObject avObject;//
+//    private AVObject avObject;//
 
     public Folder(String objectId, String name, int contain) {
         this.name = name;
         this.contain = contain;
         this.objectId = objectId;
-    }
-
-    public void setObjectId(String objectId) {
-        this.objectId = objectId;
-    }
-
-    public void add() {
-        contain++;
-    }
-
-    public void dec() {
-        contain--;
     }
 
     public void dec(final int amount) {
@@ -70,9 +58,9 @@ public class Folder {
     }
 
     //
-    public void setAvO(AVObject avObject) {
-        this.avObject = avObject;
-    }
+//    public void setAvO(AVObject avObject) {
+//        this.avObject = avObject;
+//    }
 
     public String getName() {
         return name;

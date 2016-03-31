@@ -469,7 +469,7 @@ public class FolderFragment extends BaseFragment {
                                 Folder folder = new Folder(avObjects.get(i).getObjectId()
                                         , avObjects.get(i).getString("folder_name")
                                         , avObjects.get(i).getInt("folder_contain"));
-                                folder.setAvO(avObjects.get(i));
+//                                folder.setAvO(avObjects.get(i));
                                 if (!contain(folder)) {
                                     MyApplication.listFolder.add(folder);
                                 }

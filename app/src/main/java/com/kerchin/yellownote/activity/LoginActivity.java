@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVMobilePhoneVerifyCallback;
@@ -96,7 +97,7 @@ public class LoginActivity extends User {
                     finish();
                     break;
                 case withoutNet:
-                    Trace.show(LoginActivity.this, "请检查网络后单击图标重试");
+                    Trace.show(LoginActivity.this, "请检查网络后单击图标重试", Toast.LENGTH_LONG);
                     break;
                 default:
                     break;
@@ -460,7 +461,7 @@ public class LoginActivity extends User {
                     @Override
                     public void done(AVException ex) {
                         if (ex != null) {
-                            Trace.e("验证验证码失败"+Trace.getErrorMsg(ex));
+                            Trace.e("验证验证码失败" + Trace.getErrorMsg(ex));
                             ex.printStackTrace();
                             Trace.show(LoginActivity.this, "验证码错误");
                         } else {
@@ -488,12 +489,12 @@ public class LoginActivity extends User {
                             if (avObjects.size() > 0) {
                                 boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
                                 Trace.d("isFrozen " + isFrozen);
-                                if(isFrozen){
+                                if (isFrozen) {
                                     Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
                                     Message message = new Message();//更新UI
                                     message.what = reLog;
                                     handler.sendMessageDelayed(message, 1000);
-                                }else {
+                                } else {
                                     MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
                                     //缓存正确跳转
                                     Message message = new Message();//更新UI
@@ -544,9 +545,9 @@ public class LoginActivity extends User {
                                         if (avObjects.size() > 0) {
                                             boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
                                             Trace.d("isFrozen " + isFrozen);
-                                            if(isFrozen){
+                                            if (isFrozen) {
                                                 Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
-                                            }else {
+                                            } else {
                                                 MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
                                                 goToMain();
                                             }

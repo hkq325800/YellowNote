@@ -37,7 +37,7 @@ public class Note {
     String folder;
     String folderId;
     String type;
-    private AVObject avObject;
+//    private AVObject avObject;
     AVObject newNote;
 
     public Note(String objectId, String title, Long date, String content
@@ -196,7 +196,7 @@ public class Note {
                                         } else {
                                             msg.obj = false;
                                             handler.sendMessage(msg);
-                                            Trace.show(context, "folderNum+1失败" + Trace.getErrorMsg(e));
+                                            Trace.show(context, "笔记夹数目+1失败" + Trace.getErrorMsg(e));
                                             e.printStackTrace();
                                         }
                                     }
@@ -244,7 +244,7 @@ public class Note {
 
     //主界面的删除
     public void delete(final FragmentActivity context, final Handler handler
-            , final byte handle4reset) throws AVException {
+            /*, final byte handle4reset*/) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject Note = query.get(objectId);
         Note.deleteInBackground(new DeleteCallback() {
@@ -254,9 +254,9 @@ public class Note {
                     Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
-                    if (handler != null) {
+//                    if (handler != null) {
 //                        handler.sendEmptyMessage(handle4reset);
-                    }
+//                    }
                 } else {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -319,9 +319,9 @@ public class Note {
     }
 
     //
-    public void setAvO(AVObject avObject) {
-        this.avObject = avObject;
-    }
+//    public void setAvO(AVObject avObject) {
+//        this.avObject = avObject;
+//    }
 
     public void setFolder(String folder) {
         this.folder = folder;
