@@ -27,7 +27,7 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 		this.mDatas = datas;
 		this.layoutId = layoutId;
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mDatas.size();
@@ -38,6 +38,15 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 		return mDatas.get(position);
 	}
 
+	public void setList(List<T> newData){
+		mDatas = newData;
+		notifyDataSetChanged();
+	}
+
+	public List<T> getList(){
+		return mDatas;
+	}
+
 	@Override
 	public long getItemId(int position) {
 		return position;
@@ -46,7 +55,7 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		CommonViewHolder holder = CommonViewHolder.get(mContext, convertView, parent, layoutId, position);
-		convert(holder, getItem(position));
+		convert(holder, getItem(position), position);
 		return holder.getConvertView();
 	}
 
@@ -55,5 +64,5 @@ public abstract class CommonAdapter<T> extends BaseAdapter {
 	 * @param holder
 	 * @param t
 	 */
-	public abstract void convert(CommonViewHolder holder, T t);
+	public abstract void convert(CommonViewHolder holder, T t, int position);
 }
