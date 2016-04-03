@@ -16,6 +16,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.LoginNoActionBar" parent="AppTheme.NoActionBar">
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:textColorHint">@color/textHintColor</item>
+    </style>
+
     <!--<style name="FloatingStyle" parent="@android:style/TextAppearance">
         &lt;!&ndash; 字体颜色 &ndash;&gt;
         <item name="android:textColor">#AA00FF</item>

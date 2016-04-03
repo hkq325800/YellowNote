@@ -7,14 +7,18 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -43,7 +47,7 @@ import butterknife.ButterKnife;
 public class LoginActivity extends User {
     boolean isEnter = false;
     boolean isNeedToRefresh = false;
-    String pass;
+//    String pass;
     boolean logoutFlag = false;
     private static final String LOG_TAG = "YellowNote-" + LoginActivity.class.getSimpleName();
     private static Long mExitTime = (long) 0;//退出时间
@@ -53,6 +57,10 @@ public class LoginActivity extends User {
     private final byte statusInit = -1;//未查询或查询中
     private final byte statusFalse = 0;//查询结果为假
     private final byte statusTrue = 1;//查询结果为真
+    @Bind(R.id.mLoginScV)
+    ScrollView mLoginScV;
+    @Bind(R.id.mLoginIconImg)
+    ImageView mLoginIconImg;
     @Bind(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
     @Bind(R.id.mLoginPassEdt)
@@ -71,6 +79,12 @@ public class LoginActivity extends User {
     Button mLoginForgetBtn;
     @Bind(R.id.mSignUpRelative)
     RelativeLayout mSignUpRelative;
+    @Bind(R.id.mLoginFunLiL)
+    LinearLayout mLoginFunLiL;
+    @Bind(R.id.mLoginRePassTextInput)
+    TextInputLayout mLoginRePassTextInput;
+    @Bind(R.id.mLoginSendProvTextInput)
+    TextInputLayout mLoginSendProvTextInput;
     private static final byte wel = 0;
     private static final byte next = 1;
     private static final byte reLog = 2;
@@ -106,32 +120,31 @@ public class LoginActivity extends User {
     };
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logoutFlag = getIntent().getBooleanExtra("logoutFlag", false);
-        if (!logoutFlag) {
-            logoutFlag = false;
-            setContentView(R.layout.fragment_welcome);
-            immerge(R.color.minionYellow);
-            Trace.d("onCreate");
-            LinearLayout mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
-            mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (isNeedToRefresh) {
-                        isNeedToRefresh = false;
-                        loginVerify(true, MyApplication.user, pass);
-                    }
-                }
-            });
-        }
-        pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
-        loginVerify(true, MyApplication.user, pass);
+//        if (!logoutFlag) {
+//            logoutFlag = false;
+//            setContentView(R.layout.fragment_welcome);
+//            immerge(R.color.minionYellow);
+//            Trace.d("onCreate");
+//            LinearLayout mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
+//            mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (isNeedToRefresh) {
+//                        isNeedToRefresh = false;
+//                        loginVerify(true, MyApplication.user, pass);
+//                    }
+//                }
+//            });
+
+            setContentView(R.layout.activity_login);
+            immerge(R.color.lightSkyBlue);
+            init();
+//        }
+//        pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
+//        loginVerify(true, MyApplication.user, pass);
     }
 
     private void immerge(int color) {
@@ -196,6 +209,27 @@ public class LoginActivity extends User {
                 return false;
             }
         });
+//        mLoginUserEdt.setOnTouchListener(null);
+//        mLoginPassEdt.setOnTouchListener(null);
+//        mLoginRePassEdt.setOnTouchListener(null);
+//        mLoginProveEdt.setOnTouchListener(onTouchListener);
+        mLoginFunLiL.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+//                mLoginIconImg.animate().alpha(0).setDuration(400).start();
+//                Trace.d("left"+left+"/top"+top+"/right"+right+"/bottom"+bottom);
+//                Trace.d("oldLeft"+oldLeft+"/oldTop"+oldTop+"/oldRight"+oldRight+"/oldBottom"+oldBottom);
+
+//                Trace.d("left" + mLoginScV.getLeft() + "/top" + mLoginScV.getTop() + "/right" + mLoginScV.getRight() + "/bottom" + mLoginScV.getBottom());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoginScV.smoothScrollTo(0, mLoginScV.getHeight());
+//                        Trace.d("left" + mLoginScV.getLeft() + "/top" + mLoginScV.getTop() + "/right" + mLoginScV.getRight() + "/bottom" + mLoginScV.getBottom());
+                    }
+                }, 400);
+            }
+        });
         mLoginProveEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -215,14 +249,14 @@ public class LoginActivity extends User {
                 return false;
             }
         });
+        mLoginPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+        mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
         mLoginSignUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mLoginSignUpBtn.getText().toString().equals("注册")) {
-                    mLoginUserEdt.setHint("请输入手机号码");
-                    mLoginPassEdt.setHint("请输入密码");
                     mLoginBtn.setText("返回登录");
                     mLoginForgetBtn.setText("忘记密码");
                     mLoginForgetBtn.setVisibility(View.GONE);
@@ -243,8 +277,6 @@ public class LoginActivity extends User {
                     mLoginForgetBtn.setText("忘记密码");
                     mLoginBtn.setText("登录");
                     mLoginSignUpBtn.setText("注册");
-                    mLoginUserEdt.setHint("请输入手机号码");
-                    mLoginPassEdt.setHint("请输入密码");
                 } else {
                     login();
                 }
@@ -254,8 +286,6 @@ public class LoginActivity extends User {
             @Override
             public void onClick(View v) {
                 if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
-                    mLoginUserEdt.setHint("请输入手机号码");
-                    mLoginPassEdt.setHint("请输入密码");
                     mLoginBtn.setText("返回登录");
                     mLoginForgetBtn.setText("找回密码");
                     mSignUpRelative.setVisibility(View.VISIBLE);
@@ -276,7 +306,7 @@ public class LoginActivity extends User {
                 } else {
                     if (txtForget.equals("找回密码")) {//忘记密码
                         //是否注册查询
-                        isRegisted(txtUser);
+                        isRegistered(txtUser);
                         new CountDownTimer(Config.timeout_avod, 500) {
                             @Override
                             public void onTick(long millisUntilFinished) {
@@ -298,7 +328,7 @@ public class LoginActivity extends User {
                         }.start();
                     } else {//注册
                         //是否注册查询
-                        isRegisted(txtUser);
+                        isRegistered(txtUser);
                         new CountDownTimer(Config.timeout_avod, 500) {
                             @Override
                             public void onTick(long millisUntilFinished) {
@@ -383,7 +413,7 @@ public class LoginActivity extends User {
         //表格检查
         if (tableCheck(txtUser, txtPass, txtRePass, txtProv)) {
             //是否注册查询
-            isRegisted(txtUser);
+            isRegistered(txtUser);
             new CountDownTimer(Config.timeout_avod, 500) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -525,7 +555,7 @@ public class LoginActivity extends User {
                 handler.sendMessageDelayed(message, logoutFlag ? 0 : 1500);
             }
         } else {//正常登录流程
-            isRegisted(txtUser);//是否注册查询
+            isRegistered(txtUser);//是否注册查询
             new CountDownTimer(Config.timeout_avod, 500) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -662,7 +692,7 @@ public class LoginActivity extends User {
 
     //是否注册验证
     @Override
-    protected void isRegisted(String txtUser) {
+    protected void isRegistered(String txtUser) {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
         query.findInBackground(new FindCallback<AVObject>() {

@@ -86,7 +86,7 @@ public abstract class User extends Activity {
      *
      * @param txtUser 用户名
      */
-    protected abstract void isRegisted(String txtUser);
+    protected abstract void isRegistered(String txtUser);
 
     /**
      * 表格信息校验
