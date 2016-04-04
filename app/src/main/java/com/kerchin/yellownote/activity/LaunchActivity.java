@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -29,11 +31,16 @@ import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.List;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * Created by Administrator on 2016/4/3 0003.
  */
 public class LaunchActivity extends BaseActivity {
     View view;
+    @Bind(R.id.mLoginRetryLinear)
+    LinearLayout mLoginRetryLinear;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
@@ -55,11 +62,21 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     protected void initializeView(Bundle savedInstanceState) {
-        String pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
+        ButterKnife.bind(this);
+        final String pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
+        mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isNeedToRefresh) {
+                    isNeedToRefresh = false;
+                    loginVerify(MyApplication.user, pass);
+                }
+            }
+        });
         loginVerify(MyApplication.user, pass);
         //guidePage
 //        if (PrefsAccessor.getInstance().getBoolean(SysConfig.GUIDE_FLAG, false)) {
-            // 2秒的动画
+        // 2秒的动画
 //            AlphaAnimation animation = new AlphaAnimation(0.3f, 1.0f);
 //            animation.setDuration(1500);
 //            animation.setAnimationListener(new Animation.AnimationListener() {
@@ -144,6 +161,7 @@ public class LaunchActivity extends BaseActivity {
 //            tintManager.setNavigationBarTintResource(color);
         }
     }//登录操作确认
+
     boolean isNeedToRefresh = false;
     private static final byte wel = 0;
     private static final byte next = 1;

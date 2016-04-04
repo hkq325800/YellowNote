@@ -7,6 +7,7 @@
         android:id="@+id/mLoginScV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:descendantFocusability="beforeDescendants"
         android:fitsSystemWindows="true">
 
         <LinearLayout
@@ -15,7 +16,7 @@
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
-            android:paddingTop="45dp">
+            android:paddingTop="36dp">
 
 
             <ImageView
@@ -29,7 +30,7 @@
                 android:id="@+id/mLoginUserTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp">
+                android:layout_marginTop="30dp">
 
                 <EditText
                     android:id="@+id/mLoginUserEdt"
@@ -37,6 +38,11 @@
                     android:layout_height="wrap_content"
                     android:hint="请输入手机号码"
                     android:inputType="number"
+                    android:background="@null"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:textColor="@color/textColor"
                     android:textColorHint="@color/textHintColor"
                     android:textCursorDrawable="@null" />
@@ -64,6 +70,11 @@
                     android:layout_height="wrap_content"
                     android:hint="请输入密码(长度6-13)"
                     android:inputType="textPassword"
+                    android:background="@null"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
                     android:textColor="@color/textColor"
                     android:textColorHint="@color/textHintColor"
                     android:textCursorDrawable="@null" />
@@ -84,8 +95,16 @@
                         android:id="@+id/mLoginRePassEdt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginRight="30dp"
                         android:hint="请重复一遍密码"
                         android:inputType="textPassword"
+                        android:background="@null"
+                        android:isScrollContainer="false"
+                        android:overScrollMode="never"
+                        android:scrollbars="none"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp"
                         android:textColor="@color/textColor"
                         android:textColorHint="@color/textHintColor"
                         android:textCursorDrawable="@null" />
@@ -98,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_below="@id/mLoginRePassTextInput"
-                    android:layout_marginLeft="75dp"
+                    android:layout_marginLeft="45dp"
                     android:layout_marginTop="10dp"
                     android:background="@drawable/selector_navigation_button"
                     android:minWidth="100dp"
@@ -119,7 +138,10 @@
                         android:layout_height="wrap_content"
                         android:hint="请输入6位验证码"
                         android:inputType="number"
+                        android:layout_marginLeft="30dp"
                         android:paddingTop="15dp"
+                        android:background="@null"
+                        android:paddingBottom="10dp"
                         android:textColor="@color/textColor"
                         android:textColorHint="@color/textHintColor"
                         android:textCursorDrawable="@null" />

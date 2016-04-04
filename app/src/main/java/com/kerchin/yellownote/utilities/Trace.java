@@ -4,54 +4,55 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.kerchin.yellownote.global.Config;
+
 public class Trace {
     public static final String TAG = "hkq_trace";
-    public static boolean DEBUG = true;
 
     public static void d(String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.d(TAG, msg);
         }
     }
 
     public static void d(String TAG, String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.d(TAG, msg);
         }
     }
 
     public static void i(String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.i(TAG, msg);
         }
     }
 
     public static void i(String TAG, String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.i(TAG, msg);
         }
     }
 
     public static void w(String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.w(TAG, msg);
         }
     }
 
     public static void w(String TAG, String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.w(TAG, msg);
         }
     }
 
     public static void e(String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.e(TAG, msg);
         }
     }
 
     public static void e(String TAG, String msg) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             Log.e(TAG, msg);
         }
     }
@@ -70,7 +71,7 @@ public class Trace {
     }
 
     public static String getErrorMsg(Exception e) {
-        if (DEBUG) {
+        if (Config.isDebugMode) {
             if (e.getMessage() != null) {
                 return e.getMessage();
             } else {

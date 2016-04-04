@@ -60,7 +60,7 @@ public abstract class User extends Activity {
      * @param txtUser 用户名
      * @param txtPass 密码
      */
-    protected abstract void loginVerify(boolean isCache, String txtUser, String txtPass);
+    protected abstract void loginVerify(String txtUser, String txtPass);
 
     /**
      * 注册操作确认(插入)

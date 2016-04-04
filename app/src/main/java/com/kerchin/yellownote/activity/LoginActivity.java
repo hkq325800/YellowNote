@@ -47,7 +47,7 @@ import butterknife.ButterKnife;
 public class LoginActivity extends User {
     boolean isEnter = false;
     boolean isNeedToRefresh = false;
-//    String pass;
+    //    String pass;
     boolean logoutFlag = false;
     private static final String LOG_TAG = "YellowNote-" + LoginActivity.class.getSimpleName();
     private static Long mExitTime = (long) 0;//退出时间
@@ -59,8 +59,6 @@ public class LoginActivity extends User {
     private final byte statusTrue = 1;//查询结果为真
     @Bind(R.id.mLoginScV)
     ScrollView mLoginScV;
-    @Bind(R.id.mLoginIconImg)
-    ImageView mLoginIconImg;
     @Bind(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
     @Bind(R.id.mLoginPassEdt)
@@ -123,28 +121,10 @@ public class LoginActivity extends User {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         logoutFlag = getIntent().getBooleanExtra("logoutFlag", false);
-//        if (!logoutFlag) {
-//            logoutFlag = false;
-//            setContentView(R.layout.fragment_welcome);
-//            immerge(R.color.minionYellow);
-//            Trace.d("onCreate");
-//            LinearLayout mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
-//            mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (isNeedToRefresh) {
-//                        isNeedToRefresh = false;
-//                        loginVerify(true, MyApplication.user, pass);
-//                    }
-//                }
-//            });
 
-            setContentView(R.layout.activity_login);
-            immerge(R.color.lightSkyBlue);
-            init();
-//        }
-//        pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
-//        loginVerify(true, MyApplication.user, pass);
+        setContentView(R.layout.activity_login);
+        immerge(R.color.lightSkyBlue);
+        init();
     }
 
     private void immerge(int color) {
@@ -157,11 +137,6 @@ public class LoginActivity extends User {
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//
-            // Translucent status bar
-//            Window window = getWindow();
-//            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-//                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             setStatusBarColor(color);//阴影绘制
             //设置状态栏颜色
 //            getWindow().setStatusBarColor(getResources().getColor(color));
@@ -365,7 +340,7 @@ public class LoginActivity extends User {
             Trace.show(LoginActivity.this, "请输入密码");
         } else {
             //登录验证
-            loginVerify(false, txtUser, txtPass);
+            loginVerify(txtUser, txtPass);
         }
     }
 
@@ -504,105 +479,54 @@ public class LoginActivity extends User {
 
     //登录操作确认
     @Override
-    protected void loginVerify(boolean flag, final String txtUser, final String txtPass) {
-        //缓存查询流程
-        if (flag) {
-            if (!txtUser.equals("") && !txtPass.equals("")) {
-                //密码查询
-                AVQuery<AVObject> query = new AVQuery<>("mUser");
-                query.whereEqualTo("user_tel", txtUser);
-                query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
-                query.findInBackground(new FindCallback<AVObject>() {
-                    public void done(List<AVObject> avObjects, AVException e) {
-                        if (e == null) {
-                            Trace.d("查询缓存 查询到" + avObjects.size() + " 条符合条件的数据");
-                            if (avObjects.size() > 0) {
-                                boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
-                                Trace.d("isFrozen " + isFrozen);
-                                if (isFrozen) {
-                                    Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
-                                    Message message = Message.obtain();//更新UI
-                                    message.what = reLog;
-                                    handler.sendMessageDelayed(message, 1000);
-                                } else {
-                                    MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
-                                    //缓存正确跳转
-                                    Message message = Message.obtain();//更新UI
-                                    message.what = next;
-                                    handler.sendMessageDelayed(message, 1000);
-                                }
-                            } else {
-                                //缓存错误重新登录
-                                Trace.show(LoginActivity.this, "你的密码已被修改,请重新登录");
-                                Message message = Message.obtain();//更新UI
-                                message.what = reLog;
-                                handler.sendMessageDelayed(message, 1000);
-                            }
-                        } else {
-                            e.printStackTrace();
-                            isNeedToRefresh = true;
-                            Message message = Message.obtain();//更新UI
-                            message.what = withoutNet;
-                            handler.sendMessageDelayed(message, 1000);
-                        }
-                    }
-                });
-            } else {//无缓存显示界面
-                //注销时logoutFlag为true不显示welcome
-                Message message = Message.obtain();//更新UI
-                message.what = wel;
-                //TODO delay时间随加载快慢变化
-                handler.sendMessageDelayed(message, logoutFlag ? 0 : 1500);
-            }
-        } else {//正常登录流程
-            isRegistered(txtUser);//是否注册查询
-            new CountDownTimer(Config.timeout_avod, 500) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    if (registerStatus > statusInit) {
-                        Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
-                        if (registerStatus == statusFalse) {
-                            Trace.show(LoginActivity.this, "该帐号尚未注册");
-                        } else {
-                            //密码查询
-                            AVQuery<AVObject> query = new AVQuery<>("mUser");
-                            query.whereEqualTo("user_tel", txtUser);
-                            query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
-                            query.findInBackground(new FindCallback<AVObject>() {
-                                public void done(List<AVObject> avObjects, AVException e) {
-                                    if (e == null) {
-                                        Trace.d("登陆验证 查询到" + avObjects.size() + " 条符合条件的数据");
-                                        if (avObjects.size() > 0) {
-                                            boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
-                                            Trace.d("isFrozen " + isFrozen);
-                                            if (isFrozen) {
-                                                Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
-                                            } else {
-                                                MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
-                                                goToMain();
-                                            }
+    protected void loginVerify(final String txtUser, final String txtPass) {
+        isRegistered(txtUser);//是否注册查询
+        new CountDownTimer(Config.timeout_avod, 500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                if (registerStatus > statusInit) {
+                    Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
+                    if (registerStatus == statusFalse) {
+                        Trace.show(LoginActivity.this, "该帐号尚未注册");
+                    } else {
+                        //密码查询
+                        AVQuery<AVObject> query = new AVQuery<>("mUser");
+                        query.whereEqualTo("user_tel", txtUser);
+                        query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
+                        query.findInBackground(new FindCallback<AVObject>() {
+                            public void done(List<AVObject> avObjects, AVException e) {
+                                if (e == null) {
+                                    Trace.d("登陆验证 查询到" + avObjects.size() + " 条符合条件的数据");
+                                    if (avObjects.size() > 0) {
+                                        boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
+                                        Trace.d("isFrozen " + isFrozen);
+                                        if (isFrozen) {
+                                            Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
                                         } else {
-                                            //密码错误重新登录
-                                            mLoginPassEdt.setText("");
-                                            Trace.show(LoginActivity.this, "密码错误,请重试");
+                                            MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
+                                            goToMain();
                                         }
                                     } else {
-                                        e.printStackTrace();
-                                        Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
+                                        //密码错误重新登录
+                                        mLoginPassEdt.setText("");
+                                        Trace.show(LoginActivity.this, "密码错误,请重试");
                                     }
+                                } else {
+                                    e.printStackTrace();
+                                    Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
                                 }
-                            });
-                        }
-                        registerStatus = statusInit;
-                        cancel();
+                            }
+                        });
                     }
+                    registerStatus = statusInit;
+                    cancel();
                 }
+            }
 
-                @Override
-                public void onFinish() {
-                }
-            }.start();
-        }
+            @Override
+            public void onFinish() {
+            }
+        }.start();
     }
 
     //注册操作确认
