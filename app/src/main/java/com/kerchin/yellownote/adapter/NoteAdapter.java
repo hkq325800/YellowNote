@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.adapter;
 
 import android.content.Context;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +27,11 @@ public class NoteAdapter extends BaseAdapter {
     public int[] listDeleteNum;
     public boolean isDelete = false;
     private final int layoutId = R.layout.item_note;
+    private SparseArray<View> mViews;
 
     public NoteAdapter(Context context, List<Note> infos) {
         inflater = LayoutInflater.from(context);
+        mViews = new SparseArray<View>();
         this.context = context;
         this.infos = infos;
     }
@@ -68,7 +71,12 @@ public class NoteAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         CommonViewHolder holder = CommonViewHolder.get(context, convertView, parent, layoutId, position);
         setValue(position, holder);
+        mViews.put(position, holder.getConvertView());
         return holder.getConvertView();
+    }
+
+    public View getView(int pos){
+        return mViews.get(pos);
     }
 
     private void setValue(int position, CommonViewHolder holder) {
@@ -89,5 +97,10 @@ public class NoteAdapter extends BaseAdapter {
             (holder.getView(R.id.mNoteItemDateTxt)).setVisibility(View.VISIBLE);
             (holder.getView(R.id.mNoteItemDeleteImg)).setVisibility(View.INVISIBLE);
         }
+    }
+
+    public void setList(List<Note> list) {
+        this.infos = list;
+        notifyDataSetChanged();
     }
 }

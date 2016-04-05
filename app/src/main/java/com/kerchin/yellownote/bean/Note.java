@@ -12,6 +12,7 @@ import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.text.SimpleDateFormat;
@@ -196,7 +197,7 @@ public class Note {
     }
 
     //主界面的删除
-    public void delete(final FragmentActivity context) {
+    public void delete(final FragmentActivity context, final SystemHandler handler, final Message msg) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -205,6 +206,7 @@ public class Note {
                     Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
+                    handler.sendMessage(msg);
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
