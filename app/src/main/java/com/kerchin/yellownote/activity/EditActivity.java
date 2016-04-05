@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -26,8 +25,8 @@ import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.model.Folder;
-import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.bean.Folder;
+import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -241,19 +240,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                 builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    ad.dismiss();
-                                    mNote.delete(EditActivity.this, handler, handle4finish
-                                            , mNote.getFolderId());
-                                } catch (AVException e) {
-                                    e.printStackTrace();
-                                    Trace.show(EditActivity.this, "删除确认失败" + Trace.getErrorMsg(e));
-                                }
-                            }
-                        }).start();
+                        ad.dismiss();
+                        mNote.delete(EditActivity.this, handler, handle4finish
+                                , mNote.getFolderId());
                     }
                 });
                 builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -395,29 +384,15 @@ public class EditActivity extends BaseHasSwipeActivity {
     }
 
     private void saveDifference() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mNote.saveChange(EditActivity.this
-                            , mNavigationTitleEdt.getText().toString()
-                            , mEditContentEdt.getText().toString()
-                            , handler, handle4saveChange);
-                    if (!isNew && isFolderChanged) {
-                        mNote.move2folder(EditActivity.this, thisFolder);
-                    }
-                    isNew = false;
-                    isFolderChanged = false;
-                } catch (AVException e) {
-                    Message msg = Message.obtain();
-                    msg.obj = false;
-                    msg.what = handle4saveChange;
-                    handler.sendMessage(msg);
-                    Trace.show(EditActivity.this, "保存更改失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        mNote.saveChange(EditActivity.this
+                , mNavigationTitleEdt.getText().toString()
+                , mEditContentEdt.getText().toString()
+                , handler, handle4saveChange);
+        if (!isNew && isFolderChanged) {
+            mNote.move2folder(EditActivity.this, thisFolder);
+        }
+        isNew = false;
+        isFolderChanged = false;
     }
 
     private void backConfirm() {

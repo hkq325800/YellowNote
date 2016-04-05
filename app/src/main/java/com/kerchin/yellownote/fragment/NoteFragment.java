@@ -30,7 +30,7 @@ import com.kerchin.yellownote.adapter.NoteAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
@@ -156,8 +156,10 @@ public class NoteFragment extends BaseFragment
                     Note note = (Note) msg.obj;
                     if (note != null) {
                         for (int i = 0; i < mNoteWDList.getChildCount(); i++) {
+                            TextView preview = (TextView) mNoteWDList.getChildAt(i).findViewById(R.id.mNoteItemPreviewTxt);
                             TextView date = (TextView) mNoteWDList.getChildAt(i).findViewById(R.id.mNoteItemDateTxt);
-                            if (date != null && date.getText().toString().equals(note.getShowDate())) {
+                            if (date != null && date.getText().toString().equals(note.getShowDate())
+                                    && preview.getText().toString().equals(note.getPreview())) {
                                 //Explosion Animation
                                 ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
                                 mExplosionField.explode(mNoteWDList.getChildAt(i));
@@ -234,53 +236,35 @@ public class NoteFragment extends BaseFragment
                                     noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
                                     if (noteAdapter.getDeleteNum() > 0) {
                                         //TODO 当前为双线程提交note的删除和folder数目的减法
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
-                                                    final Note delete = noteAdapter.getDeleteItem(i);
-                                                    try {
-                                                        //线上删除
-                                                        Trace.d("delete", delete.getTitle());
-                                                        delete.delete(getActivity());
-                                                        MyApplication.listNote.remove(delete);//从数据源中删除
-                                                        Message msg = Message.obtain();
-                                                        msg.obj = delete;
-                                                        msg.what = handle4explosion;//ui特效
-                                                        handler.sendMessage(msg);
-                                                    } catch (AVException e) {
-                                                        e.printStackTrace();
-                                                        Message msg = Message.obtain();
-                                                        msg.obj = e;
-                                                        msg.what = handle4AVException;
-                                                        handler.sendMessage(msg);
-                                                    }
-                                                }
-                                                //ui删除 从数据源中重新获取list并设置到adapter中
-                                                status = statusDataGot;
-                                                getAdapter4note(800);
-                                            }
-                                        }).start();
-                                        new Thread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
-                                                    //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
-                                                    for (int j = 0; j < MyApplication.listFolder.size(); j++) {
-                                                        if (noteAdapter.getDeleteItem(i).getFolderId().equals(MyApplication.listFolder.get(j).getObjectId())) {
-                                                            noteAdapter.listDeleteNum[j]++;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                //num-1
-                                                for (int i = 0; i < noteAdapter.listDeleteNum.length; i++) {
-                                                    if (noteAdapter.listDeleteNum[i] != 0) {
-                                                        MyApplication.listFolder.get(i).dec(noteAdapter.listDeleteNum[i]);
-                                                    }
+                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                            final Note delete = noteAdapter.getDeleteItem(i);
+                                            //线上删除
+                                            Trace.d("delete", delete.getTitle());
+                                            delete.delete(getActivity());
+                                            MyApplication.listNote.remove(delete);//从数据源中删除
+                                            Message msg = Message.obtain();
+                                            msg.obj = delete;
+                                            msg.what = handle4explosion;//ui特效
+                                            handler.sendMessage(msg);
+                                        }
+                                        //ui删除 从数据源中重新获取list并设置到adapter中
+                                        status = statusDataGot;
+                                        getAdapter4note(800);//
+                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                            //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
+                                            for (int j = 0; j < MyApplication.listFolder.size(); j++) {
+                                                if (noteAdapter.getDeleteItem(i).getFolderId().equals(MyApplication.listFolder.get(j).getObjectId())) {
+                                                    noteAdapter.listDeleteNum[j]++;
+                                                    break;
                                                 }
                                             }
-                                        }).start();
+                                        }
+                                        //num-1
+                                        for (int i = 0; i < noteAdapter.listDeleteNum.length; i++) {
+                                            if (noteAdapter.listDeleteNum[i] != 0) {
+                                                MyApplication.listFolder.get(i).dec(getActivity(), noteAdapter.listDeleteNum[i]);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -442,9 +426,13 @@ public class NoteFragment extends BaseFragment
         mNoteWDList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                MainActivity m = (MainActivity) getActivity();
-                m.hideBtnAdd();
-                EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
+                if (MyApplication.listFolder.size() > 0) {
+                    MainActivity m = (MainActivity) getActivity();
+                    m.hideBtnAdd();
+                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
+                } else {
+                    Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+                }
             }
         });
     }

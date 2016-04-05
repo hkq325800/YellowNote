@@ -120,6 +120,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
     public void setFolders(List<SimpleFolder> mFolders) {
         this.mFolders = mFolders;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -145,7 +146,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return null;
     }
 
-//    private SystemHandler handler = new SystemHandler(this) {
+    //    private SystemHandler handler = new SystemHandler(this) {
 //
 //        @Override
 //        public void handlerMessage(Message msg) {
@@ -162,6 +163,11 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 //            }
 //        }
 //    };
+    boolean isFirst = true;
+
+    public void setIsFirstTrue() {
+        isFirst = true;
+    }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
@@ -215,7 +221,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     }
                 } else {
                     //开启动画
-                    if (thisItem.getFolderPosition() == shownFolderPosition && !thisItem.isHasShownAnim()) {
+                    if (!isFirst && thisItem.getFolderPosition() == shownFolderPosition && !thisItem.isHasShownAnim()) {
 //                        Trace.d(thisItem.getFolderPosition() + "开启1" + mHolder.isShown);
                         mHolder.runAnimator(true);//后行 等待关闭动画结束
                         thisItem.setHasShownAnim(true);
@@ -287,7 +293,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     public void openFolder(int position) {
-
+        isFirst = false;
         if (!isAnimating) {
             isAnimating = true;
             if (position != shownFolderPosition) {//点击了其他目标
@@ -403,7 +409,8 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     }
                 });
             }
-//            valueAnimator.setStartDelay(200);
+//            if (isExpand)
+//                valueAnimator.setStartDelay(200);
             valueAnimator.setDuration(animDuration);
             valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                 public void onAnimationUpdate(ValueAnimator animation) {

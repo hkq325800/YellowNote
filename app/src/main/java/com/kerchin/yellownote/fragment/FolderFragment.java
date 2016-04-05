@@ -34,7 +34,7 @@ import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.ItemDrag.ItemDragHelperCallback;
-import com.kerchin.yellownote.model.Folder;
+import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
@@ -76,8 +76,74 @@ public class FolderFragment extends BaseFragment {
                         final ItemTouchHelper helper = new ItemTouchHelper(callback);
                         GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
                         MyApplication.getItemsReady();
-                        folderAdapter = new FolderAdapter(getActivity()
-                                , helper, mHeaders, MyApplication.mItems);
+                        if (folderAdapter == null) {
+                            folderAdapter = new FolderAdapter(getActivity()
+                                    , helper, mHeaders, MyApplication.mItems);
+
+                            folderAdapter.setOnMyChannelItemClickListener(new FolderAdapter.OnFolderItemClickListener() {
+                                @Override
+                                public void onItemClick(View v, int position, int viewType) {
+                                    if (viewType == FolderAdapter.TYPE_HEADER) {
+                                        folderAdapter.openFolder(position);
+                                    }
+                                }
+
+                                @Override
+                                public void onItemLongClick(View v, final int position, int viewType) {
+                                    if (viewType == FolderAdapter.TYPE_HEADER) {
+                                        MainActivity mainActivity = (MainActivity) getActivity();
+                                        mainActivity.hideBtnAdd();
+                                        if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
+                                            //reTitle
+                                            reTitleDialogShow(position);
+                                        } else {
+                                            Trace.show(getActivity(), "默认笔记夹不许更名");
+                                        }
+                                    } else if (viewType == FolderAdapter.TYPE_ITEM) {
+
+                                    }
+                                    //笔记删除的代码
+//                                    if (viewType == FolderAdapter.TYPE_HEADER) {
+//                                        if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
+//                                            //del
+//                                            if (MyApplication.listFolder.get(
+//                                                    realFolderPosition(position)).getContain() != 0)
+//                                                //笔记夹下如果还有笔记要么全部删除要么移至默认
+//                                                Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
+//                                            else {
+//                                                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+//                                                ad.setTitle("确认删除?");
+//                                                ad.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                                                    @Override
+//                                                    public void onClick(DialogInterface dialog, int which) {
+//                                                        dialog.dismiss();
+//                                                    }
+//                                                });
+//                                                ad.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+//                                                    @Override
+//                                                    public void onClick(DialogInterface dialog, int which) {
+//                                                        dialog.dismiss();
+//                                                        MyApplication.listFolder.get(
+//                                                                realFolderPosition(position))
+//                                                                .delete(getActivity(), realFolderPosition(position), handler, handle4respond);
+//                                                    }
+//                                                });
+//                                                ad.show();
+//                                            }
+//                                        } else {
+//                                            Trace.show(getActivity(), "默认笔记夹不许删除");
+//                                        }
+//                                    } else if (viewType == FolderAdapter.TYPE_ITEM) {
+//
+//                                    }
+                                }
+                            });
+                        } else {
+                            folderAdapter.setFolders(mHeaders);
+                            //滑动到新添加的笔记夹 TODO 失效
+//                            folderAdapter.setIsFirstTrue();
+//                            mRecycleView.scrollToPosition(mHeaders.get(mHeaders.size() - 1).getId());
+                        }
                         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                             @Override
                             public int getSpanSize(int position) {
@@ -87,73 +153,6 @@ public class FolderFragment extends BaseFragment {
                         });
                         mRecycleView.setLayoutManager(manager);
                         helper.attachToRecyclerView(mRecycleView);
-                        folderAdapter.setOnMyChannelItemClickListener(new FolderAdapter.OnFolderItemClickListener() {
-                            @Override
-                            public void onItemClick(View v, int position, int viewType) {
-                                if (viewType == FolderAdapter.TYPE_HEADER) {
-                                    folderAdapter.openFolder(position);
-                                }
-                            }
-
-                            @Override
-                            public void onItemLongClick(View v, final int position, int viewType) {
-                                if (viewType == FolderAdapter.TYPE_HEADER) {
-                                    MainActivity mainActivity = (MainActivity) getActivity();
-                                    mainActivity.hideBtnAdd();
-                                    if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
-                                        //reTitle
-                                        reTitleDialogShow(position);
-                                    } else {
-                                        Trace.show(getActivity(), "默认笔记夹不许更名");
-                                    }
-                                } else if (viewType == FolderAdapter.TYPE_ITEM) {
-
-                                }
-                                //笔记删除的代码
-//                                if (viewType == FolderAdapter.TYPE_HEADER) {
-//                                    if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
-//                                        //del
-//                                        if (MyApplication.listFolder.get(
-//                                                realFolderPosition(position)).getContain() != 0)
-//                                            //笔记夹下如果还有笔记要么全部删除要么移至默认
-//                                            Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
-//                                        else {
-//                                            AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-//                                            ad.setTitle("确认删除?");
-//                                            ad.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    dialog.dismiss();
-//                                                }
-//                                            });
-//                                            ad.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-//                                                @Override
-//                                                public void onClick(DialogInterface dialog, int which) {
-//                                                    dialog.dismiss();
-//                                                    new Thread(new Runnable() {
-//                                                        @Override
-//                                                        public void run() {
-//                                                            try {
-//                                                                MyApplication.listFolder.get(
-//                                                                        realFolderPosition(position))
-//                                                                        .delete(getActivity(), realFolderPosition(position), handler, handle4respond);
-//                                                            } catch (AVException e) {
-//                                                                e.printStackTrace();
-//                                                            }
-//                                                        }
-//                                                    }).start();
-//                                                }
-//                                            });
-//                                            ad.show();
-//                                        }
-//                                    } else {
-//                                        Trace.show(getActivity(), "默认笔记夹不许删除");
-//                                    }
-//                                } else if (viewType == FolderAdapter.TYPE_ITEM) {
-//
-//                                }
-                            }
-                        });
                         mRecycleView.setAdapter(folderAdapter);
                     } catch (Exception e) {
                         isExit = true;
@@ -219,21 +218,11 @@ public class FolderFragment extends BaseFragment {
                 } else if (mRenameEdt.getText().toString().equals("默认")) {
                     Trace.show(getActivity(), "不要与默认笔记夹重名");
                 } else {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                MyApplication.listFolder.get(
-                                        realFolderPosition(position)).reName(getActivity()
-                                        , mRenameEdt.getText().toString()
-                                        , handler, handle4respond);
-                            } catch (AVException e) {
-                                e.printStackTrace();
-                            } finally {
-                                alertDialog.dismiss();
-                            }
-                        }
-                    }).start();
+                    MyApplication.listFolder.get(
+                            realFolderPosition(position)).reName(getActivity()
+                            , mRenameEdt.getText().toString()
+                            , handler, handle4respond);
+                    alertDialog.dismiss();
                     MainActivity mainActivity = (MainActivity) getActivity();
                     mainActivity.showBtnAdd();
                 }
@@ -467,7 +456,7 @@ public class FolderFragment extends BaseFragment {
 
             private boolean contain(Folder folder) {
                 for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-                    if (MyApplication.listFolder.get(i).getName().equals(folder.getName())) {
+                    if (MyApplication.listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
                         return true;
                     }
                 }
@@ -520,8 +509,8 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessage(handle4refresh);
         } else if (status == statusRespond) {
             handler.sendEmptyMessage(handle4respond);
-        } else if(status == statusDataReGot) {
-            Trace.d("isItemsReady lisNoteSize:" + MyApplication.listNote.size());
+        } else if (status == statusDataReGot) {
+            Trace.d("statusDataReGot");
             handler.sendEmptyMessage(handle4newFolder);
         }
     }

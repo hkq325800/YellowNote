@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVOSCloud;
-import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
-import com.kerchin.yellownote.model.Folder;
-import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.bean.Folder;
+import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.CrashExceptionHandler;
-import com.kerchin.yellownote.utilities.CrashHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
@@ -31,9 +29,9 @@ public class MyApplication extends Application {
     private static SharedPreferences shared;
     private static final String SaltKey = "xiaohuangj";
     private static boolean isLogin = false;
-    public static ArrayList<Folder> listFolder;
-    public static ArrayList<Note> listNote;
-    public static List<SimpleNote> mItems;
+    public static volatile ArrayList<Folder> listFolder;
+    public static volatile ArrayList<Note> listNote;
+    public static volatile List<SimpleNote> mItems;
     public static String user;
     public static String userDefaultFolderId = "";
     public static String view = "note";

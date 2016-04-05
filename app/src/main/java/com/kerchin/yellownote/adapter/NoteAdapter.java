@@ -6,18 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.CommonViewHolder;
-import com.kerchin.yellownote.model.Note;
+import com.kerchin.yellownote.bean.Note;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 
 /**
  * Created by Kerchin on 2016/1/23 0023.

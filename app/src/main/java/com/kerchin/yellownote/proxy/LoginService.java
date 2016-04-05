@@ -20,9 +20,9 @@ public class LoginService {
 
     public static void forgetVerify(String objectId, String txtPass) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        AVObject User = query.get(objectId);
-        User.put("user_pass", MyApplication.Secret(txtPass));
-        User.save();
+        AVObject user = query.get(objectId);
+        user.put("user_pass", MyApplication.Secret(txtPass));
+        user.save();
     }
 
     public static AVObject isRegistered(String txtUser) throws AVException {
@@ -32,19 +32,19 @@ public class LoginService {
     }
 
     public static AVObject signUpVerify(final String txtUser) throws AVException {
-        final AVObject Folder = new AVObject("Folder");
-        Folder.put("user_tel", txtUser);
-        Folder.setFetchWhenSave(true);
-        Folder.save();
-        return Folder;
+        final AVObject folder = new AVObject("Folder");
+        folder.put("user_tel", txtUser);
+        folder.setFetchWhenSave(true);
+        folder.save();
+        return folder;
     }
 
     public static void userSignUp(String txtUser, String txtPass, String objectId) throws AVException {
-        AVObject User = new AVObject("mUser");
-        User.put("user_tel", txtUser);
-        User.put("user_default_folderId", objectId);
-        User.put("user_pass", MyApplication.Secret(txtPass));
-        User.save();
+        AVObject user = new AVObject("mUser");
+        user.put("user_tel", txtUser);
+        user.put("user_default_folderId", objectId);
+        user.put("user_pass", MyApplication.Secret(txtPass));
+        user.save();
     }
 
     public static void sendProv(String txtUser,boolean isSignUp, int count) throws AVException {
