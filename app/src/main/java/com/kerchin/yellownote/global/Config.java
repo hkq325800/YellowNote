@@ -5,7 +5,7 @@ package com.kerchin.yellownote.global;
  */
 public class Config {
 
-    public static boolean isDebugMode = false;
+    public static boolean isDebugMode = true;
     /**
      * LeanCloud所需配置
      */

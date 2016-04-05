@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
@@ -97,7 +98,7 @@ public class Note {
     }
 
     //笔记移动
-    public void move2folder(final Context context, final Folder newOne) throws AVException {
+    public void move2folder(final Activity context, final Folder newOne) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject Note = query.get(objectId);
         Note.put("folder_name", newOne.getName());
@@ -157,7 +158,7 @@ public class Note {
     }
 
     //保存更改
-    public void saveChange(final Context context, final String newTitle, final String newContent
+    public void saveChange(final Activity context, final String newTitle, final String newContent
             , final Handler handler, final byte handle4saveChange) throws AVException {
         if (objectId.equals("")) {//新增
             FolderFragment.isChanged4folder = true;
@@ -266,7 +267,7 @@ public class Note {
     }
 
     //编辑界面的删除
-    public void delete(final Context context, final Handler handler, final byte handle4reset
+    public void delete(final Activity context, final Handler handler, final byte handle4reset
             , final String folderId) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject Note = query.get(objectId);
@@ -294,7 +295,7 @@ public class Note {
     }
 
     //更名的批量移动
-    public void move2folder(final Context context, final String newOne, final String newFolderId) throws AVException {
+    public void move2folder(final Activity context, final String newOne, final String newFolderId) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         query.getInBackground(objectId, new GetCallback<AVObject>() {
             @Override

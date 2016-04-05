@@ -43,7 +43,7 @@
         <activity
             android:name=".activity.SettingActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:theme="@style/JK.SwipeBack.Transparent.Theme" />
         <!--<activity android:name=".activities.MaterialActivity" />-->
     </application>

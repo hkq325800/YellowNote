@@ -1,43 +1,35 @@
 package com.kerchin.yellownote.activity;
 
-import android.app.Activity;
-import android.app.LauncherActivity;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by Administrator on 2016/4/3 0003.
+ * Created by Kerchin on 2016/4/3 0003.
  */
 public class LaunchActivity extends BaseActivity {
+    final static int delayTime = 1000;
+    final static int delayTimeToLogin = 1500;
     View view;
     @Bind(R.id.mLoginRetryLinear)
     LinearLayout mLoginRetryLinear;
@@ -52,12 +44,10 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     protected void initializeClick(Bundle savedInstanceState) {
-
     }
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-
     }
 
     @Override
@@ -73,54 +63,15 @@ public class LaunchActivity extends BaseActivity {
                 }
             }
         });
-        loginVerify(MyApplication.user, pass);
         //guidePage
-//        if (PrefsAccessor.getInstance().getBoolean(SysConfig.GUIDE_FLAG, false)) {
-        // 2秒的动画
-//            AlphaAnimation animation = new AlphaAnimation(0.3f, 1.0f);
-//            animation.setDuration(1500);
-//            animation.setAnimationListener(new Animation.AnimationListener() {
-//
-//                @Override
-//                public void onAnimationStart(Animation animation) {
-//                    String pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
-//                    loginVerify(MyApplication.user, pass);
-//                }
-//
-//                @Override
-//                public void onAnimationRepeat(Animation animation) {
-//
-//                }
-//
-//                @Override
-//                public void onAnimationEnd(Animation animation) {
-//                    // 跳转界面
-//
-//                    if (IUEApplication.isLogin) {
-//                        if (IUEApplication.getDoctorSetting()
-//                                .getRegisterState() == RegisterState.unPass
-//                                || IUEApplication.getDoctorSetting()
-//                                .getRegisterState() == RegisterState.unRegister) {
-//                            startActivity(new Intent(LauncherActivity.this,
-//                                    ApplyDoctorActivity.class));
-//                        } else {
-//                            startActivity(new Intent(LauncherActivity.this,
-//                                    MainActivity.class));
-//                        }
-//                    } else {
-//
-//                        startActivity(new Intent(LauncherActivity.this,
-//                                LoginActivity.class));
-//
-//                    }
-//                    finish();
-//                }
-//            });
-//            view.setAnimation(animation);
-//        } else {
+        if (MyApplication.getDefaultShared().getBoolean("isGuide", false)) {
+            loginVerify(MyApplication.user, pass);
+
 //            startActivity(new Intent(this, GuideActivity.class));
 //            finish();
-//        }
+        } else {
+            loginVerify(MyApplication.user, pass);
+        }
     }
 
     private void immerge(int color) {
@@ -133,11 +84,6 @@ public class LaunchActivity extends BaseActivity {
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                     | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//
-            // Translucent status bar
-//            Window window = getWindow();
-//            window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-//                    WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             setStatusBarColor(color);//阴影绘制
             //设置状态栏颜色
 //            getWindow().setStatusBarColor(getResources().getColor(color));
@@ -154,11 +100,11 @@ public class LaunchActivity extends BaseActivity {
             tintManager.setTintResource(color);
             //激活导航栏会变黑
             //透明导航栏
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//            //激活导航栏设置
-//            tintManager.setNavigationBarTintEnabled(true);
-//            //设置导航栏颜色
-//            tintManager.setNavigationBarTintResource(color);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            //激活导航栏设置
+            tintManager.setNavigationBarTintEnabled(true);
+            //设置导航栏颜色
+            tintManager.setNavigationBarTintResource(color);
         }
     }//登录操作确认
 
@@ -166,25 +112,27 @@ public class LaunchActivity extends BaseActivity {
     private static final byte wel = 0;
     private static final byte next = 1;
     private static final byte reLog = 2;
-    private static final byte withoutNet = 3;
+    private static final byte reLogForFrozen = 4;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case wel:
+                case wel://首次登陆
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
                     break;
-                case reLog:
+                case reLog://由于密码错误重新登陆
+                    Trace.show(LaunchActivity.this, "你的密码已被修改,请重新登录", Toast.LENGTH_LONG);
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
-//                    mLoginUserEdt.setText(MyApplication.user);
                     break;
-                case next:
+                case reLogForFrozen://由于账户冻结重新登陆
+                    Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
+                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    finish();
+                    break;
+                case next://缓存正确 直接进入
                     NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
                     finish();
-                    break;
-                case withoutNet:
-                    Trace.show(LaunchActivity.this, "请检查网络后单击图标重试", Toast.LENGTH_LONG);
                     break;
                 default:
                     break;
@@ -197,50 +145,44 @@ public class LaunchActivity extends BaseActivity {
         //缓存查询流程
         if (!txtUser.equals("") && !txtPass.equals("")) {
             //密码查询
-            AVQuery<AVObject> query = new AVQuery<>("mUser");
-            query.whereEqualTo("user_tel", txtUser);
-            query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
-            query.findInBackground(new FindCallback<AVObject>() {
-                public void done(List<AVObject> avObjects, AVException e) {
-                    if (e == null) {
-                        Trace.d("查询缓存 查询到" + avObjects.size() + " 条符合条件的数据");
-                        if (avObjects.size() > 0) {
-                            boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
-                            Trace.d("isFrozen " + isFrozen);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        AVObject avObjects = LoginService.loginVerify(txtUser, txtPass);
+                        if (avObjects != null) {
+                            Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
+                            boolean isFrozen = avObjects.getBoolean("isFrozen");
                             if (isFrozen) {
-                                Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
-                                Message message = Message.obtain();//更新UI
-                                message.what = reLog;
-                                handler.sendMessageDelayed(message, 1000);
+                                Message message = Message.obtain();//由于账户冻结重新登陆
+                                message.what = reLogForFrozen;
+                                handler.sendMessageDelayed(message, delayTime);
                             } else {
-                                MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
+                                //保存默认笔记夹id
+                                MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
                                 //缓存正确跳转
-                                Message message = Message.obtain();//更新UI
+                                Message message = Message.obtain();//直接进入
                                 message.what = next;
-                                handler.sendMessageDelayed(message, 1000);
+                                handler.sendMessageDelayed(message, delayTime);
                             }
                         } else {
                             //缓存错误重新登录
-                            Trace.show(LaunchActivity.this, "你的密码已被修改,请重新登录");
-                            Message message = Message.obtain();//更新UI
+                            Message message = Message.obtain();//由于密码错误重新登陆
                             message.what = reLog;
-                            handler.sendMessageDelayed(message, 1000);
+                            handler.sendMessageDelayed(message, delayTimeToLogin);
                         }
-                    } else {
+                    } catch (AVException e) {
                         e.printStackTrace();
                         isNeedToRefresh = true;
-                        Message message = Message.obtain();//更新UI
-                        message.what = withoutNet;
-                        handler.sendMessageDelayed(message, 1000);
+                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
                 }
-            });
+            }).start();
         } else {//无缓存显示界面
-            //注销时logoutFlag为true不显示welcome
-            Message message = Message.obtain();//更新UI
+            Message message = Message.obtain();//首次登陆
             message.what = wel;
             //TODO delay时间随加载快慢变化
-            handler.sendMessageDelayed(message, 1500);
+            handler.sendMessageDelayed(message, delayTimeToLogin);
         }
     }
 }

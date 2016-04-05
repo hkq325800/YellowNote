@@ -250,6 +250,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                                             , mNote.getFolderId());
                                 } catch (AVException e) {
                                     e.printStackTrace();
+                                    Trace.show(EditActivity.this, "删除确认失败" + Trace.getErrorMsg(e));
                                 }
                             }
                         }).start();
@@ -398,7 +399,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void run() {
                 try {
-                    mNote.saveChange(getApplicationContext()
+                    mNote.saveChange(EditActivity.this
                             , mNavigationTitleEdt.getText().toString()
                             , mEditContentEdt.getText().toString()
                             , handler, handle4saveChange);
@@ -412,9 +413,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     msg.obj = false;
                     msg.what = handle4saveChange;
                     handler.sendMessage(msg);
-                    Looper.prepare();
                     Trace.show(EditActivity.this, "保存更改失败" + Trace.getErrorMsg(e));
-                    Looper.loop();
                     e.printStackTrace();
                 }
             }

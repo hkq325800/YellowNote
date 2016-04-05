@@ -10,18 +10,18 @@ import android.os.Message;
  * @author syc
  */
 public abstract class SystemHandler extends Handler {
-	private WeakReference<Object> weekPeference;
+	private WeakReference<Object> weekReference;
 
 	
 
 	public SystemHandler(Object obj) {
-		weekPeference = new WeakReference<Object>(obj);
+		weekReference = new WeakReference<Object>(obj);
 	}
 
 	@Override
 	public void dispatchMessage(Message msg) {
 		super.dispatchMessage(msg);
-		Object obj = weekPeference.get();
+		Object obj = weekReference.get();
 		if (null != obj)
 			handlerMessage(msg);
 	}

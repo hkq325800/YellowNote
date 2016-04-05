@@ -1,11 +1,15 @@
 package com.kerchin.yellownote.utilities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
 
+/**
+ * Created by Kerchin on 2016/3/1 0005.
+ */
 public class Trace {
     public static final String TAG = "hkq_trace";
 
@@ -57,27 +61,32 @@ public class Trace {
         }
     }
 
-    public static void show(Context context, String msg) {
-        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    public static void show(final Activity context, final String msg) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    public static void show(Context context, String msg, int length) {
-        Toast.makeText(context, msg, length).show();
-    }
-
-    public static void show(Context context, int id) {
-        Toast.makeText(context, context.getResources().getString(id),
-                Toast.LENGTH_SHORT).show();
+    public static void show(final Activity context, final String msg, final int length) {
+        context.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, length).show();
+            }
+        });
     }
 
     public static String getErrorMsg(Exception e) {
-        if (Config.isDebugMode) {
-            if (e.getMessage() != null) {
+        if (e.getMessage() != null) {
+            if (Config.isDebugMode)
                 return e.getMessage();
-            } else {
+            else
                 return "";
-            }
-        } else
-            return "请检查网络";
+        } else {
+            return "";
+        }
     }
 }

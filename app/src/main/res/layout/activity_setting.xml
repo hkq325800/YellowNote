@@ -10,6 +10,7 @@
         android:layout_height="?attr/actionBarSize" />
 
     <ScrollView
+        android:id="@+id/mSettingScV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize">
@@ -33,6 +34,7 @@
                 android:layout_below="@id/mSettingTipsTxt"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
+                android:focusableInTouchMode="true"
                 android:src="@mipmap/ic_code" />
 
             <TextView
@@ -46,14 +48,12 @@
                 android:id="@+id/mSettingTouchTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/mSettingCodeImg"
+                android:layout_below="@id/mSettingCodeImg"
                 android:padding="20dp">
 
                 <EditText
                     android:id="@+id/mSettingTouchEdt"
                     android:layout_width="match_parent"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
                     android:layout_height="wrap_content"
                     android:hint="留下您的QQ或邮箱(选填)"
                     android:maxLength="500"
@@ -71,8 +71,6 @@
                     android:id="@+id/mSettingContentEdt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
                     android:hint="您的建议就是我的最大动力"
                     android:maxLength="500"
                     android:textSize="16sp" />

@@ -55,6 +55,7 @@ public class FolderFragment extends BaseFragment {
     private final byte statusDataGot = 0;//重置listFolder
     private final byte statusRefresh = 1;//getData getAdapter4 handle4refresh handle4refresh
     private final byte statusRespond = 2;//根据listFolder重置dataList4folder
+    private final byte statusDataReGot = 3;
     private final byte statusDataError = 11;
     private List<SimpleFolder> mHeaders;
     private FolderAdapter folderAdapter;
@@ -310,9 +311,9 @@ public class FolderFragment extends BaseFragment {
                                                 if (e == null) {
                                                     Trace.show(getActivity(), "保存成功");
                                                     Trace.d("saveNewFolder", "成功");
-                                                    status = statusDataGot;
-                                                    statusName = "dataGot";
-                                                    getData(statusDataGot);
+                                                    status = statusDataReGot;
+                                                    statusName = "dataReGot";
+                                                    getData(statusDataReGot);
                                                 } else {
                                                     Trace.show(getActivity(), "操作失败,请检查网络");
                                                     e.printStackTrace();
@@ -401,7 +402,6 @@ public class FolderFragment extends BaseFragment {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-//                Trace.d("newState" + newState);
             }
 
             @Override
@@ -414,28 +414,6 @@ public class FolderFragment extends BaseFragment {
                 } else if (m.isHide && dy < 0) {
                     m.showBtnAdd();
                 }
-//                if (firstVisibleItem > lastVisibleItemPosition) {// 上滑
-//                    if (firstVisibleItem + visibleItemCount > totalItemCount) {//到底
-//                        Trace.d("end");
-//                        MainActivity m = (MainActivity) getActivity();
-//                        if (m.isHide) {
-//                            m.showBtnAdd();
-//                        }
-//                    } else {//未到底
-//                        MainActivity m = (MainActivity) getActivity();
-//                        if (!m.isHide) {
-//                            m.hideBtnAdd();
-//                        }
-//                    }
-//                } else if (firstVisibleItem < lastVisibleItemPosition) {// 下滑
-//                    MainActivity m = (MainActivity) getActivity();
-//                    if (m.isHide) {
-//                        m.showBtnAdd();
-//                    }
-//                } else {
-//                    return;
-//                }
-//                lastVisibleItemPosition = firstVisibleItem;
             }
         });
         MyApplication.listFolder = new ArrayList<>();//初始化列表
@@ -533,13 +511,18 @@ public class FolderFragment extends BaseFragment {
             } else {
                 Trace.d("isItemsReady isn't ready:" + repeatCount);
                 repeatCount++;
-                if (repeatCount < 150)
+                if (repeatCount < 50)
                     handler.postDelayed(runnableForAdapter, 200);
+                else
+                    Trace.show(getActivity(), "超时");
             }
         } else if (status == statusRefresh) {
             handler.sendEmptyMessage(handle4refresh);
         } else if (status == statusRespond) {
             handler.sendEmptyMessage(handle4respond);
+        } else if(status == statusDataReGot) {
+            Trace.d("isItemsReady lisNoteSize:" + MyApplication.listNote.size());
+            handler.sendEmptyMessage(handle4newFolder);
         }
     }
 

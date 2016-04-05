@@ -4,10 +4,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -15,48 +12,39 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVMobilePhoneVerifyCallback;
-import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.RequestMobileCodeCallback;
-import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.base.User;
+import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
-import java.util.List;
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-
+/**
+ * Created by Kerchin on 2015/8/1 0005.
+ */
 public class LoginActivity extends User {
-    boolean isEnter = false;
-    boolean isNeedToRefresh = false;
-    //    String pass;
-    boolean logoutFlag = false;
     private static final String LOG_TAG = "YellowNote-" + LoginActivity.class.getSimpleName();
     private static Long mExitTime = (long) 0;//退出时间
-    private String objectId;
-    private byte registerStatus = -1;
-    private boolean smsStatus = false;
     private final byte statusInit = -1;//未查询或查询中
     private final byte statusFalse = 0;//查询结果为假
     private final byte statusTrue = 1;//查询结果为真
+    boolean isEnter = false;
+    private String objectId;
+    private byte registerStatus = -1;
+    private boolean smsStatus = false;
     @Bind(R.id.mLoginScV)
     ScrollView mLoginScV;
     @Bind(R.id.mLoginUserEdt)
@@ -79,49 +67,10 @@ public class LoginActivity extends User {
     RelativeLayout mSignUpRelative;
     @Bind(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
-    @Bind(R.id.mLoginRePassTextInput)
-    TextInputLayout mLoginRePassTextInput;
-    @Bind(R.id.mLoginSendProvTextInput)
-    TextInputLayout mLoginSendProvTextInput;
-    private static final byte wel = 0;
-    private static final byte next = 1;
-    private static final byte reLog = 2;
-    private static final byte withoutNet = 3;
-    private Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case wel:
-                    Trace.d("wel");
-                    setContentView(R.layout.activity_login);
-                    immerge(R.color.lightSkyBlue);
-                    init();
-                    System.gc();
-                    break;
-                case reLog:
-                    Trace.d("reLog");
-                    setContentView(R.layout.activity_login);
-                    immerge(R.color.lightSkyBlue);
-                    init();
-                    mLoginUserEdt.setText(MyApplication.user);
-                    break;
-                case next:
-                    NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
-                    finish();
-                    break;
-                case withoutNet:
-                    Trace.show(LoginActivity.this, "请检查网络后单击图标重试", Toast.LENGTH_LONG);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        logoutFlag = getIntent().getBooleanExtra("logoutFlag", false);
-
         setContentView(R.layout.activity_login);
         immerge(R.color.lightSkyBlue);
         init();
@@ -153,11 +102,11 @@ public class LoginActivity extends User {
             tintManager.setTintResource(color);
             //激活导航栏会变黑
             //透明导航栏
-//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-//            //激活导航栏设置
-//            tintManager.setNavigationBarTintEnabled(true);
-//            //设置导航栏颜色
-//            tintManager.setNavigationBarTintResource(color);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            //激活导航栏设置
+            tintManager.setNavigationBarTintEnabled(true);
+            //设置导航栏颜色
+            tintManager.setNavigationBarTintResource(color);
         }
     }
 
@@ -169,7 +118,6 @@ public class LoginActivity extends User {
             mLoginPassEdt.requestFocus();
         } else
             mLoginUserEdt.requestFocus();
-        //弹出软键盘
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -184,23 +132,20 @@ public class LoginActivity extends User {
                 return false;
             }
         });
-//        mLoginUserEdt.setOnTouchListener(null);
-//        mLoginPassEdt.setOnTouchListener(null);
-//        mLoginRePassEdt.setOnTouchListener(null);
-//        mLoginProveEdt.setOnTouchListener(onTouchListener);
+        //禁止scrollview的滑动
+        mLoginScV.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View arg0, MotionEvent arg1) {
+                return true;
+            }
+        });
         mLoginFunLiL.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-//                mLoginIconImg.animate().alpha(0).setDuration(400).start();
-//                Trace.d("left"+left+"/top"+top+"/right"+right+"/bottom"+bottom);
-//                Trace.d("oldLeft"+oldLeft+"/oldTop"+oldTop+"/oldRight"+oldRight+"/oldBottom"+oldBottom);
-
-//                Trace.d("left" + mLoginScV.getLeft() + "/top" + mLoginScV.getTop() + "/right" + mLoginScV.getRight() + "/bottom" + mLoginScV.getBottom());
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         mLoginScV.smoothScrollTo(0, mLoginScV.getHeight());
-//                        Trace.d("left" + mLoginScV.getLeft() + "/top" + mLoginScV.getTop() + "/right" + mLoginScV.getRight() + "/bottom" + mLoginScV.getBottom());
                     }
                 }, 400);
             }
@@ -344,7 +289,7 @@ public class LoginActivity extends User {
         }
     }
 
-    //注册流程起点
+    //注册流程起点 已将isRegistered放在sendProv中判断可通过smsVerify就不再判断
     @Override
     protected void signUp() {
         final String txtUser = mLoginUserEdt.getText().toString();
@@ -357,7 +302,7 @@ public class LoginActivity extends User {
             if (Config.isDebugMode)
                 signUpVerify(txtUser, txtPass);
             else {
-                SMSVerify(txtProv, txtUser);
+                smsVerify(txtProv, txtUser);
                 new CountDownTimer(Config.timeout_avod, 500) {
                     @Override
                     public void onTick(long millisUntilFinished) {
@@ -375,7 +320,7 @@ public class LoginActivity extends User {
                 }.start();
             }
         } else
-            isEnter = false;
+            isEnter = false;//signUp tableCheck false
     }
 
     //找回密码流程起点
@@ -398,23 +343,27 @@ public class LoginActivity extends User {
                         if (registerStatus == statusFalse) {
                             Trace.show(LoginActivity.this, "该帐号尚未注册");
                         } else {
-                            //验证验证码成功则找回成功以该帐号登录
-                            SMSVerify(txtProv, txtUser);
-                            new CountDownTimer(Config.timeout_avod, 500) {
-                                @Override
-                                public void onTick(long millisUntilFinished) {
-                                    if (smsStatus) {
-                                        cancel();
-                                        smsStatus = false;
-                                        Trace.d("CDTimer SMSVerify server echo " + millisUntilFinished);
-                                        forgetVerify(txtUser, txtPass);
+                            if (Config.isDebugMode)
+                                forgetVerify(txtUser, txtPass);
+                            else {
+                                //验证验证码成功则找回成功以该帐号登录
+                                smsVerify(txtProv, txtUser);
+                                new CountDownTimer(Config.timeout_avod, 500) {
+                                    @Override
+                                    public void onTick(long millisUntilFinished) {
+                                        if (smsStatus) {
+                                            cancel();
+                                            smsStatus = false;
+                                            Trace.d("CDTimer SMSVerify server echo " + millisUntilFinished);
+                                            forgetVerify(txtUser, txtPass);
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onFinish() {
-                                }
-                            }.start();
+                                    @Override
+                                    public void onFinish() {
+                                    }
+                                }.start();
+                            }
                         }
                         registerStatus = statusInit;
                     }
@@ -425,18 +374,18 @@ public class LoginActivity extends User {
                 }
             }.start();
         } else
-            isEnter = false;
+            isEnter = false;//forgetSecret tableCheck false
     }
 
     //发送验证码
     @Override
-    protected void sendProv(boolean isSignup, String txtUser, final int count) {
-        AVOSCloud.requestSMSCodeInBackground(txtUser, "小黄云笔记", isSignup ? "注册" : "找回密码", count, new RequestMobileCodeCallback() {
+    protected void sendProv(final boolean isSignUp, final String txtUser, final int count) {
+        mLoginSendProvBtn.setEnabled(false);
+        mLoginUserEdt.setEnabled(false);
+        new Thread(new Runnable() {
             @Override
-            public void done(AVException e) {
-                if (e == null) {
-                    mLoginSendProvBtn.setEnabled(false);
-                    mLoginUserEdt.setEnabled(false);
+            public void run() {
+                try {
                     new CountDownTimer(count * 60 * 1000, 1000) {
                         @Override
                         public void onTick(long millisUntilFinished) {
@@ -450,31 +399,32 @@ public class LoginActivity extends User {
                             mLoginSendProvBtn.setText("发送验证码");
                         }
                     }.start();
-                } else {
+                    LoginService.sendProv(txtUser, isSignUp, count);
+                } catch (AVException e) {
+                    Trace.e("发送验证码失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                     Trace.show(LoginActivity.this, "发送验证码失败" + Trace.getErrorMsg(e));
                 }
             }
-        });
+        }).start();
     }
 
     //短信验证
     @Override
-    protected void SMSVerify(String txtProv, String txtUser) {
-        AVOSCloud.verifySMSCodeInBackground(txtProv, txtUser,
-                new AVMobilePhoneVerifyCallback() {
-                    @Override
-                    public void done(AVException ex) {
-                        if (ex != null) {
-                            Trace.e("验证验证码失败" + Trace.getErrorMsg(ex));
-                            ex.printStackTrace();
-                            Trace.show(LoginActivity.this, "验证码错误");
-                        } else {
-                            //修改密码
-                            smsStatus = true;
-                        }
-                    }
-                });
+    protected void smsVerify(final String txtProv, final String txtUser) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    LoginService.smsVerify(txtProv, txtUser);
+                    smsStatus = true;
+                } catch (AVException e) {
+                    Trace.e("验证验证码失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                    Trace.show(LoginActivity.this, "验证码错误" + Trace.getErrorMsg(e));
+                }
+            }
+        }).start();
     }
 
     //登录操作确认
@@ -490,33 +440,36 @@ public class LoginActivity extends User {
                         Trace.show(LoginActivity.this, "该帐号尚未注册");
                     } else {
                         //密码查询
-                        AVQuery<AVObject> query = new AVQuery<>("mUser");
-                        query.whereEqualTo("user_tel", txtUser);
-                        query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
-                        query.findInBackground(new FindCallback<AVObject>() {
-                            public void done(List<AVObject> avObjects, AVException e) {
-                                if (e == null) {
-                                    Trace.d("登陆验证 查询到" + avObjects.size() + " 条符合条件的数据");
-                                    if (avObjects.size() > 0) {
-                                        boolean isFrozen = avObjects.get(0).getBoolean("isFrozen");
-                                        Trace.d("isFrozen " + isFrozen);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    AVObject avObjects = LoginService.loginVerify(txtUser, txtPass);
+                                    if (avObjects != null) {
+                                        boolean isFrozen = avObjects.getBoolean("isFrozen");
                                         if (isFrozen) {
-                                            Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com");
+                                            Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
-                                            MyApplication.userDefaultFolderId = avObjects.get(0).getString("user_default_folderId");
+                                            MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
                                             goToMain();
                                         }
                                     } else {
                                         //密码错误重新登录
-                                        mLoginPassEdt.setText("");
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                mLoginPassEdt.setText("");
+                                            }
+                                        });
                                         Trace.show(LoginActivity.this, "密码错误,请重试");
                                     }
-                                } else {
+                                } catch (AVException e) {
+                                    Trace.e("登陆验证失败" + Trace.getErrorMsg(e));
                                     e.printStackTrace();
                                     Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
                                 }
                             }
-                        });
+                        }).start();
                     }
                     registerStatus = statusInit;
                     cancel();
@@ -532,63 +485,40 @@ public class LoginActivity extends User {
     //注册操作确认
     @Override
     protected void signUpVerify(final String txtUser, final String txtPass) {
-        final AVObject Folder = new AVObject("Folder");
-        Folder.put("user_tel", txtUser);
-        Folder.setFetchWhenSave(true);
-        Folder.saveInBackground(new SaveCallback() {
+        new Thread(new Runnable() {
             @Override
-            public void done(AVException e) {
-                if (e == null) {
+            public void run() {
+                AVObject folder = null;
+                try {
+                    folder = LoginService.signUpVerify(txtUser);
                     Trace.d("signUpVerify 默认文件夹创建完成");
-                    MyApplication.userDefaultFolderId = Folder.getObjectId();
-                    AVObject User = new AVObject("mUser");
-                    User.put("user_tel", txtUser);
-                    User.put("user_default_folderId", Folder.getObjectId());
-                    User.put("user_pass", MyApplication.Secret(txtPass));
-                    User.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(AVException exx) {
-                            if (exx == null && mLoginUserEdt != null) {
-                                Trace.d("signUpVerify 用户注册完成");
-                                Trace.show(LoginActivity.this, txtUser + "注册成功");
-                                goToMain();
-                                isEnter = false;
-                            } else if (exx != null) {
-                                exx.printStackTrace();
-                                Trace.show(LoginActivity.this, "提交注册失败" + Trace.getErrorMsg(exx));
-                            }
-                        }
-                    });
-                } else {
+                    MyApplication.userDefaultFolderId = folder.getObjectId();
+                } catch (AVException e) {
+                    Trace.e("创建默认笔记夹失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
+                    Trace.show(LoginActivity.this, "创建默认笔记夹失败" + Trace.getErrorMsg(e));
+                }
+                try {
+                    if (folder != null) {
+                        LoginService.userSignUp(txtUser, txtPass, MyApplication.userDefaultFolderId);
+                        Trace.d("signUpVerify 用户注册完成");
+                        Trace.show(LoginActivity.this, txtUser + "注册成功");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                goToMain();
+                            }
+                        });
+                    }
+                } catch (AVException e) {
+                    Trace.e("提交注册失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                    Trace.show(LoginActivity.this, "提交注册失败" + Trace.getErrorMsg(e));
+                } finally {
+                    isEnter = false;//signUpVerify saveInBackground true
                 }
             }
-        });
-//        AVFile.withObjectIdInBackground("560ba05f60b2ce30b2d4727e", new GetFileCallback<AVFile>() {
-//            @Override
-//            public void done(AVFile avFile, AVException e) {
-//                if (e == null) {
-//                    AVObject Folder = new AVObject("Folder");
-//                    Folder.put("user_tel", txtUser);
-//                    Folder.put("folder_cover", avFile);
-//                    Folder.saveInBackground(new SaveCallback() {
-//                        @Override
-//                        public void done(AVException e) {
-//                            if (e == null) {
-//                                Log.d("signupVerify", "默认文件夹创建完成");
-//                                goToMain();
-//                                Toast.makeText(LoginActivity.this, txtUser + "注册成功", Toast.LENGTH_SHORT).show();
-//                                isEnter = false;
-//                            } else {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    });
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+        }).start();
     }
 
     //忘记密码操作确认
@@ -598,17 +528,20 @@ public class LoginActivity extends User {
             @Override
             public void run() {
                 try {
-                    AVQuery<AVObject> query = new AVQuery<>("mUser");
-                    AVObject User = query.get(objectId);
-                    User.put("user_pass", MyApplication.Secret(txtPass));
-                    User.saveInBackground();
-                    Looper.prepare();
+                    LoginService.forgetVerify(objectId, txtPass);
                     Trace.show(LoginActivity.this, "修改成功");
-                    goToMain();
-                    Looper.loop();
-                    isEnter = false;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            goToMain();
+                        }
+                    });
                 } catch (AVException e) {
+                    Trace.e("忘记密码操作失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
+                    Trace.show(LoginActivity.this, "忘记密码操作失败" + Trace.getErrorMsg(e));
+                } finally {
+                    isEnter = false;//forgetVerify saveInBackground true
                 }
             }
         }).start();
@@ -616,30 +549,32 @@ public class LoginActivity extends User {
 
     //是否注册验证
     @Override
-    protected void isRegistered(String txtUser) {
-        AVQuery<AVObject> query = new AVQuery<>("mUser");
-        query.whereEqualTo("user_tel", txtUser);
-        query.findInBackground(new FindCallback<AVObject>() {
-            public void done(List<AVObject> avObjects, AVException e) {
-                if (e == null) {
-                    Trace.d("验证是否已经注册 查询到" + avObjects.size() + " 条符合条件的数据");
-                    if (avObjects.size() > 0) {
-                        objectId = avObjects.get(0).getObjectId();
+    protected void isRegistered(final String txtUser) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    AVObject a = LoginService.isRegistered(txtUser);
+                    if (a != null) {
+                        Trace.d("验证是否已经注册 查询到" + a.get("user_tel") + " 已注册");
+                        objectId = a.getObjectId();
                         registerStatus = statusTrue;
-                    } else {
+                    } else
                         registerStatus = statusFalse;
-                    }
-                } else {
+                } catch (AVException e) {
+                    Trace.e("验证是否注册失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                     Trace.show(LoginActivity.this, "验证是否注册失败" + Trace.getErrorMsg(e));
                 }
             }
-        });
+        }).start();
     }
 
     //表格信息校验
     @Override
     protected boolean tableCheck(String txtUser, String txtPass, String txtRepass, String txtProv) {
+        if (Config.isDebugMode)
+            return true;
         if (txtUser.equals("") || txtUser.length() != 11) {
             Trace.show(LoginActivity.this, "请输入11位手机号并接收验证码");
             return false;

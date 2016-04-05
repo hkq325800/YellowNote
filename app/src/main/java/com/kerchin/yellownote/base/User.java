@@ -12,11 +12,6 @@ import com.kerchin.yellownote.utilities.SystemBarTintManager;
  * Created by Administrator on 2015/9/26 0026.
  */
 public abstract class User extends Activity {
-    //缓存本地信息 使用SecurePreferences
-    private static SharedPreferences shared;
-    //退出时间
-    private static Long mExitTime = (long) 0;
-
     /**
      * 点击登录：表格检查-loginVerify
      */
@@ -50,13 +45,12 @@ public abstract class User extends Activity {
      * @param txtProv 验证码
      * @param txtUser 用户名
      */
-    protected abstract void SMSVerify(String txtProv, String txtUser);
+    protected abstract void smsVerify(String txtProv, String txtUser);
 
     /**
      * 登录操作确认(查询)
      * 是否有缓存(isCache)?(密码查询?跳转主页面:重新登录):(是否注册?(密码查询?跳转主页面:失败):提示)
      *
-     * @param isCache 是否从缓存中登录
      * @param txtUser 用户名
      * @param txtPass 密码
      */

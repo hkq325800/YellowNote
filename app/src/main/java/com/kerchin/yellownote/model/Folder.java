@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 
@@ -68,7 +69,7 @@ public class Folder {
         return objectId;
     }
 
-    public void reName(final Context context, final String newName, final Handler handler
+    public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) throws AVException {
         boolean isTheSame = false;
         for (int i = 0; i < MyApplication.listFolder.size(); i++) {
@@ -112,7 +113,7 @@ public class Folder {
         }
     }
 
-    public void delete(final Context context, final int position, final SystemHandler handler, final byte handle4respond) throws AVException {
+    public void delete(final Activity context, final int position, final SystemHandler handler, final byte handle4respond) throws AVException {
         if (contain == 0) {
             AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
             AVObject Folder = query.get(objectId);
