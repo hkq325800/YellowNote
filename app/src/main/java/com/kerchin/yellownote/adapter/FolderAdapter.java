@@ -49,11 +49,12 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public static final int TYPE_ITEM = 1;
     // 是否为 编辑 模式
     private boolean isEditMode;
+    boolean isFirst = true;//防止第一次的动画
     private static final long ANIM_TIME = 360L;
     // touch 点击开始时间
     private long startTime;
     private int shownFolderPosition = 0;
-    private int lastFolderPosition = 0;
+    private int lastFolderPosition = 0;//记录上一次展现的folder的位置 用于关闭动画
     // touch 间隔时间  用于分辨是否是 "点击"
     private static final long SPACE_TIME = 100;
     private LayoutInflater mInflater;
@@ -118,8 +119,10 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         });
     }
 
-    public void setFolders(List<SimpleFolder> mFolders) {
+    public void setFolders(List<SimpleFolder> mFolders, List<SimpleNote> mNotes) {
         this.mFolders = mFolders;
+        this.mNotes = mNotes;
+        initData(this.mFolders);
         notifyDataSetChanged();
     }
 
@@ -163,11 +166,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 //            }
 //        }
 //    };
-    boolean isFirst = true;
-
-    public void setIsFirstTrue() {
-        isFirst = true;
-    }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
@@ -389,25 +387,11 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         public void runAnimator(final boolean isExpand) {
             if (isExpand) {
-//                mFolderItemRelative.setAlpha(0);
-//                mFolderItemRelative.animate()
-//                        .alpha(1)
-//                        .setDuration(200).start();
                 valueAnimator = ValueAnimator.ofFloat(0, childHeight);
-                valueAnimator.setInterpolator(ai);
+//                valueAnimator.setInterpolator(ai);
             } else {
-//                mFolderItemRelative.setAlpha(1);
-//                mFolderItemRelative.animate()
-//                        .alpha(0.2f)
-//                        .setDuration(200).start();
                 valueAnimator = ValueAnimator.ofFloat(childHeight, 0);
-                valueAnimator.setInterpolator(di);
-                valueAnimator.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        lastFolderPosition = -1;
-                    }
-                });
+//                valueAnimator.setInterpolator(di);
             }
 //            if (isExpand)
 //                valueAnimator.setStartDelay(200);

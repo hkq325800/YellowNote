@@ -21,17 +21,15 @@ import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
-import com.kerchin.yellownote.adapter.NoteAdapter;
 import com.kerchin.yellownote.adapter.NoteShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
@@ -61,7 +59,7 @@ public class NoteFragment extends BaseFragment
     private View.OnClickListener addClickListener;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
-//        private NoteAdapter noteAdapter;
+    //        private NoteAdapter noteAdapter;
     private NoteShrinkAdapter noteAdapter;
     private List<Note> list;
     private ToolbarStatus mainStatus;
@@ -86,7 +84,7 @@ public class NoteFragment extends BaseFragment
     private final byte handle4reset = 4;//由于新增、删除、修改影响note视图
     private final byte handle4loadMore = 5;
     private final byte handle4explosion = 6;
-    private final byte handle4AVException = 40;
+    //    private final byte handle4AVException = 40;
     @SuppressLint("HandlerLeak")
     private SystemHandler handler = new SystemHandler(this) {
 
@@ -99,7 +97,6 @@ public class NoteFragment extends BaseFragment
                         getDataListFromNote(MyApplication.listNote);
                         //TODO 避免滑动到顶部
                         if (noteAdapter == null)
-//                            noteAdapter = new NoteAdapter(getActivity(), list);
                             noteAdapter = new NoteShrinkAdapter(getActivity(), list, R.layout.item_note);
                         else {
                             noteAdapter.initListDelete();
@@ -186,8 +183,8 @@ public class NoteFragment extends BaseFragment
                     }
                     MyApplication.listNote.remove(note);//从数据源中删除
                     break;
-                case handle4AVException:
-                    Trace.show(getActivity(), "操作失败" + Trace.getErrorMsg((Exception) msg.obj));
+//                case handle4AVException:
+//                    Trace.show(getActivity(), "操作失败" + Trace.getErrorMsg((Exception) msg.obj));
                 default:
                     break;
             }
@@ -253,6 +250,16 @@ public class NoteFragment extends BaseFragment
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
+                                        //TODO 当前为双线程提交note的删除和folder数目的减法
+                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                            final Note note = noteAdapter.getDeleteItem(i);
+                                            //线上删除
+                                            Trace.d("delete", note.getTitle());
+                                            Message msg = new Message();
+                                            msg.obj = note;
+                                            msg.what = handle4explosion;//ui特效
+                                            note.delete(getActivity(), handler, msg);
+                                        }
                                         for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
                                             //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
                                             for (int j = 0; j < MyApplication.listFolder.size(); j++) {
@@ -267,17 +274,6 @@ public class NoteFragment extends BaseFragment
                                             if (noteAdapter.listDeleteNum[i] != 0) {
                                                 MyApplication.listFolder.get(i).dec(getActivity(), noteAdapter.listDeleteNum[i]);
                                             }
-                                        }
-                                        //TODO 当前为双线程提交note的删除和folder数目的减法
-                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
-                                            final Note note = noteAdapter.getDeleteItem(i);
-                                            //线上删除
-                                            Trace.d("delete", note.getTitle());
-                                            Message msg = new Message();
-                                            msg.obj = note;
-                                            msg.what = handle4explosion;//ui特效
-                                            note.delete(getActivity(), handler, msg);
-
                                         }
                                         //ui删除 从数据源中重新获取list并设置到adapter中
                                         status = statusDataGot;
@@ -304,7 +300,7 @@ public class NoteFragment extends BaseFragment
         if (isChanged4note) {
             //被动刷新
             status = statusReturn;
-            getData(statusReturn);
+            getData();//statusReturn
         }
         super.onResume();
     }
@@ -341,8 +337,8 @@ public class NoteFragment extends BaseFragment
 
     private void doSort(final int sortType) {
         list.clear();
-        //noinspection unchecked
-        ArrayList<Note> temp = (ArrayList<Note>) MyApplication.listNote.clone();
+        ArrayList<Note> temp = new ArrayList<>();
+        temp.addAll(MyApplication.listNote);//(ArrayList<Note>) MyApplication.listNote..clone();
         Collections.sort(temp, new Comparator<Note>() {
             @Override
             public int compare(Note n1, Note n2) {
@@ -378,7 +374,7 @@ public class NoteFragment extends BaseFragment
         list = new ArrayList<>();
         MyApplication.listNote = new ArrayList<>();
         status = statusDataGot;
-        getData(statusDataGot);
+        getData();//statusDataGot
         ButterKnife.bind(this, view);
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -421,7 +417,7 @@ public class NoteFragment extends BaseFragment
                     public void run() {
                         //刷新界面
                         status = statusDataGot;
-                        getData(statusDataGot);
+                        getData();//statusDataGot
                     }
                 }, 600);
             }
@@ -436,7 +432,6 @@ public class NoteFragment extends BaseFragment
                 } else {
                     deleteViewHide();//叉号隐藏 取消删除 恢复点击编辑
                 }
-                //main.btnDelete.setVisible(mainStatus.isDeleteMode());//显示删除 隐藏删除
                 return true;
             }
         });
@@ -478,16 +473,13 @@ public class NoteFragment extends BaseFragment
             mNoteWDList.setPullRefreshEnable(false);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = true;
-                noteAdapter.notifyDataSetChanged();//列表项目未变更可以直接调用
+                noteAdapter.notifyDataSetHasChanged();//列表项目未变更可以直接调用
             }
         }
     }
 
     public void deleteViewHide() {
-//        MainActivity main = (MainActivity) getActivity();
         if (mainStatus.isDeleteMode()) {
-            //按钮隐藏
-//            main.btnDelete.setVisible(false);
             //恢复点击编辑
             mNoteWDList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -502,32 +494,20 @@ public class NoteFragment extends BaseFragment
             mNoteWDList.setPullRefreshEnable(true);
             if (noteAdapter != null) {
                 noteAdapter.isDelete = false;
-                noteAdapter.notifyDataSetChanged();//列表项目未变更可以直接调用
+                noteAdapter.notifyDataSetHasChanged();//列表项目未变更可以直接调用
             }
         } else {
             Trace.d("deleteViewHideNote error");
         }
     }
 
-    private void getData(final byte statusEx) {
+    private void getData() {
         Trace.d("getData");
-        AVQuery<AVObject> query = new AVQuery<>("Note");
-        query.whereEqualTo("user_tel", MyApplication.user);
-        query.orderByDescending("note_editedAt");
-//        if (status == statusLoadMore) {
-        //query.setSkip(skip);
-        //query.setLimit(MyApplication.pageLimit);
-//        } else if (status == statusRefresh
-//                || status == statusDataGot
-//                || status == statusReturn) {
-//            MyApplication.listNote.clear();
-        //query.setSkip(0);
-        //query.setLimit(MyApplication.pageLimit);
-        //skip = 0;
-//        }
-        query.findInBackground(new FindCallback<AVObject>() {
-            public void done(List<AVObject> avObjects, AVException e) {
-                if (e == null) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
                     if (mNoteWDList != null) {
                         //skip += avObjects.size();
                         Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
@@ -546,12 +526,12 @@ public class NoteFragment extends BaseFragment
                                         , avObjects.get(i).getString("folder_name")
                                         , avObjects.get(i).getString("folder_id")
                                         , avObjects.get(i).getString("note_type")));
-//                                MyApplication.listNote.get(i).setAvO(avObjects.get(i));
                             }
-                            MyApplication.isItemsReady = true;
+                            MyApplication.isItemsReadyToGo = true;
                             Trace.d("isItemsReady", "true");
                         } else {
-                            MyApplication.isItemsReady = true;
+                            MyApplication.isItemsReadyToGo = true;
+                            Trace.d("isItemsReady", "true");
                             mNoteWDList.setPullLoadEnable(false);
                         }
                         if (status == statusRefresh
@@ -564,13 +544,13 @@ public class NoteFragment extends BaseFragment
                             moreDataAdapter4note();
                         }
                     }
-                } else {
+                } catch (AVException e) {
                     e.printStackTrace();
                     Trace.show(getActivity(), "刷新失败" + Trace.getErrorMsg(e));
                     stopRefresh();
                 }
             }
-        });
+        }).start();
     }
 
     private void moreDataAdapter4note() {
@@ -613,7 +593,7 @@ public class NoteFragment extends BaseFragment
             @Override
             public void run() {
                 status = statusRefresh;
-                getData(statusRefresh);
+                getData();//statusRefresh
             }
         });
     }
@@ -625,7 +605,7 @@ public class NoteFragment extends BaseFragment
             @Override
             public void run() {
                 status = statusLoadMore;
-                getData(statusLoadMore);
+                getData();//statusLoadMore
             }
         });
     }
@@ -633,6 +613,7 @@ public class NoteFragment extends BaseFragment
     @Override
     public boolean onMenuItemClick(MenuItem item) {
         switch (item.getItemId()) {
+            //TODO
 //            case R.id.name:
 //                doSort(sortByName);
 //                break;

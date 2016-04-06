@@ -169,6 +169,8 @@ public class MainActivity extends BaseActivity
                     mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
+                        Trace.d("isChanged4folder");
+                        MyApplication.isItemsReadyToGo = true;
                         folderFragment.dataGot();
                         FolderFragment.isChanged4folder = false;
                     }

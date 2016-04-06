@@ -19,7 +19,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
-import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
@@ -45,10 +44,11 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
     private static final int RESULT_LOAD_IMAGE = 100;
+    private static final int animDuration = 160;//动画的长度
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
+    private int lastStepperValue = 0;//用来控制stepper
     private Double b1, b2;//实践单动画修改两个属性
-    private static final int animDuration = 160;//动画的长度
     private ValueAnimator animHide, animShow;
     private static Note mNote;
     private boolean isNew = false;//是否为新笔记
@@ -57,11 +57,10 @@ public class EditActivity extends BaseHasSwipeActivity {
     private boolean userConfirm = false;
     private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
     private int index = 0;//用来记录当前在aText和aTextSelection中的位置
-    private Folder thisFolder;
+    private Folder thisFolder;//记录目前处在哪个笔记夹
     private String[] mFolder;
     private AlertDialog ad;
     //    CountDownTimer timer;
-    int lastStepperValue = 0;//用来控制stepper
     private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
     @Bind(R.id.mNavigationTitleLinear)

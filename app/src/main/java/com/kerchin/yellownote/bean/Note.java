@@ -139,7 +139,8 @@ public class Note {
                 public void run() {
                     FolderFragment.isChanged4folder = true;
                     try {
-                        AVObject newNote = NoteService.addNewNote(MyApplication.user, newTitle, System.currentTimeMillis(), newContent, folder, folderId);
+                        AVObject newNote = NoteService.addNewNote(
+                                MyApplication.user, newTitle, newContent, folder, folderId);
                         //取回objectId
                         if (newNote != null)
                             objectId = newNote.getObjectId();
@@ -178,7 +179,7 @@ public class Note {
                     Message msg = Message.obtain();
                     msg.what = handle4saveChange;
                     try {
-                        NoteService.saveEdit(objectId, newTitle, newContent, System.currentTimeMillis());
+                        NoteService.saveEdit(objectId, newTitle, newContent);
                         title = newTitle;
                         content = newContent;
                         NoteFragment.isChanged4note = true;

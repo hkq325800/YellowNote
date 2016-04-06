@@ -37,11 +37,7 @@ public class MyApplication extends Application {
     public static String view = "note";
     //public static final int pageLimit = 5;
     public static int thisPosition = 0;
-    public static boolean isItemsReady = false;
-    /*public static final String KEY_PROV = "xiaohuangjProv";
-    public static final String KEY_ISFLOAT = "isFloat";
-    public static final String KEY_ISFLOAT = "isFloat";
-    public static final String KEY_ISFLOAT = "isFloat";*/
+    public static boolean isItemsReadyToGo = false;
 
     public static Context getContext() {
         return context;
@@ -116,6 +112,15 @@ public class MyApplication extends Application {
         return null;
     }
 
+    public static boolean isFolderContain(Folder folder) {
+        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
+            if (listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Note getNote(String objectId) {
         for (int i = 0; i < listNote.size(); i++) {
             if (listNote.get(i).getObjectId().equals(objectId))
@@ -124,7 +129,12 @@ public class MyApplication extends Application {
         return null;
     }
 
-    public static String getUserDefaultFolderId() {
-        return "";
+    public static boolean isNoteContain(Note note) {
+        for (int i = 0; i < MyApplication.listNote.size(); i++) {
+            if (listNote.get(i).getObjectId().equals(note.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

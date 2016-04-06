@@ -23,9 +23,6 @@ import android.widget.EditText;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.SaveCallback;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderAdapter;
@@ -35,6 +32,7 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.ItemDrag.ItemDragHelperCallback;
 import com.kerchin.yellownote.bean.Folder;
+import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
@@ -55,7 +53,7 @@ public class FolderFragment extends BaseFragment {
     private final byte statusDataGot = 0;//重置listFolder
     private final byte statusRefresh = 1;//getData getAdapter4 handle4refresh handle4refresh
     private final byte statusRespond = 2;//根据listFolder重置dataList4folder
-    private final byte statusDataReGot = 3;
+//    private final byte statusDataReGot = 3;
     private final byte statusDataError = 11;
     private List<SimpleFolder> mHeaders;
     private FolderAdapter folderAdapter;
@@ -139,7 +137,7 @@ public class FolderFragment extends BaseFragment {
                                 }
                             });
                         } else {
-                            folderAdapter.setFolders(mHeaders);
+                            folderAdapter.setFolders(mHeaders, MyApplication.mItems);
                             //滑动到新添加的笔记夹 TODO 失效
 //                            folderAdapter.setIsFirstTrue();
 //                            mRecycleView.scrollToPosition(mHeaders.get(mHeaders.size() - 1).getId());
@@ -167,7 +165,7 @@ public class FolderFragment extends BaseFragment {
                 case handle4respond:
                     Trace.d("handlerInFolder", "handle4respond");
                     getDataListFromFolder();
-                    folderAdapter.setFolders(mHeaders);
+                    folderAdapter.setFolders(mHeaders, MyApplication.mItems);
                     folderAdapter.notifyDataSetChanged();
                     break;
                 default:
@@ -288,27 +286,17 @@ public class FolderFragment extends BaseFragment {
                                 new Thread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        //AVFile file = MyApplication.listFolder.get(0).getCover();
-                                        AVObject Folder = new AVObject("Folder");
-                                        Folder.put("user_tel", MyApplication.user);
-                                        //Folder.put("folder_cover", file);
-                                        Folder.put("folder_name", mRenameEdt.getText().toString());
-                                        Folder.put("folder_contain", 0);
-                                        Folder.saveInBackground(new SaveCallback() {
-                                            @Override
-                                            public void done(AVException e) {
-                                                if (e == null) {
-                                                    Trace.show(getActivity(), "保存成功");
-                                                    Trace.d("saveNewFolder", "成功");
-                                                    status = statusDataReGot;
-                                                    statusName = "dataReGot";
-                                                    getData(statusDataReGot);
-                                                } else {
-                                                    Trace.show(getActivity(), "操作失败,请检查网络");
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        });
+                                        try {
+                                            FolderService.newFolder(MyApplication.user, mRenameEdt.getText().toString());
+                                            Trace.show(getActivity(), "保存成功");
+                                            Trace.d("saveNewFolder", "成功");
+                                            status = statusDataGot;
+                                            statusName = "dataGot";
+                                            getData(statusDataGot);
+                                        } catch (AVException e) {
+                                            Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }).start();
                                 alertDialog.dismiss();
@@ -413,56 +401,42 @@ public class FolderFragment extends BaseFragment {
 
     private void getData(byte statusCode) {
         Trace.d("getData status", statusName + "code:" + statusCode);
-        AVQuery<AVObject> query = new AVQuery<>("Folder");
-        query.whereEqualTo("user_tel", MyApplication.user);
-        query.orderByAscending("createdAt");
-        query.findInBackground(new FindCallback<AVObject>() {
-            public void done(List<AVObject> avObjects, AVException e) {
-                if (e == null) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    List<AVObject> avObjects = FolderService.getUserFolder(MyApplication.user);
                     if (mRecycleView != null) {
                         Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据 statusCode:" + status);
                         MyApplication.listFolder.clear();
-                        if (avObjects.size() != 0) {
-                            for (int i = 0; i < avObjects.size(); i++) {
-                                for (int j = i + 1; j < avObjects.size(); j++) {
-                                    if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
-                                        AVObject temp = avObjects.get(i);
-                                        avObjects.set(i, avObjects.get(j));
-                                        avObjects.set(j, temp);
-                                    }
+                        for (int i = 0; i < avObjects.size(); i++) {
+                            for (int j = i + 1; j < avObjects.size(); j++) {
+                                if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
+                                    AVObject temp = avObjects.get(i);
+                                    avObjects.set(i, avObjects.get(j));
+                                    avObjects.set(j, temp);
                                 }
                             }
-                            for (int i = 0; i < avObjects.size(); i++) {
-                                Folder folder = new Folder(avObjects.get(i).getObjectId()
-                                        , avObjects.get(i).getString("folder_name")
-                                        , avObjects.get(i).getInt("folder_contain"));
-//                                folder.setAvO(avObjects.get(i));
-                                if (!contain(folder)) {
-                                    MyApplication.listFolder.add(folder);
-                                }
-                            }
-                            Trace.d("statusCode" + status, "getAdapter4Folder");
-                            getDataListFromFolder();
-                            getAdapter4Folder();
-                        } else {
-                            // TODO
-                            //"默认"被意外删除
                         }
+                        for (int i = 0; i < avObjects.size(); i++) {
+                            Folder folder = new Folder(avObjects.get(i).getObjectId()
+                                    , avObjects.get(i).getString("folder_name")
+                                    , avObjects.get(i).getInt("folder_contain"));
+//                                folder.setAvO(avObjects.get(i));
+                            if (!MyApplication.isFolderContain(folder)) {
+                                MyApplication.listFolder.add(folder);
+                            }
+                        }
+                        Trace.d("statusCode" + status, "getAdapter4Folder");
+                        getDataListFromFolder();
+                        getAdapter4Folder();
                     }
-                } else {
+                } catch (AVException e) {
                     e.printStackTrace();
+                    Trace.show(getActivity(), "获取用户笔记夹失败" + Trace.getErrorMsg(e));
                 }
             }
-
-            private boolean contain(Folder folder) {
-                for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-                    if (MyApplication.listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        }).start();
     }
 
     private void getDataListFromFolder() {
@@ -492,8 +466,8 @@ public class FolderFragment extends BaseFragment {
     private void getAdapter4Folder() {/*List<? extends Map<String, ?>>*/
         if (status == statusDataGot) {
             //相当于一直在每隔200ms判断isItemReady 为true时sendMessage
-            if (MyApplication.isItemsReady) {
-                MyApplication.isItemsReady = false;
+            if (MyApplication.isItemsReadyToGo) {
+                MyApplication.isItemsReadyToGo = false;
                 repeatCount = 0;
                 Trace.d("isItemsReady lisNoteSize:" + MyApplication.listNote.size());
                 handler.sendEmptyMessage(handle4newFolder);
@@ -509,10 +483,10 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessage(handle4refresh);
         } else if (status == statusRespond) {
             handler.sendEmptyMessage(handle4respond);
-        } else if (status == statusDataReGot) {
+        } /*else if (status == statusDataReGot) {
             Trace.d("statusDataReGot");
             handler.sendEmptyMessage(handle4newFolder);
-        }
+        }*/
     }
 
     public ToolbarStatus getMainStatus() {

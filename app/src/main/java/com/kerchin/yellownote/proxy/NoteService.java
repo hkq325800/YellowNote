@@ -4,12 +4,15 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 
+import java.util.List;
+
 /**
  * Created by Kerchin on 2016/4/5 0005.
  */
 public class NoteService {
 
-    public static void move2folder(String objectId, String folderName, String folderId) throws AVException {
+    public static void move2folder(String objectId, String folderName, String folderId)
+            throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject note = query.get(objectId);
         note.put("folder_name", folderName);
@@ -30,14 +33,15 @@ public class NoteService {
     public static void saveFolderNumAdd(String folderId) throws AVException {
         AVQuery<AVObject> query2 = new AVQuery<AVObject>("Folder");
         AVObject folder = query2.get(folderId);
-        if(folder!=null) {
+        if (folder != null) {
             int num = folder.getInt("folder_contain");
             folder.put("folder_contain", num + 1);
             folder.save();
         }
     }
 
-    public static AVObject addNewNote(String user, String newTitle, long editedAt, String newContent, String folder, String folderId) throws AVException {
+    public static AVObject addNewNote(String user, String newTitle
+            , String newContent, String folder, String folderId) throws AVException {
         final AVObject newNote;
         newNote = new AVObject("Note");
         newNote.put("user_tel", user);
@@ -51,7 +55,8 @@ public class NoteService {
         return newNote;
     }
 
-    public static void saveEdit(String objectId, String newTitle, String newContent, long editedAt) throws AVException {
+    public static void saveEdit(String objectId, String newTitle, String newContent)
+            throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject note = query.get(objectId);
         note.put("note_title", newTitle);
@@ -64,5 +69,22 @@ public class NoteService {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
         AVObject note = query.get(objectId);
         note.delete();
+    }
+
+    public static List<AVObject> getUserNote(String user) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("Note");
+        query.whereEqualTo("user_tel", user);
+        query.orderByDescending("note_editedAt");
+        return query.find();
+    }
+
+    public static List<AVObject> getMoreNote(String user, int skip, int limit, boolean isFirst)
+            throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("Note");
+        query.whereEqualTo("user_tel", user);
+        query.orderByDescending("note_editedAt");
+        query.setLimit(limit);
+        query.setSkip(isFirst ? skip : 0);
+        return query.find();
     }
 }
