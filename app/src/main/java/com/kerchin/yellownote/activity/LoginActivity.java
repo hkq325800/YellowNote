@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.activity;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -9,7 +8,6 @@ import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -25,7 +23,6 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.base.User;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -74,40 +71,6 @@ public class LoginActivity extends User {
         setContentView(R.layout.activity_login);
         immerge(R.color.lightSkyBlue);
         init();
-    }
-
-    private void immerge(int color) {
-        /**沉浸式状态栏设置部分**/
-        //Android5.0版本
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            setStatusBarColor(color);//阴影绘制
-            //设置状态栏颜色
-//            getWindow().setStatusBarColor(getResources().getColor(color));
-            //设置导航栏颜色
-            getWindow().setNavigationBarColor(getResources().getColor(color));
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //透明状态栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //创建状态栏的管理实例
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            //激活状态栏设置
-            tintManager.setStatusBarTintEnabled(true);
-            //设置状态栏颜色
-            tintManager.setTintResource(color);
-            //激活导航栏会变黑
-            //透明导航栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            //激活导航栏设置
-            tintManager.setNavigationBarTintEnabled(true);
-            //设置导航栏颜色
-            tintManager.setNavigationBarTintResource(color);
-        }
     }
 
     private void init() {
@@ -382,23 +345,24 @@ public class LoginActivity extends User {
     protected void sendProv(final boolean isSignUp, final String txtUser, final int count) {
         mLoginSendProvBtn.setEnabled(false);
         mLoginUserEdt.setEnabled(false);
+        new CountDownTimer(count * 60 * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                String str = "发送成功" + (millisUntilFinished / 1000);
+                mLoginSendProvBtn.setText(str);
+            }
+
+            @Override
+            public void onFinish() {
+                mLoginSendProvBtn.setEnabled(true);
+                mLoginUserEdt.setEnabled(true);
+                mLoginSendProvBtn.setText("发送验证码");
+            }
+        }.start();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    new CountDownTimer(count * 60 * 1000, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            mLoginSendProvBtn.setText("发送成功" + ((millisUntilFinished) / 1000));
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            mLoginSendProvBtn.setEnabled(true);
-                            mLoginUserEdt.setEnabled(true);
-                            mLoginSendProvBtn.setText("发送验证码");
-                        }
-                    }.start();
                     LoginService.sendProv(txtUser, isSignUp, count);
                 } catch (AVException e) {
                     Trace.e("发送验证码失败" + Trace.getErrorMsg(e));

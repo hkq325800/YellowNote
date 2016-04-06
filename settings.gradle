@@ -1,1 +1,1 @@
-include ':app', ':SlidingLibrary'
+include ':app', ':SlidingLibrary', ':superadapter'

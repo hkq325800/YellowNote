@@ -1,15 +1,15 @@
 package com.kerchin.yellownote.base;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Build;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 
 
 /**
- * Created by Administrator on 2015/9/26 0026.
+ * Created by Kerchin on 2015/9/26 0026.
  */
 public abstract class User extends Activity {
     /**
@@ -18,7 +18,7 @@ public abstract class User extends Activity {
     protected abstract void login();
 
     /**
-     * 点击注册：表格检查-短信验证-signupVerify(是否注册查询在sendProv时检查)
+     * 点击注册：表格检查-短信验证-signUpVerify(是否注册查询在sendProv时检查)
      */
     protected abstract void signUp();
 
@@ -31,11 +31,11 @@ public abstract class User extends Activity {
      * 发送验证码(请求)
      * CountDownTimer显示倒计时
      *
-     * @param isSignup 判断是注册还是找回密码
+     * @param isSignUp 判断是注册还是找回密码
      * @param txtUser  用户名
      * @param count    可用时限
      */
-    protected abstract void sendProv(boolean isSignup, String txtUser, int count);
+    protected abstract void sendProv(boolean isSignUp, String txtUser, int count);
 
     /**
      * 短信验证(验证)
@@ -87,11 +87,11 @@ public abstract class User extends Activity {
      *
      * @param txtUser   判断用户名是否符合规范
      * @param txtPass   判断用户密码是否符合规范
-     * @param txtRepass 判断重复密码是否正确
+     * @param txtRePass 判断重复密码是否正确
      * @param txtProv   判断验证码格式是否正确
      * @return boolean
      */
-    protected abstract boolean tableCheck(String txtUser, String txtPass, String txtRepass, String txtProv);
+    protected abstract boolean tableCheck(String txtUser, String txtPass, String txtRePass, String txtProv);
 
     /**
      * 缓存登录状态跳转主页面
@@ -115,6 +115,40 @@ public abstract class User extends Activity {
             //Window window = getWindow();
             //window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             //window.setStatusBarColor(color);
+        }
+    }
+
+    public void immerge(int color) {
+        /**沉浸式状态栏设置部分**/
+        //Android5.0版本
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            setStatusBarColor(color);//阴影绘制
+            //设置状态栏颜色
+//            getWindow().setStatusBarColor(getResources().getColor(color));
+            //设置导航栏颜色
+            getWindow().setNavigationBarColor(getResources().getColor(color));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            //透明状态栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            //创建状态栏的管理实例
+            SystemBarTintManager tintManager = new SystemBarTintManager(this);
+            //激活状态栏设置
+            tintManager.setStatusBarTintEnabled(true);
+            //设置状态栏颜色
+            tintManager.setTintResource(color);
+            //激活导航栏会变黑
+            //透明导航栏
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            //激活导航栏设置
+            tintManager.setNavigationBarTintEnabled(true);
+            //设置导航栏颜色
+            tintManager.setNavigationBarTintResource(color);
         }
     }
 }

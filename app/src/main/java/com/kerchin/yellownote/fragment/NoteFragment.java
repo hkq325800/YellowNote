@@ -27,6 +27,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.NoteAdapter;
+import com.kerchin.yellownote.adapter.NoteShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
@@ -60,7 +61,8 @@ public class NoteFragment extends BaseFragment
     private View.OnClickListener addClickListener;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
-    private NoteAdapter noteAdapter;
+//        private NoteAdapter noteAdapter;
+    private NoteShrinkAdapter noteAdapter;
     private List<Note> list;
     private ToolbarStatus mainStatus;
     //    private boolean isRefreshing = false;
@@ -94,18 +96,17 @@ public class NoteFragment extends BaseFragment
                 case handle4newNote:
                     try {
                         Trace.d("handle4newNote");
-//                        list = MyApplication.listNote;
                         getDataListFromNote(MyApplication.listNote);
-                        //TODO noteAdapter避免新建
-                        noteAdapter = new NoteAdapter(getActivity(), list);
+                        //TODO 避免滑动到顶部
+                        if (noteAdapter == null)
+//                            noteAdapter = new NoteAdapter(getActivity(), list);
+                            noteAdapter = new NoteShrinkAdapter(getActivity(), list, R.layout.item_note);
+                        else {
+                            noteAdapter.initListDelete();
+                            noteAdapter.setList(list);
+                        }
                         mNoteWDList.setAdapter(noteAdapter);
                         mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-//                        if (noteAdapter == null) {
-//                            noteAdapter = new NoteAdapter(getActivity(), list);
-//                            mNoteWDList.setAdapter(noteAdapter);
-//                            mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-//                        } else
-//                            noteAdapter.setList(list);
                         mNoteWDList.setVisibility(View.VISIBLE);
                         mNoteEmptyTxt.setVisibility(View.GONE);
                     } catch (Exception e) {
@@ -120,7 +121,7 @@ public class NoteFragment extends BaseFragment
                     if (MyApplication.view.equals("note")) {
                         mNoteWDList.setVisibility(View.VISIBLE);
                         mNoteEmptyTxt.setVisibility(View.GONE);
-                        noteAdapter.notifyDataSetChanged();
+                        noteAdapter.setList(list);
                         stopRefresh();
                     }
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
@@ -130,7 +131,7 @@ public class NoteFragment extends BaseFragment
                 case handle4return:
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mNoteEmptyTxt.setVisibility(View.GONE);
-                    noteAdapter.notifyDataSetChanged();
+                    noteAdapter.setList(list);
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
                         mNoteProgress.setVisibility(View.GONE);
                     }
@@ -146,7 +147,7 @@ public class NoteFragment extends BaseFragment
 //                case handle4reset:
 //                    if (isChanged4note) {
 //                        getDataListFromNote(MyApplication.listNote);
-//                        noteAdapter.notifyDataSetChanged();
+//                        noteAdapter.notifyDataSetHasChanged();
 //                        isChanged4note = false;
 //                    }
 //                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
@@ -251,19 +252,7 @@ public class NoteFragment extends BaseFragment
                                 deleteViewHide();
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
-                                    noteAdapter.listDeleteNum = new int[MyApplication.listFolder.size()];
                                     if (noteAdapter.getDeleteNum() > 0) {
-                                        //TODO 当前为双线程提交note的删除和folder数目的减法
-                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
-                                            final Note note = noteAdapter.getDeleteItem(i);
-                                            //线上删除
-                                            Trace.d("delete", note.getTitle());
-                                            Message msg = new Message();
-                                            msg.obj = note;
-                                            msg.what = handle4explosion;//ui特效
-                                            note.delete(getActivity(), handler, msg);
-
-                                        }
                                         for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
                                             //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
                                             for (int j = 0; j < MyApplication.listFolder.size(); j++) {
@@ -278,6 +267,17 @@ public class NoteFragment extends BaseFragment
                                             if (noteAdapter.listDeleteNum[i] != 0) {
                                                 MyApplication.listFolder.get(i).dec(getActivity(), noteAdapter.listDeleteNum[i]);
                                             }
+                                        }
+                                        //TODO 当前为双线程提交note的删除和folder数目的减法
+                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                            final Note note = noteAdapter.getDeleteItem(i);
+                                            //线上删除
+                                            Trace.d("delete", note.getTitle());
+                                            Message msg = new Message();
+                                            msg.obj = note;
+                                            msg.what = handle4explosion;//ui特效
+                                            note.delete(getActivity(), handler, msg);
+
                                         }
                                         //ui删除 从数据源中重新获取list并设置到adapter中
                                         status = statusDataGot;
@@ -336,7 +336,7 @@ public class NoteFragment extends BaseFragment
         }
         if (noteAdapter != null)
             if (!isChanged4note)
-                noteAdapter.notifyDataSetChanged();
+                noteAdapter.setList(list);
     }
 
     private void doSort(final int sortType) {
@@ -362,7 +362,7 @@ public class NoteFragment extends BaseFragment
         });
         getDataListFromNote(temp);
         if (noteAdapter != null)
-            noteAdapter.notifyDataSetChanged();
+            noteAdapter.setList(list);
     }
 
     @Override
@@ -477,8 +477,8 @@ public class NoteFragment extends BaseFragment
             mainStatus.setIsDeleteMode(true);
             mNoteWDList.setPullRefreshEnable(false);
             if (noteAdapter != null) {
-                noteAdapter.isDelete = mainStatus.isDeleteMode();
-                noteAdapter.notifyDataSetChanged();
+                noteAdapter.isDelete = true;
+                noteAdapter.notifyDataSetChanged();//列表项目未变更可以直接调用
             }
         }
     }
@@ -501,8 +501,8 @@ public class NoteFragment extends BaseFragment
             mainStatus.setIsDeleteMode(false);
             mNoteWDList.setPullRefreshEnable(true);
             if (noteAdapter != null) {
-                noteAdapter.isDelete = mainStatus.isDeleteMode();
-                noteAdapter.notifyDataSetChanged();
+                noteAdapter.isDelete = false;
+                noteAdapter.notifyDataSetChanged();//列表项目未变更可以直接调用
             }
         } else {
             Trace.d("deleteViewHideNote error");

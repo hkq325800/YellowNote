@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.CommonViewHolder;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.global.MyApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +22,13 @@ import java.util.List;
  */
 public class NoteAdapter extends BaseAdapter {
     private Context context;
-    private LayoutInflater inflater;
     private List<Note> infos;
     public List<Note> listDelete;
     public int[] listDeleteNum;
     public boolean isDelete = false;
-    private final int layoutId = R.layout.item_note;
     private SparseArray<View> mViews;
 
     public NoteAdapter(Context context, List<Note> infos) {
-        inflater = LayoutInflater.from(context);
         mViews = new SparseArray<View>();
         this.context = context;
         this.infos = infos;
@@ -50,6 +48,7 @@ public class NoteAdapter extends BaseAdapter {
 
     public void initListDelete(){
         listDelete = new ArrayList<>();
+        listDeleteNum = new int[MyApplication.listFolder.size()];
     }
 
     @Override
@@ -69,7 +68,7 @@ public class NoteAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        CommonViewHolder holder = CommonViewHolder.get(context, convertView, parent, layoutId, position);
+        CommonViewHolder holder = CommonViewHolder.get(context, convertView, parent, R.layout.item_note, position);
         setValue(position, holder);
         mViews.put(position, holder.getConvertView());
         return holder.getConvertView();
