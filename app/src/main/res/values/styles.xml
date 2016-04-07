@@ -23,6 +23,11 @@
         <item name="android:textColorHint">@color/textHintColor</item>
     </style>
 
+    <style name="AppTheme.NoActionBarDrawer" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/white</item><!--字-->
+        <item name="colorControlHighlight">@color/colorPrimary</item><!--背景-->
+    </style>
+
     <!--<style name="FloatingStyle" parent="@android:style/TextAppearance">
         &lt;!&ndash; 字体颜色 &ndash;&gt;
         <item name="android:textColor">#AA00FF</item>

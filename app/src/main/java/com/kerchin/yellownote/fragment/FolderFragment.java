@@ -138,9 +138,11 @@ public class FolderFragment extends BaseFragment {
                             });
                         } else {
                             folderAdapter.setFolders(mHeaders, MyApplication.mItems);
-                            //滑动到新添加的笔记夹 TODO 失效
+                            //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
 //                            folderAdapter.setIsFirstTrue();
-//                            mRecycleView.scrollToPosition(mHeaders.get(mHeaders.size() - 1).getId());
+//                            Trace.d("scroll"+mHeaders.get(mHeaders.size() - 1).getId()+"/"+mHeaders.get(mHeaders.size() - 1).getName());
+//                            mRecycleView.getLayoutManager().scrollToPosition(mHeaders.get(mHeaders.size() - 1).getId());
+//                            mRecycleView.smoothScrollToPosition();
                         }
                         manager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                             @Override
@@ -251,7 +253,7 @@ public class FolderFragment extends BaseFragment {
     public void dataGot() {
         status = statusDataGot;
         statusName = "dataGot";
-        getData(statusDataGot);
+        getData(statusDataGot);//dataGot
     }
 
     public static FolderFragment newInstance(Bundle bundle) {
@@ -292,7 +294,8 @@ public class FolderFragment extends BaseFragment {
                                             Trace.d("saveNewFolder", "成功");
                                             status = statusDataGot;
                                             statusName = "dataGot";
-                                            getData(statusDataGot);
+                                            MyApplication.isItemsReadyToGo = true;
+                                            getData(statusDataGot);//add folder
                                         } catch (AVException e) {
                                             Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
                                             e.printStackTrace();

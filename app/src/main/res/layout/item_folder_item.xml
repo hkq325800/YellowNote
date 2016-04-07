@@ -27,7 +27,7 @@
         android:id="@+id/mFolderItemImg"
         android:layout_alignParentRight="true"
         android:layout_width="16dp"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:layout_height="16dp"
         android:contentDescription="img_edit" />
 

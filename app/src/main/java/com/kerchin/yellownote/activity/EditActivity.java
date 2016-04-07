@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -180,6 +181,8 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     }
 
+    Drawable rightButtonRes, rightButtonGrayRes, leftButtonRes, leftButtonGrayRes;
+
     @Override
     protected void initializeClick(Bundle savedInstanceState) {
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
@@ -297,15 +300,19 @@ public class EditActivity extends BaseHasSwipeActivity {
                 }
             }
         });
+        rightButtonRes = getResources().getDrawable(R.mipmap.ic_redo);
+        rightButtonGrayRes = getResources().getDrawable(R.mipmap.ic_redo_gray);
+        leftButtonRes = getResources().getDrawable(R.mipmap.ic_undo);
+        leftButtonGrayRes = getResources().getDrawable(R.mipmap.ic_undo_gray);
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
             public void onValueChange(View view, int value) {
-//                Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
+                // Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
                 if (value == 0 || value < lastStepperValue) {
                     //撤销
                     int old = isNew ? 1 : 2;
                     if (index > old) {
-                        mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
+                        mEditReUnStepper.setRightButtonResources(rightButtonRes);
                         isUndo = true;
                         index--;
                         String text = textOrder.get(index - 1);
@@ -313,8 +320,8 @@ public class EditActivity extends BaseHasSwipeActivity {
                         mEditContentEdt.setSelection(textSelection.get(index - 1));
                         isUndo = false;
                     } else if (index == old) {
-                        mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
-                        mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo_gray);
+                        mEditReUnStepper.setRightButtonResources(rightButtonRes);
+                        mEditReUnStepper.setLeftButtonResources(leftButtonGrayRes);
                         isUndo = true;
                         index--;
                         if (!isNew) {
@@ -329,8 +336,8 @@ public class EditActivity extends BaseHasSwipeActivity {
                     //恢复
                     if (index + 1 <= textOrder.size()) {//有可以恢复的内容
                         if (index + 1 == textOrder.size())//aText的内容被读完了
-                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
-                        mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
+                            mEditReUnStepper.setRightButtonResources(rightButtonGrayRes);
+                        mEditReUnStepper.setLeftButtonResources(leftButtonRes);
                         isRedo = true;
                         index++;
                         String text = textOrder.get(index - 1);

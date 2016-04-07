@@ -9,8 +9,8 @@ public class SimpleNote {
     private String name;
     private String folderId;
     private int folderPosition = 0;
-    private boolean isShown;//是否应当显示
-    private boolean hasShownAnim;//是否已通过动画
+    private boolean isShown;//是否应当显示 解决动画的显示与否
+    private boolean hasShownAnim;//是否已通过动画 解决动画的重复
     private int brotherCount;
 
     public SimpleNote(int id,String name,String folderId){
