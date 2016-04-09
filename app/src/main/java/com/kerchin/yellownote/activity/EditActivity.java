@@ -184,7 +184,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     Drawable rightButtonRes, rightButtonGrayRes, leftButtonRes, leftButtonGrayRes;
 
     @Override
-    protected void initializeClick(Bundle savedInstanceState) {
+    protected void initializeEvent(Bundle savedInstanceState) {
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -56,10 +56,8 @@ public class NoteFragment extends BaseFragment
     TextView mNoteEmptyTxt;
     @Bind(R.id.mNoteProgress)
     ProgressBar mNoteProgress;
-    private View.OnClickListener addClickListener;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
-    //        private NoteAdapter noteAdapter;
     private NoteShrinkAdapter noteAdapter;
     private List<Note> list;
     private ToolbarStatus mainStatus;
@@ -160,31 +158,16 @@ public class NoteFragment extends BaseFragment
                 case handle4explosion:
                     Note note = (Note) msg.obj;
                     Trace.d(note.getPreview());
-                    if (note != null) {
-                        for (int i = 0; i < noteAdapter.getCount(); i++) {
-                            if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
-                                Trace.d("date" + note.getShowDate() + "preview" + note.getPreview());
-                                //Explosion Animation
-                                ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
-                                mExplosionField.explode(noteAdapter.getView(i));
-                            }
+                    for (int i = 0; i < noteAdapter.getCount(); i++) {
+                        if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
+                            Trace.d("date" + note.getShowDate() + "preview" + note.getPreview());
+                            //Explosion Animation
+                            ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
+                            mExplosionField.explode(noteAdapter.getView(i));
                         }
-//                        for (int i = 0; i < mNoteWDList.getChildCount(); i++) {
-//                            TextView preview = (TextView) mNoteWDList.getChildAt(i).findViewById(R.id.mNoteItemPreviewTxt);
-//                            TextView date = (TextView) mNoteWDList.getChildAt(i).findViewById(R.id.mNoteItemDateTxt);
-//                            if (date != null && date.getText().toString().equals(note.getShowDate())
-//                                    && preview.getText().toString().equals(note.getPreview())) {
-//                                Trace.d("date" + note.getShowDate() + "preview" + note.getPreview());
-//                                //Explosion Animation
-//                                ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
-//                                mExplosionField.explode(mNoteWDList.getChildAt(i));
-//                            }
-//                        }
                     }
                     MyApplication.listNote.remove(note);//从数据源中删除
                     break;
-//                case handle4AVException:
-//                    Trace.show(getActivity(), "操作失败" + Trace.getErrorMsg((Exception) msg.obj));
                 default:
                     break;
             }
@@ -197,21 +180,14 @@ public class NoteFragment extends BaseFragment
         return frag;
     }
 
-    public View.OnClickListener getAddClickListener() {
-        if (addClickListener == null)
-            addClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (MyApplication.listFolder.size() > 0) {
-                        MainActivity m = (MainActivity) getActivity();
-                        m.hideBtnAdd();
-                        EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
-                                , MyApplication.userDefaultFolderId, "text"));
-                    } else
-                        Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
-                }
-            };
-        return addClickListener;
+    public void getAddClickListener() {
+        if (MyApplication.listFolder.size() > 0) {
+            MainActivity m = (MainActivity) getActivity();
+            m.hideBtnAdd();
+            EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
+                    , MyApplication.userDefaultFolderId, "text"));
+        } else
+            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {

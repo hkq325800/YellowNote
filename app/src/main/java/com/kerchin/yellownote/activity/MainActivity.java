@@ -40,6 +40,7 @@ import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -146,7 +147,7 @@ public class MainActivity extends BaseActivity
                     btnSort.setVisible(true);
                     btnDelete.setVisible(true);
                     btnSearch.setVisible(true);
-                    mMainFab.setOnClickListener(noteFragment.getAddClickListener());
+//                    mMainFab.setOnClickListener(noteFragment.getAddClickListener());
                     mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
 
@@ -165,7 +166,7 @@ public class MainActivity extends BaseActivity
                         if (getCurrentFocus() != null)
                             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
-                    mMainFab.setOnClickListener(folderFragment.getAddClickListener());
+//                    mMainFab.setOnClickListener(folderFragment.getAddClickListener());
                     mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
@@ -187,7 +188,7 @@ public class MainActivity extends BaseActivity
     }
 
     @Override
-    protected void initializeClick(Bundle savedInstanceState) {
+    protected void initializeEvent(Bundle savedInstanceState) {
         mMainNav.setNavigationItemSelectedListener(this);
         //若新增按钮位置下移 说明软键盘收起
         mMainFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
@@ -198,12 +199,12 @@ public class MainActivity extends BaseActivity
                 if (getFragmentStatus() != null) {
                     if (top > oldTop) {
                         getFragmentStatus().setIsSoftKeyboardUp(false);
-                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
 //                    mSearchView.onActionViewCollapsed();
 //                    noteFragment.restore();
                     } else if (top < oldTop) {
                         getFragmentStatus().setIsSoftKeyboardUp(true);
-                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
                     }
                 } else {
                     Trace.show(MainActivity.this, "过久未使用 资源被回收");
@@ -300,10 +301,7 @@ public class MainActivity extends BaseActivity
                 noteFragment.disableLoad();//TODO
             }
         });
-//        btnDelete.setVisible(false);
-
         mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
-        mMainFab.setOnClickListener(noteFragment.getAddClickListener());
         mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
         mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
@@ -316,6 +314,14 @@ public class MainActivity extends BaseActivity
         //mSearchView.setIconified(true);//取消方法
 //        setSearchView();
         return true;
+    }
+
+    @OnClick(R.id.mMainFab)
+    public void createNew() {
+        if (MyApplication.thisPosition == 0)
+            noteFragment.getAddClickListener();
+        else if (MyApplication.thisPosition == 1)
+            folderFragment.getAddClickListener();
     }
 
     @Override
@@ -335,6 +341,9 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_setting) {
             mMainDrawer.closeDrawers();
             handler.sendEmptyMessageDelayed(gotoSetting, 300);
+        } else if (id == R.id.nav_resetSecret) {
+            mMainDrawer.closeDrawers();
+            handler.sendEmptyMessageDelayed(gotoSecret, 300);
         }
 
         if (id != R.id.nav_logout)
@@ -352,14 +361,19 @@ public class MainActivity extends BaseActivity
     public static final int gotoSetting = 0;
     public static final int showBtnAdd = 1;
     public static final int hideBtnAdd = 2;
+    public static final int gotoSecret = 3;
     private SystemHandler handler = new SystemHandler(this) {
 
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case gotoSecret:
+                    hideBtnAdd();
+                    SecretActivity.startMe(MainActivity.this);
+                    break;
                 case gotoSetting:
                     hideBtnAdd();
-                    SettingActivity.startMe(MainActivity.this);
+                    ShareSuggestActivity.startMe(MainActivity.this);
                     break;
                 case showBtnAdd:
                     mMainFab.animate()

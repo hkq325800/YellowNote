@@ -10,7 +10,7 @@
         android:layout_height="?attr/actionBarSize" />
 
     <ScrollView
-        android:id="@+id/mSettingScV"
+        android:id="@+id/mShareSuggetScV"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize">
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content">
 
             <TextView
-                android:id="@+id/mSettingTipsTxt"
+                android:id="@+id/mShareSuggetTipsTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -28,10 +28,10 @@
                 android:text="点击下载最新版或者分享给你的朋友吧" />
 
             <ImageView
-                android:id="@+id/mSettingCodeImg"
+                android:id="@+id/mShareSuggetCodeImg"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mSettingTipsTxt"
+                android:layout_below="@id/mShareSuggetTipsTxt"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="10dp"
                 android:focusableInTouchMode="true"
@@ -40,19 +40,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mSettingCodeImg"
+                android:layout_below="@id/mShareSuggetCodeImg"
                 android:text="github:hkq325800@163.com"
                 android:visibility="gone" />
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/mSettingTouchTextInput"
+                android:id="@+id/mShareSuggetTouchTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mSettingCodeImg"
+                android:layout_below="@id/mShareSuggetCodeImg"
                 android:padding="20dp">
 
                 <EditText
-                    android:id="@+id/mSettingTouchEdt"
+                    android:id="@+id/mShareSuggetTouchEdt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="留下您的QQ或邮箱(选填)"
@@ -61,14 +61,14 @@
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
-                android:id="@+id/mSettingContentTextInput"
+                android:id="@+id/mShareSuggetContentTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/mSettingTouchTextInput"
+                android:layout_below="@id/mShareSuggetTouchTextInput"
                 android:padding="20dp">
 
                 <EditText
-                    android:id="@+id/mSettingContentEdt"
+                    android:id="@+id/mShareSuggetContentEdt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="您的建议就是我的最大动力"

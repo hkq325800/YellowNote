@@ -23,6 +23,10 @@
                 android:icon="@android:drawable/ic_menu_send"
                 android:title="分享与反馈" />
             <item
+                android:id="@+id/nav_resetSecret"
+                android:icon="@mipmap/nav_lock"
+                android:title="密码相关" />
+            <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_menu_share"
                 android:title="注销" />

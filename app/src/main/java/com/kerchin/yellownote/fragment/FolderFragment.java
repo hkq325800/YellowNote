@@ -43,7 +43,6 @@ public class FolderFragment extends BaseFragment {
 
     private RecyclerView mRecycleView;
     private SearchView.OnQueryTextListener queryTextListener;
-    private View.OnClickListener addClickListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     public static boolean isChanged4folder = false;
     private byte status = 0;
@@ -53,7 +52,7 @@ public class FolderFragment extends BaseFragment {
     private final byte statusDataGot = 0;//重置listFolder
     private final byte statusRefresh = 1;//getData getAdapter4 handle4refresh handle4refresh
     private final byte statusRespond = 2;//根据listFolder重置dataList4folder
-//    private final byte statusDataReGot = 3;
+    //    private final byte statusDataReGot = 3;
     private final byte statusDataError = 11;
     private List<SimpleFolder> mHeaders;
     private FolderAdapter folderAdapter;
@@ -63,7 +62,6 @@ public class FolderFragment extends BaseFragment {
     private final byte handle4respond = 102;//由于新增、删除、修改影响note视图
     boolean isExit = false;
     private SystemHandler handler = new SystemHandler(this) {
-
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
@@ -267,59 +265,52 @@ public class FolderFragment extends BaseFragment {
         super.onDestroy();
     }
 
-    public View.OnClickListener getAddClickListener() {
-        if (addClickListener == null)
-            addClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LayoutInflater inflater = LayoutInflater.from(getActivity());
-                    @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
-                    final EditText mRenameEdt = (EditText) view.findViewById(R.id.mRenameEdt);
-                    final Button mRenameBtn = (Button) view.findViewById(R.id.mRenameBtn);
-                    final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-                            .setTitle("新增笔记夹")
-                            .setView(view).create();
-                    mRenameBtn.setOnClickListener(new View.OnClickListener() {
+    public void getAddClickListener() {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
+        final EditText mRenameEdt = (EditText) view.findViewById(R.id.mRenameEdt);
+        final Button mRenameBtn = (Button) view.findViewById(R.id.mRenameBtn);
+        final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
+                .setTitle("新增笔记夹")
+                .setView(view).create();
+        mRenameBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mRenameEdt.getText().toString().equals("默认")) {
+                    Trace.show(getActivity(), "不要与默认笔记夹重名");
+                } else if (!mRenameEdt.getText().toString().equals("")) {
+                    new Thread(new Runnable() {
                         @Override
-                        public void onClick(View v) {
-                            if (mRenameEdt.getText().toString().equals("默认")) {
-                                Trace.show(getActivity(), "不要与默认笔记夹重名");
-                            } else if (!mRenameEdt.getText().toString().equals("")) {
-                                new Thread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            FolderService.newFolder(MyApplication.user, mRenameEdt.getText().toString());
-                                            Trace.show(getActivity(), "保存成功");
-                                            Trace.d("saveNewFolder", "成功");
-                                            status = statusDataGot;
-                                            statusName = "dataGot";
-                                            MyApplication.isItemsReadyToGo = true;
-                                            getData(statusDataGot);//add folder
-                                        } catch (AVException e) {
-                                            Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }).start();
-                                alertDialog.dismiss();
-                            } else {
-                                Trace.show(getActivity(), "笔记夹名不能为空");
+                        public void run() {
+                            try {
+                                FolderService.newFolder(MyApplication.user, mRenameEdt.getText().toString());
+                                Trace.show(getActivity(), "保存成功");
+                                Trace.d("saveNewFolder", "成功");
+                                status = statusDataGot;
+                                statusName = "dataGot";
+                                MyApplication.isItemsReadyToGo = true;
+                                getData(statusDataGot);//add folder
+                            } catch (AVException e) {
+                                Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                e.printStackTrace();
                             }
                         }
-                    });
-                    mRenameEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                        @Override
-                        public void onFocusChange(View v, boolean hasFocus) {
-                            if (hasFocus) {
-                                alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                            }
-                        }
-                    });
-                    alertDialog.show();
+                    }).start();
+                    alertDialog.dismiss();
+                } else {
+                    Trace.show(getActivity(), "笔记夹名不能为空");
                 }
-            };
-        return addClickListener;
+            }
+        });
+        mRenameEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+        alertDialog.show();
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {

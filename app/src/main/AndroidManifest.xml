@@ -41,7 +41,12 @@
             android:theme="@style/JK.SwipeBack.Transparent.Theme"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".activity.SettingActivity"
+            android:name=".activity.ShareSuggestActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"
+            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+        <activity
+            android:name=".activity.SecretActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:theme="@style/JK.SwipeBack.Transparent.Theme" />

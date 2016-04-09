@@ -66,7 +66,7 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 //        onTitleClick();
         initializeView(savedInstanceState);
         initializeData(savedInstanceState);
-        initializeClick(savedInstanceState);
+        initializeEvent(savedInstanceState);
 //        initSwipeBackFinish();
     }
 
@@ -74,7 +74,7 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 
     //protected abstract void onTitleClick();
 
-    protected abstract void initializeClick(Bundle savedInstanceState);
+    protected abstract void initializeEvent(Bundle savedInstanceState);
 
 //    private void initTitleView() {
 //        if (isExisTitle) {

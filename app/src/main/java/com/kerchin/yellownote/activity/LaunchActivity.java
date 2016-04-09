@@ -43,7 +43,7 @@ public class LaunchActivity extends BaseActivity {
     }
 
     @Override
-    protected void initializeClick(Bundle savedInstanceState) {
+    protected void initializeEvent(Bundle savedInstanceState) {
     }
 
     @Override
@@ -125,7 +125,7 @@ public class LaunchActivity extends BaseActivity {
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
                     break;
-                case reLogForFrozen://由于账户冻结重新登陆
+                case reLogForFrozen://账户冻结
                     Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();

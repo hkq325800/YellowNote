@@ -28,6 +28,7 @@ import com.securepreferences.SecurePreferences;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Kerchin on 2015/8/1 0005.
@@ -136,105 +137,20 @@ public class LoginActivity extends User {
         mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
-        mLoginSignUpBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoginSignUpBtn.getText().toString().equals("注册")) {
-                    mLoginBtn.setText("返回登录");
-                    mLoginForgetBtn.setText("忘记密码");
-                    mLoginForgetBtn.setVisibility(View.GONE);
-                    mLoginSignUpBtn.setText("注册确认");
-                    mSignUpRelative.setVisibility(View.VISIBLE);
-                } else {
-                    signUp();
-                }
-            }
-        });
-        mLoginBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
-                if (mLoginBtn.getText().toString().equals("返回登录")) {
-                    mSignUpRelative.setVisibility(View.GONE);
-                    mLoginForgetBtn.setVisibility(View.VISIBLE);
-                    mLoginForgetBtn.setText("忘记密码");
-                    mLoginBtn.setText("登录");
-                    mLoginSignUpBtn.setText("注册");
-                } else {
-                    login();
-                }
-            }
-        });
-        mLoginForgetBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
-                    mLoginBtn.setText("返回登录");
-                    mLoginForgetBtn.setText("找回密码");
-                    mSignUpRelative.setVisibility(View.VISIBLE);
-                    //Toast.makeText(LoginActivity.this, "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
-                } else {
-                    forgetSecret();
-                }
-            }
-        });
-        mLoginSendProvBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String txtForget = mLoginForgetBtn.getText().toString();
-                final String txtUser = mLoginUserEdt.getText().toString();
-                final int count = Config.timeout_prov;
-                if (txtUser.equals("") || txtUser.length() != 11) {
-                    Trace.show(LoginActivity.this, "请先填写11位手机号");
-                } else {
-                    if (txtForget.equals("找回密码")) {//忘记密码
-                        //是否注册查询
-                        isRegistered(txtUser);
-                        new CountDownTimer(Config.timeout_avod, 500) {
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                if (registerStatus > statusInit) {
-                                    cancel();
-                                    Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
-                                    if (registerStatus == statusTrue) {
-                                        sendProv(false, txtUser, count);
-                                    } else {
-                                        Trace.show(LoginActivity.this, "该帐号未注册,请先注册");
-                                    }
-                                    registerStatus = statusInit;
-                                }
-                            }
+    }
 
-                            @Override
-                            public void onFinish() {
-                            }
-                        }.start();
-                    } else {//注册
-                        //是否注册查询
-                        isRegistered(txtUser);
-                        new CountDownTimer(Config.timeout_avod, 500) {
-                            @Override
-                            public void onTick(long millisUntilFinished) {
-                                if (registerStatus > statusInit) {
-                                    cancel();
-                                    Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
-                                    if (registerStatus == statusFalse) {
-                                        sendProv(true, txtUser, count);
-                                    } else {
-                                        Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
-                                    }
-                                    registerStatus = statusInit;
-                                }
-                            }
-
-                            @Override
-                            public void onFinish() {
-                            }
-                        }.start();
-                    }
-                }
-            }
-        });
+    @OnClick(R.id.mLoginBtn)
+    public void loginClick(){
+        //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
+        if (mLoginBtn.getText().toString().equals("返回登录")) {
+            mSignUpRelative.setVisibility(View.GONE);
+            mLoginForgetBtn.setVisibility(View.VISIBLE);
+            mLoginForgetBtn.setText("忘记密码");
+            mLoginBtn.setText("登录");
+            mLoginSignUpBtn.setText("注册");
+        } else {
+            login();
+        }
     }
 
     //登录流程起点
@@ -249,6 +165,19 @@ public class LoginActivity extends User {
         } else {
             //登录验证
             loginVerify(txtUser, txtPass);
+        }
+    }
+
+    @OnClick(R.id.mLoginSignUpBtn)
+    public void signUpClick(){
+        if (mLoginSignUpBtn.getText().toString().equals("注册")) {
+            mLoginBtn.setText("返回登录");
+            mLoginForgetBtn.setText("忘记密码");
+            mLoginForgetBtn.setVisibility(View.GONE);
+            mLoginSignUpBtn.setText("注册确认");
+            mSignUpRelative.setVisibility(View.VISIBLE);
+        } else {
+            signUp();
         }
     }
 
@@ -284,6 +213,18 @@ public class LoginActivity extends User {
             }
         } else
             isEnter = false;//signUp tableCheck false
+    }
+
+    @OnClick(R.id.mLoginForgetBtn)
+    public void forgetSecretClick(){
+        if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
+            mLoginBtn.setText("返回登录");
+            mLoginForgetBtn.setText("找回密码");
+            mSignUpRelative.setVisibility(View.VISIBLE);
+            //Toast.makeText(LoginActivity.this, "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
+        } else {
+            forgetSecret();
+        }
     }
 
     //找回密码流程起点
@@ -338,6 +279,62 @@ public class LoginActivity extends User {
             }.start();
         } else
             isEnter = false;//forgetSecret tableCheck false
+    }
+
+    @OnClick(R.id.mLoginSendProvBtn)
+    public void sendProvClick(){
+        String txtForget = mLoginForgetBtn.getText().toString();
+        final String txtUser = mLoginUserEdt.getText().toString();
+        final int count = Config.timeout_prov;
+        if (txtUser.equals("") || txtUser.length() != 11) {
+            Trace.show(LoginActivity.this, "请先填写11位手机号");
+        } else {
+            if (txtForget.equals("找回密码")) {//忘记密码
+                //是否注册查询
+                isRegistered(txtUser);
+                new CountDownTimer(Config.timeout_avod, 500) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        if (registerStatus > statusInit) {
+                            cancel();
+                            Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
+                            if (registerStatus == statusTrue) {
+                                sendProv(false, txtUser, count);
+                            } else {
+                                Trace.show(LoginActivity.this, "该帐号未注册,请先注册");
+                            }
+                            registerStatus = statusInit;
+                        }
+                    }
+
+                    @Override
+                    public void onFinish() {
+                    }
+                }.start();
+            } else {//注册
+                //是否注册查询
+                isRegistered(txtUser);
+                new CountDownTimer(Config.timeout_avod, 500) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        if (registerStatus > statusInit) {
+                            cancel();
+                            Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
+                            if (registerStatus == statusFalse) {
+                                sendProv(true, txtUser, count);
+                            } else {
+                                Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
+                            }
+                            registerStatus = statusInit;
+                        }
+                    }
+
+                    @Override
+                    public void onFinish() {
+                    }
+                }.start();
+            }
+        }
     }
 
     //发送验证码
