@@ -8,13 +8,20 @@
     <LinearLayout
         android:id="@+id/mEditNavLinear"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal">
 
         <include
             layout="@layout/fragment_navigation"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize" />
+
+        <LinearLayout
+            android:id="@+id/mEditSearchLinear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </LinearLayout>
     </LinearLayout>
 
     <ScrollView
