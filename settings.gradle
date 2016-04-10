@@ -1,1 +1,1 @@
-include ':app', ':SlidingLibrary', ':superadapter'
+include ':app', ':SlidingLibrary', ':superadapter', ':JJSearchViewAnim'

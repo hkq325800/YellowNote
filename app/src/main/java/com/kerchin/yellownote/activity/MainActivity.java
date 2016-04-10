@@ -35,6 +35,8 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.widget.DepthPageTransformer;
+import com.kerchin.yellownote.widget.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 
@@ -131,6 +133,7 @@ public class MainActivity extends BaseActivity
                 getSupportFragmentManager(), fragments);
         mMainPager.setOffscreenPageLimit(fragments.size());
         mMainPager.setAdapter(adapter);
+        mMainPager.setPageTransformer(true, new DepthPageTransformer());
         mMainPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position,

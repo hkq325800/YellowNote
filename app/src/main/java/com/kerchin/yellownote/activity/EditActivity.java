@@ -13,6 +13,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -27,13 +28,17 @@ import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.widget.CircleSearchView;
+import com.kerchin.yellownote.widget.MyScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 /**
@@ -48,12 +53,14 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final int animDuration = 160;//动画的长度
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
+    private int searchHeight = 0;//搜索条高度
     private int lastStepperValue = 0;//用来控制stepper
     private Double b1, b2;//实践单动画修改两个属性
     private ValueAnimator animHide, animShow;
     private static Note mNote;
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
+    private boolean isSearchViewShown = false;//搜索栏是否显示
     private boolean isFolderChanged = false;
     private boolean userConfirm = false;
     private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
@@ -61,9 +68,14 @@ public class EditActivity extends BaseHasSwipeActivity {
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private String[] mFolder;
     private AlertDialog ad;
+    private Drawable rightButtonRes, rightButtonGrayRes, leftButtonRes, leftButtonGrayRes;
     //    CountDownTimer timer;
     private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
+    @Bind(R.id.mEditCircleSearch)
+    CircleSearchView mEditCircleSearch;
+    @Bind(R.id.mEditSearchLinear)
+    LinearLayout mEditSearchLinear;
     @Bind(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
     @Bind(R.id.mEditReUnStepper)
@@ -83,7 +95,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Bind(R.id.mNavigationLeftBtn)
     Button mNavigationLeftBtn;
     @Bind(R.id.mEditScroll)
-    ScrollView mEditScroll;
+    MyScrollView mEditScroll;
     @Bind(R.id.mEditFuncLinear)
     LinearLayout mEditFuncLinear;
     private Handler handler = new Handler() {
@@ -181,129 +193,150 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     }
 
-    Drawable rightButtonRes, rightButtonGrayRes, leftButtonRes, leftButtonGrayRes;
+    @OnClick(R.id.mEditMoveLinear)
+    public void noteMove() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+        if (mFolder.length == 0) {
+            builder.setTitle("没有别的笔记夹可以选择\n是否新建？")
+                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            //TODO 新建笔记夹
+                            Trace.show(EditActivity.this, "确认");
+                        }
+                    }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Trace.show(EditActivity.this, "算了吧");
+                }
+            });
+            builder.create().show();
+        } else {
+            builder.setTitle("选择移至笔记夹");
+            // 设置一个下拉的列表选择项
+            builder.setItems(mFolder, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, final int which) {
+                    isFolderChanged = true;
+                    Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
+                    //Folder newOne = null;
+                    final String oldName = thisFolder.getName();
+                    final String newName = mFolder[which];
+                    //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
+                    thisFolder = Folder.search4folder(mFolder[which]);
+                    //将现在的夹名添加到列表中供用户选择
+                    for (int i = 0; i < mFolder.length; i++) {
+                        if (mFolder[i].equals(newName)) {
+                            mFolder[i] = oldName;
+                            break;
+                        }
+                    }
+                    if (isNew) {
+                        mNote.setFolder(newName);
+                        mNote.setFolderId(thisFolder.getObjectId());
+                    }
+                }
+            });
+            builder.show();
+        }
+    }
+
+    @OnClick(R.id.mEditDeleteLinear)
+    public void noteDelete() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+        builder.setTitle("删除确认");
+        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ad.dismiss();
+                mNote.delete(EditActivity.this, handler, handle4finish
+                        , mNote.getFolderId());
+            }
+        });
+        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ad.dismiss();
+            }
+        });
+        ad = builder.create();
+        ad.show();
+    }
+
+    @OnClick(R.id.mNavigationRightBtn)
+    public void saveChanges() {
+        if (mEditContentEdt.getText().toString().trim().equals("") || mNavigationTitleEdt.getText().toString().equals("")) {
+            Trace.show(EditActivity.this, "请输入标题和内容");
+        } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
+                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
+                || isFolderChanged) {
+            mNavigationRightBtn.setText("保存中..");
+            closeSliding();
+            mNavigationRightBtn.setEnabled(false);
+            saveDifference();
+        } else {
+            Trace.show(EditActivity.this, "内容未修改");
+        }
+    }
+
+    @OnClick(R.id.mNavigationLeftBtn)
+    public void back() {
+        if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
+                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
+                || isFolderChanged) {
+            backConfirm();
+        } else {
+            finish();
+        }
+    }
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
+        mEditCircleSearch.setText("共5个 当前第3个");
+        mEditCircleSearch.setUpAndDownClick(new CircleSearchView.UpAndDownListener() {
             @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
-                if (mFolder.length == 0) {
-                    builder.setTitle("没有别的笔记夹可以选择\n是否新建？")
-                            .setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    //TODO 新建笔记夹
-                                    Trace.show(EditActivity.this, "确认");
-                                }
-                            }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Trace.show(EditActivity.this, "算了吧");
-                        }
-                    });
-                    builder.create().show();
-                } else {
-                    builder.setTitle("选择移至笔记夹");
-                    // 设置一个下拉的列表选择项
-                    builder.setItems(mFolder, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, final int which) {
-                            isFolderChanged = true;
-                            Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
-                            //Folder newOne = null;
-                            final String oldName = thisFolder.getName();
-                            final String newName = mFolder[which];
-                            //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
-                            thisFolder = Folder.search4folder(mFolder[which]);
-                            //将现在的夹名添加到列表中供用户选择
-                            for (int i = 0; i < mFolder.length; i++) {
-                                if (mFolder[i].equals(newName)) {
-                                    mFolder[i] = oldName;
-                                    break;
-                                }
-                            }
-                            if (isNew) {
-                                mNote.setFolder(newName);
-                                mNote.setFolderId(thisFolder.getObjectId());
-                            }
-                        }
-                    });
-                    builder.show();
-                }
+            public void upClick() {
+                Trace.show(EditActivity.this, "up");
             }
-        });
-        mEditDeleteLinear.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
-                builder.setTitle("删除确认");
-                builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ad.dismiss();
-                        mNote.delete(EditActivity.this, handler, handle4finish
-                                , mNote.getFolderId());
-                    }
-                });
-                builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ad.dismiss();
-                    }
-                });
-                ad = builder.create();
-                ad.show();
-            }
-        });
-        mNavigationRightBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mEditContentEdt.getText().toString().trim().equals("") || mNavigationTitleEdt.getText().toString().equals("")) {
-                    Trace.show(EditActivity.this, "请输入标题和内容");
-                } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
-                        || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
-                        || isFolderChanged) {
-                    mNavigationRightBtn.setText("保存中..");
-                    closeSliding();
-                    mNavigationRightBtn.setEnabled(false);
-//                    timer = new CountDownTimer(Config.timeout_avod, Config.timeout_avod) {
-//                        @Override
-//                        public void onTick(long millisUntilFinished) {
-//                        }
-//
-//                        @Override
-//                        public void onFinish() {
-//                            Trace.d("timer onFinish");
-//                            Trace.show(EditActivity.this, "网络开小差辣···");
-//                            mNavigationRightBtn.setText("保存");
-//                            mNavigationRightBtn.setEnabled(true);
-//                        }
-//                    }.start();
-//                    Trace.d("timer start");
-                    saveDifference();
-                } else {
-                    Trace.show(EditActivity.this, "内容未修改");
-                }
-            }
-        });
-        mNavigationLeftBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
-                        || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
-                        || isFolderChanged) {
-                    backConfirm();
-                } else {
-                    finish();
-                }
+            public void downClick() {
+                Trace.show(EditActivity.this, "down");
             }
         });
         rightButtonRes = getResources().getDrawable(R.mipmap.ic_redo);
         rightButtonGrayRes = getResources().getDrawable(R.mipmap.ic_redo_gray);
         leftButtonRes = getResources().getDrawable(R.mipmap.ic_undo);
         leftButtonGrayRes = getResources().getDrawable(R.mipmap.ic_undo_gray);
+        mEditScroll.setOnScrollListener(new MyScrollView.OnScrollListener() {
+            @Override
+            public void onScroll(int mScrollY, int oldY) {
+                Trace.d("mScrollY" + mScrollY + "oldY" + oldY);
+                if (mScrollY >= NormalUtils.dip2px(EditActivity.this, 60 * 2) && isSearchViewShown) {
+                    isSearchViewShown = false;
+                    mEditCircleSearch.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onScrollTop() {
+                if (!isSearchViewShown) {
+                    isSearchViewShown = true;
+                    mEditCircleSearch.setVisibility(View.VISIBLE);
+//                    ValueAnimator anim = ValueAnimator.ofInt(0, searchHeight).setDuration(animDuration);
+//                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+//                        @Override
+//                        public void onAnimationUpdate(ValueAnimator animation) {
+//                            Trace.d(""+animation.getAnimatedValue());
+//                            mEditSearchLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
+//                            mEditSearchLinear.requestLayout();
+//                            mEditScroll.requestLayout();
+//                        }
+//                    });
+//                    anim.start();
+                }
+            }
+        });
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
             public void onValueChange(View view, int value) {
@@ -387,6 +420,8 @@ public class EditActivity extends BaseHasSwipeActivity {
             public void afterTextChanged(Editable s) {
             }
         });
+        searchHeight = mEditSearchLinear.getMeasuredHeight();
+        Trace.d("mEditScroll" + searchHeight);
     }
 
     private void saveDifference() {

@@ -61,6 +61,10 @@ public class Trace {
         }
     }
 
+    public static void show(final Context context, final String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+    }
+
     public static void show(final Activity context, final String msg) {
         context.runOnUiThread(new Runnable() {
             @Override
@@ -68,6 +72,10 @@ public class Trace {
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static void show(final Context context, final String msg, final int length) {
+        Toast.makeText(context, msg, length).show();
     }
 
     public static void show(final Activity context, final String msg, final int length) {

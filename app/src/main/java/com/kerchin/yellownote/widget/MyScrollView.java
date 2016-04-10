@@ -6,6 +6,9 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.ScrollView;
+
+import com.kerchin.yellownote.utilities.Trace;
+
 /**
  * Created by Kerchin on 2016/3/14 0014.
  */
@@ -30,6 +33,7 @@ public class MyScrollView extends ScrollView {
 
     /**
      * 设置滚动接口
+     *
      * @param onScrollListener
      */
     public void setOnScrollListener(OnScrollListener onScrollListener) {
@@ -40,23 +44,29 @@ public class MyScrollView extends ScrollView {
     /**
      * 用于用户手指离开MyScrollView的时候获取MyScrollView滚动的Y距离，然后回调给onScroll方法中
      */
-    private Handler handler = new Handler() {
+//    private Handler handler = new Handler() {
+//
+//        public void handleMessage(android.os.Message msg) {
+//            int scrollY = MyScrollView.this.getScrollY();
+//            //此时的距离和记录下的距离不相等，在隔5毫秒给handler发送消息
+//            if (lastScrollY != scrollY) {
+//                lastScrollY = scrollY;
+//                handler.sendMessageDelayed(handler.obtainMessage(), 5);
+//            }
+//            if (onScrollListener != null) {
+//                onScrollListener.onScroll(scrollY);
+//            }
+//        }
+//    };
 
-        public void handleMessage(android.os.Message msg) {
-            int scrollY = MyScrollView.this.getScrollY();
-
-            //此时的距离和记录下的距离不相等，在隔5毫秒给handler发送消息
-            if(lastScrollY != scrollY){
-                lastScrollY = scrollY;
-                handler.sendMessageDelayed(handler.obtainMessage(), 5);
-            }
-            if(onScrollListener != null){
-                onScrollListener.onScroll(scrollY);
-            }
-
-        };
-
-    };
+    @Override
+    protected void onScrollChanged(int mScrollX, int mScrollY, int oldX, int oldY) {
+        super.onScrollChanged(mScrollX, mScrollY, oldX, oldY);
+//        Trace.d("mScrollY" + mScrollY + "oldY" + oldY);
+        if (onScrollListener != null) {
+            onScrollListener.onScroll(mScrollY, oldY);
+        }
+    }
 
     /**
      * 重写onTouchEvent， 当用户的手在MyScrollView上面的时候，
@@ -64,14 +74,23 @@ public class MyScrollView extends ScrollView {
      * MyScrollView可能还在滑动，所以当用户抬起手我们隔5毫秒给handler发送消息，在handler处理
      * MyScrollView滑动的距离
      */
+    int downY, upY;
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        if(onScrollListener != null){
-            onScrollListener.onScroll(lastScrollY = this.getScrollY());
-        }
-        switch(ev.getAction()){
+//        if (onScrollListener != null) {
+//            onScrollListener.onScroll(lastScrollY = this.getScrollY());
+//        }
+        switch (ev.getAction()) {
             case MotionEvent.ACTION_UP:
-                handler.sendMessageDelayed(handler.obtainMessage(), 5);
+//                handler.sendMessageDelayed(handler.obtainMessage(), 5);
+                upY = getScrollY();
+                Trace.d("upY"+upY+"downY"+downY);
+                if(upY==0&&onScrollListener != null){
+                    onScrollListener.onScrollTop();
+                }
+                break;
+            case MotionEvent.ACTION_DOWN:
+                downY = getScrollY();
                 break;
         }
         return super.onTouchEvent(ev);
@@ -79,21 +98,21 @@ public class MyScrollView extends ScrollView {
 
 
     /**
-     *
      * 滚动的回调接口
      *
      * @author xiaanming
-     *
      */
-    public interface OnScrollListener{
+    public interface OnScrollListener {
         /**
          * 回调方法， 返回MyScrollView滑动的Y方向距离
-         * @param scrollY
-         *              、
+         *
+         * @param mScrollY 当前
+         * @param oldY 过去
          */
-        public void onScroll(int scrollY);
-    }
+        public void onScroll(int mScrollY, int oldY);
 
+        public void onScrollTop();
+    }
 
 
 }
