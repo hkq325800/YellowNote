@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
@@ -44,8 +45,7 @@ public class MyApplication extends Application {
         configCollectCrashInfo();
         shared = new SecurePreferences(context);
         user = shared.getString(Config.KEY_User, "");
-        if (!user.equals(""))
-            isLogin = true;
+        isLogin = shared.getBoolean(Config.KEY_ISLOGIN, false);
         super.onCreate();
     }
 
@@ -78,9 +78,10 @@ public class MyApplication extends Application {
 
     public static void logout() {
         isLogin = false;
+        PrimaryData.clearData();
         //清除密码缓存
         SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();
-//        editor.putString(Config.KEY_User, "");
+        editor.putBoolean(Config.KEY_ISLOGIN, isLogin);
         editor.putString(Config.KEY_PASS, "");
         editor.apply();
     }

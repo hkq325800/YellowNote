@@ -1,13 +1,14 @@
 package com.kerchin.yellownote.adapter;
 
 import android.content.Context;
+import android.os.*;
+import android.os.Process;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
-import com.kerchin.yellownote.global.MyApplication;
 
 import org.byteam.superadapter.SuperAdapter;
 import org.byteam.superadapter.internal.SuperViewHolder;
@@ -22,7 +23,7 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     private SparseArray<View> mViews;
     public List<Note> listDelete;
     public int[] listDeleteNum;
-    public boolean isDelete = false;
+    public volatile boolean isDelete = false;
 
     public NoteShrinkAdapter(Context context, List<Note> items, int layoutResId) {
         super(context, items, layoutResId);
@@ -30,8 +31,9 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     }
 
     @Override
-    public void onBind(SuperViewHolder holder, int viewType, int position, Note note) {
-        mViews.put(position, holder.itemView);
+    public void onBind(final SuperViewHolder holder, int viewType, final int position, Note note) {
+        if (mViews.get(position) == null)
+            mViews.put(position, holder.itemView);
         holder.setText(R.id.mNoteItemTitleTxt, note.getTitle());
         holder.setText(R.id.mNoteItemDateTxt, note.getShowDate());
         holder.setText(R.id.mNoteItemPreviewTxt, note.getPreview());
@@ -50,23 +52,23 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
         }
     }
 
-    public View getView(int pos){
+    public View getView(int pos) {
         return mViews.get(pos);
     }
 
-    public int getDeleteNum(){
+    public int getDeleteNum() {
         return listDelete.size();
     }
 
-    public Note getDeleteItem(int pos){
+    public Note getDeleteItem(int pos) {
         return listDelete.get(pos);
     }
 
-    public List<Note> getListDelete(){
+    public List<Note> getListDelete() {
         return listDelete;
     }
 
-    public void initListDelete(){
+    public void initListDelete() {
         listDelete = new ArrayList<>();
         listDeleteNum = new int[PrimaryData.getInstance().listFolder.size()];
     }

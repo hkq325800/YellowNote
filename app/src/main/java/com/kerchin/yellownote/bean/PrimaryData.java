@@ -32,6 +32,7 @@ public class PrimaryData {
      * 网络获取
      */
     private void initData() {
+        Trace.d("loadPrimaryData");
         getNoteFromCloud();
         getFolderFromCloud();
     }
@@ -112,6 +113,10 @@ public class PrimaryData {
             data = new PrimaryData();
         }
         return data;
+    }
+
+    public static void clearData(){
+        data = null;
     }
 
     /**

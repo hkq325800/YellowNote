@@ -15,6 +15,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -23,7 +24,7 @@ import java.util.Locale;
 /**
  * Created by Administrator on 2015/9/26 0026.
  */
-public class Note {
+public class Note implements Serializable {
     private String objectId;
     private String title;
     private Date date;

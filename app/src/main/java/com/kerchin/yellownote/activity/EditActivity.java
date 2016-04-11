@@ -5,15 +5,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -26,13 +23,10 @@ import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.bean.PrimaryData;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
-import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
-import com.kerchin.yellownote.widget.MyScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,18 +44,20 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4finish = 1;
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
-    private static final int RESULT_LOAD_IMAGE = 100;
+//    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
+    private static final int rightButtonRes = R.mipmap.ic_redo;
+    private static final int rightButtonGrayRes = R.mipmap.ic_redo_gray;
+    private static final int leftButtonRes = R.mipmap.ic_undo;
+    private static final int leftButtonGrayRes = R.mipmap.ic_undo_gray;
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
-    private int searchHeight = 0;//搜索条高度
     private int lastStepperValue = 0;//用来控制stepper
     private Double b1, b2;//实践单动画修改两个属性
     private ValueAnimator animHide, animShow;
-    private static Note mNote;
+    private Note mNote;
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
-    private boolean isSearchViewShown = false;//搜索栏是否显示
     private boolean isFolderChanged = false;
     private boolean userConfirm = false;
     private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
@@ -69,8 +65,8 @@ public class EditActivity extends BaseHasSwipeActivity {
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private String[] mFolder;
     private AlertDialog ad;
-    private Drawable rightButtonRes, rightButtonGrayRes, leftButtonRes, leftButtonGrayRes;
-    //    CountDownTimer timer;
+    boolean isLeftGray = true;//左侧的控制
+    boolean isRightGray = true;//右侧的控制
     private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
     @Bind(R.id.mEditCircleSearch)
@@ -85,18 +81,14 @@ public class EditActivity extends BaseHasSwipeActivity {
     LinearLayout mEditNavLinear;
     @Bind(R.id.mEditDeleteLinear)
     LinearLayout mEditDeleteLinear;
-    @Bind(R.id.mEditMoveLinear)
-    LinearLayout mEditMoveLinear;
     @Bind(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
     @Bind(R.id.mEditContentEdt)
     EditText mEditContentEdt;
     @Bind(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
-    @Bind(R.id.mNavigationLeftBtn)
-    Button mNavigationLeftBtn;
     @Bind(R.id.mEditScroll)
-    MyScrollView mEditScroll;
+    ScrollView mEditScroll;
     @Bind(R.id.mEditFuncLinear)
     LinearLayout mEditFuncLinear;
     private Handler handler = new Handler() {
@@ -112,8 +104,6 @@ public class EditActivity extends BaseHasSwipeActivity {
                     Trace.show(EditActivity.this, "内容不应为空");
                     break;
                 case handle4saveChange:
-//                    Trace.d("timer cancel");
-//                    timer.cancel();
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
                     openSliding();
@@ -133,21 +123,22 @@ public class EditActivity extends BaseHasSwipeActivity {
     };
 
     public static void startMe(Context context, Note note) {
-        mNote = note;
         // 指定下拉列表的显示数据
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.putExtra("note", note);
         context.startActivity(intent);
     }
 
-//    @Override
-//    protected void onDestroy() {
+    @Override
+    protected void onDestroy() {
 //        if (!userConfirm && !mEditContentEdt.getText().toString().equals(mNote.getContent())
-//                || !etTitle.getText().toString().equals(mNote.getTitle())) {
-//            ;//保存至草稿箱 数据库
+//                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())) {
+//            //保存至草稿箱 数据库
 //        }
-//        super.onDestroy();
-//    }
+        System.gc();
+        super.onDestroy();
+    }
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
@@ -161,8 +152,9 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-        PrimaryData primaryData = PrimaryData.getInstance();
         //初始化笔记夹选择
+        PrimaryData primaryData = PrimaryData.getInstance();
+        mNote = (Note) getIntent().getSerializableExtra("note");
         mFolder = new String[primaryData.listFolder.size() - 1];
         thisFolder = Folder.search4folder(mNote.getFolder());
         int sum = 0;
@@ -193,6 +185,107 @@ public class EditActivity extends BaseHasSwipeActivity {
             if (isNew)
                 mEditDeleteLinear.setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    protected void initializeEvent(Bundle savedInstanceState) {
+        mEditCircleSearch.setText("共5个 当前第3个");
+        mEditCircleSearch.setUpAndDownClick(new CircleSearchView.UpAndDownListener() {
+            @Override
+            public void upClick() {
+                Trace.show(EditActivity.this, "up");
+            }
+
+            @Override
+            public void downClick() {
+                Trace.show(EditActivity.this, "down");
+            }
+        });
+        mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
+            @Override
+            public void onValueChange(View view, int value) {
+                // Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
+                if (value == 0 || value < lastStepperValue) {
+                    //撤销
+                    int old = isNew ? 1 : 2;
+                    if (index > old) {
+                        if (isRightGray)
+                            mEditReUnStepper.setRightButtonResources(rightButtonRes);
+                        isRightGray = false;
+                        isUndo = true;
+                        index--;
+                        String text = textOrder.get(index - 1);
+                        mEditContentEdt.setText(text);
+                        mEditContentEdt.setSelection(textSelection.get(index - 1));
+                        isUndo = false;
+                    } else if (index == old) {
+                        if (isRightGray)
+                            mEditReUnStepper.setRightButtonResources(rightButtonRes);
+                        if (!isLeftGray)
+                            mEditReUnStepper.setLeftButtonResources(leftButtonGrayRes);
+                        isRightGray = false;
+                        isLeftGray = true;
+                        isUndo = true;
+                        index--;
+                        if (!isNew) {
+                            String text = textOrder.get(index - 1);
+                            mEditContentEdt.setText(text);
+                            mEditContentEdt.setSelection(textSelection.get(index - 1));
+                        } else
+                            mEditContentEdt.setText("");
+                        isUndo = false;
+                    }
+                } else if (value > lastStepperValue) {
+                    //恢复
+                    if (index + 1 <= textOrder.size()) {//有可以恢复的内容
+                        if (index + 1 == textOrder.size()
+                                && !isRightGray)//aText的内容被读完了
+                            mEditReUnStepper.setRightButtonResources(rightButtonGrayRes);
+                        if (isLeftGray)
+                            mEditReUnStepper.setLeftButtonResources(leftButtonRes);
+                        isRightGray = true;
+                        isLeftGray = false;
+                        isRedo = true;
+                        index++;
+                        String text = textOrder.get(index - 1);
+                        mEditContentEdt.setText(text);
+                        mEditContentEdt.setSelection(textSelection.get(index - 1));
+                        isRedo = false;
+                    }
+                }
+                lastStepperValue = value;
+            }
+        });
+        mEditContentEdt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!isUndo && !isRedo) {//被添加到aText中的部分
+                    mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
+                    mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
+                    textOrder.add(index, s.toString());
+                    textSelection.add(index, start + count);
+                    Trace.d("start:" + start + "before:" + before + "count:" + count);
+                    index++;
+                    mEditReUnStepper.setValue(mEditReUnStepper.getValue() + 1);
+                    if (textOrder.size() > index) {
+                        final int all = textOrder.size();
+                        for (int i = index; i < all; i++) {
+                            //Trace.d("remove" + textOrder.get(i - 1));
+                            textOrder.remove(index);//移除的都是第index个
+                            textSelection.remove(index);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     @OnClick(R.id.mEditMoveLinear)
@@ -292,138 +385,10 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     }
 
-    @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
-        mEditCircleSearch.setText("共5个 当前第3个");
-        mEditCircleSearch.setUpAndDownClick(new CircleSearchView.UpAndDownListener() {
-            @Override
-            public void upClick() {
-                Trace.show(EditActivity.this, "up");
-            }
-
-            @Override
-            public void downClick() {
-                Trace.show(EditActivity.this, "down");
-            }
-        });
-        rightButtonRes = getResources().getDrawable(R.mipmap.ic_redo);
-        rightButtonGrayRes = getResources().getDrawable(R.mipmap.ic_redo_gray);
-        leftButtonRes = getResources().getDrawable(R.mipmap.ic_undo);
-        leftButtonGrayRes = getResources().getDrawable(R.mipmap.ic_undo_gray);
-        mEditScroll.setOnScrollListener(new MyScrollView.OnScrollListener() {
-            @Override
-            public void onScroll(int mScrollY, int oldY) {
-                Trace.d("mScrollY" + mScrollY + "oldY" + oldY);
-                if (mScrollY >= NormalUtils.dip2px(EditActivity.this, 60 * 2) && isSearchViewShown) {
-                    isSearchViewShown = false;
-                    mEditCircleSearch.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onScrollTop() {
-                if (!isSearchViewShown) {
-                    isSearchViewShown = true;
-                    mEditCircleSearch.setVisibility(View.VISIBLE);
-//                    ValueAnimator anim = ValueAnimator.ofInt(0, searchHeight).setDuration(animDuration);
-//                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-//                        @Override
-//                        public void onAnimationUpdate(ValueAnimator animation) {
-//                            Trace.d(""+animation.getAnimatedValue());
-//                            mEditSearchLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
-//                            mEditSearchLinear.requestLayout();
-//                            mEditScroll.requestLayout();
-//                        }
-//                    });
-//                    anim.start();
-                }
-            }
-        });
-        mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
-            @Override
-            public void onValueChange(View view, int value) {
-                // Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
-                if (value == 0 || value < lastStepperValue) {
-                    //撤销
-                    int old = isNew ? 1 : 2;
-                    if (index > old) {
-                        mEditReUnStepper.setRightButtonResources(rightButtonRes);
-                        isUndo = true;
-                        index--;
-                        String text = textOrder.get(index - 1);
-                        mEditContentEdt.setText(text);
-                        mEditContentEdt.setSelection(textSelection.get(index - 1));
-                        isUndo = false;
-                    } else if (index == old) {
-                        mEditReUnStepper.setRightButtonResources(rightButtonRes);
-                        mEditReUnStepper.setLeftButtonResources(leftButtonGrayRes);
-                        isUndo = true;
-                        index--;
-                        if (!isNew) {
-                            String text = textOrder.get(index - 1);
-                            mEditContentEdt.setText(text);
-                            mEditContentEdt.setSelection(textSelection.get(index - 1));
-                        } else
-                            mEditContentEdt.setText("");
-                        isUndo = false;
-                    }
-                } else if (value > lastStepperValue) {
-                    //恢复
-                    if (index + 1 <= textOrder.size()) {//有可以恢复的内容
-                        if (index + 1 == textOrder.size())//aText的内容被读完了
-                            mEditReUnStepper.setRightButtonResources(rightButtonGrayRes);
-                        mEditReUnStepper.setLeftButtonResources(leftButtonRes);
-                        isRedo = true;
-                        index++;
-                        String text = textOrder.get(index - 1);
-                        mEditContentEdt.setText(text);
-                        mEditContentEdt.setSelection(textSelection.get(index - 1));
-                        isRedo = false;
-                    }
-                }
-                lastStepperValue = value;
-            }
-        });
-        mEditContentEdt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText et = (EditText) v;
-                if (textSelection.size() != 0)
-                    textSelection.set(index == 0 ? 0 : index - 1, et.getSelectionEnd());
-            }
-        });
-        mEditContentEdt.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!isUndo && !isRedo) {//被添加到aText中的部分
-                    mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
-                    mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
-                    textOrder.add(index, s.toString());
-                    textSelection.add(index, start + count);
-                    Trace.d("start:" + start + "before:" + before + "count:" + count);
-                    index++;
-                    mEditReUnStepper.setValue(mEditReUnStepper.getValue() + 1);
-                    if (textOrder.size() > index) {
-                        final int all = textOrder.size();
-                        for (int i = index; i < all; i++) {
-                            //Trace.d("remove" + textOrder.get(i - 1));
-                            textOrder.remove(index);//移除的都是第index个
-                            textSelection.remove(index);
-                        }
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
-        searchHeight = mEditSearchLinear.getMeasuredHeight();
-        Trace.d("mEditScroll" + searchHeight);
+    @OnClick(R.id.mEditContentEdt)
+    public void setTextSelection(){
+        if (textSelection.size() != 0)
+            textSelection.set(index == 0 ? 0 : index - 1, mEditContentEdt.getSelectionEnd());
     }
 
     private void saveDifference() {
@@ -461,11 +426,10 @@ public class EditActivity extends BaseHasSwipeActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         // TODO how to load pic from phone
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
+//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+//            Uri selectedImage = data.getData();
 //            NormalUtils.setDrawableToWidget(this, selectedImage, ivMove);
-
-        }
+//        }
     }
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {

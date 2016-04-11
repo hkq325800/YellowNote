@@ -116,3 +116,37 @@ public class MyScrollView extends ScrollView {
 
 
 }
+//private boolean isSearchViewShown = false;//搜索栏是否显示
+//    private int searchHeight = 0;//搜索条高度
+//        searchHeight = mEditSearchLinear.getMeasuredHeight();
+//        Trace.d("mEditScroll" + searchHeight);
+
+//        mEditScroll.setOnScrollListener(new MyScrollView.OnScrollListener() {
+//            @Override
+//            public void onScroll(int mScrollY, int oldY) {
+//                Trace.d("mScrollY" + mScrollY + "oldY" + oldY);
+//                if (mScrollY >= NormalUtils.dip2px(EditActivity.this, 60 * 2) && isSearchViewShown) {
+//                    isSearchViewShown = false;
+//                    mEditCircleSearch.setVisibility(View.GONE);
+//                }
+//            }
+//
+//            @Override
+//            public void onScrollTop() {
+//                if (!isSearchViewShown) {
+//                    isSearchViewShown = true;
+//                    mEditCircleSearch.setVisibility(View.VISIBLE);
+////                    ValueAnimator anim = ValueAnimator.ofInt(0, searchHeight).setDuration(animDuration);
+////                    anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+////                        @Override
+////                        public void onAnimationUpdate(ValueAnimator animation) {
+////                            Trace.d(""+animation.getAnimatedValue());
+////                            mEditSearchLinear.getLayoutParams().height = (int) animation.getAnimatedValue();
+////                            mEditSearchLinear.requestLayout();
+////                            mEditScroll.requestLayout();
+////                        }
+////                    });
+////                    anim.start();
+//                }
+//            }
+//        });

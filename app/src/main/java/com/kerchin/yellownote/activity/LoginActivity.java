@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.base.User;
@@ -195,7 +196,7 @@ public class LoginActivity extends User {
                 signUpVerify(txtUser, txtPass);
             else {
                 smsVerify(txtProv, txtUser);
-                new CountDownTimer(Config.timeout_avod, 500) {
+                new CountDownTimer(Config.timeout_avod, 250) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         if (smsStatus) {
@@ -238,7 +239,7 @@ public class LoginActivity extends User {
         if (tableCheck(txtUser, txtPass, txtRePass, txtProv)) {
             //是否注册查询
             isRegistered(txtUser);
-            new CountDownTimer(Config.timeout_avod, 500) {
+            new CountDownTimer(Config.timeout_avod, 250) {
                 @Override
                 public void onTick(long millisUntilFinished) {
                     if (registerStatus > statusInit) {
@@ -252,7 +253,7 @@ public class LoginActivity extends User {
                             else {
                                 //验证验证码成功则找回成功以该帐号登录
                                 smsVerify(txtProv, txtUser);
-                                new CountDownTimer(Config.timeout_avod, 500) {
+                                new CountDownTimer(Config.timeout_avod, 250) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
                                         if (smsStatus) {
@@ -292,7 +293,7 @@ public class LoginActivity extends User {
             if (txtForget.equals("找回密码")) {//忘记密码
                 //是否注册查询
                 isRegistered(txtUser);
-                new CountDownTimer(Config.timeout_avod, 500) {
+                new CountDownTimer(Config.timeout_avod, 250) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         if (registerStatus > statusInit) {
@@ -314,7 +315,7 @@ public class LoginActivity extends User {
             } else {//注册
                 //是否注册查询
                 isRegistered(txtUser);
-                new CountDownTimer(Config.timeout_avod, 500) {
+                new CountDownTimer(Config.timeout_avod, 250) {
                     @Override
                     public void onTick(long millisUntilFinished) {
                         if (registerStatus > statusInit) {
@@ -392,7 +393,7 @@ public class LoginActivity extends User {
     @Override
     protected void loginVerify(final String txtUser, final String txtPass) {
         isRegistered(txtUser);//是否注册查询
-        new CountDownTimer(Config.timeout_avod, 500) {
+        new CountDownTimer(Config.timeout_avod, 250) {
             @Override
             public void onTick(long millisUntilFinished) {
                 if (registerStatus > statusInit) {
@@ -464,12 +465,7 @@ public class LoginActivity extends User {
                         LoginService.userSignUp(txtUser, txtPass, MyApplication.userDefaultFolderId);
                         Trace.d("signUpVerify 用户注册完成");
                         Trace.show(LoginActivity.this, txtUser + "注册成功");
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                goToMain();
-                            }
-                        });
+                        goToMain();
                     }
                 } catch (AVException e) {
                     Trace.e("提交注册失败" + Trace.getErrorMsg(e));
@@ -491,12 +487,7 @@ public class LoginActivity extends User {
                 try {
                     LoginService.forgetVerify(objectId, txtPass);
                     Trace.show(LoginActivity.this, "修改成功");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            goToMain();
-                        }
-                    });
+                    goToMain();
                 } catch (AVException e) {
                     Trace.e("忘记密码操作失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -559,14 +550,36 @@ public class LoginActivity extends User {
     //缓存登录状态跳转主页面
     protected void goToMain() {
         //存入shared
+        MyApplication.setUser(mLoginUserEdt.getText().toString());
+        PrimaryData.getInstance();
         SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
         editor.putString(Config.KEY_User, mLoginUserEdt.getText().toString());
+        editor.putBoolean(Config.KEY_ISLOGIN, true);
         editor.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString());
         editor.apply();
-        MyApplication.setUser(mLoginUserEdt.getText().toString());
-        NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
-        finish();
+        handler.post(runnableForData);
     }
+
+    int repeatCount = 0;
+    Handler handler = new Handler();
+    private Runnable runnableForData = new Runnable() {
+        @Override
+        public void run() {
+            if (PrimaryData.status.isFolderReady
+                    && PrimaryData.status.isItemReady
+                    && PrimaryData.status.isNoteReady) {
+                Trace.d("runnableForData done");
+                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
+                finish();
+            } else {
+                Trace.d("folder:" + PrimaryData.status.isFolderReady
+                        + "note:" + PrimaryData.status.isNoteReady
+                        + "items:" + PrimaryData.status.isItemReady);
+                handler.postDelayed(runnableForData, 200);
+                repeatCount++;
+            }
+        }
+    };
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
