@@ -27,6 +27,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
@@ -55,6 +56,7 @@ public class FolderFragment extends BaseFragment {
     //    private final byte statusDataReGot = 3;
     private final byte statusDataError = 11;
     private List<SimpleFolder> mHeaders;
+    private PrimaryData primaryData;
     private FolderAdapter folderAdapter;
     private AlertDialog alertDialog;
     private final byte handle4newFolder = 100;//创建adapter4folder并应用于wterDrop4folder
@@ -71,10 +73,10 @@ public class FolderFragment extends BaseFragment {
                         ItemDragHelperCallback callback = new ItemDragHelperCallback();
                         final ItemTouchHelper helper = new ItemTouchHelper(callback);
                         GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
-                        MyApplication.getItemsReady();
+//                        primaryData.getItemsReady();
                         if (folderAdapter == null) {
                             folderAdapter = new FolderAdapter(getActivity()
-                                    , helper, mHeaders, MyApplication.mItems);
+                                    , helper, mHeaders, primaryData.mItems);
 
                             folderAdapter.setOnMyChannelItemClickListener(new FolderAdapter.OnFolderItemClickListener() {
                                 @Override
@@ -86,11 +88,11 @@ public class FolderFragment extends BaseFragment {
 
                                 @Override
                                 public void onItemLongClick(View v, final int position, int viewType) {
+                                    //reTitle+delete TODO 做成右键菜单的模式
                                     if (viewType == FolderAdapter.TYPE_HEADER) {
                                         MainActivity mainActivity = (MainActivity) getActivity();
                                         mainActivity.hideBtnAdd();
-                                        if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
-                                            //reTitle
+                                        if (!primaryData.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
                                             reTitleDialogShow(position);
                                         } else {
                                             Trace.show(getActivity(), "默认笔记夹不许更名");
@@ -98,44 +100,10 @@ public class FolderFragment extends BaseFragment {
                                     } else if (viewType == FolderAdapter.TYPE_ITEM) {
 
                                     }
-                                    //笔记删除的代码
-//                                    if (viewType == FolderAdapter.TYPE_HEADER) {
-//                                        if (!MyApplication.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
-//                                            //del
-//                                            if (MyApplication.listFolder.get(
-//                                                    realFolderPosition(position)).getContain() != 0)
-//                                                //笔记夹下如果还有笔记要么全部删除要么移至默认
-//                                                Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
-//                                            else {
-//                                                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-//                                                ad.setTitle("确认删除?");
-//                                                ad.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                                                    @Override
-//                                                    public void onClick(DialogInterface dialog, int which) {
-//                                                        dialog.dismiss();
-//                                                    }
-//                                                });
-//                                                ad.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-//                                                    @Override
-//                                                    public void onClick(DialogInterface dialog, int which) {
-//                                                        dialog.dismiss();
-//                                                        MyApplication.listFolder.get(
-//                                                                realFolderPosition(position))
-//                                                                .delete(getActivity(), realFolderPosition(position), handler, handle4respond);
-//                                                    }
-//                                                });
-//                                                ad.show();
-//                                            }
-//                                        } else {
-//                                            Trace.show(getActivity(), "默认笔记夹不许删除");
-//                                        }
-//                                    } else if (viewType == FolderAdapter.TYPE_ITEM) {
-//
-//                                    }
                                 }
                             });
                         } else {
-                            folderAdapter.setFolders(mHeaders, MyApplication.mItems);
+                            folderAdapter.setFolders(mHeaders, primaryData.mItems);
                             //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
 //                            folderAdapter.setIsFirstTrue();
 //                            Trace.d("scroll"+mHeaders.get(mHeaders.size() - 1).getId()+"/"+mHeaders.get(mHeaders.size() - 1).getName());
@@ -165,7 +133,7 @@ public class FolderFragment extends BaseFragment {
                 case handle4respond:
                     Trace.d("handlerInFolder", "handle4respond");
                     getDataListFromFolder();
-                    folderAdapter.setFolders(mHeaders, MyApplication.mItems);
+                    folderAdapter.setFolders(mHeaders, primaryData.mItems);
                     folderAdapter.notifyDataSetChanged();
                     break;
                 default:
@@ -173,6 +141,42 @@ public class FolderFragment extends BaseFragment {
             }
         }
     };
+
+    /**
+     * 笔记删除的代码
+     * @param position 点击的position
+     */
+    private void deleteFolder(final int position) {
+        if (!primaryData.listFolder.get(realFolderPosition(position)).getName().equals("默认")) {
+            //del
+            if (primaryData.listFolder.get(
+                    realFolderPosition(position)).getContain() != 0)
+                //笔记夹下如果还有笔记要么全部删除要么移至默认
+                Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
+            else {
+                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
+                ad.setTitle("确认删除?");
+                ad.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                ad.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        primaryData.listFolder.get(
+                                realFolderPosition(position))
+                                .delete(getActivity(), realFolderPosition(position), handler, handle4respond);
+                    }
+                });
+                ad.show();
+            }
+        } else {
+            Trace.show(getActivity(), "默认笔记夹不许删除");
+        }
+    }
 
     private int realFolderPosition(int position) {
         for (int i = 0; i < mHeaders.size(); i++) {
@@ -187,7 +191,7 @@ public class FolderFragment extends BaseFragment {
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mRenameEdt = (EditText) view.findViewById(R.id.mRenameEdt);
         final Button mRenameBtn = (Button) view.findViewById(R.id.mRenameBtn);
-        mRenameEdt.setText(MyApplication.listFolder.get(realFolderPosition(position)).getName());
+        mRenameEdt.setText(primaryData.listFolder.get(realFolderPosition(position)).getName());
         mRenameEdt.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -207,7 +211,7 @@ public class FolderFragment extends BaseFragment {
                 return false;
             }
         });
-        mRenameEdt.setSelection(MyApplication.listFolder.get(realFolderPosition(position)).getName().length());
+        mRenameEdt.setSelection(primaryData.listFolder.get(realFolderPosition(position)).getName().length());
         mRenameBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -216,7 +220,7 @@ public class FolderFragment extends BaseFragment {
                 } else if (mRenameEdt.getText().toString().equals("默认")) {
                     Trace.show(getActivity(), "不要与默认笔记夹重名");
                 } else {
-                    MyApplication.listFolder.get(
+                    primaryData.listFolder.get(
                             realFolderPosition(position)).reName(getActivity()
                             , mRenameEdt.getText().toString()
                             , handler, handle4respond);
@@ -288,7 +292,7 @@ public class FolderFragment extends BaseFragment {
                                 Trace.d("saveNewFolder", "成功");
                                 status = statusDataGot;
                                 statusName = "dataGot";
-                                MyApplication.isItemsReadyToGo = true;
+//                                MyApplication.isItemsReadyToGo = true;
                                 getData(statusDataGot);//add folder
                             } catch (AVException e) {
                                 Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
@@ -387,7 +391,7 @@ public class FolderFragment extends BaseFragment {
                 }
             }
         });
-        MyApplication.listFolder = new ArrayList<>();//初始化列表
+        primaryData = PrimaryData.getInstance();//初始化列表
         status = statusDataGot;
         statusName = "dataGot";
         getData(statusDataGot);//首次加载数据
@@ -395,84 +399,54 @@ public class FolderFragment extends BaseFragment {
 
     private void getData(byte statusCode) {
         Trace.d("getData status", statusName + "code:" + statusCode);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    List<AVObject> avObjects = FolderService.getUserFolder(MyApplication.user);
-                    if (mRecycleView != null) {
-                        Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据 statusCode:" + status);
-                        MyApplication.listFolder.clear();
-                        for (int i = 0; i < avObjects.size(); i++) {
-                            for (int j = i + 1; j < avObjects.size(); j++) {
-                                if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
-                                    AVObject temp = avObjects.get(i);
-                                    avObjects.set(i, avObjects.get(j));
-                                    avObjects.set(j, temp);
-                                }
-                            }
-                        }
-                        for (int i = 0; i < avObjects.size(); i++) {
-                            Folder folder = new Folder(avObjects.get(i).getObjectId()
-                                    , avObjects.get(i).getString("folder_name")
-                                    , avObjects.get(i).getInt("folder_contain"));
-//                                folder.setAvO(avObjects.get(i));
-                            if (!MyApplication.isFolderContain(folder)) {
-                                MyApplication.listFolder.add(folder);
-                            }
-                        }
-                        Trace.d("statusCode" + status, "getAdapter4Folder");
-                        getDataListFromFolder();
-                        getAdapter4Folder();
-                    }
-                } catch (AVException e) {
-                    e.printStackTrace();
-                    Trace.show(getActivity(), "获取用户笔记夹失败" + Trace.getErrorMsg(e));
-                }
-            }
-        }).start();
+        if (mRecycleView != null) {
+
+            Trace.d("statusCode" + status, "getAdapter4Folder");
+            getDataListFromFolder();
+            getAdapter4Folder();
+        }
     }
 
     private void getDataListFromFolder() {
         mHeaders = new ArrayList<SimpleFolder>();
         int sum = 0;
-        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
+        for (int i = 0; i < primaryData.listFolder.size(); i++) {
 
             mHeaders.add(new SimpleFolder(i + sum
-                    , MyApplication.listFolder.get(i).getName()
-                    , MyApplication.listFolder.get(i).getContain()
-                    , MyApplication.listFolder.get(i).getObjectId()));
-            sum += MyApplication.listFolder.get(i).getContain();
+                    , primaryData.listFolder.get(i).getName()
+                    , primaryData.listFolder.get(i).getContain()
+                    , primaryData.listFolder.get(i).getObjectId()));
+            sum += primaryData.listFolder.get(i).getContain();
         }
     }
 
 
-    int repeatCount = 0;
-    private Runnable runnableForAdapter = new Runnable() {
-        @Override
-        public void run() {
-            Trace.d("waitForIsItemsReady", "true");
-            getAdapter4Folder();
-        }
-    };
+//    int repeatCount = 0;
+//    private Runnable runnableForAdapter = new Runnable() {
+//        @Override
+//        public void run() {
+//            Trace.d("waitForIsItemsReady", "true");
+//            getAdapter4Folder();
+//        }
+//    };
 
     //根据list重置dataList以重置adapter
     private void getAdapter4Folder() {/*List<? extends Map<String, ?>>*/
         if (status == statusDataGot) {
             //相当于一直在每隔200ms判断isItemReady 为true时sendMessage
-            if (MyApplication.isItemsReadyToGo) {
-                MyApplication.isItemsReadyToGo = false;
-                repeatCount = 0;
-                Trace.d("isItemsReady lisNoteSize:" + MyApplication.listNote.size());
-                handler.sendEmptyMessage(handle4newFolder);
-            } else {
-                Trace.d("isItemsReady isn't ready:" + repeatCount);
-                repeatCount++;
-                if (repeatCount < 50)
-                    handler.postDelayed(runnableForAdapter, 200);
-                else
-                    Trace.show(getActivity(), "超时");
-            }
+//            if (MyApplication.isItemsReadyToGo) {
+//                MyApplication.isItemsReadyToGo = false;
+//                repeatCount = 0;
+            Trace.d("isItemsReady lisNoteSize:" + primaryData.listNote.size());
+            handler.sendEmptyMessage(handle4newFolder);
+//            } else {
+//                Trace.d("isItemsReady isn't ready:" + repeatCount);
+//                repeatCount++;
+//                if (repeatCount < 50)
+//                    handler.postDelayed(runnableForAdapter, 200);
+//                else
+//                    Trace.show(getActivity(), "超时");
+//            }
         } else if (status == statusRefresh) {
             handler.sendEmptyMessage(handle4refresh);
         } else if (status == statusRespond) {

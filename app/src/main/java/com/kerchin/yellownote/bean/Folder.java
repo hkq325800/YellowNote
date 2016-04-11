@@ -72,9 +72,9 @@ public class Folder {
                         NoteFragment.isChanged4note = true;
                         //将所有folder下的note移至新folder下 线上修改
                         if (contain != 0) {
-                            for (int i = 0; i < MyApplication.listNote.size(); i++) {
-                                if (MyApplication.listNote.get(i).getFolderId().equals(objectId)) {
-                                    MyApplication.listNote.get(i).move2folder(context, newName, objectId);
+                            for (int i = 0; i < PrimaryData.getInstance().listNote.size(); i++) {
+                                if (PrimaryData.getInstance().listNote.get(i).getFolderId().equals(objectId)) {
+                                    PrimaryData.getInstance().listNote.get(i).move2folder(context, newName, objectId);
                                 }
                             }
                         }
@@ -95,7 +95,7 @@ public class Folder {
                 public void run() {
                     try {
                         FolderService.delete(objectId);
-                        MyApplication.listFolder.remove(position);
+                        PrimaryData.getInstance().listFolder.remove(position);
                         Trace.show(context, "删除成功");
                         handler.sendEmptyMessage(handle4respond);
                     } catch (AVException e) {
@@ -110,9 +110,9 @@ public class Folder {
 
     //在listFolder中查找符合mNote名字的
     public static Folder search4folder(String folderName) {
-        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-            if (MyApplication.listFolder.get(i).getName().equals(folderName)) {
-                return MyApplication.listFolder.get(i);
+        for (int i = 0; i < PrimaryData.getInstance().listFolder.size(); i++) {
+            if (PrimaryData.getInstance().listFolder.get(i).getName().equals(folderName)) {
+                return PrimaryData.getInstance().listFolder.get(i);
             }
         }
         return null;
@@ -120,8 +120,8 @@ public class Folder {
 
     //与search4folder有相同的方法体返回值不同
     public boolean hasTheSameName(String name) {
-        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-            if (name.equals(MyApplication.listFolder.get(i).getName())) {
+        for (int i = 0; i < PrimaryData.getInstance().listFolder.size(); i++) {
+            if (name.equals(PrimaryData.getInstance().listFolder.get(i).getName())) {
                 return true;
             }
         }

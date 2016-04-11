@@ -224,7 +224,7 @@ public class Note {
             public void run() {
                 try {
                     NoteService.delete(objectId);
-                    Folder folder = MyApplication.getFolder(folderId);
+                    Folder folder = PrimaryData.getInstance().getFolder(folderId);
                     if (folder != null) {
                         folder.dec(context, 1);
                     }

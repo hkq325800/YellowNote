@@ -25,6 +25,7 @@ import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
@@ -160,13 +161,14 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
+        PrimaryData primaryData = PrimaryData.getInstance();
         //初始化笔记夹选择
-        mFolder = new String[MyApplication.listFolder.size() - 1];
+        mFolder = new String[primaryData.listFolder.size() - 1];
         thisFolder = Folder.search4folder(mNote.getFolder());
         int sum = 0;
-        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-            if (!MyApplication.listFolder.get(i).getName().equals(mNote.getFolder())) {
-                mFolder[sum] = MyApplication.listFolder.get(i).getName();
+        for (int i = 0; i < primaryData.listFolder.size(); i++) {
+            if (!primaryData.listFolder.get(i).getObjectId().equals(mNote.getFolderId())) {
+                mFolder[sum] = primaryData.listFolder.get(i).getName();
                 sum++;
             }
         }

@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.MyApplication;
 
 import org.byteam.superadapter.SuperAdapter;
@@ -67,7 +68,7 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
 
     public void initListDelete(){
         listDelete = new ArrayList<>();
-        listDeleteNum = new int[MyApplication.listFolder.size()];
+        listDeleteNum = new int[PrimaryData.getInstance().listFolder.size()];
     }
 
     public void setList(List<Note> list) {

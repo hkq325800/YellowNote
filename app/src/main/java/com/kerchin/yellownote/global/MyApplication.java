@@ -5,16 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVOSCloud;
-import com.kerchin.yellownote.bean.SimpleNote;
-import com.kerchin.yellownote.bean.Folder;
-import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MyApplication extends Application {
     /**
@@ -29,28 +23,15 @@ public class MyApplication extends Application {
     private static SharedPreferences shared;
     private static final String SaltKey = "xiaohuangj";
     private static boolean isLogin = false;
-    public static volatile ArrayList<Folder> listFolder;
-    public static volatile ArrayList<Note> listNote;
-    public static volatile List<SimpleNote> mItems;
     public static String user;
     public static String userDefaultFolderId = "";
-    public static String view = "note";
+    public static String view = "note";//TODO
     //public static final int pageLimit = 5;
     public static int thisPosition = 0;
-    public static boolean isItemsReadyToGo = false;
+    public static boolean isItemsReadyToGo = false;//TODO
 
     public static Context getContext() {
         return context;
-    }
-
-    public static void getItemsReady() {
-        if (MyApplication.listNote != null)
-            MyApplication.mItems = new ArrayList<SimpleNote>();
-            for (int i = 0; i < MyApplication.listNote.size(); i++) {
-                MyApplication.mItems.add(new SimpleNote(i
-                        , MyApplication.listNote.get(i).getTitle()
-                        , MyApplication.listNote.get(i).getFolderId()));
-            }
     }
 
     @Override
@@ -102,39 +83,5 @@ public class MyApplication extends Application {
 //        editor.putString(Config.KEY_User, "");
         editor.putString(Config.KEY_PASS, "");
         editor.apply();
-    }
-
-    public static Folder getFolder(String folderId) {
-        for (int i = 0; i < listFolder.size(); i++) {
-            if (listFolder.get(i).getObjectId().equals(folderId))
-                return listFolder.get(i);
-        }
-        return null;
-    }
-
-    public static boolean isFolderContain(Folder folder) {
-        for (int i = 0; i < MyApplication.listFolder.size(); i++) {
-            if (listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static Note getNote(String objectId) {
-        for (int i = 0; i < listNote.size(); i++) {
-            if (listNote.get(i).getObjectId().equals(objectId))
-                return listNote.get(i);
-        }
-        return null;
-    }
-
-    public static boolean isNoteContain(Note note) {
-        for (int i = 0; i < MyApplication.listNote.size(); i++) {
-            if (listNote.get(i).getObjectId().equals(note.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
     }
 }

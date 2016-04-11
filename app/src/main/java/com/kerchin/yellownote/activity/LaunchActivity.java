@@ -14,6 +14,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseActivity;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
@@ -48,29 +49,29 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
+        PrimaryData primaryData = PrimaryData.getInstance();
     }
 
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        final String pass = MyApplication.getDefaultShared().getString(Config.KEY_PASS, "");
         mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isNeedToRefresh) {
                     isNeedToRefresh = false;
-                    loginVerify(MyApplication.user, pass);
+                    loginVerify(MyApplication.user);
                 }
             }
         });
         //guidePage
         if (MyApplication.getDefaultShared().getBoolean("isGuide", false)) {
-            loginVerify(MyApplication.user, pass);
+            loginVerify(MyApplication.user);
 
 //            startActivity(new Intent(this, GuideActivity.class));
 //            finish();
         } else {
-            loginVerify(MyApplication.user, pass);
+            loginVerify(MyApplication.user);
         }
     }
 
@@ -141,15 +142,15 @@ public class LaunchActivity extends BaseActivity {
     };
 
 
-    protected void loginVerify(final String txtUser, final String txtPass) {
+    protected void loginVerify(final String txtUser) {
         //缓存查询流程
-        if (!txtUser.equals("") && !txtPass.equals("")) {
+        if (!txtUser.equals("") && !MyApplication.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
             //密码查询
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        AVObject avObjects = LoginService.loginVerify(txtUser, txtPass);
+                        AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");
@@ -174,7 +175,11 @@ public class LaunchActivity extends BaseActivity {
                     } catch (AVException e) {
                         e.printStackTrace();
                         isNeedToRefresh = true;
-                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        //无网络时如果已经有缓存登录，还是允许进入查看离线消息
+                        Message message = Message.obtain();//直接进入
+                        message.what = next;
+                        handler.sendMessageDelayed(message, delayTime);
+//                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
                 }
             }).start();
