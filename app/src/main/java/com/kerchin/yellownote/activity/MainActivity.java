@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
@@ -33,11 +32,9 @@ import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SystemBarTintManager;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.DepthPageTransformer;
-import com.kerchin.yellownote.widget.ZoomOutPageTransformer;
 
 import java.util.ArrayList;
 
@@ -57,6 +54,9 @@ public class MainActivity extends BaseActivity
     DrawerLayout mMainDrawer;
     @Bind(R.id.mMainToolbar)
     Toolbar mMainToolbar;
+
+    public static int thisPosition = 0;
+    public boolean isHide = false;
     private static Long mExitTime = (long) 0;//退出时间
     private boolean isDrawerOpen = false;
     public SearchView mSearchView;
@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity
 
             @Override
             public void onPageSelected(int position) {
-                MyApplication.thisPosition = position;
+                thisPosition = position;
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
                 if (position == 0) {
                     //delete初始化
@@ -140,7 +140,7 @@ public class MainActivity extends BaseActivity
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
                         Trace.d("isChanged4folder");
-                        MyApplication.isItemsReadyToGo = true;
+//                        MyApplication.isItemsReadyToGo = true;
                         folderFragment.dataGot();
                         FolderFragment.isChanged4folder = false;
                     }
@@ -205,7 +205,7 @@ public class MainActivity extends BaseActivity
             @Override
             public void onDrawerClosed(View drawerView) {
                 isDrawerOpen = false;
-                boolean isVisible = MyApplication.thisPosition == 0;
+                boolean isVisible = thisPosition == 0;
                 btnSearch.setVisible(isVisible);
                 btnDelete.setVisible(isVisible);
                 btnSort.setVisible(isVisible);
@@ -222,7 +222,7 @@ public class MainActivity extends BaseActivity
 
     private ToolbarStatus getFragmentStatus() {
         if (noteFragment != null && folderFragment != null) {
-            switch (MyApplication.thisPosition) {
+            switch (thisPosition) {
                 case 0:
                     return noteFragment.getMainStatus();
                 case 1:
@@ -237,9 +237,9 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onResume() {
         super.onResume();
-        mMainToolbar.setTitle(MyApplication.thisPosition == 0 ? "笔记" : "笔记本");
+        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
         mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
-        if (mMainFab != null && isHide)
+        if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
             showBtnAdd();
         if (!MyApplication.isLogin()) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -287,10 +287,10 @@ public class MainActivity extends BaseActivity
 
     @OnClick(R.id.mMainFab)
     public void createNew() {
-        if (MyApplication.thisPosition == 0)
-            noteFragment.getAddClickListener();
-        else if (MyApplication.thisPosition == 1)
-            folderFragment.getAddClickListener();
+        if (thisPosition == 0)
+            noteFragment.addClick();
+        else if (thisPosition == 1)
+            folderFragment.addClick();
     }
 
     @Override
@@ -381,8 +381,6 @@ public class MainActivity extends BaseActivity
         }
     };
 
-    public boolean isHide = false;
-
     public void showBtnAdd() {
 //        Trace.d("showBtnAddDelay");
         isHide = false;
@@ -402,11 +400,11 @@ public class MainActivity extends BaseActivity
         } else if (getFragmentStatus().isSearchMode()) {
             mSearchView.onActionViewCollapsed();
             showBtnAdd();
-            if (MyApplication.thisPosition == 0)
+            if (thisPosition == 0)
                 noteFragment.restore();
             getFragmentStatus().setIsSearchMode(false);
         } else {
-            if (MyApplication.thisPosition == 0) {
+            if (thisPosition == 0) {
                 if (getFragmentStatus().isDeleteMode()) {
                     noteFragment.deleteViewHide();
                 } else {
@@ -459,15 +457,15 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-            /*隐藏软键盘*/
+        /*if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+            *//*隐藏软键盘*//*
             InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             if (inputMethodManager.isActive()) {
                 //noinspection ConstantConditions
                 inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
             return true;
-        } else if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {//拦截menu按钮
+        } else */if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {//拦截menu按钮
             //弹出侧边栏
             if (isDrawerOpen)
                 mMainDrawer.closeDrawers();

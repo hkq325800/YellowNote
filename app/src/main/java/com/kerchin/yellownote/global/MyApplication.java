@@ -26,10 +26,9 @@ public class MyApplication extends Application {
     private static boolean isLogin = false;
     public static String user;
     public static String userDefaultFolderId = "";
-    public static String view = "note";//TODO
+//    public static String view = "note";//TODO
     //public static final int pageLimit = 5;
-    public static int thisPosition = 0;
-    public static boolean isItemsReadyToGo = false;//TODO
+//    public static boolean isItemsReadyToGo = false;//TODO
 
     public static Context getContext() {
         return context;

@@ -37,7 +37,7 @@ public class FolderService {
             folder.delete();
     }
 
-    public static void newFolder(String user, String name) throws AVException {
+    public static String newFolder(String user, String name) throws AVException {
         //AVFile file = MyApplication.listFolder.get(0).getCover();
         AVObject folder = new AVObject("Folder");
         folder.put("user_tel", user);
@@ -45,6 +45,7 @@ public class FolderService {
         folder.put("folder_name", name);
         folder.put("folder_contain", 0);
         folder.save();
+        return folder.getObjectId();
     }
 
     public static List<AVObject> getUserFolder(String user) throws AVException {

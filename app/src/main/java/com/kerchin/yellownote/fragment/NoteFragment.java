@@ -89,37 +89,33 @@ public class NoteFragment extends BaseFragment
         public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case handle4newNote:
-                    try {
-                        Trace.d("handle4newNote");
-                        getDataListFromNote(primaryData.listNote);
-                        //TODO 避免滑动到顶部
-                        if (noteAdapter == null)
-                            noteAdapter = new NoteShrinkAdapter(getActivity(), list, R.layout.item_note);
-                        else {
-                            noteAdapter.initListDelete();
-                            noteAdapter.setList(list);
-                        }
-                        mNoteWDList.setAdapter(noteAdapter);
-                        mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-                        mNoteWDList.setVisibility(View.VISIBLE);
-                        mNoteEmptyTxt.setVisibility(View.GONE);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (mNoteProgress.getVisibility() == View.VISIBLE) {
-                            mNoteProgress.setVisibility(View.GONE);
-                        }
+                    Trace.d("handle4newNote");
+                    getDataListFromNote(primaryData.listNote);
+                    //TODO 删除后避免滑动到顶部
+                    if (noteAdapter == null)
+                        noteAdapter = new NoteShrinkAdapter(
+                                getActivity(), list, R.layout.item_note);
+                    else {
+                        noteAdapter.initListDelete();
+                        noteAdapter.setList(list);
+                    }
+                    mNoteWDList.setAdapter(noteAdapter);
+                    mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
+                    mNoteWDList.setVisibility(View.VISIBLE);
+                    mNoteEmptyTxt.setVisibility(View.GONE);
+                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
+                        mNoteProgress.setVisibility(View.GONE);
                     }
                     break;
                 case handle4refresh:
-                    if (MyApplication.view.equals("note")) {
+                    if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(View.VISIBLE);
                         mNoteEmptyTxt.setVisibility(View.GONE);
                         noteAdapter.setList(list);
                         stopRefresh();
-                    }
-                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
-                        mNoteProgress.setVisibility(View.GONE);
+                        if (mNoteProgress.getVisibility() == View.VISIBLE) {
+                            mNoteProgress.setVisibility(View.GONE);
+                        }
                     }
                     break;
                 case handle4return:
@@ -138,16 +134,6 @@ public class NoteFragment extends BaseFragment
                     }
                     stopRefresh();
                     break;
-//                case handle4reset:
-//                    if (isChanged4note) {
-//                        getDataListFromNote(MyApplication.listNote);
-//                        noteAdapter.notifyDataSetHasChanged();
-//                        isChanged4note = false;
-//                    }
-//                    if (mNoteProgress.getVisibility() == View.VISIBLE) {
-//                        mNoteProgress.setVisibility(View.GONE);
-//                    }
-//                    break;
                 case handle4loadMore:
                     mNoteWDList.stopLoadMore();
                     if (mNoteProgress.getVisibility() == View.VISIBLE) {
@@ -173,13 +159,118 @@ public class NoteFragment extends BaseFragment
         }
     };
 
+    private void getData() {
+        Trace.d("getData");
+        if (primaryData.listNote.size() != 0) {
+//            if (primaryData.listNote.size() == MyApplication.pageLimit) {
+//                mNoteWDList.setPullLoadEnable(true);
+//            } else {
+//                mNoteWDList.setPullLoadEnable(false);
+//            }
+//            MyApplication.isItemsReadyToGo = true;
+//            Trace.d("isItemsReady", "true");
+        } else {
+//            MyApplication.isItemsReadyToGo = true;
+//            Trace.d("isItemsReady", "true");
+            mNoteWDList.setPullLoadEnable(false);//空白页不允许load? TODO
+        }
+        if (status == statusRefresh
+                || status == statusDataGot
+                || status == statusReturn) {
+
+            getAdapter4note(0);
+            isChanged4note = false;
+        } else if (status == statusLoadMore) {
+            moreDataAdapter4note();
+        }
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
+//                    if (mNoteWDList != null) {
+//                        //skip += avObjects.size();
+//                        Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
+//                        primaryData.listNote.clear();
+//                        if (avObjects.size() != 0) {
+////                            if (avObjects.size() == MyApplication.pageLimit) {
+////                                mNoteWDList.setPullLoadEnable(true);
+////                            } else {
+////                                mNoteWDList.setPullLoadEnable(false);
+////                            }
+//                            for (int i = 0; i < avObjects.size(); i++) {
+//                                primaryData.listNote.add(new Note(avObjects.get(i).getObjectId()
+//                                        , avObjects.get(i).getString("note_title")
+//                                        , avObjects.get(i).getLong("note_editedAt")
+//                                        , avObjects.get(i).getString("note_content")
+//                                        , avObjects.get(i).getString("folder_name")
+//                                        , avObjects.get(i).getString("folder_id")
+//                                        , avObjects.get(i).getString("note_type")));
+//                            }
+//                            MyApplication.isItemsReadyToGo = true;
+//                            Trace.d("isItemsReady", "true");
+//                        } else {
+//                            MyApplication.isItemsReadyToGo = true;
+//                            Trace.d("isItemsReady", "true");
+//                            mNoteWDList.setPullLoadEnable(false);
+//                        }
+//                        if (status == statusRefresh
+//                                || status == statusDataGot
+//                                || status == statusReturn) {
+//
+//                            getAdapter4note(0);
+//                            isChanged4note = false;
+//                        } else if (status == statusLoadMore) {
+//                            moreDataAdapter4note();
+//                        }
+//                    }
+//                } catch (AVException e) {
+//                    e.printStackTrace();
+//                    Trace.show(getActivity(), "刷新失败" + Trace.getErrorMsg(e));
+//                    stopRefresh();
+//                }
+//            }
+//        }).start();
+    }
+
+    private void moreDataAdapter4note() {
+        getDataListFromNote(primaryData.listNote);
+        handler.sendEmptyMessage(handle4loadMore);
+    }
+
+    private void getDataListFromNote(List<Note> order) {
+        list.clear();
+        for (int i = 0; i < order.size(); i++) {
+            list.add(order.get(i));
+        }
+    }
+
+    private void getAdapter4note(long delay) {
+        if (primaryData.listNote.size() == 0) {
+            handler.sendEmptyMessage(handle4zero);
+        } else {
+            getDataListFromNote(primaryData.listNote);
+            if (status == statusDataGot) {
+                handler.sendEmptyMessageDelayed(handle4newNote, delay);
+            } else if (status == statusReturn) {
+                if (noteAdapter == null) {
+                    handler.sendEmptyMessage(handle4newNote);
+                } else {
+                    handler.sendEmptyMessage(handle4return);
+                }
+            } else if (status == statusRefresh) {
+                handler.sendEmptyMessage(handle4refresh);
+            }
+        }
+    }
+
     public static NoteFragment newInstance(Bundle bundle) {
         NoteFragment frag = new NoteFragment();
         frag.setArguments(bundle);
         return frag;
     }
 
-    public void getAddClickListener() {
+    public void addClick() {
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
@@ -473,111 +564,6 @@ public class NoteFragment extends BaseFragment
             }
         } else {
             Trace.d("deleteViewHideNote error");
-        }
-    }
-
-    private void getData() {
-        Trace.d("getData");
-        if (primaryData.listNote.size() != 0) {
-//            if (primaryData.listNote.size() == MyApplication.pageLimit) {
-//                mNoteWDList.setPullLoadEnable(true);
-//            } else {
-//                mNoteWDList.setPullLoadEnable(false);
-//            }
-//            MyApplication.isItemsReadyToGo = true;
-//            Trace.d("isItemsReady", "true");
-        } else {
-//            MyApplication.isItemsReadyToGo = true;
-//            Trace.d("isItemsReady", "true");
-            mNoteWDList.setPullLoadEnable(false);//空白页不允许load? TODO
-        }
-        if (status == statusRefresh
-                || status == statusDataGot
-                || status == statusReturn) {
-
-            getAdapter4note(0);
-            isChanged4note = false;
-        } else if (status == statusLoadMore) {
-            moreDataAdapter4note();
-        }
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
-//                    if (mNoteWDList != null) {
-//                        //skip += avObjects.size();
-//                        Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
-//                        primaryData.listNote.clear();
-//                        if (avObjects.size() != 0) {
-////                            if (avObjects.size() == MyApplication.pageLimit) {
-////                                mNoteWDList.setPullLoadEnable(true);
-////                            } else {
-////                                mNoteWDList.setPullLoadEnable(false);
-////                            }
-//                            for (int i = 0; i < avObjects.size(); i++) {
-//                                primaryData.listNote.add(new Note(avObjects.get(i).getObjectId()
-//                                        , avObjects.get(i).getString("note_title")
-//                                        , avObjects.get(i).getLong("note_editedAt")
-//                                        , avObjects.get(i).getString("note_content")
-//                                        , avObjects.get(i).getString("folder_name")
-//                                        , avObjects.get(i).getString("folder_id")
-//                                        , avObjects.get(i).getString("note_type")));
-//                            }
-//                            MyApplication.isItemsReadyToGo = true;
-//                            Trace.d("isItemsReady", "true");
-//                        } else {
-//                            MyApplication.isItemsReadyToGo = true;
-//                            Trace.d("isItemsReady", "true");
-//                            mNoteWDList.setPullLoadEnable(false);
-//                        }
-//                        if (status == statusRefresh
-//                                || status == statusDataGot
-//                                || status == statusReturn) {
-//
-//                            getAdapter4note(0);
-//                            isChanged4note = false;
-//                        } else if (status == statusLoadMore) {
-//                            moreDataAdapter4note();
-//                        }
-//                    }
-//                } catch (AVException e) {
-//                    e.printStackTrace();
-//                    Trace.show(getActivity(), "刷新失败" + Trace.getErrorMsg(e));
-//                    stopRefresh();
-//                }
-//            }
-//        }).start();
-    }
-
-    private void moreDataAdapter4note() {
-        getDataListFromNote(primaryData.listNote);
-        handler.sendEmptyMessage(handle4loadMore);
-    }
-
-    private void getDataListFromNote(List<Note> order) {
-        list.clear();
-        for (int i = 0; i < order.size(); i++) {
-            list.add(order.get(i));
-        }
-    }
-
-    private void getAdapter4note(long delay) {
-        if (primaryData.listNote.size() == 0) {
-            handler.sendEmptyMessage(handle4zero);
-        } else {
-            getDataListFromNote(primaryData.listNote);
-            if (status == statusDataGot) {
-                handler.sendEmptyMessageDelayed(handle4newNote, delay);
-            } else if (status == statusReturn) {
-                if (noteAdapter == null) {
-                    handler.sendEmptyMessage(handle4newNote);
-                } else {
-                    handler.sendEmptyMessage(handle4return);
-                }
-            } else if (status == statusRefresh) {
-                handler.sendEmptyMessage(handle4refresh);
-            }
         }
     }
 
