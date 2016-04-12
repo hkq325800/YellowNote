@@ -21,7 +21,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.base.User;
+import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
@@ -34,16 +34,7 @@ import butterknife.OnClick;
 /**
  * Created by Kerchin on 2015/8/1 0005.
  */
-public class LoginActivity extends User {
-    private static final String LOG_TAG = "YellowNote-" + LoginActivity.class.getSimpleName();
-    private static Long mExitTime = (long) 0;//退出时间
-    private final byte statusInit = -1;//未查询或查询中
-    private final byte statusFalse = 0;//查询结果为假
-    private final byte statusTrue = 1;//查询结果为真
-    boolean isEnter = false;
-    private String objectId;
-    private byte registerStatus = -1;
-    private boolean smsStatus = false;
+public class LoginActivity extends LoginAbstract {
     @Bind(R.id.mLoginScV)
     ScrollView mLoginScV;
     @Bind(R.id.mLoginUserEdt)
@@ -66,17 +57,35 @@ public class LoginActivity extends User {
     RelativeLayout mSignUpRelative;
     @Bind(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
+    private final static byte statusInit = -1;//未查询或查询中
+    private final static byte statusFalse = 0;//查询结果为假
+    private final static byte statusTrue = 1;//查询结果为真
+    private static Long mExitTime = (long) 0;//退出时间
+    private boolean isEnter = false;
+    private boolean smsStatus = false;
+    private byte registerStatus = -1;
+    private int repeatCount = 0;
+    private String objectId;
+    private Handler handler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
-        immerge(R.color.lightSkyBlue);
-        init();
+        NormalUtils.immerge(LoginActivity.this, R.color.lightSkyBlue);
     }
 
-    private void init() {
+    @Override
+    protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+    }
+
+    @Override
+    protected void initializeData(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected void initializeEvent(Bundle savedInstanceState) {
         if (!MyApplication.user.equals("")) {
             mLoginUserEdt.setText(MyApplication.user);
             mLoginUserEdt.setSelection(MyApplication.user.length());
@@ -138,6 +147,7 @@ public class LoginActivity extends User {
         mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+
     }
 
     @OnClick(R.id.mLoginBtn)
@@ -286,7 +296,6 @@ public class LoginActivity extends User {
     public void sendProvClick(){
         String txtForget = mLoginForgetBtn.getText().toString();
         final String txtUser = mLoginUserEdt.getText().toString();
-        final int count = Config.timeout_prov;
         if (txtUser.equals("") || txtUser.length() != 11) {
             Trace.show(LoginActivity.this, "请先填写11位手机号");
         } else {
@@ -300,7 +309,7 @@ public class LoginActivity extends User {
                             cancel();
                             Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                             if (registerStatus == statusTrue) {
-                                sendProv(false, txtUser, count);
+                                sendProv(false, txtUser, Config.timeout_prov);
                             } else {
                                 Trace.show(LoginActivity.this, "该帐号未注册,请先注册");
                             }
@@ -322,7 +331,7 @@ public class LoginActivity extends User {
                             cancel();
                             Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                             if (registerStatus == statusFalse) {
-                                sendProv(true, txtUser, count);
+                                sendProv(true, txtUser, Config.timeout_prov);
                             } else {
                                 Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
                             }
@@ -340,10 +349,10 @@ public class LoginActivity extends User {
 
     //发送验证码
     @Override
-    protected void sendProv(final boolean isSignUp, final String txtUser, final int count) {
+    protected void sendProv(final boolean isSignUp, final String txtUser, final int validPeriod) {
         mLoginSendProvBtn.setEnabled(false);
         mLoginUserEdt.setEnabled(false);
-        new CountDownTimer(count * 60 * 1000, 1000) {
+        new CountDownTimer(validPeriod * 60 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 String str = "发送成功" + (millisUntilFinished / 1000);
@@ -361,7 +370,7 @@ public class LoginActivity extends User {
             @Override
             public void run() {
                 try {
-                    LoginService.sendProv(txtUser, isSignUp, count);
+                    LoginService.sendProv(txtUser, isSignUp, validPeriod);
                 } catch (AVException e) {
                     Trace.e("发送验证码失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -450,18 +459,16 @@ public class LoginActivity extends User {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                AVObject folder = null;
                 try {
-                    folder = LoginService.signUpVerify(txtUser);
+                    MyApplication.userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
                     Trace.d("signUpVerify 默认文件夹创建完成");
-                    MyApplication.userDefaultFolderId = folder.getObjectId();
                 } catch (AVException e) {
                     Trace.e("创建默认笔记夹失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                     Trace.show(LoginActivity.this, "创建默认笔记夹失败" + Trace.getErrorMsg(e));
                 }
                 try {
-                    if (folder != null) {
+                    if (!MyApplication.userDefaultFolderId.equals("")) {
                         LoginService.userSignUp(txtUser, txtPass, MyApplication.userDefaultFolderId);
                         Trace.d("signUpVerify 用户注册完成");
                         Trace.show(LoginActivity.this, txtUser + "注册成功");
@@ -524,16 +531,16 @@ public class LoginActivity extends User {
 
     //表格信息校验
     @Override
-    protected boolean tableCheck(String txtUser, String txtPass, String txtRepass, String txtProv) {
+    protected boolean tableCheck(String txtUser, String txtPass, String txtRePass, String txtProv) {
         if (Config.isDebugMode)
             return true;
         if (txtUser.equals("") || txtUser.length() != 11) {
             Trace.show(LoginActivity.this, "请输入11位手机号并接收验证码");
             return false;
-        } else if (txtRepass.equals("") | txtPass.equals("")) {
+        } else if (txtRePass.equals("") | txtPass.equals("")) {
             Trace.show(LoginActivity.this, "请输入密码并重复一次");
             return false;
-        } else if (!txtRepass.equals(txtPass)) {
+        } else if (!txtRePass.equals(txtPass)) {
             Trace.show(LoginActivity.this, "两次输入的密码不同");
             return false;
         } else if (txtPass.length() < 6 || txtPass.length() > 13) {
@@ -548,6 +555,7 @@ public class LoginActivity extends User {
     }
 
     //缓存登录状态跳转主页面
+    @Override
     protected void goToMain() {
         //存入shared
         MyApplication.setUser(mLoginUserEdt.getText().toString());
@@ -560,8 +568,6 @@ public class LoginActivity extends User {
         handler.post(runnableForData);
     }
 
-    int repeatCount = 0;
-    Handler handler = new Handler();
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
@@ -571,7 +577,7 @@ public class LoginActivity extends User {
                 Trace.d("runnableForData done");
                 NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
-            } else {
+            } else {//若一直未能进入需要处理 TODO
                 Trace.d("folder:" + PrimaryData.status.isFolderReady
                         + "note:" + PrimaryData.status.isNoteReady
                         + "items:" + PrimaryData.status.isItemReady);
@@ -587,7 +593,7 @@ public class LoginActivity extends User {
                 Trace.show(LoginActivity.this, "再点击一次退出应用");
                 mExitTime = System.currentTimeMillis();
             } else {
-                Trace.i(LOG_TAG, "exit Main");
+                Trace.i(TAG, "exit Main");
                 finish();
             }
             return true;

@@ -40,35 +40,6 @@ import butterknife.OnClick;
  * Created by Administrator on 2015/9/30 0030.
  */
 public class EditActivity extends BaseHasSwipeActivity {
-    private static final byte handle4noTitle = 0;
-    private static final byte handle4finish = 1;
-    private static final byte handle4noContent = 2;
-    private static final byte handle4saveChange = 3;
-//    private static final int RESULT_LOAD_IMAGE = 100;
-    private static final int animDuration = 160;//动画的长度
-    private static final int rightButtonRes = R.mipmap.ic_redo;
-    private static final int rightButtonGrayRes = R.mipmap.ic_redo_gray;
-    private static final int leftButtonRes = R.mipmap.ic_undo;
-    private static final int leftButtonGrayRes = R.mipmap.ic_undo_gray;
-    private int navLinearHeight = 0;//导航条高度
-    private int funcHeight = 0;//工具条高度
-    private int lastStepperValue = 0;//用来控制stepper
-    private Double b1, b2;//实践单动画修改两个属性
-    private ValueAnimator animHide, animShow;
-    private Note mNote;
-    private boolean isNew = false;//是否为新笔记
-    private boolean isShown = true;//func条是否显示
-    private boolean isFolderChanged = false;
-    private boolean userConfirm = false;
-    private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
-    private int index = 0;//用来记录当前在aText和aTextSelection中的位置
-    private Folder thisFolder;//记录目前处在哪个笔记夹
-    private String[] mFolder;
-    private AlertDialog ad;
-    boolean isLeftGray = true;//左侧的控制
-    boolean isRightGray = true;//右侧的控制
-    private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
-    private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
     @Bind(R.id.mEditCircleSearch)
     CircleSearchView mEditCircleSearch;
     @Bind(R.id.mEditSearchLinear)
@@ -91,6 +62,35 @@ public class EditActivity extends BaseHasSwipeActivity {
     ScrollView mEditScroll;
     @Bind(R.id.mEditFuncLinear)
     LinearLayout mEditFuncLinear;
+    private static final byte handle4noTitle = 0;
+    private static final byte handle4finish = 1;
+    private static final byte handle4noContent = 2;
+    private static final byte handle4saveChange = 3;
+//    private static final int RESULT_LOAD_IMAGE = 100;
+    private static final int animDuration = 160;//动画的长度
+    private static final int rightButtonRes = R.mipmap.ic_redo;
+    private static final int rightButtonGrayRes = R.mipmap.ic_redo_gray;
+    private static final int leftButtonRes = R.mipmap.ic_undo;
+    private static final int leftButtonGrayRes = R.mipmap.ic_undo_gray;
+    private boolean isNew = false;//是否为新笔记
+    private boolean isShown = true;//func条是否显示
+    private boolean isFolderChanged = false;
+    private boolean userConfirm = false;
+    private boolean isUndo, isRedo;//用在onTextChanged判断是否为手动操作还是按钮操作
+    private boolean isLeftGray = true;//左侧的控制
+    private boolean isRightGray = true;//右侧的控制
+    private int navLinearHeight = 0;//导航条高度
+    private int funcHeight = 0;//工具条高度
+    private int lastStepperValue = 0;//用来控制stepper
+    private int index = 0;//用来记录当前在aText和aTextSelection中的位置
+    private Double b1, b2;//实践单动画修改两个属性
+    private String[] mFolder;
+    private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
+    private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
+    private ValueAnimator animHide, animShow;
+    private Note mNote;
+    private Folder thisFolder;//记录目前处在哪个笔记夹
+    private AlertDialog ad;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {

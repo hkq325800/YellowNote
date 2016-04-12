@@ -22,8 +22,15 @@ import com.kerchin.yellownote.utilities.Trace;
  * Created by Kerchin on 2016/4/3 0003.
  */
 public class LaunchActivity extends BaseActivity {
-    final static int delayTime = 1500;
-    final static int delayTimeToMain = 1200;
+    private final static int delayTime = 1500;
+    private final static int delayTimeToMain = 1200;
+    private static final byte wel = 0;
+    private static final byte next = 1;
+    private static final byte reLog = 2;
+    private static final byte reLogForFrozen = 4;
+    private int repeatCount = 0;
+    private long getDataStart;
+    private Message cycleTarget;
 //    View view;
 
     @Override
@@ -31,7 +38,7 @@ public class LaunchActivity extends BaseActivity {
 //        view = LayoutInflater.from(this).inflate(R.layout.fragment_welcome,
 //                null);
         setContentView(R.layout.fragment_welcome);
-        immerge(R.color.minionYellow);
+        NormalUtils.immerge(LaunchActivity.this, R.color.minionYellow);
     }
 
     @Override
@@ -41,16 +48,7 @@ public class LaunchActivity extends BaseActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
 //        ButterKnife.bind(this);
-//        mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (isNeedToRefresh) {
-//                    isNeedToRefresh = false;
-//                    loginVerify(MyApplication.user);
-//                }
-//            }
-//        });
-        //guidePage
+        //TODO guidePage
         if (MyApplication.getDefaultShared().getBoolean("isGuide", false)) {
             loginVerify(MyApplication.user);
 
@@ -65,61 +63,50 @@ public class LaunchActivity extends BaseActivity {
     protected void initializeData(Bundle savedInstanceState) {
         //只为有缓存登录的用户初始化数据
         if (MyApplication.isLogin()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                    PrimaryData.getInstance();
-                    getDataStart = System.currentTimeMillis();
-                }
-            }).start();
+            getDataStart = System.currentTimeMillis();
+            PrimaryData.getInstance();
         }
     }
 
-    private void immerge(int color) {
-        /**沉浸式状态栏设置部分**/
-        //Android5.0版本
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            setStatusBarColor(color);//阴影绘制
-            //设置状态栏颜色
-//            getWindow().setStatusBarColor(getResources().getColor(color));
-            //设置导航栏颜色
-            getWindow().setNavigationBarColor(getResources().getColor(color));
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //透明状态栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            //创建状态栏的管理实例
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            //激活状态栏设置
-            tintManager.setStatusBarTintEnabled(true);
-            //设置状态栏颜色
-            tintManager.setTintResource(color);
-            //透明导航栏
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            //激活导航栏设置
-            tintManager.setNavigationBarTintEnabled(true);
-            //设置导航栏颜色
-            tintManager.setNavigationBarTintResource(color);
-        }
-    }//登录操作确认
+//    private void immerge(int color) {
+//        /**沉浸式状态栏设置部分**/
+//        //Android5.0版本
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+//                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            setStatusBarColor(color);//阴影绘制
+//            //设置状态栏颜色
+////            getWindow().setStatusBarColor(getResources().getColor(color));
+//            //设置导航栏颜色
+//            getWindow().setNavigationBarColor(getResources().getColor(color));
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            //透明状态栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            //创建状态栏的管理实例
+//            SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//            //激活状态栏设置
+//            tintManager.setStatusBarTintEnabled(true);
+//            //设置状态栏颜色
+//            tintManager.setTintResource(color);
+//            //透明导航栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            //激活导航栏设置
+//            tintManager.setNavigationBarTintEnabled(true);
+//            //设置导航栏颜色
+//            tintManager.setNavigationBarTintResource(color);
+//        }
+//    }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         System.gc();
     }
 
-    //    boolean isNeedToRefresh = false;
-    private static final byte wel = 0;
-    private static final byte next = 1;
-    private static final byte reLog = 2;
-    private static final byte reLogForFrozen = 4;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -155,9 +142,6 @@ public class LaunchActivity extends BaseActivity {
         }
     };
 
-    int repeatCount = 0;
-    Message cycleTarget;
-    long getDataStart;
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
@@ -167,11 +151,12 @@ public class LaunchActivity extends BaseActivity {
                     && PrimaryData.status.isNoteReady
                     && cycleTarget != null) {
                 Trace.d("runnableForData done");
+                //保证标志图的最低显示时间为delayTimeToMain
                 if (System.currentTimeMillis() - getDataStart <= delayTimeToMain) {
                     handler.sendMessageDelayed(cycleTarget, delayTimeToMain - System.currentTimeMillis() + getDataStart);
                 } else
                     handler.sendMessage(cycleTarget);
-            } else {
+            } else {//若一直未能进入需要处理 TODO
                 Trace.d("folder:" + PrimaryData.status.isFolderReady
                         + "note:" + PrimaryData.status.isNoteReady
                         + "items:" + PrimaryData.status.isItemReady);
@@ -181,6 +166,7 @@ public class LaunchActivity extends BaseActivity {
         }
     };
 
+    //登录操作确认
     protected void loginVerify(final String txtUser) {
         //缓存查询流程
         if (!txtUser.equals("") && !MyApplication.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {

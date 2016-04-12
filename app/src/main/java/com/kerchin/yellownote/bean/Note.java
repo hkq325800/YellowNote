@@ -43,7 +43,10 @@ public class Note implements Serializable {
         this.content = content;
         this.folder = folder;
         this.folderId = folderId;
-        preview = content.replace("\n", " ");
+        if (content.length() > 70)
+            preview = content.substring(0, 70).replace("\n", " ");
+        else
+            preview = content.replace("\n", " ");
         this.type = type;
     }
 

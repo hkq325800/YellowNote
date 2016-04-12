@@ -437,7 +437,7 @@ public class FolderFragment extends BaseFragment {
 //            if (MyApplication.isItemsReadyToGo) {
 //                MyApplication.isItemsReadyToGo = false;
 //                repeatCount = 0;
-            Trace.d("isItemsReady lisNoteSize:" + primaryData.listNote.size());
+            Trace.d("isItemsReady listNoteSize:" + primaryData.listNote.size());
             handler.sendEmptyMessage(handle4newFolder);
 //            } else {
 //                Trace.d("isItemsReady isn't ready:" + repeatCount);

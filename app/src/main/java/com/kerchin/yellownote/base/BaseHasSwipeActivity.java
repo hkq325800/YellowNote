@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.base;
 
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -24,33 +23,64 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
         super.onSaveInstanceState(outState);
     }
 
+//    public void immerge(int color) {
+//        /**沉浸式状态栏设置部分**/
+//        //Android5.0版本
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+//                    | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            setStatusBarColor(color);//阴影绘制
+//            //设置状态栏颜色
+////            getWindow().setStatusBarColor(getResources().getColor(color));
+//            //设置导航栏颜色
+//            getWindow().setNavigationBarColor(getResources().getColor(color));
+//        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            //透明状态栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            //创建状态栏的管理实例
+//            SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//            //激活状态栏设置
+//            tintManager.setStatusBarTintEnabled(true);
+//            //设置状态栏颜色
+//            tintManager.setTintResource(color);
+//            //透明导航栏
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//            //激活导航栏设置
+//            tintManager.setNavigationBarTintEnabled(true);
+//            //设置导航栏颜色
+//            tintManager.setNavigationBarTintResource(color);
+//        }
+//    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            //Android5.0版本
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
-                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-                getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                // Translucent status bar
-//                getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
+        NormalUtils.immerge(BaseHasSwipeActivity.this, R.color.lightSkyBlue);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//            //Android5.0版本
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS
+//                        | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+//                getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+//                getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//                //设置状态栏颜色
+////                getWindow().setStatusBarColor(getResources().getColor(R.color.lightSkyBlue));
+//                //设置导航栏颜色
+//                getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
+//                setStatusBarColor(R.color.lightSkyBlue);
+//            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
 //                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-                //设置状态栏颜色
-//                getWindow().setStatusBarColor(getResources().getColor(R.color.lightSkyBlue));
-                //设置导航栏颜色
-                getWindow().setNavigationBarColor(getResources().getColor(R.color.lightSkyBlue));
-                setStatusBarColor(R.color.lightSkyBlue);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS,
-                        WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            }
-        }
+//            }
+//        }
 
 //        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
 //            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -145,23 +175,23 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 //        Log.d("onPanelSlide","x:"+view.getX()+" slideOffset:"+slideOffset);
 //    }
 
-    /**
-     * 设置状态栏颜色
-     * 也就是所谓沉浸式状态栏
-     */
-    public void setStatusBarColor(int color) {
-        /**
-         * Android4.4以上可用
-         */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            SystemBarTintManager tintManager = new SystemBarTintManager(this);
-            tintManager.setStatusBarTintResource(color);
-            tintManager.setStatusBarTintEnabled(true);
-            //Window window = getWindow();
-            //window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            //window.setStatusBarColor(color);
-        }
-    }
+//    /**
+//     * 设置状态栏颜色
+//     * 也就是所谓沉浸式状态栏
+//     */
+//    public void setStatusBarColor(int color) {
+//        /**
+//         * Android4.4以上可用
+//         */
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//
+//            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+//            SystemBarTintManager tintManager = new SystemBarTintManager(this);
+//            tintManager.setStatusBarTintResource(color);
+//            tintManager.setStatusBarTintEnabled(true);
+//            //Window window = getWindow();
+//            //window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            //window.setStatusBarColor(color);
+//        }
+//    }
 }
