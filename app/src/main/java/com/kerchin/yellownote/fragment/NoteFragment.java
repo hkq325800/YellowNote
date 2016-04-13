@@ -82,9 +82,9 @@ public class NoteFragment extends BaseFragment
     //    private final byte handle4AVException = 40;
     @SuppressLint("HandlerLeak")
     private SystemHandler handler = new SystemHandler(this) {
-
         @Override
         public void handlerMessage(Message msg) {
+            Trace.d(msg.toString() + "/" + msg.what);
             hideProgress();
             stopRefresh();
             switch (msg.what) {
@@ -105,15 +105,17 @@ public class NoteFragment extends BaseFragment
 //                        noteAdapter.initListDelete();
 //                        noteAdapter.setList(list);
 //                    }
-                    mNoteWDList.setVisibility(View.VISIBLE);
-                    mNoteEmptyTxt.setVisibility(View.GONE);
+                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
+                    mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
                     break;
                 case GetDataHelper.handle4refresh:
                     Trace.d("handle4refresh");//TODO 可能为空
                     getDataListFromNote(primaryData.listNote);//handle4refresh
                     if (MainActivity.thisPosition == 0) {
-                        mNoteWDList.setVisibility(View.VISIBLE);
-                        mNoteEmptyTxt.setVisibility(View.GONE);
+                        mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
+                        mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+                    }
+                    if (noteAdapter != null) {
                         noteAdapter.setList(list);
                     }
                     break;
@@ -573,7 +575,9 @@ public class NoteFragment extends BaseFragment
                 } else {
                     getDataHelper.refresh();//MainActivity dataGot
                     //重新获取mHeaders listNote和mItems
-                    primaryData.refresh(handler, GetDataHelper.handle4refresh);
+                    primaryData.refresh(handler, noteAdapter == null
+                            ? GetDataHelper.handle4firstGet
+                            : GetDataHelper.handle4refresh);
                 }
             }
         }, 600);
@@ -617,6 +621,8 @@ public class NoteFragment extends BaseFragment
             //借emptyClickCount做一个标志
             if (emptyClickCount >= 2) {
                 emptyClickCount = 0;
+                if (noteAdapter == null || noteAdapter.getItemCount() == 0)
+                    Trace.show(getActivity(), "这个真没有");
             } else
                 mNoteWDList.stopRefresh();
         }
