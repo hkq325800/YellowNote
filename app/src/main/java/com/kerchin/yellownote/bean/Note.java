@@ -98,7 +98,7 @@ public class Note implements Serializable {
         return objectId;
     }
 
-    //笔记移动
+    //已存在的笔记在笔记夹间移动
     public void move2folder(final Activity context, final Folder newOne) {
         new Thread(new Runnable() {
             @Override

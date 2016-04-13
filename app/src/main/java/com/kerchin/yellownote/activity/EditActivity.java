@@ -91,6 +91,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private Note mNote;
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private AlertDialog ad;
+    private PrimaryData primaryData;
     private Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             switch (msg.what) {
@@ -153,7 +154,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         //初始化笔记夹选择
-        PrimaryData primaryData = PrimaryData.getInstance();
+        primaryData = PrimaryData.getInstance();
         mNote = (Note) getIntent().getSerializableExtra("note");
         mFolder = new String[primaryData.listFolder.size() - 1];
         thisFolder = Folder.search4folder(mNote.getFolder());
@@ -326,7 +327,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                             break;
                         }
                     }
-                    if (isNew) {
+                    if (isNew) {//新的笔记先设置已有的笔记在保存时设置
                         mNote.setFolder(newName);
                         mNote.setFolderId(thisFolder.getObjectId());
                     }
@@ -399,6 +400,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         if (!isNew && isFolderChanged) {
             mNote.move2folder(EditActivity.this, thisFolder);
         }
+        primaryData.newNote(mNote);
         isNew = false;
         isFolderChanged = false;
     }

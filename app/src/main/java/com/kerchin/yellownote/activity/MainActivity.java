@@ -141,7 +141,7 @@ public class MainActivity extends BaseActivity
                     if (FolderFragment.isChanged4folder) {
                         Trace.d("isChanged4folder");
 //                        MyApplication.isItemsReadyToGo = true;
-                        folderFragment.dataGot();
+                        folderFragment.dataRefresh();
                         FolderFragment.isChanged4folder = false;
                     }
                     showBtnAdd();
@@ -275,7 +275,7 @@ public class MainActivity extends BaseActivity
         mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                noteFragment.getCloseListener();
+                noteFragment.closeClick();
                 return false;
             }
         });

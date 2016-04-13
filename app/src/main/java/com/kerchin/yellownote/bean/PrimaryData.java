@@ -200,7 +200,7 @@ public class PrimaryData {
         return false;
     }
 
-    public void reGet(final Handler handler, final byte handleCode) {
+    public void refresh(final Handler handler, final byte handleCode) {
         status.isItemReady = false;
         status.isNoteReady = false;
         status.isFolderReady = false;
@@ -212,6 +212,14 @@ public class PrimaryData {
                 getNotesAndItemsFromCloud(handler, handleCode);
             }
         }).start();
+    }
+
+    public void loadMore(){
+
+    }
+
+    public void newNote(Note note) {
+        listNote.add(note);
     }
 
     public class PrimaryDataStatus {

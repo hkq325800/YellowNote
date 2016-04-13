@@ -34,17 +34,4 @@
         android:layout_height="match_parent"
         android:divider="@color/transparent"
         android:footerDividersEnabled="false" />
-
-    <!--<android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_addNote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="5dp"
-        android:layout_marginRight="5dp"
-        android:src="@mipmap/btn_menu"
-        app:borderWidth="0dp"
-        app:fabSize="normal" />-->
-    <!--android:src="@drawable/btn_menu"-->
 </RelativeLayout>

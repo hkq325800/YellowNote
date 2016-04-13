@@ -41,29 +41,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FolderFragment extends BaseFragment {
-
+    public static boolean isChanged4folder = false;
     private RecyclerView mRecyclerView;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
-    public static boolean isChanged4folder = false;
     private ToolbarStatus mainStatus;
     private List<SimpleFolder> mHeaders;
     private PrimaryData primaryData;
     private FolderAdapter folderAdapter;
     private AlertDialog alertDialog;
     //    boolean isExit = false;
-
     private GetDataHelper getDataHelper;
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
-                case GetDataHelper.handle4reGet:
+                case GetDataHelper.handle4refresh:
                     Trace.d("handlerInFolder", "handle4reGet");
                     getHeaderListFromFolder();//handle4respond
-                    folderAdapter.setFolders(mHeaders, primaryData.mItems);//reGet
+                    folderAdapter.setFolders(mHeaders, primaryData.mItems);//refresh
                     break;
-                case GetDataHelper.handle4firstGot:
+                case GetDataHelper.handle4firstGet:
                     Trace.d("handlerInFolder", "handle4firstGot");
                     setRecycleView();//firstGot
                     break;
@@ -135,10 +133,9 @@ public class FolderFragment extends BaseFragment {
     }
 
     //重新获取mHeaders listNote和mItems
-    public void dataGot() {
-        getDataHelper.reGet();//MainActivity dataGot
-        primaryData.reGet(handler, getDataHelper.handleCode);
-//        getData();//MainActivity dataGot
+    public void dataRefresh() {
+        getDataHelper.refresh();//MainActivity dataGot
+        primaryData.refresh(handler, getDataHelper.handleCode);
     }
 
     private void getData() {
@@ -167,29 +164,29 @@ public class FolderFragment extends BaseFragment {
     }
 
     //根据list重置dataList以重置adapter
-    private void sendMessage() {
-        handler.sendEmptyMessage(
-                getDataHelper.handleCode);
-//        switch (getDataHelper.status) {
-//            case GetDataHelper.statusFirstGet:
-//                handler.sendEmptyMessage(
-//                        getDataHelper.handleCode);
-//                break;
-//            case GetDataHelper.statusRefresh:
-//                handler.sendEmptyMessage(
-//                        getDataHelper.handleCode);
-//                break;
-//            case GetDataHelper.statusRespond:
-//                handler.sendEmptyMessage(
-//                        getDataHelper.handleCode);
-//                break;
-//            case GetDataHelper.handle4reGet:
-//                handler.sendEmptyMessage(
-//                        getDataHelper.handleCode);
-//            default:
-//                break;
-//        }
-    }
+//    private void sendMessage() {
+//        handler.sendEmptyMessage(
+//                getDataHelper.handleCode);
+////        switch (getDataHelper.status) {
+////            case GetDataHelper.statusFirstGet:
+////                handler.sendEmptyMessage(
+////                        getDataHelper.handleCode);
+////                break;
+////            case GetDataHelper.statusRefresh:
+////                handler.sendEmptyMessage(
+////                        getDataHelper.handleCode);
+////                break;
+////            case GetDataHelper.statusRespond:
+////                handler.sendEmptyMessage(
+////                        getDataHelper.handleCode);
+////                break;
+////            case GetDataHelper.handle4reGet:
+////                handler.sendEmptyMessage(
+////                        getDataHelper.handleCode);
+////            default:
+////                break;
+////        }
+//    }
 
     /**
      * 获取folder在listFolder中的位置
@@ -282,6 +279,8 @@ public class FolderFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
         mainStatus = new ToolbarStatus();
         mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
+        getDataHelper.firstGet();//首次加载数据 dataGot
+        getData();//首次加载数据 dataGot
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -300,10 +299,6 @@ public class FolderFragment extends BaseFragment {
                 }
             }
         });
-        primaryData = PrimaryData.getInstance();//初始化列表
-        getDataHelper = new GetDataHelper();
-        getDataHelper.firstGet();//首次加载数据 dataGot
-        getData();//首次加载数据 dataGot
     }
 
     /**
@@ -361,6 +356,8 @@ public class FolderFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
+        primaryData = PrimaryData.getInstance();//初始化列表
+        getDataHelper = new GetDataHelper();
     }
 
     @Override
