@@ -66,7 +66,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4finish = 1;
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
-//    private static final int RESULT_LOAD_IMAGE = 100;
+    //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
     private static final int rightButtonRes = R.mipmap.ic_redo;
     private static final int rightButtonGrayRes = R.mipmap.ic_redo_gray;
@@ -85,6 +85,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private int index = 0;//用来记录当前在aText和aTextSelection中的位置
     private Double b1, b2;//实践单动画修改两个属性
     private String[] mFolder;
+    private String[] mFolderId;
     private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
     private ValueAnimator animHide, animShow;
@@ -105,6 +106,12 @@ public class EditActivity extends BaseHasSwipeActivity {
                     Trace.show(EditActivity.this, "内容不应为空");
                     break;
                 case handle4saveChange:
+                    //respond
+                    if (isNew)
+                        primaryData.newNote(mNote);
+                    else
+                        primaryData.editNote(mNote);
+                    isNew = false;
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
                     openSliding();
@@ -157,11 +164,13 @@ public class EditActivity extends BaseHasSwipeActivity {
         primaryData = PrimaryData.getInstance();
         mNote = (Note) getIntent().getSerializableExtra("note");
         mFolder = new String[primaryData.listFolder.size() - 1];
-        thisFolder = Folder.search4folder(mNote.getFolder());
+        mFolderId = new String[primaryData.listFolder.size() - 1];
+        thisFolder = primaryData.getFolder(mNote.getFolderId());
         int sum = 0;
         for (int i = 0; i < primaryData.listFolder.size(); i++) {
             if (!primaryData.listFolder.get(i).getObjectId().equals(mNote.getFolderId())) {
                 mFolder[sum] = primaryData.listFolder.get(i).getName();
+                mFolderId[sum] = primaryData.listFolder.get(i).getObjectId();
                 sum++;
             }
         }
@@ -314,16 +323,20 @@ public class EditActivity extends BaseHasSwipeActivity {
                 @Override
                 public void onClick(DialogInterface dialog, final int which) {
                     isFolderChanged = true;
-                    Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
+                    Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]
+                            + "id" + mFolderId[which]);
                     //Folder newOne = null;
                     final String oldName = thisFolder.getName();
+                    final String oldId = thisFolder.getObjectId();
                     final String newName = mFolder[which];
+                    final String newId = mFolderId[which];
                     //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
-                    thisFolder = Folder.search4folder(mFolder[which]);
+                    thisFolder = primaryData.getFolder(mFolderId[which]);
                     //将现在的夹名添加到列表中供用户选择
-                    for (int i = 0; i < mFolder.length; i++) {
-                        if (mFolder[i].equals(newName)) {
+                    for (int i = 0; i < mFolderId.length; i++) {
+                        if (mFolderId[i].equals(newId)) {
                             mFolder[i] = oldName;
+                            mFolderId[i] = oldId;
                             break;
                         }
                     }
@@ -387,7 +400,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     }
 
     @OnClick(R.id.mEditContentEdt)
-    public void setTextSelection(){
+    public void setTextSelection() {
         if (textSelection.size() != 0)
             textSelection.set(index == 0 ? 0 : index - 1, mEditContentEdt.getSelectionEnd());
     }
@@ -400,8 +413,6 @@ public class EditActivity extends BaseHasSwipeActivity {
         if (!isNew && isFolderChanged) {
             mNote.move2folder(EditActivity.this, thisFolder);
         }
-        primaryData.newNote(mNote);
-        isNew = false;
         isFolderChanged = false;
     }
 

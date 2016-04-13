@@ -3,7 +3,10 @@ package com.kerchin.yellownote.fragment;
 import android.annotation.SuppressLint;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -27,6 +30,7 @@ import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -65,6 +69,7 @@ public class NoteFragment extends BaseFragment
     //    private boolean isRefreshing = false;
     private String mSearchText;
     private PrimaryData primaryData;
+    private int emptyClickCount = 0;
     private int lastVisibleItemPosition;
     //    private int skip = 0;
 //    private final static int sortByName = 0;
@@ -73,20 +78,6 @@ public class NoteFragment extends BaseFragment
     private final static int sortByDateAsc = 3;
 
     private GetDataHelper getDataHelper;
-    //onResume getData getAdapter4 handle4return
-    //getData getAdapter4 handle4refresh handle4refresh
-//    private final byte statusRespond = 2;//isChanged4note(onResume)
-//    private final byte statusRefresh = 3;//onRefresh
-//    private final byte statusDataGot = 100;//delete firstGet empty
-//    private final byte statusLoadMore = 101;//onLoadMore
-
-//    private final byte handle4newNote = 0;//创建adapter4note并应用于wterDrop4note
-//    private final byte handle4refresh = 1;//手动刷新并停止
-//    private final byte handle4return = 2;//从无到有的新建note
-//    private final byte handle4zero = 3;//从有到无的删除note
-//    private final byte handle4reset = 4;//由于新增、删除、修改影响note视图
-//    private final byte handle4loadMore = 5;
-
     private final byte handle4explosion = 6;
     //    private final byte handle4AVException = 40;
     @SuppressLint("HandlerLeak")
@@ -105,20 +96,21 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4firstGet:
                     Trace.d("handle4firstGet");
                     //TODO 删除后避免滑动到顶部
-                    if (noteAdapter == null) {
-                        noteAdapter = new NoteShrinkAdapter(
-                                getActivity(), list, R.layout.item_note);
-                        mNoteWDList.setAdapter(noteAdapter);
-                        mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-                    } else {
-                        noteAdapter.initListDelete();
-                        noteAdapter.setList(list);
-                    }
+//                    if (noteAdapter == null) {
+                    noteAdapter = new NoteShrinkAdapter(
+                            getActivity(), list, R.layout.item_note);
+                    mNoteWDList.setAdapter(noteAdapter);
+                    mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
+//                    } else {
+//                        noteAdapter.initListDelete();
+//                        noteAdapter.setList(list);
+//                    }
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mNoteEmptyTxt.setVisibility(View.GONE);
                     break;
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handle4reGet");
+                    Trace.d("handle4refresh");//TODO 可能为空
+                    getDataListFromNote(primaryData.listNote);//handle4refresh
                     if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(View.VISIBLE);
                         mNoteEmptyTxt.setVisibility(View.GONE);
@@ -126,12 +118,12 @@ public class NoteFragment extends BaseFragment
                     }
                     break;
                 case GetDataHelper.handle4respond:
-                    Trace.d("handle4respond");
-                case GetDataHelper.handle4return:
-                    Trace.d("handle4return");
+                    Trace.d("handle4respond note:" + list.size());
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mNoteEmptyTxt.setVisibility(View.GONE);
+//                    noteAdapter.initListDelete();
                     noteAdapter.setList(list);
+                    mNoteWDList.setAdapter(noteAdapter);
                     break;
                 case GetDataHelper.handle4loadMore:
                     Trace.d("handle4loadMore");
@@ -143,13 +135,15 @@ public class NoteFragment extends BaseFragment
                     Trace.d(note.getPreview());
                     for (int i = 0; i < noteAdapter.getCount(); i++) {
                         if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
-                            Trace.d("date" + note.getShowDate() + "preview" + note.getPreview());
+                            Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
                             //Explosion Animation
                             ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
                             mExplosionField.explode(noteAdapter.getView(i));
+                            break;
                         }
                     }
                     primaryData.listNote.remove(note);//从数据源中删除
+                    noteAdapter.getListDelete().remove(note);
                     break;
                 default:
                     break;
@@ -159,7 +153,7 @@ public class NoteFragment extends BaseFragment
 
     /*data part*/
 
-    private void getData() {
+    private void getData(int delay) {
 //        if (primaryData.listNote.size() != 0) {
 //            if (primaryData.listNote.size() == MyApplication.pageLimit) {
 //                mNoteWDList.setPullLoadEnable(true);
@@ -175,8 +169,8 @@ public class NoteFragment extends BaseFragment
 //        }
         Trace.d("getData status", getDataHelper.statusName);
         if (mNoteWDList != null) {
-            getDataListFromNote(primaryData.listNote);//getData
-            sendMessage(0);//getData
+            getDataListFromNote(primaryData.listNote);//getList
+            sendMessage(delay);//getData
         }
 //        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
 //            getDataListFromNote(primaryData.listNote);
@@ -188,7 +182,7 @@ public class NoteFragment extends BaseFragment
      * list的获取
      */
     private void getDataListFromNote(List<Note> order) {
-        list.clear();
+        list.clear();//getDataListFromNote
         for (int i = 0; i < order.size(); i++) {
             list.add(order.get(i));
         }
@@ -196,6 +190,7 @@ public class NoteFragment extends BaseFragment
 
     private void sendMessage(long delay) {
         if (primaryData.listNote.size() == 0) {
+            getDataHelper.zero();
             handler.sendEmptyMessage(GetDataHelper.handle4zero);
         } else {
             switch (getDataHelper.status) {
@@ -203,11 +198,16 @@ public class NoteFragment extends BaseFragment
                     handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
                     break;
                 case GetDataHelper.statusRespond:
-                    handler.sendEmptyMessage(GetDataHelper.handle4respond);
+                    if (noteAdapter == null)
+                        handler.sendEmptyMessageDelayed(
+                                GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
+                    else
+                        handler.sendEmptyMessageDelayed(
+                                GetDataHelper.handle4respond, delay);
                     break;
-                case GetDataHelper.statusReturn:
-                    handler.sendEmptyMessage(GetDataHelper.handle4return);
-                    break;
+//                case GetDataHelper.statusReturn:
+//                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4return, delay);
+//                    break;
                 default:
                     break;
             }
@@ -250,7 +250,7 @@ public class NoteFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         getDataHelper.firstGet();//first get
-        getData();//statusFirstGet
+        getData(0);//statusFirstGet
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -290,7 +290,7 @@ public class NoteFragment extends BaseFragment
         if (isChanged4note) {
             //被动刷新
             getDataHelper.respond();//isChanged4note
-            getData();//statusRespond onResume
+            getData(0);//statusRespond onResume
             isChanged4note = false;
         }
         super.onResume();
@@ -344,8 +344,8 @@ public class NoteFragment extends BaseFragment
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
-                                        //TODO 当前为双线程提交note的删除和folder数目的减法
-                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
+                                        final int num = noteAdapter.getDeleteNum();
+                                        for (int i = 0; i < num; i++) {
                                             final Note note = noteAdapter.getDeleteItem(i);
                                             //线上删除
                                             Trace.d("delete", note.getTitle());
@@ -354,24 +354,8 @@ public class NoteFragment extends BaseFragment
                                             msg.what = handle4explosion;//ui特效
                                             note.delete(getActivity(), handler, msg);
                                         }
-                                        for (int i = 0; i < noteAdapter.getDeleteNum(); i++) {
-                                            //统计到adapter中的listDeleteNum列表，以对folderContain进行操作
-                                            for (int j = 0; j < primaryData.listFolder.size(); j++) {
-                                                if (noteAdapter.getDeleteItem(i).getFolderId().equals(primaryData.listFolder.get(j).getObjectId())) {
-                                                    noteAdapter.listDeleteNum[j]++;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        //num-1
-                                        for (int i = 0; i < noteAdapter.listDeleteNum.length; i++) {
-                                            if (noteAdapter.listDeleteNum[i] != 0) {
-                                                primaryData.listFolder.get(i).dec(getActivity(), noteAdapter.listDeleteNum[i]);
-                                            }
-                                        }
                                         //ui删除 从数据源中重新获取list并设置到adapter中
-                                        getDataHelper.respond();//TODO get->respond
-                                        sendMessage(1200);//delete TODO 1200为主观臆测的数值
+                                        handler.post(runnableForData);
                                     }
                                 }
                             }
@@ -382,6 +366,19 @@ public class NoteFragment extends BaseFragment
             };
         return toolbarItemClickListener;
     }
+
+    private Runnable runnableForData = new Runnable() {
+        @Override
+        public void run() {
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            if (noteAdapter.getDeleteNum() == 0) {
+                getDataHelper.respond();
+                getData(800);//statusRespond delete
+            } else {//若一直未能进入需要处理 TODO
+                handler.postDelayed(runnableForData, 250);
+            }
+        }
+    };
 
     public ToolbarStatus getMainStatus() {
         if (mainStatus != null)
@@ -483,7 +480,7 @@ public class NoteFragment extends BaseFragment
     }
 
     private void doSort(final int sortType) {
-        list.clear();
+        list.clear();//doSort
         ArrayList<Note> temp = new ArrayList<>();
         temp.addAll(primaryData.listNote);//(ArrayList<Note>) MyApplication.listNote..clone();
         Collections.sort(temp, new Comparator<Note>() {
@@ -511,7 +508,7 @@ public class NoteFragment extends BaseFragment
     /*search part*/
 
     private void doSearch() {
-        list.clear();
+        list.clear();//doSearch
         for (int i = 0; i < primaryData.listNote.size(); i++) {
             String title = primaryData.listNote.get(i).getTitle();
             String content = primaryData.listNote.get(i).getContent();
@@ -564,13 +561,20 @@ public class NoteFragment extends BaseFragment
     public void emptyClick() {
         mNoteEmptyTxt.setVisibility(View.GONE);
         mNoteProgress.setVisibility(View.VISIBLE);
-        handler.postDelayed(new Runnable() {
+        new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 //刷新界面
-                //TODO 如果点击三次则从网络获取
-                getDataHelper.respond();//TODO get->respond empty
-                getData();//statusRespond empty
+                if (emptyClickCount < 2) {
+                    Trace.d("emptyClickCount" + emptyClickCount);
+                    emptyClickCount++;
+                    getDataHelper.respond();
+                    getData(0);//statusRespond empty
+                } else {
+                    getDataHelper.refresh();//MainActivity dataGot
+                    //重新获取mHeaders listNote和mItems
+                    primaryData.refresh(handler, GetDataHelper.handle4refresh);
+                }
             }
         }, 600);
     }
@@ -608,8 +612,14 @@ public class NoteFragment extends BaseFragment
     }
 
     public void stopRefresh() {
-        if (getDataHelper.status == GetDataHelper.statusRefresh)
-            mNoteWDList.stopRefresh();
+        if (getDataHelper.status == GetDataHelper.statusRefresh) {
+            Trace.d("emptyClickCount" + emptyClickCount);
+            //借emptyClickCount做一个标志
+            if (emptyClickCount >= 2) {
+                emptyClickCount = 0;
+            } else
+                mNoteWDList.stopRefresh();
+        }
     }
 
     private void hideProgress() {

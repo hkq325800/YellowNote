@@ -255,7 +255,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        Trace.d("onCreateOptionsMenu" + noteFragment.toString());
+//        Trace.d("onCreateOptionsMenu" + noteFragment.toString());
         getMenuInflater().inflate(R.menu.main, menu);
         btnSearch = mMainToolbar.getMenu().getItem(0);
         btnSort = mMainToolbar.getMenu().getItem(1);

@@ -10,8 +10,17 @@ import java.util.List;
  * Created by Kerchin on 2016/4/5 0005.
  */
 public class FolderService {
+    public static void add(String objectId, final int amount) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
+        AVObject folder = query.get(objectId);
+        if (folder != null) {
+            int num = folder.getInt("folder_contain");
+            folder.put("folder_contain", num + amount);
+            folder.save();
+        }
+    }
 
-    public static void dec(String objectId, final int amount) throws AVException {
+    public static synchronized void dec(String objectId, final int amount) throws AVException {
         AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
         AVObject folder = query.get(objectId);
         if (folder != null) {

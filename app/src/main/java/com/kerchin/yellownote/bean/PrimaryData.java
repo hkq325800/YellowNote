@@ -39,7 +39,7 @@ public class PrimaryData {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                getNotesAndItemsFromCloud(null, 0);
+                getNotesAndItemsFromCloud(null, 0);//initData
             }
         }).start();
         new Thread(new Runnable() {
@@ -171,6 +171,20 @@ public class PrimaryData {
     }
 
     /**
+     * 根据noteId取Note
+     *
+     * @param noteId Note唯一ID
+     * @return Note
+     */
+    public int getNotePosition(String noteId) {
+        for (int i = 0; i < listNote.size(); i++) {
+            if (listNote.get(i).getObjectId().equals(noteId))
+                return i;
+        }
+        return -1;
+    }
+
+    /**
      * 目标Folder是否在现有列表中
      *
      * @param folder 目标Folder
@@ -214,12 +228,22 @@ public class PrimaryData {
         }).start();
     }
 
-    public void loadMore(){
+    public void loadMore() {
 
     }
 
     public void newNote(Note note) {
-        listNote.add(note);
+        listNote.add(0, note);//加在队首
+    }
+
+    public void editNote(Note note) {
+        int pos = getNotePosition(note.getObjectId());
+        if (pos != -1) {
+            listNote.remove(pos);
+            newNote(note);
+        } else {
+            Trace.e("没有在listNote中找到对应的note");
+        }
     }
 
     public class PrimaryDataStatus {

@@ -13,7 +13,7 @@ import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
- * Created by Administrator on 2015/9/26 0026.
+ * Created by Kerchin on 2015/9/26 0026.
  */
 public class Folder {
     String objectId;
@@ -106,16 +106,6 @@ public class Folder {
                 }
             }).start();
         }
-    }
-
-    //在listFolder中查找符合mNote名字的
-    public static Folder search4folder(String folderName) {
-        for (int i = 0; i < PrimaryData.getInstance().listFolder.size(); i++) {
-            if (PrimaryData.getInstance().listFolder.get(i).getName().equals(folderName)) {
-                return PrimaryData.getInstance().listFolder.get(i);
-            }
-        }
-        return null;
     }
 
     //与search4folder有相同的方法体返回值不同

@@ -10,6 +10,7 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -56,6 +57,13 @@ public class Note implements Serializable {
 
     public void setFolderId(String folderId) {
         this.folderId = folderId;
+    }
+
+    public void setPreview() {
+        if (content.length() > 70)
+            preview = content.substring(0, 70).replace("\n", " ");
+        else
+            preview = content.replace("\n", " ");
     }
 
     public String getType() {
@@ -112,6 +120,7 @@ public class Note implements Serializable {
                 } catch (AVException e) {
                     Trace.show(context, "笔记移动失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
+                    return;//终止下一步
                 }
                 try {
                     NoteService.saveFolderNumDec(folderId);
@@ -146,9 +155,10 @@ public class Note implements Serializable {
                         AVObject newNote = NoteService.addNewNote(
                                 MyApplication.user, newTitle, newContent, folder, folderId);
                         //取回objectId
-                        if (newNote != null)
+                        if (newNote != null) {
                             objectId = newNote.getObjectId();
-                        Trace.d("saveNewNote 成功");
+                            Trace.d("saveNewNote 成功");
+                        }
                     } catch (AVException e) {
                         Message msg = Message.obtain();
                         msg.obj = false;
@@ -156,6 +166,7 @@ public class Note implements Serializable {
                         handler.sendMessage(msg);
                         Trace.show(context, "保存更改失败" + Trace.getErrorMsg(e));
                         e.printStackTrace();
+                        return;//终止下一步
                     }
                     Message msg = Message.obtain();
                     msg.what = handle4saveChange;
@@ -165,6 +176,8 @@ public class Note implements Serializable {
                         NoteFragment.isChanged4note = true;
                         title = newTitle;
                         content = newContent;
+                        date = new Date();
+                        setPreview();
                         Trace.d("saveFolderNum+1 成功");
                         msg.obj = true;
                         handler.sendMessage(msg);
@@ -186,6 +199,8 @@ public class Note implements Serializable {
                         NoteService.saveEdit(objectId, newTitle, newContent);
                         title = newTitle;
                         content = newContent;
+                        date = new Date();
+                        setPreview();
                         NoteFragment.isChanged4note = true;
                         Trace.d("saveModifyNote 成功");
                         msg.obj = true;
@@ -206,14 +221,29 @@ public class Note implements Serializable {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                //num-1
+                try {
+                    Trace.d(title + "num-1 成功");
+                    FolderService.dec(folderId, 1);
+                } catch (AVException e) {
+                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                    return;//终止下一步
+                }
                 try {
                     NoteService.delete(objectId);
+                    handler.sendMessage(msg);
                     Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;
                     FolderFragment.isChanged4folder = true;
-                    handler.sendMessage(msg);
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                    //失败恢复
+                    try {
+                        FolderService.add(folderId, 1);
+                    } catch (AVException e1) {
+                        e1.printStackTrace();
+                    }
                     e.printStackTrace();
                 }
             }
