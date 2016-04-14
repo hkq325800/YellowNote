@@ -27,6 +27,12 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+
+    public static int getScreenWidth(Context context){
+        WindowManager wm = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getWidth();
+    }
     /**
      * 沉浸式
      * @param activity

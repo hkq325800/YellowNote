@@ -6,16 +6,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 
 import com.bigkoo.snappingstepper.SnappingStepper;
@@ -26,6 +29,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
@@ -41,10 +45,10 @@ import butterknife.OnClick;
  * Created by Kerchin on 2015/9/30 0030.
  */
 public class EditActivity extends BaseHasSwipeActivity {
+    @Bind(R.id.mEditHorScrollView)
+    HorizontalScrollView mEditHorScrollView;
     @Bind(R.id.mEditCircleSearch)
     CircleSearchView mEditCircleSearch;
-    @Bind(R.id.mEditSearchLinear)
-    LinearLayout mEditSearchLinear;
     @Bind(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
     @Bind(R.id.mEditReUnStepper)
@@ -154,6 +158,18 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+//        int width = NormalUtils.getScreenWidth(EditActivity.this);
+//        FrameLayout.LayoutParams paramsF = (FrameLayout.LayoutParams)
+//                mEditFuncLinear.getLayoutParams();
+//        paramsF.width = width;
+//        mEditFuncLinear.setLayoutParams(paramsF);
+//        LinearLayout.LayoutParams paramsE = (LinearLayout.LayoutParams)
+//                mEditCircleSearch.getLayoutParams();
+//        paramsE.width = width;
+//        mEditCircleSearch.setLayoutParams(paramsE);
+        
+//        mEditHorScrollView.setLayoutParams(new FrameLayout.LayoutParams(
+//                FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT));
     }
 
     @Override
@@ -471,8 +487,8 @@ public class EditActivity extends BaseHasSwipeActivity {
                             b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
                             b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
                             mEditNavLinear.getLayoutParams().height = b1.intValue();
-                            mEditFuncLinear.getLayoutParams().height = b2.intValue();
-                            mEditFuncLinear.requestLayout();
+                            mEditHorScrollView.getLayoutParams().height = b2.intValue();
+                            mEditHorScrollView.requestLayout();
                             mEditNavLinear.requestLayout();
                             mEditScroll.requestLayout();
                         }
@@ -489,8 +505,8 @@ public class EditActivity extends BaseHasSwipeActivity {
                             b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
                             b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
                             mEditNavLinear.getLayoutParams().height = b1.intValue();
-                            mEditFuncLinear.getLayoutParams().height = b2.intValue();
-                            mEditFuncLinear.requestLayout();
+                            mEditHorScrollView.getLayoutParams().height = b2.intValue();
+                            mEditHorScrollView.requestLayout();
                             mEditNavLinear.requestLayout();
                             mEditScroll.requestLayout();
                         }
