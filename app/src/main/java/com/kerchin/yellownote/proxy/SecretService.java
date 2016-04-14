@@ -6,7 +6,7 @@ import com.avos.avoscloud.AVQuery;
 import com.kerchin.yellownote.global.MyApplication;
 
 /**
- * Created by Administrator on 2016/4/9 0009.
+ * Created by Kerchin on 2016/4/9 0009.
  * More Code on hkq325800@163.com
  */
 public class SecretService {

@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.bean;
 
-import android.util.SparseArray;
-
 /**
  * Created by Kerchin on 2016/4/12 0012.
  */
@@ -12,16 +10,13 @@ public class GetDataHelper {
     public final static byte statusRefresh = 3;//数据刷新
     public final static byte statusLoadMore = 4;//获取更多
     public final static byte handle4firstGet = 100;//创建adapter4folder并应用于ListView
-//    public final static byte handle4refresh = 101;//手动刷新并停止
-    public final static byte handle4respond = 102;//由于新增、删除、修改影响note视图
-    public final static byte handle4refresh = 103;//由于isChangedFolder refresh
-    public final static byte handle4loadMore = 104;//手动获取更多
-    public final static byte handle4zero = 106;//从有到无
+    public final static byte handle4respond = 101;//由于新增、删除、修改影响note视图
+    public final static byte handle4refresh = 102;//由于isChangedFolder refresh
+    public final static byte handle4loadMore = 103;//手动获取更多
+    public final static byte handle4zero = 104;//从有到无
     public byte status = 0;//当前状态
     public String statusName = "";//当前状态名
     public byte handleCode = 0;
-    //respond
-    public SparseArray<Integer> respondPos = new SparseArray<>();
 
     public void firstGet(){
         status = statusFirstGet;

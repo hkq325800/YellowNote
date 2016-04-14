@@ -3,7 +3,6 @@ package com.kerchin.yellownote.fragment;
 import android.annotation.SuppressLint;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
@@ -30,8 +29,6 @@ import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -304,8 +301,7 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), new Note("", "", System.currentTimeMillis(), "", "默认"
-                    , MyApplication.userDefaultFolderId, "text"));
+            EditActivity.startMe(getActivity(), "");
         } else
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
     }
@@ -347,6 +343,7 @@ public class NoteFragment extends BaseFragment
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
                                         final int num = noteAdapter.getDeleteNum();
+                                        getDataHelper.respond();
                                         for (int i = 0; i < num; i++) {
                                             final Note note = noteAdapter.getDeleteItem(i);
                                             //线上删除
@@ -434,7 +431,7 @@ public class NoteFragment extends BaseFragment
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MainActivity m = (MainActivity) getActivity();
                     m.hideBtnAdd();
-                    EditActivity.startMe(getActivity(), primaryData.listNote.get(position - 1));
+                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1).getObjectId());
                 }
             });
             //叉号隐藏
@@ -512,15 +509,15 @@ public class NoteFragment extends BaseFragment
     private void doSearch() {
         list.clear();//doSearch
         for (int i = 0; i < primaryData.listNote.size(); i++) {
-            String title = primaryData.listNote.get(i).getTitle();
-            String content = primaryData.listNote.get(i).getContent();
+            String title = primaryData.getNoteAt(i).getTitle();
+            String content = primaryData.getNoteAt(i).getContent();
             if (title.contains(mSearchText)
                     || content.contains(mSearchText)) {
-                list.add(primaryData.listNote.get(i));
+                list.add(primaryData.getNoteAt(i));
             }
         }
         if (noteAdapter != null)
-            if (!isChanged4note)
+            if (!isChanged4note)//doSearch
                 noteAdapter.setList(list);
     }
 
@@ -542,7 +539,7 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
+            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1).getObjectId());
         } else {
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
         }
@@ -594,6 +591,9 @@ public class NoteFragment extends BaseFragment
                 getDataHelper.refresh();//MainActivity dataGot
                 //重新获取mHeaders listNote和mItems
                 primaryData.refresh(handler, GetDataHelper.handle4refresh);
+                isChanged4note = false;
+                FolderFragment.hasRefresh = true;
+                FolderFragment.isChanged4folder = true;//onRefresh
             }
         });
     }

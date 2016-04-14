@@ -32,7 +32,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 /**
- * Created by KerchinHuang on 2016/1/31 0031.
+ * Created by Kerchin on 2016/1/31 0031.
  */
 public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> /*implements OnItemMoveListener*/ {
     public static int animDuration = 450;

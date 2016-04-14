@@ -12,6 +12,8 @@ import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
+import java.util.List;
+
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
@@ -38,6 +40,7 @@ public class Folder {
         return objectId;
     }
 
+    //编辑界面的删除
     public void dec(final Activity context, final int amount) {
         new Thread(new Runnable() {
             @Override
@@ -45,7 +48,7 @@ public class Folder {
                 try {
                     FolderService.dec(objectId, amount);
                     //刷新note界面
-                    FolderFragment.isChanged4folder = true;
+                    FolderFragment.isChanged4folder = true;//edit delete
                     contain -= amount;
                     Trace.d("saveFolderNum-" + amount + "成功");
                 } catch (AVException e) {
@@ -58,7 +61,7 @@ public class Folder {
 
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {
-        if (!hasTheSameName(newName)) {
+        if (!PrimaryData.getInstance().hasTheSameName(newName)) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -68,16 +71,15 @@ public class Folder {
                         //线下修改
                         name = newName;
                         Trace.show(context, "更名成功");
-                        handler.sendEmptyMessage(handle4respond);
-                        NoteFragment.isChanged4note = true;
                         //将所有folder下的note移至新folder下 线上修改
                         if (contain != 0) {
-                            for (int i = 0; i < PrimaryData.getInstance().listNote.size(); i++) {
-                                if (PrimaryData.getInstance().listNote.get(i).getFolderId().equals(objectId)) {
-                                    PrimaryData.getInstance().listNote.get(i).move2folder(context, newName, objectId);
-                                }
+                            List<Note> list = PrimaryData.getInstance().getNoteListInFolder(objectId);
+                            for (Note note : list){
+                                note.move2folder(context, newName, objectId);
                             }
+                            NoteFragment.isChanged4note = true;//reName
                         }
+                        handler.sendEmptyMessage(handle4respond);
                     } catch (AVException e) {
                         Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
                         e.printStackTrace();
@@ -106,15 +108,5 @@ public class Folder {
                 }
             }).start();
         }
-    }
-
-    //与search4folder有相同的方法体返回值不同
-    public boolean hasTheSameName(String name) {
-        for (int i = 0; i < PrimaryData.getInstance().listFolder.size(); i++) {
-            if (name.equals(PrimaryData.getInstance().listFolder.get(i).getName())) {
-                return true;
-            }
-        }
-        return false;
     }
 }

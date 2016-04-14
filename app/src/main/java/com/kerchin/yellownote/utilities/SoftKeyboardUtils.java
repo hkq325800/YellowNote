@@ -1,14 +1,11 @@
 package com.kerchin.yellownote.utilities;
 
 import android.app.Activity;
-import android.content.Context;
-import android.hardware.input.InputManager;
-import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
 /**
- * Created by Administrator on 2016/2/27 0027.
+ * Created by Kerchin on 2016/2/27 0027.
  */
 public class SoftKeyboardUtils {
 

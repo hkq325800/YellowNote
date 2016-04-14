@@ -16,13 +16,13 @@ import java.util.List;
  * Created by Kerchin on 2016/4/11 0011.
  */
 public class PrimaryData {
+    private static PrimaryData data;
     public static PrimaryDataStatus status;
-    public static PrimaryData data;
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
     public volatile List<SimpleNote> mItems;
 
-    public PrimaryData() {
+    private PrimaryData() {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
@@ -199,6 +199,14 @@ public class PrimaryData {
         return false;
     }
 
+    public Folder getFolderAt(int position){
+        return listFolder.get(position);
+    }
+
+    public Note getNoteAt(int position){
+        return listNote.get(position);
+    }
+
     /**
      * 目标Note是否在现有列表中
      *
@@ -244,6 +252,35 @@ public class PrimaryData {
         } else {
             Trace.e("没有在listNote中找到对应的note");
         }
+    }
+
+    public void removeNoteById(String objectId) {
+        for (Note note : listNote) {
+            if (note.getObjectId().equals(objectId)) {
+                listNote.remove(note);
+                return;
+            }
+        }
+    }
+
+    public List<Note> getNoteListInFolder(String objectId) {
+        List<Note> list = new ArrayList<>();
+        for (Note note : listNote) {
+            if(note.getFolderId().equals(objectId)){
+                list.add(note);
+            }
+        }
+        return list;
+    }
+
+    //与search4folder有相同的方法体返回值不同
+    public boolean hasTheSameName(String name) {
+        for (int i = 0; i < listFolder.size(); i++) {
+            if (name.equals(listFolder.get(i).getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public class PrimaryDataStatus {

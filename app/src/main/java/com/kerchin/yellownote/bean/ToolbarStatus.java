@@ -1,7 +1,7 @@
 package com.kerchin.yellownote.bean;
 
 /**
- * Created by Administrator on 2016/1/22 0022.
+ * Created by Kerchin on 2016/1/22 0022.
  */
 public class ToolbarStatus {
     private boolean isDeleteMode = false;

@@ -23,7 +23,7 @@ import java.util.Locale;
 
 
 /**
- * Created by Administrator on 2015/9/26 0026.
+ * Created by Kerchin on 2015/9/26 0026.
  */
 public class Note implements Serializable {
     private String objectId;
@@ -34,10 +34,11 @@ public class Note implements Serializable {
     private String folder;
     private String folderId;
     private String type;
-    SimpleDateFormat myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
+    private SimpleDateFormat myFmt;
 
     public Note(String objectId, String title, Long date, String content
             , String folder, String folderId, String type) {
+        myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         this.objectId = objectId;
         this.title = title;
         this.date = new Date(date);
@@ -106,43 +107,6 @@ public class Note implements Serializable {
         return objectId;
     }
 
-    //已存在的笔记在笔记夹间移动
-    public void move2folder(final Activity context, final Folder newOne) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //TODO 笔记移动事务流
-                try {
-                    NoteService.move2folder(objectId, newOne.getName(), newOne.getObjectId());
-                    NoteFragment.isChanged4note = true;
-                    //Toast.makeText(context, "移动成功", Toast.LENGTH_SHORT).show();
-                    Trace.d("move2folder 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "笔记移动失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                    return;//终止下一步
-                }
-                try {
-                    NoteService.saveFolderNumDec(folderId);
-                    Trace.d("saveFolderNum-1 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "saveFolderNum-1失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
-                try {
-                    NoteService.saveFolderNumAdd(newOne.getObjectId());
-                    Trace.d("saveFolderNum+1 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "saveFolderNum+1失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
-                folder = newOne.getName();
-                folderId = newOne.getObjectId();
-                FolderFragment.isChanged4folder = true;
-            }
-        }).start();
-    }
-
     //保存更改
     public void saveChange(final Activity context, final String newTitle, final String newContent
             , final Handler handler, final byte handle4saveChange) {
@@ -150,7 +114,7 @@ public class Note implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    FolderFragment.isChanged4folder = true;
+                    FolderFragment.isChanged4folder = true;//saveChange
                     try {
                         AVObject newNote = NoteService.addNewNote(
                                 MyApplication.user, newTitle, newContent, folder, folderId);
@@ -173,7 +137,7 @@ public class Note implements Serializable {
                     try {
                         //folderNum+1
                         NoteService.saveFolderNumAdd(folderId);
-                        NoteFragment.isChanged4note = true;
+                        NoteFragment.isChanged4note = true;//saveChange
                         title = newTitle;
                         content = newContent;
                         date = new Date();
@@ -201,7 +165,7 @@ public class Note implements Serializable {
                         content = newContent;
                         date = new Date();
                         setPreview();
-                        NoteFragment.isChanged4note = true;
+                        NoteFragment.isChanged4note = true;//saveChange
                         Trace.d("saveModifyNote 成功");
                         msg.obj = true;
                         handler.sendMessage(msg);
@@ -217,7 +181,7 @@ public class Note implements Serializable {
     }
 
     //主界面的删除
-    public void delete(final FragmentActivity context, final SystemHandler handler, final Message msg) {
+    public void delete(final FragmentActivity context, final SystemHandler handler, final Message handle4explosion) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -232,10 +196,10 @@ public class Note implements Serializable {
                 }
                 try {
                     NoteService.delete(objectId);
-                    handler.sendMessage(msg);
+                    handler.sendMessage(handle4explosion);
                     Trace.d("deleteNote 成功");
-                    NoteFragment.isChanged4note = true;
-                    FolderFragment.isChanged4folder = true;
+//                    NoteFragment.isChanged4note = true;//delete Main 没必要
+                    FolderFragment.isChanged4folder = true;//delete Main
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     //失败恢复
@@ -251,28 +215,77 @@ public class Note implements Serializable {
     }
 
     //编辑界面的删除
-    public void delete(final Activity context, final Handler handler, final byte handle4reset
+    public void delete(final Activity context, final Handler handler, final byte handle4finish
             , final String folderId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                //num-1
+//                try {
+//                    Trace.d(title + "num-1 成功");
+//                    FolderService.dec(folderId, 1);
+//                } catch (AVException e) {
+//                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+//                    e.printStackTrace();
+//                    return;//终止下一步
+//                }
                 try {
-                    NoteService.delete(objectId);
-                    Folder folder = PrimaryData.getInstance().getFolder(folderId);
+                    PrimaryData primaryData = PrimaryData.getInstance();
+                    NoteService.delete(objectId);//笔记网络删除
+                    Folder folder = primaryData.getFolder(folderId);
                     if (folder != null) {
-                        folder.dec(context, 1);
+                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
                     }
+//                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
+                    primaryData.listNote.remove(Note.this);
                     Trace.show(context, "删除成功");
                     Trace.d("deleteNote 成功");
-                    NoteFragment.isChanged4note = true;
-                    FolderFragment.isChanged4folder = true;
+                    NoteFragment.isChanged4note = true;//delete edit
+                    FolderFragment.isChanged4folder = true;//delete edit
                     if (handler != null) {
-                        handler.sendEmptyMessage(handle4reset);
+                        handler.sendEmptyMessage(handle4finish);
                     }
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                 }
+            }
+        }).start();
+    }
+
+    //已存在的笔记在笔记夹间移动
+    public void move2folder(final Activity context, final Folder newOne) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //TODO 笔记移动事务流
+                try {
+                    NoteService.move2folder(objectId, newOne.getName(), newOne.getObjectId());
+                    NoteFragment.isChanged4note = true;//move2folder
+                    //Toast.makeText(context, "移动成功", Toast.LENGTH_SHORT).show();
+                    Trace.d("move2folder 成功");
+                } catch (AVException e) {
+                    Trace.show(context, "笔记移动失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                    return;//终止下一步
+                }
+                try {
+                    NoteService.saveFolderNumDec(folderId);
+                    Trace.d("saveFolderNum-1 成功");
+                } catch (AVException e) {
+                    Trace.show(context, "saveFolderNum-1失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                }
+                try {
+                    NoteService.saveFolderNumAdd(newOne.getObjectId());
+                    Trace.d("saveFolderNum+1 成功");
+                } catch (AVException e) {
+                    Trace.show(context, "saveFolderNum+1失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                }
+                folder = newOne.getName();
+                folderId = newOne.getObjectId();
+                FolderFragment.isChanged4folder = true;//move2folder
             }
         }).start();
     }

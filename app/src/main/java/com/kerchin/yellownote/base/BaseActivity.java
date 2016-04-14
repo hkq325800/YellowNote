@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
- * Created by Administrator on 2016/3/6 0006.
+ * Created by Kerchin on 2016/3/6 0006.
  */
 public abstract class BaseActivity extends AppCompatActivity /*implements SlidingPaneLayout.PanelSlideListener*/ {
 //    public boolean isExisTitle = true;

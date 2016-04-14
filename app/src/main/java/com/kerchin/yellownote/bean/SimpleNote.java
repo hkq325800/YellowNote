@@ -1,7 +1,7 @@
 package com.kerchin.yellownote.bean;
 
 /**
- * Created by Administrator on 2016/1/31 0031.
+ * Created by Kerchin on 2016/1/31 0031.
  */
 public class SimpleNote {
     private int id;

@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
- * Created by Administrator on 2016/4/9 0009.
+ * Created by Kerchin on 2016/4/9 0009.
  * More Code on hkq325800@163.com
  */
 public class SecretActivity extends BaseHasSwipeActivity {

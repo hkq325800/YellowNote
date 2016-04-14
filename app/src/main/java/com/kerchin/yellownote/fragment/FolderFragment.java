@@ -42,6 +42,7 @@ import java.util.List;
 
 public class FolderFragment extends BaseFragment {
     public static boolean isChanged4folder = false;
+    public static boolean hasRefresh = false;
     private RecyclerView mRecyclerView;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
@@ -50,7 +51,6 @@ public class FolderFragment extends BaseFragment {
     private PrimaryData primaryData;
     private FolderAdapter folderAdapter;
     private AlertDialog alertDialog;
-    //    boolean isExit = false;
     private GetDataHelper getDataHelper;
     private SystemHandler handler = new SystemHandler(this) {
         @Override
@@ -102,7 +102,7 @@ public class FolderFragment extends BaseFragment {
                         MainActivity mainActivity = (MainActivity) getActivity();
                         mainActivity.hideBtnAdd();
                         int realPos = realFolderPosition(position);
-                        if (!primaryData.listFolder.get(realPos).getName().equals("默认")) {
+                        if (!primaryData.getFolderAt(realPos).getName().equals("默认")) {
                             reTitleDialogShow(realPos);
                         } else {
                             Trace.show(getActivity(), "默认笔记夹不许更名");
@@ -134,8 +134,16 @@ public class FolderFragment extends BaseFragment {
 
     //重新获取mHeaders listNote和mItems
     public void dataRefresh() {
-        getDataHelper.refresh();//MainActivity dataGot
-        primaryData.refresh(handler, getDataHelper.handleCode);
+        //防止重复刷新
+        if(hasRefresh){
+            hasRefresh = false;
+            getDataHelper.respond();//dataRefresh
+            handler.sendEmptyMessage(
+                    getDataHelper.handleCode);
+        }else {
+            getDataHelper.refresh();//MainActivity dataGot
+            primaryData.refresh(handler, getDataHelper.handleCode);
+        }
     }
 
     private void getData() {
@@ -156,10 +164,10 @@ public class FolderFragment extends BaseFragment {
         int sum = 0;
         for (int i = 0; i < primaryData.listFolder.size(); i++) {
             mHeaders.add(new SimpleFolder(i + sum
-                    , primaryData.listFolder.get(i).getName()
-                    , primaryData.listFolder.get(i).getContain()
-                    , primaryData.listFolder.get(i).getObjectId()));
-            sum += primaryData.listFolder.get(i).getContain();
+                    , primaryData.getFolderAt(i).getName()
+                    , primaryData.getFolderAt(i).getContain()
+                    , primaryData.getFolderAt(i).getObjectId()));
+            sum += primaryData.getFolderAt(i).getContain();
         }
     }
 
@@ -212,7 +220,7 @@ public class FolderFragment extends BaseFragment {
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
-        final Folder folder = primaryData.listFolder.get(position);
+        final Folder folder = primaryData.getFolderAt(position);
         mEditEdt.setText(folder.getName());
         mEditEdt.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -308,10 +316,9 @@ public class FolderFragment extends BaseFragment {
      */
     private void deleteFolder(final int position) {
         final int realPos = realFolderPosition(position);
-        if (!primaryData.listFolder.get(realPos).getName().equals("默认")) {
+        if (!primaryData.getFolderAt(realPos).getName().equals("默认")) {
             //del
-            if (primaryData.listFolder.get(
-                    realPos).getContain() != 0)
+            if (primaryData.getFolderAt(realPos).getContain() != 0)
                 //笔记夹下如果还有笔记要么全部删除要么移至默认
                 Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
             else {
@@ -328,7 +335,7 @@ public class FolderFragment extends BaseFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         getDataHelper.respond();//deleteFolder->folder.delete
-                        primaryData.listFolder.get(realPos)
+                        primaryData.getFolderAt(realPos)
                                 .delete(getActivity(), realPos, handler, getDataHelper.handleCode);
                     }
                 });
@@ -457,14 +464,3 @@ public class FolderFragment extends BaseFragment {
         super.onDestroy();
     }
 }
-
-//    private byte status = 0;
-//    private String statusName = "dataGot";
-//    private final byte statusDataGot = 0;//重置listFolder
-//    private final byte statusRefresh = 1;//getData getAdapter4 handle4refresh handle4refresh
-//    private final byte statusRespond = 2;//根据listFolder重置dataList4folder
-//    //    private final byte statusDataReGot = 3;
-//    private final byte statusDataError = 11;
-//    private final byte handle4newFolder = 100;//创建adapter4folder并应用于wterDrop4folder
-//    private final byte handle4refresh = 101;//手动刷新并停止
-//    private final byte handle4respond = 102;//由于新增、删除、修改影响note视图

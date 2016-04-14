@@ -25,6 +25,7 @@ import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
 
@@ -37,7 +38,7 @@ import butterknife.OnClick;
 
 
 /**
- * Created by Administrator on 2015/9/30 0030.
+ * Created by Kerchin on 2015/9/30 0030.
  */
 public class EditActivity extends BaseHasSwipeActivity {
     @Bind(R.id.mEditCircleSearch)
@@ -130,11 +131,11 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     };
 
-    public static void startMe(Context context, Note note) {
+    public static void startMe(Context context, String noteId) {
         // 指定下拉列表的显示数据
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("note", note);
+        intent.putExtra("noteId", noteId);
         context.startActivity(intent);
     }
 
@@ -162,15 +163,24 @@ public class EditActivity extends BaseHasSwipeActivity {
     protected void initializeData(Bundle savedInstanceState) {
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
-        mNote = (Note) getIntent().getSerializableExtra("note");
-        mFolder = new String[primaryData.listFolder.size() - 1];
-        mFolderId = new String[primaryData.listFolder.size() - 1];
+        String noteId = getIntent().getStringExtra("noteId");
+        if (noteId.equals("")) {
+            isNew = true;
+            mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
+                    , MyApplication.userDefaultFolderId, "text");
+        } else {
+            isNew = false;
+            mNote = primaryData.getNote(noteId);
+        }
+        int size = primaryData.listFolder.size();
+        mFolder = new String[size - 1];
+        mFolderId = new String[size - 1];
         thisFolder = primaryData.getFolder(mNote.getFolderId());
         int sum = 0;
-        for (int i = 0; i < primaryData.listFolder.size(); i++) {
-            if (!primaryData.listFolder.get(i).getObjectId().equals(mNote.getFolderId())) {
-                mFolder[sum] = primaryData.listFolder.get(i).getName();
-                mFolderId[sum] = primaryData.listFolder.get(i).getObjectId();
+        for (int i = 0; i < size; i++) {
+            if (!primaryData.getFolderAt(i).getObjectId().equals(mNote.getFolderId())) {
+                mFolder[sum] = primaryData.getFolderAt(i).getName();
+                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
                 sum++;
             }
         }
@@ -179,10 +189,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         mNavigationRightBtn.setVisibility(View.VISIBLE);
         mEditContentEdt.setText(mNote.getContent());
         //根据标题是否为空字符判断是否为new
-        if (mNote.getTitle().equals("")) {
-            isNew = true;
-        } else {
-            isNew = false;
+        if (!mNote.getTitle().equals("")) {
             textOrder.add(mNote.getContent());
             textSelection.add(index, 0);
             index++;
