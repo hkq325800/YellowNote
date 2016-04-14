@@ -26,6 +26,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
 
@@ -35,7 +36,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-
 
 /**
  * Created by Kerchin on 2015/9/30 0030.
@@ -69,10 +69,6 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4saveChange = 3;
     //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
-    private static final int rightButtonRes = R.mipmap.ic_redo;
-    private static final int rightButtonGrayRes = R.mipmap.ic_redo_gray;
-    private static final int leftButtonRes = R.mipmap.ic_undo;
-    private static final int leftButtonGrayRes = R.mipmap.ic_undo_gray;
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
     private boolean isFolderChanged = false;
@@ -94,8 +90,9 @@ public class EditActivity extends BaseHasSwipeActivity {
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private AlertDialog ad;
     private PrimaryData primaryData;
-    private Handler handler = new Handler() {
-        public void handleMessage(Message msg) {
+    private SystemHandler handler = new SystemHandler(EditActivity.this) {
+        @Override
+        public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case handle4finish:
                     finish();
@@ -227,7 +224,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     int old = isNew ? 1 : 2;
                     if (index > old) {
                         if (isRightGray)
-                            mEditReUnStepper.setRightButtonResources(rightButtonRes);
+                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
                         isRightGray = false;
                         isUndo = true;
                         index--;
@@ -237,9 +234,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                         isUndo = false;
                     } else if (index == old) {
                         if (isRightGray)
-                            mEditReUnStepper.setRightButtonResources(rightButtonRes);
+                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
                         if (!isLeftGray)
-                            mEditReUnStepper.setLeftButtonResources(leftButtonGrayRes);
+                            mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo_gray);
                         isRightGray = false;
                         isLeftGray = true;
                         isUndo = true;
@@ -257,9 +254,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                     if (index + 1 <= textOrder.size()) {//有可以恢复的内容
                         if (index + 1 == textOrder.size()
                                 && !isRightGray)//aText的内容被读完了
-                            mEditReUnStepper.setRightButtonResources(rightButtonGrayRes);
+                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
                         if (isLeftGray)
-                            mEditReUnStepper.setLeftButtonResources(leftButtonRes);
+                            mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
                         isRightGray = true;
                         isLeftGray = false;
                         isRedo = true;

@@ -57,12 +57,12 @@ public class FolderFragment extends BaseFragment {
         public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInFolder", "handle4reGet");
-                    getHeaderListFromFolder();//handle4respond
-                    folderAdapter.setFolders(mHeaders, primaryData.mItems);//refresh
+                    Trace.d("handlerInFolder", "handle4refresh");
+                    getHeaderListFromFolder();//handle4refresh
+                    setRecycleView();//refresh
                     break;
                 case GetDataHelper.handle4firstGet:
-                    Trace.d("handlerInFolder", "handle4firstGot");
+                    Trace.d("handlerInFolder", "handle4firstGet");
                     setRecycleView();//firstGot
                     break;
 //                case GetDataHelper.handle4refresh:
@@ -72,7 +72,7 @@ public class FolderFragment extends BaseFragment {
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInFolder", "handle4respond");
                     getHeaderListFromFolder();//handle4respond
-                    folderAdapter.setFolders(mHeaders, primaryData.mItems);//respond
+                    setRecycleView();//respond
                     break;
                 default:
                     break;
@@ -124,6 +124,7 @@ public class FolderFragment extends BaseFragment {
             mRecyclerView.setAdapter(folderAdapter);
         } else {
             folderAdapter.setFolders(mHeaders, primaryData.mItems);
+            mRecyclerView.setAdapter(folderAdapter);
             //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
 //            folderAdapter.setIsFirstTrue();
 //            Trace.d("scroll" + mHeaders.get(mHeaders.size() - 1).getId() + "/" + mHeaders.get(mHeaders.size() - 1).getName());
@@ -135,12 +136,12 @@ public class FolderFragment extends BaseFragment {
     //重新获取mHeaders listNote和mItems
     public void dataRefresh() {
         //防止重复刷新
-        if(hasRefresh){
+        if (hasRefresh) {
             hasRefresh = false;
             getDataHelper.respond();//dataRefresh
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
-        }else {
+        } else {
             getDataHelper.refresh();//MainActivity dataGot
             primaryData.refresh(handler, getDataHelper.handleCode);
         }
@@ -152,7 +153,6 @@ public class FolderFragment extends BaseFragment {
             getHeaderListFromFolder();//getData
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
-//            sendMessage();
         }
     }
 
@@ -170,31 +170,6 @@ public class FolderFragment extends BaseFragment {
             sum += primaryData.getFolderAt(i).getContain();
         }
     }
-
-    //根据list重置dataList以重置adapter
-//    private void sendMessage() {
-//        handler.sendEmptyMessage(
-//                getDataHelper.handleCode);
-////        switch (getDataHelper.status) {
-////            case GetDataHelper.statusFirstGet:
-////                handler.sendEmptyMessage(
-////                        getDataHelper.handleCode);
-////                break;
-////            case GetDataHelper.statusRefresh:
-////                handler.sendEmptyMessage(
-////                        getDataHelper.handleCode);
-////                break;
-////            case GetDataHelper.statusRespond:
-////                handler.sendEmptyMessage(
-////                        getDataHelper.handleCode);
-////                break;
-////            case GetDataHelper.handle4reGet:
-////                handler.sendEmptyMessage(
-////                        getDataHelper.handleCode);
-////            default:
-////                break;
-////        }
-//    }
 
     /**
      * 获取folder在listFolder中的位置
@@ -288,7 +263,7 @@ public class FolderFragment extends BaseFragment {
         mainStatus = new ToolbarStatus();
         mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
         getDataHelper.firstGet();//首次加载数据 dataGot
-        getData();//首次加载数据 dataGot
+        getData();//首次加载数据 firstGet
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -384,36 +359,45 @@ public class FolderFragment extends BaseFragment {
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mEditEdt.getText().toString().equals("默认")) {
-                    Trace.show(getActivity(), "不要与默认笔记夹重名");
-                } else if (!mEditEdt.getText().toString().equals("")) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
-                                Trace.show(getActivity(), "保存成功");
-                                Trace.d("saveNewFolder", "成功");
-                                getDataHelper.respond();//addClick->getData
-                                primaryData.listFolder.add(
-                                        new Folder(objectId, mEditEdt.getText().toString(), 0));
-                                getData();//add folder respond
-                            } catch (AVException e) {
-                                Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
-                                e.printStackTrace();
+                final String newFolderName = mEditEdt.getText().toString();
+                mEditEdt.setEnabled(false);
+                if (!newFolderName.equals("")) {
+                    if (primaryData.isFolderNameContain(newFolderName)) {
+                        Trace.show(getActivity(), "该笔记夹名称已存在");
+                        mEditEdt.setEnabled(true);
+                    } else {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
+                                    Trace.show(getActivity(), "保存成功");
+                                    Trace.d("saveNewFolder", "成功");
+                                    primaryData.listFolder.add(
+                                            new Folder(objectId, newFolderName, 0));
+                                    getDataHelper.respond();//addClick->getData
+//                                getData();//add folder respond
+                                    handler.sendEmptyMessage(
+                                            getDataHelper.handleCode);
+                                } catch (AVException e) {
+                                    Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                    e.printStackTrace();
+                                }
                             }
-                        }
-                    }).start();
-                    alertDialog.dismiss();
+                        }).start();
+                        alertDialog.dismiss();
+                        mEditEdt.setEnabled(true);
+                    }
                 } else {
                     Trace.show(getActivity(), "笔记夹名不能为空");
+                    mEditEdt.setEnabled(true);
                 }
             }
         });
         mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
+                if (hasFocus) {//SOFT_INPUT_STATE_ALWAYS_VISIBLE
                     alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
             }

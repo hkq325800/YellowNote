@@ -86,12 +86,12 @@ public class NoteFragment extends BaseFragment
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4zero:
-                    Trace.d("handle4zero");
+                    Trace.d("handlerInNote", "handle4zero");
                     mNoteWDList.setVisibility(View.GONE);
                     mNoteEmptyTxt.setVisibility(View.VISIBLE);
                     break;
                 case GetDataHelper.handle4firstGet:
-                    Trace.d("handle4firstGet");
+                    Trace.d("handlerInNote", "handle4firstGet");
                     //TODO 删除后避免滑动到顶部
 //                    if (noteAdapter == null) {
                     noteAdapter = new NoteShrinkAdapter(
@@ -106,7 +106,7 @@ public class NoteFragment extends BaseFragment
                     mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
                     break;
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handle4refresh");//TODO 可能为空
+                    Trace.d("handlerInNote", "handle4refresh");//TODO 可能为空
                     getDataListFromNote(primaryData.listNote);//handle4refresh
                     if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
@@ -117,7 +117,7 @@ public class NoteFragment extends BaseFragment
                     }
                     break;
                 case GetDataHelper.handle4respond:
-                    Trace.d("handle4respond note:" + list.size());
+                    Trace.d("handlerInNote", "handle4respond note:" + list.size());
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mNoteEmptyTxt.setVisibility(View.GONE);
 //                    noteAdapter.initListDelete();
@@ -125,11 +125,11 @@ public class NoteFragment extends BaseFragment
                     mNoteWDList.setAdapter(noteAdapter);
                     break;
                 case GetDataHelper.handle4loadMore:
-                    Trace.d("handle4loadMore");
+                    Trace.d("handlerInNote", "handle4loadMore");
                     mNoteWDList.stopLoadMore();
                     break;
                 case handle4explosion:
-                    Trace.d("handle4explosion");
+                    Trace.d("handlerInNote", "handle4explosion");
                     Note note = (Note) msg.obj;
                     Trace.d(note.getPreview());
                     for (int i = 0; i < noteAdapter.getCount(); i++) {
@@ -353,7 +353,7 @@ public class NoteFragment extends BaseFragment
                                             msg.what = handle4explosion;//ui特效
                                             note.delete(getActivity(), handler, msg);
                                         }
-                                        //ui删除 从数据源中重新获取list并设置到adapter中
+                                        //循环查询是否删除 从数据源中重新获取list并设置到adapter中
                                         handler.post(runnableForData);
                                     }
                                 }
@@ -403,13 +403,14 @@ public class NoteFragment extends BaseFragment
             mNoteWDList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    ImageView delete = (ImageView) view.findViewById(R.id.mNoteItemDeleteImg);
-                    if (noteAdapter.getListDelete().contains(list.get(position - 1))) {
+                    final ImageView delete = (ImageView) view.findViewById(R.id.mNoteItemDeleteImg);
+                    final Note note = primaryData.getNote(list.get(position - 1).getObjectId());
+                    if (noteAdapter.getListDelete().contains(note)) {
                         delete.setImageResource(R.mipmap.delete);
-                        noteAdapter.getListDelete().remove(list.get(position - 1));
+                        noteAdapter.getListDelete().remove(note);
                     } else {
                         delete.setImageResource(R.mipmap.delete_true);
-                        noteAdapter.getListDelete().add(list.get(position - 1));
+                        noteAdapter.getListDelete().add(note);
                     }
                 }
             });

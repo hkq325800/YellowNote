@@ -55,10 +55,9 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private ItemTouchHelper mItemTouchHelper;
     private List<SimpleFolder> mFolders;
     private List<SimpleNote> mNotes;
-    //    private int headersNum = 0;
+    private float childHeight;
     private SimpleFolder fromFolder;
     private SimpleFolder toFolder;
-    private float childHeight;
     SimpleNote fromItem;
     SimpleNote toItem;
     // 我的频道点击事件

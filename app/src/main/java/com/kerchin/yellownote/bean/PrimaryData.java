@@ -30,12 +30,18 @@ public class PrimaryData {
         initData();
     }
 
+    public static PrimaryData getInstance() {
+        if (data == null) {
+            data = new PrimaryData();
+        }
+        return data;
+    }
+
     /**
      * 网络获取
      */
     private void initData() {
         Trace.d("loadPrimaryData");
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -51,7 +57,7 @@ public class PrimaryData {
     }
 
     /**
-     * 获取Folder
+     * 网络获取Folder
      */
     private void getFolderFromCloud() {
         try {
@@ -79,12 +85,11 @@ public class PrimaryData {
             status.isFolderReady = true;
         } catch (AVException e) {
             e.printStackTrace();
-//                    Trace.show(MyApplication.getContext(), "获取Folder失败" + Trace.getErrorMsg(e));
         }
     }
 
     /**
-     * 获取Note
+     * 网络获取Note
      */
     private void getNotesAndItemsFromCloud(final Handler handler, final int handleCode) {
         new Thread(new Runnable() {
@@ -129,13 +134,6 @@ public class PrimaryData {
         }
         status.isItemReady = true;
         Trace.d("isItemReady", "true");
-    }
-
-    public static PrimaryData getInstance() {
-        if (data == null) {
-            data = new PrimaryData();
-        }
-        return data;
     }
 
     public static void clearData() {
@@ -184,42 +182,12 @@ public class PrimaryData {
         return -1;
     }
 
-    /**
-     * 目标Folder是否在现有列表中
-     *
-     * @param folder 目标Folder
-     * @return isFolderContain
-     */
-    public boolean isFolderContain(Folder folder) {
-        for (int i = 0; i < listFolder.size(); i++) {
-            if (listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Folder getFolderAt(int position){
         return listFolder.get(position);
     }
 
     public Note getNoteAt(int position){
         return listNote.get(position);
-    }
-
-    /**
-     * 目标Note是否在现有列表中
-     *
-     * @param note 目标Note
-     * @return isNoteContain
-     */
-    public boolean isNoteContain(Note note) {
-        for (int i = 0; i < listNote.size(); i++) {
-            if (listNote.get(i).getObjectId().equals(note.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void refresh(final Handler handler, final byte handleCode) {
@@ -277,6 +245,51 @@ public class PrimaryData {
     public boolean hasTheSameName(String name) {
         for (int i = 0; i < listFolder.size(); i++) {
             if (name.equals(listFolder.get(i).getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 目标Folder是否在现有列表中
+     *
+     * @param folder 目标Folder
+     * @return isFolderContain
+     */
+    public boolean isFolderContain(Folder folder) {
+        for (int i = 0; i < listFolder.size(); i++) {
+            if (listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 目标Folder是否在现有列表中
+     *
+     * @param name 目标Folder名称
+     * @return isFolderContain
+     */
+    public boolean isFolderNameContain(String name) {
+        for (int i = 0; i < listFolder.size(); i++) {
+            if (listFolder.get(i).getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 目标Note是否在现有列表中
+     *
+     * @param note 目标Note
+     * @return isNoteContain
+     */
+    public boolean isNoteContain(Note note) {
+        for (int i = 0; i < listNote.size(); i++) {
+            if (listNote.get(i).getObjectId().equals(note.getObjectId())) {
                 return true;
             }
         }

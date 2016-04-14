@@ -1,14 +1,11 @@
 package com.kerchin.yellownote.adapter;
 
 import android.content.Context;
-import android.os.*;
-import android.os.Process;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.Note;
-import com.kerchin.yellownote.bean.PrimaryData;
 
 import org.byteam.superadapter.SuperAdapter;
 import org.byteam.superadapter.internal.SuperViewHolder;
@@ -21,8 +18,7 @@ import java.util.List;
  */
 public class NoteShrinkAdapter extends SuperAdapter<Note> {
     private SparseArray<View> mViews;
-    public List<Note> listDelete;//用于记录此次删除行为的note
-    //    public int[] listDeleteNum;
+    public volatile List<Note> listDelete;//用于记录此次删除行为的note
     public volatile boolean isDelete = false;
 
     public NoteShrinkAdapter(Context context, List<Note> items, int layoutResId) {
@@ -70,7 +66,6 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
 
     public void initListDelete() {
         listDelete = new ArrayList<>();
-//        listDeleteNum = new int[PrimaryData.getInstance().listFolder.size()];
     }
 
     public void setList(List<Note> list) {

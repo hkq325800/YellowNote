@@ -196,10 +196,9 @@ public class Note implements Serializable {
                 }
                 try {
                     NoteService.delete(objectId);
-                    handler.sendMessage(handle4explosion);
                     Trace.d("deleteNote 成功");
-//                    NoteFragment.isChanged4note = true;//delete Main 没必要
                     FolderFragment.isChanged4folder = true;//delete Main
+                    handler.sendMessage(handle4explosion);
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     //失败恢复
