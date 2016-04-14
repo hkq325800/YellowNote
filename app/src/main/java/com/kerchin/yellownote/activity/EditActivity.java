@@ -167,7 +167,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 //                mEditCircleSearch.getLayoutParams();
 //        paramsE.width = width;
 //        mEditCircleSearch.setLayoutParams(paramsE);
-        
+
 //        mEditHorScrollView.setLayoutParams(new FrameLayout.LayoutParams(
 //                FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT));
     }
@@ -176,6 +176,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     protected void initializeData(Bundle savedInstanceState) {
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
+        searchResult = new ArrayList<>();
         String noteId = getIntent().getStringExtra("noteId");
         if (noteId.equals("")) {
             isNew = true;
@@ -217,18 +218,75 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     }
 
+    private List<Integer> searchResult;
+    private int thisIndex = 1;
+
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mEditCircleSearch.setText("共5个 当前第3个");
+        mEditCircleSearch.setText("共X个 当前第X个");
+        mEditCircleSearch.setSearchClick(new CircleSearchView.SearchClickListener() {
+            @Override
+            public void searchClick(String text) {
+                String str = mEditContentEdt.getText().toString();
+                int index = -1;
+                searchResult.clear();
+                while (str.indexOf(text, index + 1) != -1) {
+                    index = str.indexOf(text, index + 1);
+                    searchResult.add(index);
+                }
+                if (searchResult.size() != 0) {
+                    thisIndex = 1;
+                    mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    mEditCircleSearch.setUpEnable(false);
+                    if(searchResult.size()!=1)
+                        mEditCircleSearch.setDownEnable(true);
+                } else {
+                    thisIndex = -1;
+                    mEditCircleSearch.setText("共X个 当前第X个");
+                }
+            }
+        });
         mEditCircleSearch.setUpAndDownClick(new CircleSearchView.UpAndDownListener() {
             @Override
             public void upClick() {
-                Trace.show(EditActivity.this, "up");
+                //TODO up
+                if (thisIndex >= 3) {
+                    thisIndex--;
+                    mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    if (thisIndex < searchResult.size())
+                        mEditCircleSearch.setDownEnable(true);
+                } else if (thisIndex == 2) {
+                    thisIndex--;
+                    mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    mEditCircleSearch.setUpEnable(false);
+                    if (thisIndex < searchResult.size())
+                        mEditCircleSearch.setDownEnable(true);
+                } else if (thisIndex == -1) {
+                    Trace.show(EditActivity.this, "未找到");
+                }
             }
 
             @Override
             public void downClick() {
-                Trace.show(EditActivity.this, "down");
+                //TODO down thisIndex 5 size 6
+                if (thisIndex != -1) {
+                    if (thisIndex < searchResult.size() - 1) {
+                        thisIndex++;
+                        mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                        if (thisIndex >= 2)
+                            mEditCircleSearch.setUpEnable(true);
+                    } else if (thisIndex == searchResult.size() - 1) {
+                        thisIndex++;
+                        mEditCircleSearch.setDownEnable(false);
+                        if (thisIndex >= 2)
+                            mEditCircleSearch.setUpEnable(true);
+                        mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    } else if (thisIndex == searchResult.size()) {
+                        if (thisIndex >= 2)
+                            mEditCircleSearch.setUpEnable(true);
+                        Trace.show(EditActivity.this, "已到底");
+                    }
+                }
             }
         });
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {

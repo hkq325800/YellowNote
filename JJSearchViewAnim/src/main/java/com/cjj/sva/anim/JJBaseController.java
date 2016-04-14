@@ -115,7 +115,7 @@ public abstract class JJBaseController {
                 mPro = (float) valueAnimator.getAnimatedValue();
                 if (null != pathMeasure)
                     pathMeasure.getPosTan(mPro, mPos, null);
-                LogHelper.trace("mpos--->"+mPos[0]);
+//                LogHelper.trace("mpos--->"+mPos[0]);
                 getSearchView().invalidate();
             }
         });
