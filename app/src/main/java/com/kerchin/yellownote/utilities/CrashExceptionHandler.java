@@ -6,6 +6,8 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.kerchin.yellownote.global.Config;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -86,7 +88,8 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
             e.printStackTrace();
         }
         //杀死进程
-        android.os.Process.killProcess(android.os.Process.myPid());
+        if (!Config.isDebugMode)
+            android.os.Process.killProcess(android.os.Process.myPid());
     }
 
     /**

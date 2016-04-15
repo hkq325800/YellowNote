@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.widget;
 
 import android.content.Context;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +14,8 @@ import com.cjj.sva.JJSearchView;
 import com.cjj.sva.anim.JJBaseController;
 import com.cjj.sva.anim.controller.JJCircleToLineAlphaController;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.Trace;
 
 public class CircleSearchView extends RelativeLayout {
-    private Context mContext;
     private JJSearchView mSearchView;
     private EditText mEditText;
     private TextView mSearchViewWeGotTxt;
@@ -44,21 +43,11 @@ public class CircleSearchView extends RelativeLayout {
     }
 
     public interface SearchClickListener {
-        void searchClick(String text);
+        void searchClick(EditText editText, String text);
     }
 
-    public void setText(String str) {
-        mSearchViewWeGotTxt.setText(str);
-    }
-
-    public void setUpEnable(boolean isEnable) {
-        Trace.d("upEnable", isEnable + "");
-        mSearchViewUpImg.setEnabled(isEnable);
-    }
-
-    public void setDownEnable(boolean isEnable) {
-        Trace.d("downEnable", isEnable + "");
-        mSearchViewDownImg.setEnabled(isEnable);
+    public void setEditTextWatcher(TextWatcher textWatcher){
+        mEditText.addTextChangedListener(textWatcher);
     }
 
     public void setUpAndDownClick(UpAndDownListener listener) {
@@ -69,30 +58,8 @@ public class CircleSearchView extends RelativeLayout {
         searchListener = listener;
     }
 
-    //滑动到时调用
-    public void startSearch() {
-        if (mSearchView.getState() == JJBaseController.STATE_ANIM_NONE
-                || mSearchView.getState() == JJBaseController.STATE_ANIM_STOP) {
-            mSearchView.startAnim();
-            mEditText.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mEditText.setVisibility(View.VISIBLE);
-                }
-            }, 600);
-            mEditText.bringToFront();
-        }
-    }
-
-    //滑动过时调用
-    public void resetSearch() {
-        mSearchView.resetAnim();
-        mEditText.setVisibility(View.INVISIBLE);
-    }
-
     private void initLayout(Context context) {
-        this.mContext = context;
-        LayoutInflater.from(mContext).inflate(R.layout.widget_circle_search, this);
+        LayoutInflater.from(context).inflate(R.layout.widget_circle_search, this);
         mSearchViewWeGotTxt = (TextView) findViewById(R.id.mSearchViewWeGotTxt);
         mSearchViewDownImg = (ImageView) findViewById(R.id.mSearchViewDownImg);
         mSearchViewUpImg = (ImageView) findViewById(R.id.mSearchViewUpImg);
@@ -125,12 +92,51 @@ public class CircleSearchView extends RelativeLayout {
                         }
                     }, 600);
                     mEditText.bringToFront();
-                    mEditText.requestFocus();
+                    //TODO 强制获取焦点
+//                    mEditText.requestFocus();
                 } else if (mSearchView.getState() == JJBaseController.STATE_ANIM_START) {
-//                    Trace.show(mContext, "正在搜索", Toast.LENGTH_LONG);
-                    searchListener.searchClick(mEditText.getText().toString());
+                    searchListener.searchClick(mEditText, mEditText.getText().toString());
                 }
             }
         });
+    }
+
+    /**
+     * 设置结果文字
+     * @param str 结果文字
+     */
+    public void setText(String str) {
+        mSearchViewWeGotTxt.setText(str);
+    }
+
+    public void setUpEnable(boolean isEnable) {
+//        Trace.d("upEnable", isEnable + "");
+        mSearchViewUpImg.setEnabled(isEnable);
+    }
+
+    public void setDownEnable(boolean isEnable) {
+//        Trace.d("downEnable", isEnable + "");
+        mSearchViewDownImg.setEnabled(isEnable);
+    }
+
+    //滑动到时调用
+    public void startSearch() {
+        if (mSearchView.getState() == JJBaseController.STATE_ANIM_NONE
+                || mSearchView.getState() == JJBaseController.STATE_ANIM_STOP) {
+            mSearchView.startAnim();
+            mEditText.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mEditText.setVisibility(View.VISIBLE);
+                }
+            }, 600);
+            mEditText.bringToFront();
+        }
+    }
+
+    //滑动过时调用
+    public void resetSearch() {
+        mSearchView.resetAnim();
+        mEditText.setVisibility(View.INVISIBLE);
     }
 }

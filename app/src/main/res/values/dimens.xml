@@ -10,4 +10,6 @@
     <dimen name="snappingstepper_padding_button">0dp</dimen>
     <!--folderAdapter-->
     <dimen name="folder_item_height">50dp</dimen>
+    <!--editFunctionBar-->
+    <dimen name="edit_function_height">45dp</dimen>
 </resources>

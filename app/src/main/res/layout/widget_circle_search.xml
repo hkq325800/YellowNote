@@ -51,7 +51,6 @@
         android:layout_marginRight="36dp"
         android:background="@null"
         android:hint="请输入搜索关键字"
-        android:singleLine="true"
         android:text=""
         android:textColor="@android:color/white"
         android:textColorHint="@android:color/white"

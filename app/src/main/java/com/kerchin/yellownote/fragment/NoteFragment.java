@@ -63,7 +63,6 @@ public class NoteFragment extends BaseFragment
     private NoteShrinkAdapter noteAdapter;
     private List<Note> list;
     private ToolbarStatus mainStatus;
-    //    private boolean isRefreshing = false;
     private String mSearchText;
     private PrimaryData primaryData;
     private int emptyClickCount = 0;
@@ -81,7 +80,6 @@ public class NoteFragment extends BaseFragment
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
-            Trace.d(msg.toString() + "/" + msg.what);
             hideProgress();
             stopRefresh();
             switch (msg.what) {
@@ -131,7 +129,6 @@ public class NoteFragment extends BaseFragment
                 case handle4explosion:
                     Trace.d("handlerInNote", "handle4explosion");
                     Note note = (Note) msg.obj;
-                    Trace.d(note.getPreview());
                     for (int i = 0; i < noteAdapter.getCount(); i++) {
                         if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
                             Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
