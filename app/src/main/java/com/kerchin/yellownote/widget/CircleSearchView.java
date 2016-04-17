@@ -92,8 +92,6 @@ public class CircleSearchView extends RelativeLayout {
                         }
                     }, 600);
                     mEditText.bringToFront();
-                    //TODO 强制获取焦点
-//                    mEditText.requestFocus();
                 } else if (mSearchView.getState() == JJBaseController.STATE_ANIM_START) {
                     searchListener.searchClick(mEditText, mEditText.getText().toString());
                 }
@@ -128,9 +126,10 @@ public class CircleSearchView extends RelativeLayout {
                 @Override
                 public void run() {
                     mEditText.setVisibility(View.VISIBLE);
+                    mEditText.bringToFront();
+                    mEditText.requestFocusFromTouch();
                 }
             }, 600);
-            mEditText.bringToFront();
         }
     }
 

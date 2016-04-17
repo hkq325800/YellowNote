@@ -83,7 +83,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
     private int lastStepperValue = 0;//用来控制stepper
-    private int index = 0;//用来记录当前在aText和aTextSelection中的位置
+    private int index = 0;//用来记录当前在textOrder和textSelection中的位置
     private Double b1, b2;//实践单动画修改两个属性
     private String[] mFolder;
     private String[] mFolderId;
@@ -220,6 +220,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
+        mEditCircleSearch.setText("共X个 当前第X个");
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
         searchResult = new ArrayList<>();
@@ -266,7 +267,6 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mEditCircleSearch.setText("共X个 当前第X个");
         mEditFuncViP.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -319,7 +319,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                     mEditContentEdt.setText(replace(s.toString(), mEditContentEdt.getText().toString()));
                     search(s.toString());
                 } else {
+                    int selection = mEditContentEdt.getSelectionEnd();
                     mEditContentEdt.setText(mEditContentEdt.getText().toString());
+                    mEditContentEdt.setSelection(selection);
                     thisIndex = -1;
                     mEditCircleSearch.setText("共X个 当前第X个");
                 }
@@ -339,12 +341,16 @@ public class EditActivity extends BaseHasSwipeActivity {
                 if (thisIndex >= 3) {
                     thisIndex--;
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
+                    mEditContentEdt.requestFocusFromTouch();
+                    mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
                     mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
                     if (thisIndex < searchResult.size())
                         mEditCircleSearch.setDownEnable(true);
                 } else if (thisIndex == 2) {
                     thisIndex--;
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
+                    mEditContentEdt.requestFocusFromTouch();
+                    mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) +1);
                     mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
                     mEditCircleSearch.setUpEnable(false);
                     if (thisIndex < searchResult.size())
@@ -359,12 +365,16 @@ public class EditActivity extends BaseHasSwipeActivity {
                     if (thisIndex < searchResult.size() - 1) {
                         thisIndex++;
                         Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
+                        mEditContentEdt.requestFocusFromTouch();
+                        mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
                         mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
                         if (thisIndex >= 2)
                             mEditCircleSearch.setUpEnable(true);
                     } else if (thisIndex == searchResult.size() - 1) {
                         thisIndex++;
                         Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
+                        mEditContentEdt.requestFocusFromTouch();
+                        mEditContentEdt.setSelection(searchResult.get(thisIndex - 1)+1);
                         mEditCircleSearch.setDownEnable(false);
                         if (thisIndex >= 2)
                             mEditCircleSearch.setUpEnable(true);
@@ -376,14 +386,13 @@ public class EditActivity extends BaseHasSwipeActivity {
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
             public void onValueChange(View view, int value) {
-                // Trace.d("value" + value + " lastStepperValue" + lastStepperValue);
-                if (value == 0 || value < lastStepperValue) {
-                    //撤销
+                if (value == 0 || value < lastStepperValue) {//撤销
                     int old = isNew ? 1 : 2;
                     if (index > old) {
-                        if (isRightGray)
+                        if (isRightGray) {
+                            isRightGray = false;
                             mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
-                        isRightGray = false;
+                        }
                         needReUn = true;
                         index--;
                         String text = textOrder.get(index - 1);
@@ -391,12 +400,14 @@ public class EditActivity extends BaseHasSwipeActivity {
                         mEditContentEdt.setSelection(textSelection.get(index - 1));
                         needReUn = false;
                     } else if (index == old) {
-                        if (isRightGray)
+                        if (isRightGray) {
+                            isRightGray = false;
                             mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
-                        if (!isLeftGray)
+                        }
+                        if (!isLeftGray) {
+                            isLeftGray = true;
                             mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo_gray);
-                        isRightGray = false;
-                        isLeftGray = true;
+                        }
                         needReUn = true;
                         index--;
                         if (!isNew) {
@@ -407,16 +418,17 @@ public class EditActivity extends BaseHasSwipeActivity {
                             mEditContentEdt.setText("");
                         needReUn = false;
                     }
-                } else if (value > lastStepperValue) {
-                    //恢复
+                } else if (value > lastStepperValue) {//恢复
                     if (index + 1 <= textOrder.size()) {//有可以恢复的内容
                         if (index + 1 == textOrder.size()
-                                && !isRightGray)//aText的内容被读完了
+                                && !isRightGray) {//textOrder的内容被读完了
+                            isRightGray = true;
                             mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
-                        if (isLeftGray)
+                        }
+                        if (isLeftGray) {
+                            isLeftGray = false;
                             mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
-                        isRightGray = true;
-                        isLeftGray = false;
+                        }
                         needReUn = true;
                         index++;
                         String text = textOrder.get(index - 1);
@@ -435,8 +447,10 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!needReUn && !needReUn && !needReUn) {//被添加到aText中的部分
+                if (!needReUn) {//被添加到textOrder中的部分
+                    isLeftGray = false;
                     mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
+                    isRightGray = true;
                     mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo_gray);
                     textOrder.add(index, s.toString());
                     textSelection.add(index, start + count);

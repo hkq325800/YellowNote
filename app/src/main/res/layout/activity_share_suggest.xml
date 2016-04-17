@@ -5,7 +5,7 @@
     android:background="@color/textBackgroundColor">
 
     <include
-        layout="@layout/fragment_navigation"
+        layout="@layout/include_navigation"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize" />
 

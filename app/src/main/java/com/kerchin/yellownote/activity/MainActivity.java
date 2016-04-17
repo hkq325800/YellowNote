@@ -257,9 +257,9 @@ public class MainActivity extends BaseActivity
     public boolean onCreateOptionsMenu(Menu menu) {
 //        Trace.d("onCreateOptionsMenu" + noteFragment.toString());
         getMenuInflater().inflate(R.menu.main, menu);
-        btnSearch = mMainToolbar.getMenu().getItem(0);
-        btnSort = mMainToolbar.getMenu().getItem(1);
-        btnDelete = mMainToolbar.getMenu().getItem(2);
+        btnSearch = mMainToolbar.getMenu().findItem(R.id.action_search);
+        btnSort = mMainToolbar.getMenu().findItem(R.id.action_sort);
+        btnDelete = mMainToolbar.getMenu().findItem(R.id.action_delete);
         mSearchView = (SearchView) MenuItemCompat.getActionView(btnSearch);
         mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
