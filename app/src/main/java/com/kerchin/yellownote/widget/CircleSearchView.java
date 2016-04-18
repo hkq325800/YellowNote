@@ -107,6 +107,10 @@ public class CircleSearchView extends RelativeLayout {
         mSearchViewWeGotTxt.setText(str);
     }
 
+    public void setEditEmpty(){
+        mEditText.setText("");
+    }
+
     public void setUpEnable(boolean isEnable) {
 //        Trace.d("upEnable", isEnable + "");
         mSearchViewUpImg.setEnabled(isEnable);

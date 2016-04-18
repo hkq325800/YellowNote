@@ -87,7 +87,13 @@ public class FolderFragment extends BaseFragment {
             GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
             folderAdapter = new FolderAdapter(getActivity()
                     , helper, mHeaders, primaryData.mItems);
-            folderAdapter.setOnMyChannelItemClickListener(new FolderAdapter.OnFolderItemClickListener() {
+            folderAdapter.setOnItemDragListener(new FolderAdapter.OnItemDragListener() {
+                @Override
+                public void onDragItem() {
+
+                }
+            });
+            folderAdapter.setOnHeaderClickListener(new FolderAdapter.OnHeaderClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewType) {
                     if (viewType == FolderAdapter.TYPE_HEADER) {

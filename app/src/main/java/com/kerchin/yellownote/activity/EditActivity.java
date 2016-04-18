@@ -75,6 +75,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final int animDuration = 160;//动画的长度
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
+    private boolean isSearching = false;//是否search in edit
     private boolean isFolderChanged = false;
     private boolean userConfirm = false;
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
@@ -84,6 +85,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private int funcHeight = 0;//工具条高度
     private int lastStepperValue = 0;//用来控制stepper
     private int index = 0;//用来记录当前在textOrder和textSelection中的位置
+    private String target = "";
     private Double b1, b2;//实践单动画修改两个属性
     private String[] mFolder;
     private String[] mFolderId;
@@ -204,18 +206,6 @@ public class EditActivity extends BaseHasSwipeActivity {
                 return "";
             }
         });
-//        int width = NormalUtils.getScreenWidth(EditActivity.this);
-//        FrameLayout.LayoutParams paramsF = (FrameLayout.LayoutParams)
-//                mEditFuncLinear.getLayoutParams();
-//        paramsF.width = width;
-//        mEditFuncLinear.setLayoutParams(paramsF);
-//        LinearLayout.LayoutParams paramsE = (LinearLayout.LayoutParams)
-//                mEditCircleSearch.getLayoutParams();
-//        paramsE.width = width;
-//        mEditCircleSearch.setLayoutParams(paramsE);
-
-//        mEditHorScrollView.setLayoutParams(new FrameLayout.LayoutParams(
-//                FrameLayout.LayoutParams.MATCH_PARENT,FrameLayout.LayoutParams.MATCH_PARENT));
     }
 
     @Override
@@ -249,15 +239,20 @@ public class EditActivity extends BaseHasSwipeActivity {
         mNavigationTitleLinear.setVisibility(View.VISIBLE);
         mNavigationRightBtn.setVisibility(View.VISIBLE);
         mEditContentEdt.setText(mNote.getContent());
-        //根据标题是否为空字符判断是否为new
-        if (!mNote.getTitle().equals("")) {
+        if (!isNew) {
             textOrder.add(mNote.getContent());
             textSelection.add(index, 0);
             index++;
             mNavigationTitleEdt.setText(mNote.getTitle());
             mNavigationTitleEdt.setSelection(mNote.getTitle().length());
-            mEditContentEdt.requestFocus();
-            mEditContentEdt.setSelection(mNote.getContent().length());
+//            mEditContentEdt.requestFocusFromTouch();
+//            mEditContentEdt.setSelection(mNote.getContent().length());
+        } else {
+            textOrder.add(mNote.getContent());
+            textSelection.add(index, 0);
+            index++;
+            mNavigationTitleEdt.setText(mNote.getTitle());
+            mNavigationTitleEdt.setSelection(mNote.getTitle().length());
         }
         if (mNote.getType().equals("text")) {
             if (isNew)
@@ -281,6 +276,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 if (position == 1) {
                     mEditCircleSearch.startSearch();
                 } else {
+                    mEditCircleSearch.setEditEmpty();
                     mEditCircleSearch.resetSearch();
                 }
             }
@@ -313,19 +309,8 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                //将目标着色
-                needReUn = true;
-                if (!s.toString().equals("")) {
-                    mEditContentEdt.setText(replace(s.toString(), mEditContentEdt.getText().toString()));
-                    search(s.toString());
-                } else {
-                    int selection = mEditContentEdt.getSelectionEnd();
-                    mEditContentEdt.setText(mEditContentEdt.getText().toString());
-                    mEditContentEdt.setSelection(selection);
-                    thisIndex = -1;
-                    mEditCircleSearch.setText("共X个 当前第X个");
-                }
-                needReUn = false;
+                target = s.toString();
+                signTheTarget();//输入关键字
             }
         });
         mEditCircleSearch.setSearchClick(new CircleSearchView.SearchClickListener() {
@@ -350,7 +335,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     thisIndex--;
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
                     mEditContentEdt.requestFocusFromTouch();
-                    mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) +1);
+                    mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
                     mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
                     mEditCircleSearch.setUpEnable(false);
                     if (thisIndex < searchResult.size())
@@ -374,7 +359,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                         thisIndex++;
                         Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
                         mEditContentEdt.requestFocusFromTouch();
-                        mEditContentEdt.setSelection(searchResult.get(thisIndex - 1)+1);
+                        mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
                         mEditCircleSearch.setDownEnable(false);
                         if (thisIndex >= 2)
                             mEditCircleSearch.setUpEnable(true);
@@ -387,35 +372,20 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onValueChange(View view, int value) {
                 if (value == 0 || value < lastStepperValue) {//撤销
-                    int old = isNew ? 1 : 2;
-                    if (index > old) {
+                    if (index >= 2) {//相当于enable false
+                        //右侧置白 左侧置灰 撤销到头
                         if (isRightGray) {
                             isRightGray = false;
                             mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
                         }
-                        needReUn = true;
-                        index--;
-                        String text = textOrder.get(index - 1);
-                        mEditContentEdt.setText(text);
-                        mEditContentEdt.setSelection(textSelection.get(index - 1));
-                        needReUn = false;
-                    } else if (index == old) {
-                        if (isRightGray) {
-                            isRightGray = false;
-                            mEditReUnStepper.setRightButtonResources(R.mipmap.ic_redo);
-                        }
-                        if (!isLeftGray) {
+                        if (!isLeftGray && index == 2) {
                             isLeftGray = true;
                             mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo_gray);
                         }
-                        needReUn = true;
                         index--;
-                        if (!isNew) {
-                            String text = textOrder.get(index - 1);
-                            mEditContentEdt.setText(text);
-                            mEditContentEdt.setSelection(textSelection.get(index - 1));
-                        } else
-                            mEditContentEdt.setText("");
+                        needReUn = true;
+                        mEditContentEdt.setText(textOrder.get(index - 1));
+                        mEditContentEdt.setSelection(textSelection.get(index - 1));
                         needReUn = false;
                     }
                 } else if (value > lastStepperValue) {//恢复
@@ -429,14 +399,17 @@ public class EditActivity extends BaseHasSwipeActivity {
                             isLeftGray = false;
                             mEditReUnStepper.setLeftButtonResources(R.mipmap.ic_undo);
                         }
-                        needReUn = true;
                         index++;
-                        String text = textOrder.get(index - 1);
-                        mEditContentEdt.setText(text);
+                        needReUn = true;
+                        mEditContentEdt.setText(textOrder.get(index - 1));
                         mEditContentEdt.setSelection(textSelection.get(index - 1));
                         needReUn = false;
                     }
                 }
+                //TODO 撤销恢复时需要 文字改变时也需要
+//                if(isSearching) {
+//                    signTheTarget();//撤销恢复时
+//                }
                 lastStepperValue = value;
             }
         });
@@ -474,6 +447,25 @@ public class EditActivity extends BaseHasSwipeActivity {
         });
     }
 
+    private void signTheTarget() {
+        needReUn = true;
+        int selection = mEditContentEdt.getSelectionEnd();
+        if (!target.equals("")) {
+            //replace将目标着色
+            isSearching = true;
+            search(target);
+            mEditContentEdt.setText(replace(target, mEditContentEdt.getText().toString()));
+        } else {
+            isSearching = false;
+            //置回全黑
+            mEditContentEdt.setText(mEditContentEdt.getText().toString());
+            thisIndex = -1;
+            mEditCircleSearch.setText("共X个 当前第X个");
+        }
+        mEditContentEdt.setSelection(selection);
+        needReUn = false;
+    }
+
     @OnClick(R.id.mNavigationRightBtn)
     public void saveChanges() {
         if (mEditContentEdt.getText().toString().trim().equals("") || mNavigationTitleEdt.getText().toString().equals("")) {
@@ -502,13 +494,14 @@ public class EditActivity extends BaseHasSwipeActivity {
     }
 
     @OnClick(R.id.mEditContentEdt)
-    public void setTextSelection() {
+    public void setTextSelection() {//获取焦点的第一次点击无效
         if (textSelection.size() != 0)
             textSelection.set(index == 0 ? 0 : index - 1, mEditContentEdt.getSelectionEnd());
     }
 
     /**
      * 对结果栏进行设置
+     *
      * @param text 关键字
      */
     private void search(String text) {
@@ -535,20 +528,26 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     /**
      * 将匹配的字符设置背景色
-     * @param target 目标字符
+     *
+     * @param target  目标字符
      * @param content 全体字符
      * @return 设置好背景色的text
      */
     public Spannable replace(String target, String content) {
         spanText = new SpannableString(content);
-        int index = -1;
+//        int index = -1;
         //TODO 用searchResult
-        while (content.indexOf(target, index + 1) != -1) {
-            index = content.indexOf(target, index + 1);
+        for(Integer i: searchResult){
             spanText.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.minionYellow))
-                    , index, index + target.length(),
+                    , i, i + target.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
+//        while (content.indexOf(target, index + 1) != -1) {
+//            index = content.indexOf(target, index + 1);
+//            spanText.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.minionYellow))
+//                    , index, index + target.length(),
+//                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//        }
         return spanText;
     }
 
