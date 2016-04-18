@@ -25,6 +25,20 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/mEditMoveLinear"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@mipmap/editbar_move"
+            android:contentDescription="move" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/mEditDeleteLinear"
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -37,19 +51,5 @@
             android:layout_height="32dp"
             android:background="@mipmap/toolbar_delete"
             android:contentDescription="delete" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/mEditMoveLinear"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center">
-
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:background="@mipmap/editbar_move"
-            android:contentDescription="move" />
     </LinearLayout>
 </LinearLayout>

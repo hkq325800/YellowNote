@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -16,12 +17,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
 import com.kerchin.yellownote.helper.ItemDrag.OnDragVHListener;
-import com.kerchin.yellownote.helper.OnItemMoveListener;
+import com.kerchin.yellownote.helper.ItemDrag.OnItemMoveListener;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ import butterknife.ButterKnife;
 /**
  * Created by Kerchin on 2016/1/31 0031.
  */
-public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements OnItemMoveListener {
+public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> /*implements OnItemMoveListener*/ {
     public static int animDuration = 450;
     private Context context;
     // 笔记夹名
@@ -57,14 +59,9 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<SimpleFolder> mFolders;
     private List<SimpleNote> mNotes;
     private float childHeight;
-    private SimpleFolder fromFolder;
-    private SimpleFolder toFolder;
-    SimpleNote fromItem;
-    SimpleNote toItem;
     // header点击事件
     private OnHeaderClickListener mFolderItemClickListener;
-    private OnItemDragListener mItemDragListener;
-    boolean isAnimating = false;
+    boolean isAnimating = false;//getLayoutPosition()
 
     public FolderAdapter(Context context, ItemTouchHelper helper, List<SimpleFolder> mFoldersTrans, List<SimpleNote> mNotesTrans) {
         this.context = context;
@@ -132,6 +129,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     }
 
     ViewGroup parent;
+
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         final View view;
@@ -252,20 +250,16 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 //                        Trace.d(thisItem.getFolderPosition() + "开启2" + mHolder.isShown);
                         mHolder.mFolderItemRelative.getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
                     }
-//                    if (isEditMode) {
-//                        mHolder.mFolderItemImg.setVisibility(View.VISIBLE);
-//                    } else {
-//                        mHolder.mFolderItemImg.setVisibility(View.GONE);
-//                    }
-                    mHolder.mFolderItemTxt.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(final View v) {
-
-                            mItemTouchHelper.startDrag(mHolder);
-                            mItemDragListener.onDragItem();
-                            return true;
-                        }
-                    });
+                    //伟大的尝试
+//                    mHolder.mFolderItemTxt.setOnLongClickListener(new View.OnLongClickListener() {
+//                        @Override
+//                        public boolean onLongClick(final View v) {
+//                            mItemTouchHelper.startDrag(mHolder);
+//                            mItemDragListener.onDragItem();
+//                            ((RecyclerView)parent).clearOnScrollListeners();
+//                            return true;
+//                        }
+//                    });
                     mHolder.mFolderItemTxt.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -278,7 +272,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                                 int targetX, targetY;
 
                                 RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
-                                int spanCount = ((GridLayoutManager) manager).getSpanCount()/2;
+                                int spanCount = ((GridLayoutManager) manager).getSpanCount() / 2;
 
                                 // 移动后 高度将变化 (我的频道Grid 最后一个item在新的一行第一个)
                                 if ((mNotes.size() - 1) % spanCount == 0) {
@@ -298,28 +292,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                             }
                         }
                     });
-//                    mHolder.mFolderItemTxt.setOnTouchListener(new View.OnTouchListener() {
-//                        @Override
-//                        public boolean onTouch(View v, MotionEvent event) {
-//                            if (isEditMode) {
-//                                switch (MotionEventCompat.getActionMasked(event)) {
-//                                    case MotionEvent.ACTION_DOWN:
-//                                        startTime = System.currentTimeMillis();
-//                                        break;
-//                                    case MotionEvent.ACTION_MOVE:
-//                                        if (System.currentTimeMillis() - startTime > SPACE_TIME) {
-//                                            mItemTouchHelper.startDrag(mHolder);
-//                                        }
-//                                        break;
-//                                    case MotionEvent.ACTION_CANCEL:
-//                                    case MotionEvent.ACTION_UP:
-//                                        startTime = 0;
-//                                        break;
-//                                }
-//                            }
-//                            return false;
-//                        }
-//                    });
                 }
             }
         }
@@ -376,7 +348,18 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
     }
 
-    class HeaderViewHolder extends RecyclerView.ViewHolder implements OnDragVHListener {
+    //伟大的尝试
+//    @Override
+//    public void onItemMove(RecyclerView.ViewHolder fromPosition, RecyclerView.ViewHolder toPosition) {
+//        if (toPosition instanceof HeaderViewHolder) {
+//            Trace.d(((HeaderViewHolder) toPosition).mFolderHeaderNameTxt.getText().toString());
+//            targetFolder = (HeaderViewHolder) toPosition;
+//        }
+//    }
+
+    private HeaderViewHolder targetFolder;
+
+    class HeaderViewHolder extends RecyclerView.ViewHolder {
         @Bind(R.id.mFolderHeaderNameTxt)
         TextView mFolderHeaderNameTxt;
         @Bind(R.id.mFolderHeaderContainTxt)
@@ -385,22 +368,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         public HeaderViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
-        }
-
-        /**
-         * item 被选中时
-         */
-        @Override
-        public void onItemSelected() {
-            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel_p);
-        }
-
-        /**
-         * item 取消选中时
-         */
-        @Override
-        public void onItemFinish() {
-            mFolderHeaderNameTxt.setBackgroundResource(R.drawable.bg_channel);
         }
     }
 
@@ -452,6 +419,11 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         @Override
         public void onItemFinish() {
             mFolderItemTxt.setBackgroundResource(R.drawable.bg_channel);
+            Trace.show(context, "移动到:" + targetFolder.mFolderHeaderNameTxt.getText().toString());
+//            RecyclerView recyclerView = ((RecyclerView) parent);
+////            View targetView = recyclerView.getLayoutManager().findViewByPosition(finalNote.getFolderPosition());
+//            View currentView = recyclerView.getLayoutManager().findViewByPosition(mFolders.get(1).getId());
+//            Trace.d(currentView.getTop()+""+itemView.getTop());
         }
     }
 
@@ -461,48 +433,16 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         void onItemLongClick(View v, int position, int viewType);
     }
 
-    public interface OnItemDragListener{
-        void onDragItem();
-    }
-
     public void setOnHeaderClickListener(OnHeaderClickListener listener) {
         this.mFolderItemClickListener = listener;
     }
 
-    public void setOnItemDragListener(OnItemDragListener listener){
-        this.mItemDragListener = listener;
-    }
-
-    @Override
-    public void onItemMove(RecyclerView.ViewHolder fromViewHolder, RecyclerView.ViewHolder toViewHolder) {
-        if (toViewHolder instanceof HeaderViewHolder) {
-            Trace.d(((HeaderViewHolder) toViewHolder).mFolderHeaderNameTxt.getText().toString());
-        }
-    }
-
-    private void findTwoFolder(String oldFolderId, String newFolderId) {
-        for (int i = 0; i < mFolders.size(); i++) {
-            //-1
-            if (oldFolderId.equals(mFolders.get(i).getFolderId())) {
-                fromFolder = mFolders.get(i);
-            }
-            //+1
-            if (newFolderId.equals(mFolders.get(i).getFolderId())) {
-                toFolder = mFolders.get(i);
-            }
-        }
-    }
-
-    private void findTwoItem(int fromPosition, int toPosition) {
-        for (int i = 0; i < mNotes.size(); i++) {
-            if (fromPosition == mNotes.get(i).getId()) {
-                fromItem = mNotes.get(i);
-            }
-            if (toPosition == mNotes.get(i).getId()) {
-                toItem = mNotes.get(i);
-            }
-        }
-    }
+//    @Override
+//    public void onItemMove(RecyclerView.ViewHolder fromViewHolder, RecyclerView.ViewHolder toViewHolder) {
+//        if (toViewHolder instanceof HeaderViewHolder) {
+//            Trace.d(((HeaderViewHolder) toViewHolder).mFolderHeaderNameTxt.getText().toString());
+//        }
+//    }
 
     /**
      * 开启编辑模式
@@ -569,7 +509,8 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
             }
         });
     }
-//
+
+    //
 //    /**
 //     * 我的频道 移动到 其他频道
 //     *

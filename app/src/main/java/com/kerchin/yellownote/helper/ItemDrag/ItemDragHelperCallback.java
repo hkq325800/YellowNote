@@ -28,13 +28,13 @@ public class ItemDragHelperCallback extends ItemTouchHelper.Callback {
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
         // 不同Type之间不可移动
-        if (viewHolder.getItemViewType() != target.getItemViewType()) {
-            return false;
-        }
+//        if (viewHolder.getItemViewType() != target.getItemViewType()) {
+//            return false;
+//        }
 
         if (recyclerView.getAdapter() instanceof OnItemMoveListener) {
             OnItemMoveListener listener = ((OnItemMoveListener) recyclerView.getAdapter());
-            listener.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+            listener.onItemMove(viewHolder, target);//.getAdapterPosition()
         }
         return true;
     }
