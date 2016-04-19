@@ -8,7 +8,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -17,13 +16,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
 import com.kerchin.yellownote.helper.ItemDrag.OnDragVHListener;
-import com.kerchin.yellownote.helper.ItemDrag.OnItemMoveListener;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -59,6 +56,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<SimpleFolder> mFolders;
     private List<SimpleNote> mNotes;
     private float childHeight;
+    ViewGroup parent;
     // header点击事件
     private OnHeaderClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
@@ -128,8 +126,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         return TYPE_ITEM;
     }
 
-    ViewGroup parent;
-
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         final View view;
@@ -144,24 +140,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         }
         return null;
     }
-
-    //    private SystemHandler handler = new SystemHandler(this) {
-//
-//        @Override
-//        public void handlerMessage(Message msg) {
-//            ItemViewHolder mHolder = (ItemViewHolder) msg.obj;
-//            switch (msg.what) {
-//                case 0:
-//                    mHolder.mFolderItemRelative.setLayoutParams(new RelativeLayout.LayoutParams(0, 0));
-//                    break;
-//                case 1:
-//                    mHolder.mFolderItemRelative.setLayoutParams(new RelativeLayout.LayoutParams(
-//                            RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT));
-//                    break;
-//                default:break;
-//            }
-//        }
-//    };
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
@@ -263,33 +241,33 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     mHolder.mFolderItemTxt.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            RecyclerView recyclerView = ((RecyclerView) parent);
-                            View targetView = recyclerView.getLayoutManager().findViewByPosition(finalNote.getFolderPosition());
-                            View currentView = recyclerView.getLayoutManager().findViewByPosition(mFolders.get(1).getId());
-                            // 如果targetView不在屏幕内,则indexOfChild为-1  此时不需要添加动画,因为此时notifyItemMoved自带一个向目标移动的动画
-                            // 如果在屏幕内,则添加一个位移动画
-                            if (recyclerView.indexOfChild(targetView) >= 0) {
-                                int targetX, targetY;
-
-                                RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
-                                int spanCount = ((GridLayoutManager) manager).getSpanCount() / 2;
-
-                                // 移动后 高度将变化 (我的频道Grid 最后一个item在新的一行第一个)
-                                if ((mNotes.size() - 1) % spanCount == 0) {
-                                    View preTargetView = recyclerView.getLayoutManager().findViewByPosition(mNotes.size() + 2 - 1);
-                                    targetX = preTargetView.getLeft();
-                                    targetY = preTargetView.getTop();
-                                } else {
-                                    targetX = targetView.getLeft();
-                                    targetY = targetView.getTop();
-                                }
-
-                                moveMyToOther(mHolder, finalNote);
-                                startAnimation(recyclerView, currentView, targetX, targetY);
-
-                            } else {
-                                moveMyToOther(mHolder, finalNote);
-                            }
+//                            RecyclerView recyclerView = ((RecyclerView) parent);
+//                            View targetView = recyclerView.getLayoutManager().findViewByPosition(finalNote.getFolderPosition());
+//                            View currentView = recyclerView.getLayoutManager().findViewByPosition(mFolders.get(1).getId());
+//                            // 如果targetView不在屏幕内,则indexOfChild为-1  此时不需要添加动画,因为此时notifyItemMoved自带一个向目标移动的动画
+//                            // 如果在屏幕内,则添加一个位移动画
+//                            if (recyclerView.indexOfChild(targetView) >= 0) {
+//                                int targetX, targetY;
+//
+//                                RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
+//                                int spanCount = ((GridLayoutManager) manager).getSpanCount() / 2;
+//
+//                                // 移动后 高度将变化 (我的频道Grid 最后一个item在新的一行第一个)
+//                                if ((mNotes.size() - 1) % spanCount == 0) {
+//                                    View preTargetView = recyclerView.getLayoutManager().findViewByPosition(mNotes.size() + 2 - 1);
+//                                    targetX = preTargetView.getLeft();
+//                                    targetY = preTargetView.getTop();
+//                                } else {
+//                                    targetX = targetView.getLeft();
+//                                    targetY = targetView.getTop();
+//                                }
+//
+//                                moveMyToOther(mHolder, finalNote);
+//                                startAnimation(recyclerView, currentView, targetX, targetY);
+//
+//                            } else {
+//                                moveMyToOther(mHolder, finalNote);
+//                            }
                         }
                     });
                 }
@@ -510,12 +488,12 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         });
     }
 
-    //
-//    /**
-//     * 我的频道 移动到 其他频道
-//     *
-//     * @param myHolder
-//     */
+
+    /**
+     * 我的频道 移动到 其他频道
+     *
+     * @param myHolder
+     */
     private void moveMyToOther(ItemViewHolder myHolder, SimpleNote finalNote) {
         int position = myHolder.getAdapterPosition();
 
@@ -529,12 +507,12 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 
         notifyItemMoved(position, mNotes.size() + 5);
     }
-//
-//    /**
-//     * 其他频道 移动到 我的频道
-//     *
-//     * @param otherHolder
-//     */
+
+    /**
+     * 其他频道 移动到 我的频道
+     *
+     * @param otherHolder
+     */
 //    private void moveOtherToMy(ItemViewHolder otherHolder) {
 //        int position = processItemRemoveAdd(otherHolder);
 //        if (position == -1) {

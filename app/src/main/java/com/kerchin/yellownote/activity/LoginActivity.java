@@ -492,7 +492,7 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    LoginService.forgetVerify(objectId, txtPass);
+                    LoginService.forgetVerify(txtUser, txtPass);
                     Trace.show(LoginActivity.this, "修改成功");
                     goToMain();
                 } catch (AVException e) {
@@ -513,10 +513,10 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    AVObject a = LoginService.isRegistered(txtUser);
-                    if (a != null) {
-                        Trace.d("验证是否已经注册 查询到" + a.get("user_tel") + " 已注册");
-                        objectId = a.getObjectId();
+                    boolean flag = LoginService.isRegistered(txtUser);
+                    if (flag) {
+                        Trace.d("验证是否已经注册 查询到" + txtUser + "已注册");
+//                        objectId = a.getObjectId();
                         registerStatus = statusTrue;
                     } else
                         registerStatus = statusFalse;

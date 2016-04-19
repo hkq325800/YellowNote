@@ -31,15 +31,18 @@ public class PrimaryData {
     }
 
     public static PrimaryData getInstance() {
-        if (data == null) {
-            data = new PrimaryData();
-        }
+        if (data == null)
+            synchronized (PrimaryData.class) {
+                if (data == null)
+                    data = new PrimaryData();
+            }
         return data;
     }
 
     /**
      * 网络获取
      */
+
     private void initData() {
         Trace.d("loadPrimaryData");
         new Thread(new Runnable() {
@@ -182,11 +185,11 @@ public class PrimaryData {
         return -1;
     }
 
-    public Folder getFolderAt(int position){
+    public Folder getFolderAt(int position) {
         return listFolder.get(position);
     }
 
-    public Note getNoteAt(int position){
+    public Note getNoteAt(int position) {
         return listNote.get(position);
     }
 
@@ -234,7 +237,7 @@ public class PrimaryData {
     public List<Note> getNoteListInFolder(String objectId) {
         List<Note> list = new ArrayList<>();
         for (Note note : listNote) {
-            if(note.getFolderId().equals(objectId)){
+            if (note.getFolderId().equals(objectId)) {
                 list.add(note);
             }
         }

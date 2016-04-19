@@ -16,7 +16,7 @@ public class LoginService {
      *
      * @param txtUser 用户名
      * @param txtPass 用户密码
-     * @return
+     * @return AVObject
      * @throws AVException
      */
     public static AVObject loginVerify(String txtUser, String txtPass) throws AVException {
@@ -29,13 +29,14 @@ public class LoginService {
     /**
      * 忘记密码的保存
      *
-     * @param objectId
+     * @param txtUser 用户名
      * @param txtPass 用户密码
      * @throws AVException
      */
-    public static void forgetVerify(String objectId, String txtPass) throws AVException {
+    public static void forgetVerify(String txtUser, String txtPass) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        AVObject user = query.get(objectId);
+        query.whereEqualTo("user_tel", txtUser);
+        AVObject user = query.getFirst();//query.get(objectId);
         user.put("user_pass", MyApplication.Secret(txtPass));
         user.save();
     }
@@ -47,10 +48,10 @@ public class LoginService {
      * @return AVObject 为了获取objectId
      * @throws AVException
      */
-    public static AVObject isRegistered(String txtUser) throws AVException {
+    public static boolean isRegistered(String txtUser) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
-        return query.getFirst();
+        return query.getFirst() != null;
     }
 
     /**
@@ -71,8 +72,8 @@ public class LoginService {
     /**
      * 用户注册
      *
-     * @param txtUser 用户名
-     * @param txtPass 用户密码
+     * @param txtUser         用户名
+     * @param txtPass         用户密码
      * @param defaultFolderId 用户的默认笔记夹Id
      * @throws AVException
      */
@@ -87,8 +88,8 @@ public class LoginService {
     /**
      * 发送验证码
      *
-     * @param txtUser 用户名
-     * @param isSignUp 是否注册，决定了模板
+     * @param txtUser     用户名
+     * @param isSignUp    是否注册，决定了模板
      * @param validPeriod 发送验证码的过期时间
      * @throws AVException
      */
