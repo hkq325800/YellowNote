@@ -287,6 +287,8 @@ public class NoteFragment extends BaseFragment
             //被动刷新
             getDataHelper.respond();//isChanged4note
             getData(0);//statusRespond onResume
+            if (mainStatus.isSearchMode())
+                doSearch();
             isChanged4note = false;
         }
         super.onResume();
@@ -314,7 +316,7 @@ public class NoteFragment extends BaseFragment
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     mSearchText = newText;
-                    doSearch();
+                    doSearch();//onQueryTextChange
                     return true;
                 }
             };
@@ -525,7 +527,7 @@ public class NoteFragment extends BaseFragment
         Trace.d("restore", "true");
         mNoteWDList.setPullRefreshEnable(true);
         mSearchText = "";
-        doSearch();
+        doSearch();//restore
         mainStatus.setIsSearchMode(false);
         Trace.d("restore", "finish");
     }
@@ -567,6 +569,7 @@ public class NoteFragment extends BaseFragment
                     emptyClickCount++;
                     getDataHelper.respond();
                     getData(0);//statusRespond empty
+                    FolderFragment.isChanged4folder = true;
                 } else {
                     getDataHelper.refresh();//MainActivity dataGot
                     //重新获取mHeaders listNote和mItems

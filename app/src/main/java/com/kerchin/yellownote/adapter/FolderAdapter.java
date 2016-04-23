@@ -67,14 +67,15 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         this.mItemTouchHelper = helper;
         this.mFolders = mFoldersTrans;
         this.mNotes = mNotesTrans;
-        initData(mFoldersTrans);
+        initData(mFoldersTrans, true);
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
     }
 
-    private void initData(List<SimpleFolder> mFoldersTrans) {
+    private void initData(List<SimpleFolder> mFoldersTrans, boolean isFirst) {
 
         List<SimpleNote> mTemp = new ArrayList<SimpleNote>();
-        shownFolderPosition = 0;
+        if (isFirst)
+            shownFolderPosition = 0;
         //mItem复刻
         for (int i = 0; i < mNotes.size(); i++) {
             mTemp.add(mNotes.get(i));
@@ -91,9 +92,10 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
                     //设置该noteItem前item的数量
                     mNotes.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
-                    if (mNotes.get(j).getHeaderBefore() == 1) {
-                        mNotes.get(j).setIsShown(true);
-                    }
+                    if (isFirst)
+                        if (mNotes.get(j).getHeaderBefore() == 1) {
+                            mNotes.get(j).setIsShown(true);
+                        }
                 }
             }
         }
@@ -113,7 +115,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     public void setFolders(List<SimpleFolder> mFolders, List<SimpleNote> mNotes) {
         this.mFolders = mFolders;
         this.mNotes = mNotes;
-        initData(this.mFolders);
+        initData(this.mFolders, false);
         notifyDataSetChanged();
     }
 
