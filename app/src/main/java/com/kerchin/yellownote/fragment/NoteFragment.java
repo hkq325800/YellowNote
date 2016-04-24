@@ -508,14 +508,7 @@ public class NoteFragment extends BaseFragment
 
     private void doSearch() {
         list.clear();//doSearch
-        for (int i = 0; i < primaryData.listNote.size(); i++) {
-            String title = primaryData.getNoteAt(i).getTitle();
-            String content = primaryData.getNoteAt(i).getContent();
-            if (title.contains(mSearchText)
-                    || content.contains(mSearchText)) {
-                list.add(primaryData.getNoteAt(i));
-            }
-        }
+        list = primaryData.getSearchList(mSearchText);
         if (noteAdapter != null)
             if (!isChanged4note)//doSearch
                 noteAdapter.setList(list);

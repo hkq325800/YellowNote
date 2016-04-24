@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.CountDownTimer;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
@@ -33,6 +32,7 @@ import butterknife.ButterKnife;
 
 /**
  * Created by Kerchin on 2016/1/31 0031.
+ * @deprecated
  */
 public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> /*implements OnItemMoveListener*/ {
     public static int animDuration = 450;
@@ -56,7 +56,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     private List<SimpleFolder> mFolders;
     private List<SimpleNote> mNotes;
     private float childHeight;
-    ViewGroup parent;
     // header点击事件
     private OnHeaderClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
@@ -89,7 +88,7 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
                     //找到一个数值+1
                     mFoldersTrans.get(i).addNow();
                     mNotes.get(j).setFolderPosition(mFoldersTrans.get(i).getId());
-                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
+//                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
                     //设置该noteItem前item的数量
                     mNotes.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
                     if (isFirst)
@@ -131,7 +130,6 @@ public class FolderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
         final View view;
-        this.parent = parent;
         switch (viewType) {
             case TYPE_HEADER:
                 view = mInflater.inflate(R.layout.item_folder_header, parent, false);

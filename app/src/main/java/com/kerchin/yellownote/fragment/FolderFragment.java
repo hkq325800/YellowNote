@@ -24,12 +24,12 @@ import android.widget.EditText;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
-import com.kerchin.yellownote.adapter.FolderAdapter;
+import com.kerchin.yellownote.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.PrimaryData;
-import com.kerchin.yellownote.bean.SimpleFolder;
+import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.ItemDrag.ItemDragHelperCallback;
@@ -37,8 +37,7 @@ import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.byteam.superadapter.IMulItemViewType;
 
 public class FolderFragment extends BaseFragment {
     public static boolean isChanged4folder = false;
@@ -47,9 +46,9 @@ public class FolderFragment extends BaseFragment {
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private ToolbarStatus mainStatus;
-    private List<SimpleFolder> mHeaders;
+    //    private List<SimpleEntity> mHeaders;
     private PrimaryData primaryData;
-    private FolderAdapter folderAdapter;
+    private FolderShrinkAdapter folderAdapter;
     private AlertDialog alertDialog;
     private GetDataHelper getDataHelper;
     private SystemHandler handler = new SystemHandler(this) {
@@ -58,7 +57,8 @@ public class FolderFragment extends BaseFragment {
             switch (msg.what) {
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInFolder", "handle4refresh");
-                    getHeaderListFromFolder();//handle4refresh
+//                    getHeaderListFromFolder();//handle4refresh
+                    primaryData.getSimpleEntityFromList();
                     setRecycleView();//refresh
                     break;
                 case GetDataHelper.handle4firstGet:
@@ -71,7 +71,8 @@ public class FolderFragment extends BaseFragment {
 //                    break;
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInFolder", "handle4respond");
-                    getHeaderListFromFolder();//handle4respond
+                    primaryData.getSimpleEntityFromList();
+//                    getHeaderListFromFolder();//handle4respond
                     setRecycleView();//respond
                     break;
                 default:
@@ -85,12 +86,31 @@ public class FolderFragment extends BaseFragment {
             ItemDragHelperCallback callback = new ItemDragHelperCallback();
             final ItemTouchHelper helper = new ItemTouchHelper(callback);
             GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
-            folderAdapter = new FolderAdapter(getActivity()
-                    , helper, mHeaders, primaryData.mItems);
-            folderAdapter.setOnHeaderClickListener(new FolderAdapter.OnHeaderClickListener() {
+            folderAdapter = new FolderShrinkAdapter(getActivity()
+                    , primaryData.mItems, new IMulItemViewType<SimpleEntity>() {
+                @Override
+                public int getViewTypeCount() {
+                    return 2;
+                }
+
+                @Override
+                public int getItemViewType(int position, SimpleEntity simpleEntity) {
+                    return simpleEntity.entityType;
+                }
+
+                @Override
+                public int getLayoutId(int viewType) {
+                    if (viewType == SimpleEntity.typeFolder)
+                        return R.layout.item_folder_header;
+                    else if (viewType == SimpleEntity.typeNote)
+                        return R.layout.item_folder_item;
+                    else return 0;
+                }
+            }, helper);
+            folderAdapter.setOnHeaderClickListener(new FolderShrinkAdapter.OnHeaderClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewType) {
-                    if (viewType == FolderAdapter.TYPE_HEADER) {
+                    if (viewType == SimpleEntity.typeFolder) {
                         folderAdapter.openFolder(position);
                     }
                 }
@@ -98,16 +118,15 @@ public class FolderFragment extends BaseFragment {
                 @Override
                 public void onItemLongClick(View v, final int position, int viewType) {
                     //reTitle+delete TODO 做成右键菜单的模式
-                    if (viewType == FolderAdapter.TYPE_HEADER) {
+                    if (viewType == SimpleEntity.typeFolder) {
                         MainActivity mainActivity = (MainActivity) getActivity();
                         mainActivity.hideBtnAdd();
-                        int realPos = realFolderPosition(position);
-                        if (!primaryData.getFolderAt(realPos).getName().equals("默认")) {
-                            reTitleDialogShow(realPos);
+                        if (!primaryData.getFolderAt(position).getName().equals("默认")) {
+                            reTitleDialogShow(position);
                         } else {
                             Trace.show(getActivity(), "默认笔记夹不许更名");
                         }
-                    } else if (viewType == FolderAdapter.TYPE_ITEM) {
+                    } else if (viewType == SimpleEntity.typeNote) {
 
                     }
                 }
@@ -116,14 +135,14 @@ public class FolderFragment extends BaseFragment {
                 @Override
                 public int getSpanSize(int position) {
                     int viewType = folderAdapter.getItemViewType(position);
-                    return viewType == FolderAdapter.TYPE_ITEM ? 2 : 6;
+                    return viewType == SimpleEntity.typeNote ? 2 : 6;
                 }
             });
             mRecyclerView.setLayoutManager(manager);
             helper.attachToRecyclerView(mRecyclerView);
             mRecyclerView.setAdapter(folderAdapter);
         } else {
-            folderAdapter.setFolders(mHeaders, primaryData.mItems);
+            folderAdapter.setFolders(primaryData.mItems);
             mRecyclerView.setAdapter(folderAdapter);
             //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
 //            folderAdapter.setIsFirstTrue();
@@ -150,39 +169,11 @@ public class FolderFragment extends BaseFragment {
     private void getData() {
         Trace.d("getData status", getDataHelper.statusName);
         if (mRecyclerView != null) {
-            getHeaderListFromFolder();//getData
+//            getHeaderListFromFolder();//getData
+            primaryData.getSimpleEntityFromList();
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
         }
-    }
-
-    /**
-     * mHeaders的获取
-     */
-    private void getHeaderListFromFolder() {
-        mHeaders = new ArrayList<SimpleFolder>();
-        int sum = 0;
-        for (int i = 0; i < primaryData.listFolder.size(); i++) {
-            mHeaders.add(new SimpleFolder(i + sum
-                    , primaryData.getFolderAt(i).getName()
-                    , primaryData.getFolderAt(i).getContain()
-                    , primaryData.getFolderAt(i).getObjectId()));
-            sum += primaryData.getFolderAt(i).getContain();
-        }
-    }
-
-    /**
-     * 获取folder在listFolder中的位置
-     *
-     * @param position folder在列表中的位置
-     * @return int folder在listFolder中的位置
-     */
-    private int realFolderPosition(int position) {
-        for (int i = 0; i < mHeaders.size(); i++) {
-            if (mHeaders.get(i).getId() == position)
-                return i;
-        }
-        return 0;
     }
 
     /**
@@ -290,10 +281,9 @@ public class FolderFragment extends BaseFragment {
      * @param position 点击的position
      */
     private void deleteFolder(final int position) {
-        final int realPos = realFolderPosition(position);
-        if (!primaryData.getFolderAt(realPos).getName().equals("默认")) {
+        if (!primaryData.getFolderAt(position).getName().equals("默认")) {
             //del
-            if (primaryData.getFolderAt(realPos).getContain() != 0)
+            if (primaryData.getFolderAt(position).getContain() != 0)
                 //笔记夹下如果还有笔记要么全部删除要么移至默认
                 Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
             else {
@@ -310,8 +300,8 @@ public class FolderFragment extends BaseFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                         getDataHelper.respond();//deleteFolder->folder.delete
-                        primaryData.getFolderAt(realPos)
-                                .delete(getActivity(), realPos, handler, getDataHelper.handleCode);
+                        primaryData.getFolderAt(position)
+                                .delete(getActivity(), position, handler, getDataHelper.handleCode);
                     }
                 });
                 ad.show();
@@ -372,7 +362,7 @@ public class FolderFragment extends BaseFragment {
                                 try {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.show(getActivity(), "保存成功");
-                                    Trace.d("saveNewFolder", "成功");
+                                    Trace.d("saveNewFolder", "成功");//TODO
                                     primaryData.listFolder.add(
                                             new Folder(objectId, newFolderName, 0));
                                     getDataHelper.respond();//addClick->getData
