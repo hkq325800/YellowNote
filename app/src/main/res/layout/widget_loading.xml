@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true">
+
+        <com.kerchin.yellownote.widget.LoadingAnimView
+            android:id="@+id/mLoadingAnim"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center" />
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/mLoadingImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+    <!--android:background="@anim/frame_progress"-->
+
+    <RelativeLayout
+        android:id="@+id/mNodataRL"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/mNoDataBtn"
+            android:layout_width="72dp"
+            android:layout_height="22dp"
+            android:layout_centerInParent="true"
+            android:text="重新加载"
+            android:textSize="14sp"
+            android:visibility="gone" />
+        <!--android:background="@drawable/button_click_transparent"-->
+        <TextView
+            android:id="@+id/mNoDataTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/mNoDataBtn"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:includeFontPadding="false"
+            android:paddingBottom="15dp"
+            android:paddingLeft="60dp"
+            android:paddingRight="60dp"
+            android:text="nodata"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/mNoDataImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/mNoDataTxt"
+            android:layout_centerInParent="true"
+            android:paddingBottom="15dp"
+            android:src="@mipmap/ic_no_network"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+</RelativeLayout>

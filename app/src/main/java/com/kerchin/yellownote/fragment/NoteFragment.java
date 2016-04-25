@@ -32,6 +32,7 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.widget.ProgressLayout;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 import java.util.ArrayList;
@@ -57,6 +58,8 @@ public class NoteFragment extends BaseFragment
     TextView mNoteEmptyTxt;
     @Bind(R.id.mNoteProgress)
     ProgressBar mNoteProgress;
+    @Bind(R.id.mProgress)
+    ProgressLayout mProgress;
     public static boolean isChanged4note = false;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
@@ -80,7 +83,8 @@ public class NoteFragment extends BaseFragment
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
-            hideProgress();
+            mProgress.dismissProg();
+//            hideProgress();
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4zero:
@@ -100,6 +104,7 @@ public class NoteFragment extends BaseFragment
 //                        noteAdapter.initListDelete();
 //                        noteAdapter.setList(list);
 //                    }
+                    mProgress.showListView(mNoteWDList);
                     mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
                     mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
                     break;
@@ -163,6 +168,7 @@ public class NoteFragment extends BaseFragment
 //            Trace.d("isItemsReady", "true");
 //            mNoteWDList.setPullLoadEnable(false);
 //        }
+        mProgress.startProg();
         Trace.d("getData status", getDataHelper.statusName);
         if (mNoteWDList != null) {
             getDataListFromNote(primaryData.listNote);//getList
@@ -246,7 +252,7 @@ public class NoteFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         getDataHelper.firstGet();//first get
-        getData(0);//statusFirstGet
+        getData(1500);//statusFirstGet
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -279,6 +285,7 @@ public class NoteFragment extends BaseFragment
             }
         });
         mNoteWDList.setPullLoadEnable(false);
+        mProgress.hideAlphaView(mNoteWDList);
     }
 
     @Override
