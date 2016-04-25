@@ -77,7 +77,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private boolean isShown = true;//func条是否显示
     private boolean isSearching = false;//是否search in edit
     private boolean isFolderChanged = false;
-    private boolean userConfirm = false;
+    private boolean userConfirm = false;//保存并退出
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
     private boolean isLeftGray = true;//左侧的控制
     private boolean isRightGray = true;//右侧的控制
@@ -85,19 +85,20 @@ public class EditActivity extends BaseHasSwipeActivity {
     private int funcHeight = 0;//工具条高度
     private int lastStepperValue = 0;//用来控制stepper
     private int index = 0;//用来记录当前在textOrder和textSelection中的位置
-    private String target = "";
-    private Double b1, b2;//实践单动画修改两个属性
+//    private String target = "";
+    private Double navRatio, funcRatio;//实践单动画修改两个属性
+    //用于切换笔记夹
     private String[] mFolder;
     private String[] mFolderId;
     private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
-    private ValueAnimator animHide, animShow;
-    private Note mNote;
+    private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
+    private Note mNote;//当前编辑的note
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private AlertDialog ad;
     private PrimaryData primaryData;
     private ArrayList<View> viewContainer = new ArrayList<View>();
-    private List<Integer> searchResult;
+    private List<Integer> searchResult;//记录关键字所在的index
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     @SuppressWarnings("FieldCanBeLocal")
     private Spannable spanText;//带span的字符
@@ -124,7 +125,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
                     openSliding();
-                    if ((boolean) msg.obj) {
+                    if ((boolean) msg.obj) {//操作是否成功便于回滚
                         Trace.show(EditActivity.this, "保存成功");
                         mEditDeleteLinear.setVisibility(View.VISIBLE);
                         if (userConfirm) {
@@ -210,7 +211,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-        mEditCircleSearch.setText("共X个 当前第X个");
+        mEditCircleSearch.setText("共0个 当前第0个");
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
         searchResult = new ArrayList<>();
@@ -309,8 +310,8 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                target = s.toString();
-                signTheTarget();//输入关键字
+//                target = s.toString();
+                signTheTarget(s.toString());//输入关键字
             }
         });
         mEditCircleSearch.setSearchClick(new CircleSearchView.SearchClickListener() {
@@ -447,7 +448,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         });
     }
 
-    private void signTheTarget() {
+    private void signTheTarget(String target) {
         needReUn = true;
         int selection = mEditContentEdt.getSelectionEnd();
         if (!target.equals("")) {
@@ -460,7 +461,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             //置回全黑
             mEditContentEdt.setText(mEditContentEdt.getText().toString());
             thisIndex = -1;
-            mEditCircleSearch.setText("共X个 当前第X个");
+            mEditCircleSearch.setText("共0个 当前第0个");
         }
         mEditContentEdt.setSelection(selection);
         needReUn = false;
@@ -521,7 +522,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     mEditCircleSearch.setDownEnable(true);
             } else {
                 thisIndex = -1;
-                mEditCircleSearch.setText("共X个 当前第X个");
+                mEditCircleSearch.setText("共0个 当前第0个");
             }
         }
     }
@@ -536,7 +537,6 @@ public class EditActivity extends BaseHasSwipeActivity {
     public Spannable replace(String target, String content) {
         spanText = new SpannableString(content);
 //        int index = -1;
-        //TODO 用searchResult
         for(Integer i: searchResult){
             spanText.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.minionYellow))
                     , i, i + target.length(),
@@ -682,10 +682,10 @@ public class EditActivity extends BaseHasSwipeActivity {
                         animHide.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public void onAnimationUpdate(ValueAnimator animation) {
-                                b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
-                                b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
-                                mEditNavLinear.getLayoutParams().height = b1.intValue();
-                                mEditFuncViP.getLayoutParams().height = b2.intValue();
+                                navRatio = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
+                                funcRatio = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
+                                mEditNavLinear.getLayoutParams().height = navRatio.intValue();
+                                mEditFuncViP.getLayoutParams().height = funcRatio.intValue();
                                 mEditFuncViP.requestLayout();
                                 mEditNavLinear.requestLayout();
                                 mEditScroll.requestLayout();
@@ -700,10 +700,10 @@ public class EditActivity extends BaseHasSwipeActivity {
                         animShow.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public void onAnimationUpdate(ValueAnimator animation) {
-                                b1 = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
-                                b2 = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
-                                mEditNavLinear.getLayoutParams().height = b1.intValue();
-                                mEditFuncViP.getLayoutParams().height = b2.intValue();
+                                navRatio = (int) animation.getAnimatedValue() / (double) animDuration * navLinearHeight;
+                                funcRatio = (int) animation.getAnimatedValue() / (double) animDuration * funcHeight;
+                                mEditNavLinear.getLayoutParams().height = navRatio.intValue();
+                                mEditFuncViP.getLayoutParams().height = funcRatio.intValue();
                                 mEditFuncViP.requestLayout();
                                 mEditNavLinear.requestLayout();
                                 mEditScroll.requestLayout();

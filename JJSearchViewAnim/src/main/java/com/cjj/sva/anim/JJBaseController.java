@@ -7,12 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PathMeasure;
 import android.support.annotation.IntDef;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
-
-import com.cjj.sva.utils.LogHelper;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -96,13 +92,11 @@ public abstract class JJBaseController {
 
 
     public ValueAnimator startSearchViewAnim() {
-        ValueAnimator valueAnimator = startSearchViewAnim(0, 1, 600);
-        return valueAnimator;
+        return startSearchViewAnim(0, 1, 600);
     }
 
     public ValueAnimator startSearchViewAnim(float startF, float endF, long time) {
-        ValueAnimator valueAnimator =startSearchViewAnim(startF, endF, time, null);
-        return valueAnimator;
+        return startSearchViewAnim(startF, endF, time, null);
     }
 
     public ValueAnimator startSearchViewAnim(float startF, float endF, long time, final PathMeasure pathMeasure) {
