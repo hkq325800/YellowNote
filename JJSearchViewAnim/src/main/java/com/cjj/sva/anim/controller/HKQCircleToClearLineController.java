@@ -17,7 +17,8 @@ public class HKQCircleToClearLineController extends JJBaseController {
     private int cx, cy, cr;
     private RectF mRectF, mRectFLarge;
     private float tran = 200;
-    private static int mGap = 3;
+    private static float mGap = 2.5f;
+    private int widthRatio = 3;//用于高度固定 长度match_parent的场景
 
     public HKQCircleToClearLineController() {
         mRectF = new RectF();
@@ -55,7 +56,7 @@ public class HKQCircleToClearLineController extends JJBaseController {
         //先画横线先把横线缩短
         canvas.drawLine(mRectF.centerX() + cr
                 , mRectF.centerY()
-                , mRectF.centerX() + cr + (2 * cr * (1 - mPro))
+                , mRectF.centerX() + cr + (cr * (1 - mPro))
                 , mRectF.centerY(), paint);
         //交叉中的横线
         if (mPro >= 0.5f)
@@ -104,8 +105,8 @@ public class HKQCircleToClearLineController extends JJBaseController {
 
     private void drawNormalView(Paint paint, Canvas canvas) {
         cr = getWidth() / 30;
-        cx = getWidth() / 2;
-        cy = getHeight() / 2;
+        cx = getWidth() / widthRatio;//居中
+        cy = getHeight() / 2;//居中
         mRectF.left = cx - cr;
         mRectF.right = cx + cr;
         mRectF.top = cy - cr;
@@ -135,7 +136,7 @@ public class HKQCircleToClearLineController extends JJBaseController {
         if (mState == STATE_ANIM_START) return;
         mState = STATE_ANIM_START;
         startSearchViewAnim();
-        tran = getWidth() / 2 - mRectF.width() * 2;
+        tran = getWidth() / widthRatio * (widthRatio - 1) - mRectF.width() * 2;
     }
 
     @Override

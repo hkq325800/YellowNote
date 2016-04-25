@@ -38,8 +38,9 @@ public class PrimaryData {
     public static PrimaryData getInstance() {
         if (data == null)
             synchronized (PrimaryData.class) {
-                if (data == null)
+                if (data == null) {
                     data = new PrimaryData();
+                }
             }
         return data;
     }
@@ -49,20 +50,15 @@ public class PrimaryData {
      */
     private void initData() {
         Trace.d("loadPrimaryData");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getNotesFromCloud();//initData
-                getFolderFromCloud();
-            }
-        }).start();
+        getNotesFromCloud();//initData
+        getFolderFromCloud();
         mHandler.post(runnableForSimple);
     }
 
     /**
      * 从本地的数据中加载Simple
      */
-    public void getSimpleEntityFromList(){
+    public void getSimpleEntityFromList() {
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
@@ -76,7 +72,7 @@ public class PrimaryData {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-            if (status.isNoteReady&&status.isFolderReady) {
+            if (status.isNoteReady && status.isFolderReady) {
                 getHeadersReady();//runnableForSimple
                 getItemsReady();//runnableForSimple
                 if (outHandler != null) {
@@ -102,14 +98,14 @@ public class PrimaryData {
         Trace.d("isItemReady", "true");
     }
 
-    public void getHeadersReady(){
+    public void getHeadersReady() {
         int sum = 0;
         for (int i = 0; i < listFolder.size(); i++) {
             mItems.add(new SimpleEntity(i, i + sum
-                    , getFolderAt(i).getName()
-                    , getFolderAt(i).getContain()
-                    , getFolderAt(i).getObjectId()));
-            sum += getFolderAt(i).getContain();
+                    , listFolder.get(i).getName()
+                    , listFolder.get(i).getContain()
+                    , listFolder.get(i).getObjectId()));
+            sum += listFolder.get(i).getContain();
         }
         status.isHeaderReady = true;
         Trace.d("isHeaderReady", "true");
@@ -253,13 +249,8 @@ public class PrimaryData {
         status.isNoteReady = false;
         status.isFolderReady = false;
         Trace.d("refreshPrimaryData");
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                getNotesFromCloud();
-                getFolderFromCloud();
-            }
-        }).start();
+        getNotesFromCloud();
+        getFolderFromCloud();
         mItems.clear();
         mHandler.post(runnableForSimple);
     }

@@ -106,12 +106,14 @@ public class FolderFragment extends BaseFragment {
                         return R.layout.item_folder_item;
                     else return 0;
                 }
-            }, helper);
+            });
             folderAdapter.setOnHeaderClickListener(new FolderShrinkAdapter.OnHeaderClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewType) {
                     if (viewType == SimpleEntity.typeFolder) {
                         folderAdapter.openFolder(position);
+                    } else if (viewType == SimpleEntity.typeNote) {
+                        //TODO 菜单
                     }
                 }
 
@@ -119,9 +121,9 @@ public class FolderFragment extends BaseFragment {
                 public void onItemLongClick(View v, final int position, int viewType) {
                     //reTitle+delete TODO 做成右键菜单的模式
                     if (viewType == SimpleEntity.typeFolder) {
-                        MainActivity mainActivity = (MainActivity) getActivity();
-                        mainActivity.hideBtnAdd();
                         if (!primaryData.getFolderAt(position).getName().equals("默认")) {
+                            MainActivity mainActivity = (MainActivity) getActivity();
+                            mainActivity.hideBtnAdd();
                             reTitleDialogShow(position);
                         } else {
                             Trace.show(getActivity(), "默认笔记夹不许更名");
@@ -152,7 +154,7 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
-    //重新获取mHeaders listNote和mItems
+    //重新获取mHeaders listNote和mItems isChanged4folder
     public void dataRefresh() {
         //防止重复刷新
         if (hasRefresh) {
@@ -162,7 +164,7 @@ public class FolderFragment extends BaseFragment {
                     getDataHelper.handleCode);
         } else {
             getDataHelper.refresh();//MainActivity dataGot
-            primaryData.refresh(handler, getDataHelper.handleCode);
+            primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
         }
     }
 
@@ -346,15 +348,35 @@ public class FolderFragment extends BaseFragment {
         final AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
                 .setTitle("新增笔记夹")
                 .setView(view).create();
+        mEditEdt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // et.getCompoundDrawables()得到一个长度为4的数组，分别表示左右上下四张图片
+                Drawable drawable = mEditEdt.getCompoundDrawables()[2];
+                //如果右边没有图片，不再处理
+                if (drawable == null)
+                    return false;
+                //如果不是按下事件，不再处理
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                    return false;
+                if (event.getX() > mEditEdt.getWidth()
+                        - mEditEdt.getPaddingRight()
+                        - drawable.getIntrinsicWidth()) {
+                    mEditEdt.setText("");
+                }
+                return false;
+            }
+        });
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String newFolderName = mEditEdt.getText().toString();
-                mEditEdt.setEnabled(false);
+//                mEditEdt.setEnabled(false);
                 if (!newFolderName.equals("")) {
                     if (primaryData.isFolderNameContain(newFolderName)) {
-                        Trace.show(getActivity(), "该笔记夹名称已存在");
-                        mEditEdt.setEnabled(true);
+//                        Trace.show(getActivity(), "该笔记夹名称已存在");
+//                        mEditEdt.setEnabled(true);
+                        mEditEdt.setError("该笔记夹名称已存在");
                     } else {
                         new Thread(new Runnable() {
                             @Override
@@ -376,11 +398,11 @@ public class FolderFragment extends BaseFragment {
                             }
                         }).start();
                         alertDialog.dismiss();
-                        mEditEdt.setEnabled(true);
+//                        mEditEdt.setEnabled(true);
                     }
                 } else {
                     Trace.show(getActivity(), "笔记夹名不能为空");
-                    mEditEdt.setEnabled(true);
+//                    mEditEdt.setEnabled(true);
                 }
             }
         });

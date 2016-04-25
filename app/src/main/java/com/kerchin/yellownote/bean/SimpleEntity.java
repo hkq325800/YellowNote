@@ -14,7 +14,7 @@ public class SimpleEntity {
     private int folderPosition = 0;
     private int headerBefore;//可能和folderPosition职能重复
     private boolean isShown;//是否应当显示 解决动画的显示与否
-    private boolean hasShownAnim;//是否已通过动画 解决动画的重复
+    private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复
     public byte entityType;
     public final static byte typeFolder = 0;
     public final static byte typeNote = 1;

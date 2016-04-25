@@ -140,7 +140,6 @@ public class MainActivity extends BaseActivity
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
                         Trace.d("isChanged4folder");
-//                        MyApplication.isItemsReadyToGo = true;
                         folderFragment.dataRefresh();
                         FolderFragment.isChanged4folder = false;
                     }

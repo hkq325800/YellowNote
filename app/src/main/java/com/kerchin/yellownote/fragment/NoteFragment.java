@@ -566,7 +566,7 @@ public class NoteFragment extends BaseFragment
                 } else {
                     getDataHelper.refresh();//MainActivity dataGot
                     //重新获取mHeaders listNote和mItems
-                    primaryData.refresh(handler, noteAdapter == null
+                    primaryData.refresh(handler, noteAdapter == null//emptyClick
                             ? GetDataHelper.handle4firstGet
                             : GetDataHelper.handle4refresh);
                 }
@@ -584,9 +584,9 @@ public class NoteFragment extends BaseFragment
             public void run() {
                 getDataHelper.refresh();//MainActivity dataGot
                 //重新获取mHeaders listNote和mItems
-                primaryData.refresh(handler, GetDataHelper.handle4refresh);
+                primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
                 isChanged4note = false;
-                FolderFragment.hasRefresh = true;
+                FolderFragment.hasRefresh = true;//onRefresh
                 FolderFragment.isChanged4folder = true;//onRefresh
             }
         });

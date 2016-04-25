@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.activity;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,11 +20,13 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
@@ -32,6 +35,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
@@ -224,18 +228,9 @@ public class EditActivity extends BaseHasSwipeActivity {
             isNew = false;
             mNote = primaryData.getNote(noteId);
         }
-        int size = primaryData.listFolder.size();
-        mFolder = new String[size - 1];
-        mFolderId = new String[size - 1];
+        mFolder = new String[primaryData.listFolder.size() - 1];
+        mFolderId = new String[primaryData.listFolder.size() - 1];
         thisFolder = primaryData.getFolder(mNote.getFolderId());
-        int sum = 0;
-        for (int i = 0; i < size; i++) {
-            if (!primaryData.getFolderAt(i).getObjectId().equals(mNote.getFolderId())) {
-                mFolder[sum] = primaryData.getFolderAt(i).getName();
-                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
-                sum++;
-            }
-        }
 //        mNavigationPager.setVisibility(View.GONE);
         mNavigationTitleLinear.setVisibility(View.VISIBLE);
         mNavigationRightBtn.setVisibility(View.VISIBLE);
@@ -263,30 +258,6 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mEditFuncViP.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//                Trace.d(TAG, "-------scrolled position:" + position);
-//                Trace.d(TAG, "-------scrolled positionOffset:" + positionOffset);
-//                Trace.d(TAG, "-------scrolled positionOffsetPixels:" + positionOffsetPixels);
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-//                Trace.d(TAG, "------selected:" + position);
-                if (position == 1) {
-                    mEditCircleSearch.startSearch();
-                } else {
-                    mEditCircleSearch.setEditEmpty();
-                    mEditCircleSearch.resetSearch();
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-//                Trace.d(TAG, "--------changed:" + state);
-            }
-        });
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,6 +268,26 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onClick(View v) {
                 noteDelete();
+            }
+        });
+        mEditFuncViP.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+//                Trace.d(TAG, "------selected:" + position);
+//                if (position == 1) {
+//                    mEditCircleSearch.startSearch();
+//                } else {
+//                    mEditCircleSearch.setEditEmpty();
+//                    mEditCircleSearch.resetSearch();
+//                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
             }
         });
         mEditCircleSearch.setEditTextWatcher(new TextWatcher() {
@@ -324,6 +315,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void upClick() {
                 String str = mEditContentEdt.getText().toString();
+                Trace.d(""+mEditContentEdt.isFocused());
                 if (thisIndex >= 3) {
                     thisIndex--;
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
@@ -347,6 +339,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void downClick() {
                 String str = mEditContentEdt.getText().toString();
+                Trace.d(""+mEditContentEdt.isFocused());
                 if (thisIndex != -1) {
                     if (thisIndex < searchResult.size() - 1) {
                         thisIndex++;
@@ -372,6 +365,8 @@ public class EditActivity extends BaseHasSwipeActivity {
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
             public void onValueChange(View view, int value) {
+                if(isSearching)
+                    mEditCircleSearch.clearEditText();
                 if (value == 0 || value < lastStepperValue) {//撤销
                     if (index >= 2) {//相当于enable false
                         //右侧置白 左侧置灰 撤销到头
@@ -559,17 +554,29 @@ public class EditActivity extends BaseHasSwipeActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             //TODO 新建笔记夹
-                            Trace.show(EditActivity.this, "确认");
+                            addClick();
+//                            Trace.show(EditActivity.this, "确认");
                         }
                     }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    Trace.show(EditActivity.this, "算了吧");
+//                    Trace.show(EditActivity.this, "算了吧");
                 }
             });
             builder.create().show();
         } else {
             builder.setTitle("选择移至笔记夹");
+            int sum = 0;
+            int size = primaryData.listFolder.size();
+            mFolder = new String[size - 1];
+            mFolderId = new String[size - 1];
+            for (int i = 0; i < size; i++) {
+                if (!primaryData.getFolderAt(i).getObjectId().equals(mNote.getFolderId())) {
+                    mFolder[sum] = primaryData.getFolderAt(i).getName();
+                    mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
+                    sum++;
+                }
+            }
             // 设置一个下拉的列表选择项
             builder.setItems(mFolder, new DialogInterface.OnClickListener() {
                 @Override
@@ -577,28 +584,90 @@ public class EditActivity extends BaseHasSwipeActivity {
                     isFolderChanged = true;
                     Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
                     //Folder newOne = null;
-                    final String oldName = thisFolder.getName();
-                    final String oldId = thisFolder.getObjectId();
-                    final String newName = mFolder[which];
-                    final String newId = mFolderId[which];
+//                    final String oldName = thisFolder.getName();
+//                    final String oldId = thisFolder.getObjectId();
+//                    final String newName = mFolder[which];
+//                    final String newId = mFolderId[which];
                     //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
                     thisFolder = primaryData.getFolder(mFolderId[which]);
                     //将现在的夹名添加到列表中供用户选择
-                    for (int i = 0; i < mFolderId.length; i++) {
-                        if (mFolderId[i].equals(newId)) {
-                            mFolder[i] = oldName;
-                            mFolderId[i] = oldId;
-                            break;
-                        }
-                    }
+//                    for (int i = 0; i < mFolderId.length; i++) {
+//                        if (mFolderId[i].equals(newId)) {
+//                            mFolder[i] = oldName;
+//                            mFolderId[i] = oldId;
+//                            break;
+//                        }
+//                    }
                     if (isNew) {//新的笔记先设置已有的笔记在保存时设置
-                        mNote.setFolder(newName);
+                        mNote.setFolder(mFolder[which]);
                         mNote.setFolderId(thisFolder.getObjectId());
                     }
                 }
             });
             builder.show();
         }
+    }
+
+    public void addClick() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
+        final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
+        final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
+        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("新增笔记夹")
+                .setView(view).create();
+        mConfirmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String newFolderName = mEditEdt.getText().toString();
+                mEditEdt.setEnabled(false);
+                if (!newFolderName.equals("")) {
+                    if (primaryData.isFolderNameContain(newFolderName)) {
+                        Trace.show(EditActivity.this, "该笔记夹名称已存在");
+                        mEditEdt.setEnabled(true);
+                    } else {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
+                                    Trace.d("saveNewFolder", "成功");
+                                    Folder newFolder = new Folder(objectId, newFolderName, 0);
+                                    primaryData.listFolder.add(
+                                            newFolder);
+                                    //添加进
+                                    mFolder = new String[primaryData.listFolder.size() - 1];
+                                    thisFolder = newFolder;
+                                    isFolderChanged = true;
+                                    Trace.show(EditActivity.this, "选择的笔记夹为：" + newFolderName);
+                                    if (isNew) {//新的笔记先设置已有的笔记在保存时设置
+                                        mNote.setFolder(newFolderName);
+                                        mNote.setFolderId(thisFolder.getObjectId());
+                                    }
+                                } catch (AVException e) {
+                                    Trace.show(EditActivity.this, "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                    e.printStackTrace();
+                                }
+                            }
+                        }).start();
+                        alertDialog.dismiss();
+                        mEditEdt.setEnabled(true);
+                    }
+                } else {
+                    Trace.show(EditActivity.this, "笔记夹名不能为空");
+                    mEditEdt.setEnabled(true);
+                }
+            }
+        });
+        mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {//SOFT_INPUT_STATE_ALWAYS_VISIBLE
+                    alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+        alertDialog.show();
     }
 
     public void noteDelete() {

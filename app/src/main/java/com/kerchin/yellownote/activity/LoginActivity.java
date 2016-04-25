@@ -422,7 +422,7 @@ public class LoginActivity extends LoginAbstract {
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
-                                            goToMain();
+                                            goToMain();//正常登陆
                                         }
                                     } else {
                                         //密码错误重新登录
@@ -472,7 +472,7 @@ public class LoginActivity extends LoginAbstract {
                         LoginService.userSignUp(txtUser, txtPass, MyApplication.userDefaultFolderId);
                         Trace.d("signUpVerify 用户注册完成");
                         Trace.show(LoginActivity.this, txtUser + "注册成功");
-                        goToMain();
+                        goToMain();//注册登录
                     }
                 } catch (AVException e) {
                     Trace.e("提交注册失败" + Trace.getErrorMsg(e));
@@ -494,7 +494,7 @@ public class LoginActivity extends LoginAbstract {
                 try {
                     LoginService.forgetVerify(txtUser, txtPass);
                     Trace.show(LoginActivity.this, "修改成功");
-                    goToMain();
+                    goToMain();//找回密码登录
                 } catch (AVException e) {
                     Trace.e("忘记密码操作失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -557,9 +557,14 @@ public class LoginActivity extends LoginAbstract {
     //缓存登录状态跳转主页面
     @Override
     protected void goToMain() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                PrimaryData.getInstance();
+            }
+        });
         //存入shared
         MyApplication.setUser(mLoginUserEdt.getText().toString());
-        PrimaryData.getInstance();
         SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
         editor.putString(Config.KEY_User, mLoginUserEdt.getText().toString());
         editor.putBoolean(Config.KEY_ISLOGIN, true);

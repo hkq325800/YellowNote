@@ -9,6 +9,7 @@ import android.view.View;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleEntity;
+import com.kerchin.yellownote.utilities.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;
 import org.byteam.superadapter.SuperAdapter;
@@ -25,25 +26,19 @@ import java.util.List;
  */
 public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     public static int animDuration = 450;
-    private LayoutInflater mInflater;
-    private ItemTouchHelper mItemTouchHelper;
     private Context context;
     private final float childHeight;
-    //    private List<SimpleEntity> mFolders;//initData
-    //    private List<SimpleEntity> mNotes;//initData
     private List<SimpleEntity> mItems;
     // header点击事件
     private OnHeaderClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
-    private int shownFolderPosition = 0;
+    public int shownFolderPosition = 0;//当前显示着的folder位置
     private int lastFolderPosition = 0;//记录上一次展现的folder的位置 用于关闭动画
     boolean isFirst = true;//防止第一次的动画
 
     public FolderShrinkAdapter(Context context, List<SimpleEntity> items, IMulItemViewType<SimpleEntity> mulItemViewType
-            , ItemTouchHelper helper) {
+            ) {
         super(context, items, mulItemViewType);
-        this.mInflater = LayoutInflater.from(context);
-        this.mItemTouchHelper = helper;
         this.context = context;
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
         this.mItems = items;
@@ -55,15 +50,12 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     private void initData(boolean isFirst) {
         //TODO 放到PrimaryData中
         List<SimpleEntity> mNotes = new ArrayList<>();
-//        List<SimpleEntity> mFolders = new ArrayList<>();
         if (isFirst)
             shownFolderPosition = 0;
         //mItem复刻
         for (int i = 0; i < mItems.size(); i++) {
             if (mItems.get(i).entityType == SimpleEntity.typeNote)
                 mNotes.add(mItems.get(i));
-//            else if (mItems.get(i).entityType == SimpleEntity.typeFolder)
-//                mFolders.add(mItems.get(i));
         }
         //设置ID和HeaderBefore
         for (int i = 0; i < mItems.size(); i++) {
@@ -85,6 +77,8 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
                             }
                     }
                 }
+            else if(mItems.get(i).getFolderPosition() == shownFolderPosition)
+                mItems.get(i).setIsShown(true);
         }
 
         //重排mNotes 非必须
@@ -100,9 +94,8 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     }
 
     public void setFolders(List<SimpleEntity> items) {
+        //shownFolderPosition会跟着改变切不确定会变成什么样故无法判断
         this.mItems = items;
-//        this.mFolders = mFolders;
-//        this.mNotes = mNotes;
         initData(false);
         notifyDataSetChanged();
     }
@@ -162,7 +155,6 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
                 }
             });
         } else if (viewType==SimpleEntity.typeNote) {
-//            ItemViewHolder mHolder = (ItemViewHolder) holder;
             holder.setText(R.id.mFolderItemTxt, item.getName());
             //应当为isShown的状态 目前是mHolder.isShown的状态
             if (!item.isShown()) {
@@ -249,7 +241,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
                 shownFolderPosition = -1;
                 notifyDataSetChanged();
             }
-            int duration = position != shownFolderPosition ? animDuration + 50 : animDuration + 150;
+            int duration = animDuration + 150;
             new CountDownTimer(duration, duration) {
                 @Override
                 public void onTick(long millisUntilFinished) {

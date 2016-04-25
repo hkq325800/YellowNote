@@ -18,9 +18,10 @@ import com.kerchin.yellownote.R;
 
 public class CircleSearchView extends RelativeLayout {
     private JJSearchView mSearchView;
-    private EditText mEditText;
+    private EditText mSearchViewEdt;
     private TextView mSearchViewWeGotTxt;
     private ImageView mSearchViewDownImg, mSearchViewUpImg;
+    private RelativeLayout mSearchViewReL;
     private UpAndDownListener listener;
     private SearchClickListener searchListener;
 
@@ -48,7 +49,7 @@ public class CircleSearchView extends RelativeLayout {
     }
 
     public void setEditTextWatcher(TextWatcher textWatcher) {
-        mEditText.addTextChangedListener(textWatcher);
+        mSearchViewEdt.addTextChangedListener(textWatcher);
     }
 
     public void setUpAndDownClick(UpAndDownListener listener) {
@@ -58,15 +59,20 @@ public class CircleSearchView extends RelativeLayout {
     public void setSearchClick(SearchClickListener listener) {
         searchListener = listener;
     }
+    
+    public void clearEditText(){
+        mSearchViewEdt.setText("");
+    }
 
     private void initLayout(Context context) {
         LayoutInflater.from(context).inflate(R.layout.widget_circle_search, this);
+        mSearchViewReL = (RelativeLayout) findViewById(R.id.mSearchViewReL);
         mSearchViewWeGotTxt = (TextView) findViewById(R.id.mSearchViewWeGotTxt);
         mSearchViewDownImg = (ImageView) findViewById(R.id.mSearchViewDownImg);
         mSearchViewUpImg = (ImageView) findViewById(R.id.mSearchViewUpImg);
         mSearchView = (JJSearchView) findViewById(R.id.mSearchView);
         mSearchView.setController(new HKQCircleToClearLineController());
-        mEditText = (EditText) findViewById(R.id.mSearchViewEdt);
+        mSearchViewEdt = (EditText) findViewById(R.id.mSearchViewEdt);
         mSearchViewUpImg.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,19 +88,21 @@ public class CircleSearchView extends RelativeLayout {
         mSearchView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-//                if (mSearchView.getState() == JJBaseController.STATE_ANIM_NONE
-//                        || mSearchView.getState() == JJBaseController.STATE_ANIM_STOP) {
-//                    mSearchView.startAnim();
-//                    mEditText.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mEditText.setVisibility(View.VISIBLE);
-//                        }
-//                    }, 600);
-//                    mEditText.bringToFront();
-                /*} else */
-                if (mSearchView.getState() == JJBaseController.STATE_ANIM_START) {
-                    searchListener.searchClick(mEditText, mEditText.getText().toString());
+                if (mSearchView.getState() == JJBaseController.STATE_ANIM_NONE
+                        || mSearchView.getState() == JJBaseController.STATE_ANIM_STOP) {
+                    mSearchView.startAnim();
+//                    mSearchViewReL.setAlpha(0);
+//                    mSearchViewReL.setVisibility(VISIBLE);
+//                    mSearchViewReL.animate().alpha(1).setDuration(1200).start();
+                    mSearchViewEdt.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSearchViewEdt.setVisibility(View.VISIBLE);
+                        }
+                    }, 600);
+                    mSearchViewEdt.bringToFront();
+                } else if (mSearchView.getState() == JJBaseController.STATE_ANIM_START) {
+                    searchListener.searchClick(mSearchViewEdt, mSearchViewEdt.getText().toString());
                 }
             }
         });
@@ -110,7 +118,7 @@ public class CircleSearchView extends RelativeLayout {
     }
 
     public void setEditEmpty() {
-        mEditText.setText("");
+        mSearchViewEdt.setText("");
     }
 
     public void setUpEnable(boolean isEnable) {
@@ -126,12 +134,12 @@ public class CircleSearchView extends RelativeLayout {
         if (mSearchView.getState() == JJBaseController.STATE_ANIM_NONE
                 || mSearchView.getState() == JJBaseController.STATE_ANIM_STOP) {
             mSearchView.startAnim();
-            mEditText.postDelayed(new Runnable() {
+            mSearchViewEdt.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mEditText.setVisibility(View.VISIBLE);
-                    mEditText.bringToFront();
-                    mEditText.requestFocusFromTouch();
+                    mSearchViewEdt.setVisibility(View.VISIBLE);
+                    mSearchViewEdt.bringToFront();
+                    mSearchViewEdt.requestFocusFromTouch();
                 }
             }, 600);//60s为动画持续的时间
         }
@@ -140,6 +148,6 @@ public class CircleSearchView extends RelativeLayout {
     //滑动过时调用
     public void resetSearch() {
         mSearchView.resetAnim();
-        mEditText.setVisibility(View.INVISIBLE);
+        mSearchViewEdt.setVisibility(View.INVISIBLE);
     }
 }

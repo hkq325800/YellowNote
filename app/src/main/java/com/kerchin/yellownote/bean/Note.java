@@ -187,8 +187,8 @@ public class Note implements Serializable {
             public void run() {
                 //num-1
                 try {
-                    Trace.d(title + "num-1 成功");
                     FolderService.dec(folderId, 1);
+                    Trace.d(title + "num-1 成功");
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
