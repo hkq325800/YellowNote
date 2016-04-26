@@ -112,7 +112,7 @@ public class MainActivity extends BaseActivity
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
                 if (position == 0) {
                     //delete初始化
-                    noteFragment.onResume();//数据按需刷新
+                    noteFragment.respondForChange();//数据按需刷新
                     btnSort.setVisible(true);
                     btnDelete.setVisible(true);
                     btnSearch.setVisible(true);

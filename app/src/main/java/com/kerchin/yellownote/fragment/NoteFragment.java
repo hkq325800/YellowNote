@@ -54,22 +54,22 @@ public class NoteFragment extends BaseFragment
         , View.OnCreateContextMenuListener, PopupMenu.OnMenuItemClickListener {
     @Bind(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
-    @Bind(R.id.mNoteEmptyTxt)
-    TextView mNoteEmptyTxt;
-    @Bind(R.id.mNoteProgress)
-    ProgressBar mNoteProgress;
+//    @Bind(R.id.mNoteEmptyTxt)
+//    TextView mNoteEmptyTxt;
+//    @Bind(R.id.mNoteProgress)
+//    ProgressBar mNoteProgress;
     @Bind(R.id.mProgress)
     ProgressLayout mProgress;
     public static boolean isChanged4note = false;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private NoteShrinkAdapter noteAdapter;
-    private List<Note> list;
+    private List<Note> list;//维护list 因为有搜索需要
     private ToolbarStatus mainStatus;
-    private String mSearchText;
+    private String mSearchText;//方便在搜索列表更改后重新搜索
     private PrimaryData primaryData;
-    private int emptyClickCount = 0;
-    private int lastVisibleItemPosition;
+    private int emptyClickCount = 0;//控制空白点击次数 三次则重新网络获取
+    private int lastVisibleItemPosition;//用于显示隐藏浮动按钮
     //    private int skip = 0;
 //    private final static int sortByName = 0;
     private final static int sortByDateDesc = 1;
@@ -83,14 +83,20 @@ public class NoteFragment extends BaseFragment
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
-            mProgress.dismissProg();
+            mProgress.dismiss();//handlerMessage
 //            hideProgress();
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4zero:
+                    mProgress.showNoData("kongkongruye", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            emptyClick();
+                        }
+                    });//handlerMessage
                     Trace.d("handlerInNote", "handle4zero");
                     mNoteWDList.setVisibility(View.GONE);
-                    mNoteEmptyTxt.setVisibility(View.VISIBLE);
+//                    mNoteEmptyTxt.setVisibility(View.VISIBLE);//TODO mNoteEmptyTxt
                     break;
                 case GetDataHelper.handle4firstGet:
                     Trace.d("handlerInNote", "handle4firstGet");
@@ -104,16 +110,16 @@ public class NoteFragment extends BaseFragment
 //                        noteAdapter.initListDelete();
 //                        noteAdapter.setList(list);
 //                    }
-                    mProgress.showListView(mNoteWDList);
-                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-                    mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+                    mProgress.showListView();//handle4firstGet
+//                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
+//                    mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);//TODO mNoteEmptyTxt
                     break;
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInNote", "handle4refresh");//TODO 可能为空
                     getDataListFromNote(primaryData.listNote);//handle4refresh
                     if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-                        mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);
+//                        mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);//TODO mNoteEmptyTxt
                     }
                     if (noteAdapter != null) {
                         noteAdapter.setList(list);
@@ -122,7 +128,7 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInNote", "handle4respond note:" + list.size());
                     mNoteWDList.setVisibility(View.VISIBLE);
-                    mNoteEmptyTxt.setVisibility(View.GONE);
+//                    mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
 //                    noteAdapter.initListDelete();
                     noteAdapter.setList(list);
                     mNoteWDList.setAdapter(noteAdapter);
@@ -155,20 +161,6 @@ public class NoteFragment extends BaseFragment
     /*data part*/
 
     private void getData(int delay) {
-//        if (primaryData.listNote.size() != 0) {
-//            if (primaryData.listNote.size() == MyApplication.pageLimit) {
-//                mNoteWDList.setPullLoadEnable(true);
-//            } else {
-//                mNoteWDList.setPullLoadEnable(false);
-//            }
-//            MyApplication.isItemsReadyToGo = true;
-//            Trace.d("isItemsReady", "true");
-//        } else {
-//            MyApplication.isItemsReadyToGo = true;
-//            Trace.d("isItemsReady", "true");
-//            mNoteWDList.setPullLoadEnable(false);
-//        }
-        mProgress.startProg();
         Trace.d("getData status", getDataHelper.statusName);
         if (mNoteWDList != null) {
             getDataListFromNote(primaryData.listNote);//getList
@@ -207,9 +199,6 @@ public class NoteFragment extends BaseFragment
                         handler.sendEmptyMessageDelayed(
                                 GetDataHelper.handle4respond, delay);
                     break;
-//                case GetDataHelper.statusReturn:
-//                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4return, delay);
-//                    break;
                 default:
                     break;
             }
@@ -252,7 +241,8 @@ public class NoteFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         getDataHelper.firstGet();//first get
-        getData(1500);//statusFirstGet
+        mProgress.startProgress();//getData
+        getData(0);//statusFirstGet
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -285,11 +275,17 @@ public class NoteFragment extends BaseFragment
             }
         });
         mNoteWDList.setPullLoadEnable(false);
-        mProgress.hideAlphaView(mNoteWDList);
+        mProgress.initListView(mNoteWDList);
+//        mProgress.hideAlphaView(mNoteWDList);
     }
 
     @Override
     public void onResume() {
+        respondForChange();
+        super.onResume();
+    }
+
+    public void respondForChange() {
         if (isChanged4note) {
             //被动刷新
             getDataHelper.respond();//isChanged4note
@@ -298,7 +294,6 @@ public class NoteFragment extends BaseFragment
                 doSearch();
             isChanged4note = false;
         }
-        super.onResume();
     }
 
     /*menu*/
@@ -556,10 +551,10 @@ public class NoteFragment extends BaseFragment
         return true;
     }
 
-    @OnClick(R.id.mNoteEmptyTxt)
+//    @OnClick(R.id.mNoteEmptyTxt)
     public void emptyClick() {
-        mNoteEmptyTxt.setVisibility(View.GONE);
-        mNoteProgress.setVisibility(View.VISIBLE);
+//        mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
+//        mNoteProgress.setVisibility(View.VISIBLE);//TODO mNoteProgress
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -568,6 +563,7 @@ public class NoteFragment extends BaseFragment
                     Trace.d("emptyClickCount" + emptyClickCount);
                     emptyClickCount++;
                     getDataHelper.respond();
+                    mProgress.startProgress();//getData
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;
                 } else {
@@ -630,8 +626,8 @@ public class NoteFragment extends BaseFragment
     }
 
     private void hideProgress() {
-        if (mNoteProgress.getVisibility() == View.VISIBLE) {
-            mNoteProgress.setVisibility(View.GONE);
-        }
+//        if (mNoteProgress.getVisibility() == View.VISIBLE) {
+//            mNoteProgress.setVisibility(View.GONE);
+//        }
     }
 }

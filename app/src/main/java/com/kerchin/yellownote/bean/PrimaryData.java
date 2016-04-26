@@ -318,7 +318,7 @@ public class PrimaryData {
     }
 
     /**
-     * 目标Folder是否在现有列表中
+     * 目标Folder名称是否在现有列表中
      *
      * @param name 目标Folder名称
      * @return isFolderContain

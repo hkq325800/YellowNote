@@ -12,20 +12,20 @@
         android:cacheColorHint="@color/light_purple"
         android:listSelector="@color/light_purple"
         android:dividerHeight="0.6px"/>-->
-    <TextView
+    <!--<TextView
         android:id="@+id/mNoteEmptyTxt"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="现在这里空空如也~"
-        android:visibility="gone" />
+        android:visibility="gone" />-->
 
-    <ProgressBar
+    <!--<ProgressBar
         android:id="@+id/mNoteProgress"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true" />-->
 
     <com.kerchin.yellownote.widget.waterdrop.WaterDropListView
         android:id="@+id/mNoteWDList"

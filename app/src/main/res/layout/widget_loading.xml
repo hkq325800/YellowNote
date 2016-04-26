@@ -13,16 +13,9 @@
             android:id="@+id/mLoadingAnim"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:visibility="gone"
             android:layout_gravity="center" />
     </FrameLayout>
-
-    <ImageView
-        android:id="@+id/mLoadingImg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
-    <!--android:background="@anim/frame_progress"-->
 
     <RelativeLayout
         android:id="@+id/mNodataRL"
@@ -49,7 +42,7 @@
             android:paddingBottom="15dp"
             android:paddingLeft="60dp"
             android:paddingRight="60dp"
-            android:text="nodata"
+            android:text=""
             android:textSize="14sp"
             android:visibility="gone" />
 
