@@ -18,18 +18,17 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.NoteShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.GetDataHelper;
+import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
-import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ProgressLayout;
@@ -44,7 +43,6 @@ import java.util.concurrent.Executors;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
 import tyrantgit.explosionfield.ExplosionField;
@@ -88,7 +86,7 @@ public class NoteFragment extends BaseFragment
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4zero:
-                    mProgress.showNoData("kongkongruye", new View.OnClickListener() {
+                    mProgress.showNoData("未找到用户的笔记数据", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             emptyClick();
@@ -151,6 +149,12 @@ public class NoteFragment extends BaseFragment
                     }
                     primaryData.listNote.remove(note);//从数据源中删除
                     noteAdapter.getListDelete().remove(note);
+                    break;
+                case GetDataHelper.handle4error:
+                    AVException e = (AVException) msg.obj;
+                    if(e.getMessage().contains("UnknownHostException")){
+                        Trace.show(getActivity(), "网络不太通畅 请稍后再试");
+                    }
                     break;
                 default:
                     break;
@@ -567,11 +571,15 @@ public class NoteFragment extends BaseFragment
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;
                 } else {
-                    getDataHelper.refresh();//MainActivity dataGot
-                    //重新获取mHeaders listNote和mItems
-                    primaryData.refresh(handler, noteAdapter == null//emptyClick
-                            ? GetDataHelper.handle4firstGet
-                            : GetDataHelper.handle4refresh);
+                    try {
+                        getDataHelper.refresh();//MainActivity dataGot
+                        //重新获取mHeaders listNote和mItems
+                        primaryData.refresh(handler, noteAdapter == null//emptyClick
+                                ? GetDataHelper.handle4firstGet
+                                : GetDataHelper.handle4refresh);
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }, 600);
@@ -585,12 +593,21 @@ public class NoteFragment extends BaseFragment
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                getDataHelper.refresh();//MainActivity dataGot
-                //重新获取mHeaders listNote和mItems
-                primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
-                isChanged4note = false;
-                FolderFragment.hasRefresh = true;//onRefresh
-                FolderFragment.isChanged4folder = true;//onRefresh
+                try {
+                    getDataHelper.refresh();//MainActivity dataGot
+                    //重新获取mHeaders listNote和mItems
+                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    Message msg = Message.obtain();
+                    msg.obj = e;
+                    msg.what = GetDataHelper.handle4error;
+                    handler.sendMessage(msg);
+                } finally {
+                    isChanged4note = false;
+                    FolderFragment.hasRefresh = true;//onRefresh
+                    FolderFragment.isChanged4folder = true;//onRefresh
+                }
             }
         });
     }
@@ -614,6 +631,7 @@ public class NoteFragment extends BaseFragment
 
     public void stopRefresh() {
         if (getDataHelper.status == GetDataHelper.statusRefresh) {
+            getDataHelper.none();
             Trace.d("emptyClickCount" + emptyClickCount);
             //借emptyClickCount做一个标志
             if (emptyClickCount >= 2) {

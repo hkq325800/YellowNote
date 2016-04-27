@@ -163,8 +163,12 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
         } else {
-            getDataHelper.refresh();//MainActivity dataGot
-            primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
+            try {
+                getDataHelper.refresh();//MainActivity dataGot
+                primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
+            } catch (AVException e) {
+                e.printStackTrace();
+            }
         }
     }
 

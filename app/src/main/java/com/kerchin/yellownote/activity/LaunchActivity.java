@@ -1,9 +1,12 @@
 package com.kerchin.yellownote.activity;
 
-import android.os.*;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.os.Process;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -23,10 +26,14 @@ import com.kerchin.yellownote.utilities.Trace;
 public class LaunchActivity extends BaseActivity {
     private final static int delayTime = 1500;
     private final static int delayTimeToMain = 1200;
+    private final static long runnableTimeout = 8000;
+    private final static long runnablePeriod = 200;
     private static final byte wel = 0;
     private static final byte next = 1;
     private static final byte reLog = 2;
     private static final byte reLogForFrozen = 4;
+    private LinearLayout mLoginRetryLinear;
+    private boolean isNeedToRefresh = false;
     private int repeatCount = 0;
     private long getDataStart;
     private Message cycleTarget;
@@ -41,12 +48,48 @@ public class LaunchActivity extends BaseActivity {
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initializeView(Bundle savedInstanceState) {
+        mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
+//        ButterKnife.bind(this);
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
-//        ButterKnife.bind(this);
+    protected void initializeEvent(Bundle savedInstanceState) {
+        mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isNeedToRefresh) {
+                    isNeedToRefresh = false;
+                    PrimaryData.getInstance().clearData();
+                    initializeData(null);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void initializeData(Bundle savedInstanceState) {
+        //只为有缓存登录的用户初始化数据
+        if (MyApplication.isLogin()) {
+            MyApplication.userDefaultFolderId = MyApplication.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    getDataStart = System.currentTimeMillis();
+                    try {
+                        Looper.prepare();
+                        //一般而言登陆过的用户都有数据本地缓存
+                        PrimaryData.getInstance().initData();
+                        Looper.loop();
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                        isNeedToRefresh = true;
+                        //TODO 在完善了本地存储后可以取消 因为那时必定有数据
+                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                    }
+                }
+            }).start();
+        }
         //TODO guidePage
         if (MyApplication.getDefaultShared().getBoolean("isGuide", false)) {
             loginVerify(MyApplication.user);
@@ -55,15 +98,6 @@ public class LaunchActivity extends BaseActivity {
 //            finish();
         } else {
             loginVerify(MyApplication.user);
-        }
-    }
-
-    @Override
-    protected void initializeData(Bundle savedInstanceState) {
-        //只为有缓存登录的用户初始化数据
-        if (MyApplication.isLogin()) {
-            getDataStart = System.currentTimeMillis();
-            PrimaryData.getInstance();
         }
     }
 
@@ -113,7 +147,6 @@ public class LaunchActivity extends BaseActivity {
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (PrimaryData.status.isFolderReady
-                    && PrimaryData.status.isItemReady
                     && PrimaryData.status.isNoteReady
                     && cycleTarget != null) {
                 Trace.d("runnableForData done");
@@ -122,12 +155,15 @@ public class LaunchActivity extends BaseActivity {
                     handler.sendMessageDelayed(cycleTarget, delayTimeToMain - System.currentTimeMillis() + getDataStart);
                 } else
                     handler.sendMessage(cycleTarget);
-            } else {//若一直未能进入需要处理 TODO
-                Trace.d("folder:" + PrimaryData.status.isFolderReady
-                        + "note:" + PrimaryData.status.isNoteReady
-                        + "items:" + PrimaryData.status.isItemReady);
-                handler.postDelayed(runnableForData, 200);
-                repeatCount++;
+            } else {
+                if (repeatCount * runnablePeriod <= runnableTimeout) {
+                    Trace.d("folder:" + PrimaryData.status.isFolderReady
+                            + "note:" + PrimaryData.status.isNoteReady
+                            + "items:" + PrimaryData.status.isItemReady);
+                    handler.postDelayed(runnableForData, runnablePeriod);
+                    repeatCount++;
+                } else
+                    repeatCount = 0;
             }
         }
     };
@@ -154,10 +190,9 @@ public class LaunchActivity extends BaseActivity {
                             } else {
                                 //保存默认笔记夹id
                                 MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
-                                //缓存正确跳转
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
-                                handler.post(runnableForData);
+                                handler.post(runnableForData);//缓存正确跳转
                             }
                         } else {
                             //缓存错误重新登录
@@ -166,13 +201,14 @@ public class LaunchActivity extends BaseActivity {
                             handler.sendMessageDelayed(message, delayTime);
                         }
                     } catch (AVException e) {
-                        //无网络时如果已经有缓存登录，还是允许进入查看离线消息
                         e.printStackTrace();
-//                        isNeedToRefresh = true;
-                        cycleTarget = Message.obtain();//直接进入
-                        cycleTarget.what = next;
-                        handler.post(runnableForData);
-//                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        //无网络时如果已经有缓存登录，还是允许进入查看离线消息
+                        //TODO 在完善本地化后取消注释
+//                        if (MyApplication.isLogin()) {
+//                            cycleTarget = Message.obtain();//直接进入
+//                            cycleTarget.what = next;
+//                            handler.post(runnableForData);//无网络时
+//                        }
                     }
                 }
             }).start();

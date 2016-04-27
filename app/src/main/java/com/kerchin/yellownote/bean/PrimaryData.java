@@ -32,9 +32,12 @@ public class PrimaryData {
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
-        initData();
+//        initData();//在首次手动调用
     }
 
+    /**
+     * @return PrimaryData
+     */
     public static PrimaryData getInstance() {
         if (data == null)
             synchronized (PrimaryData.class) {
@@ -48,17 +51,31 @@ public class PrimaryData {
     /**
      * 网络获取初始化
      */
-    private void initData() {
+    public void initData() throws AVException {
         Trace.d("loadPrimaryData");
+        //TODO getNote和getFolder在同一个线程下
+        // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
         getNotesFromCloud();//initData
         getFolderFromCloud();
-        mHandler.post(runnableForSimple);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                getHeadersReady();//runnableForSimple
+//                getItemsReady();//runnableForSimple
+//                if (outHandler != null) {
+//                    outHandler.sendEmptyMessage(outHandleCode);
+//                    outHandler = null;
+//                }
+//            }
+//        }).start();
+        mHandler.post(runnableForSimple);//initData
     }
 
     /**
      * 从本地的数据中加载Simple
      */
     public void getSimpleEntityFromList() {
+        Trace.d("getSimpleEntityFromList");
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
@@ -71,14 +88,10 @@ public class PrimaryData {
     private Runnable runnableForSimple = new Runnable() {
         @Override
         public void run() {
+            Trace.d("runnableForSimple");
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             if (status.isNoteReady && status.isFolderReady) {
-                getHeadersReady();//runnableForSimple
-                getItemsReady();//runnableForSimple
-                if (outHandler != null) {
-                    outHandler.sendEmptyMessage(outHandleCode);
-                    outHandler = null;
-                }
+                getSimpleEntityFromList();
             } else {//若一直未能进入需要处理 TODO
                 mHandler.postDelayed(runnableForSimple, 250);
             }
@@ -114,45 +127,41 @@ public class PrimaryData {
     /**
      * 网络获取Folder
      */
-    private void getFolderFromCloud() {
+    private void getFolderFromCloud() throws AVException {
+        final List<AVObject> avObjects = FolderService.getUserFolder(MyApplication.user);
+        Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    List<AVObject> avObjects = FolderService.getUserFolder(MyApplication.user);
-                    Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据");
-                    listFolder.clear();
-                    for (int i = 0; i < avObjects.size(); i++) {//sortByContain
-                        for (int j = i + 1; j < avObjects.size(); j++) {
-                            if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
-                                AVObject temp = avObjects.get(i);
-                                avObjects.set(i, avObjects.get(j));
-                                avObjects.set(j, temp);
-                            }
+                listFolder.clear();
+                for (int i = 0; i < avObjects.size(); i++) {//sortByContain
+                    for (int j = i + 1; j < avObjects.size(); j++) {
+                        if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
+                            AVObject temp = avObjects.get(i);
+                            avObjects.set(i, avObjects.get(j));
+                            avObjects.set(j, temp);
                         }
                     }
-                    for (int i = 0; i < avObjects.size(); i++) {
-                        Folder folder = new Folder(avObjects.get(i).getObjectId()
-                                , avObjects.get(i).getString("folder_name")
-                                , avObjects.get(i).getInt("folder_contain"));
-//                        if (!isFolderContain(folder)) {
-                        listFolder.add(folder);
-//                        }
-                    }
-                    Collections.sort(listFolder, new Comparator<Folder>() {
-                        @Override
-                        public int compare(Folder lhs, Folder rhs) {
-                            if (lhs.getContain() < rhs.getContain())
-                                return 1;
-                            else
-                                return -1;
-                        }
-                    });
-                    Trace.d("isFolderReady", "true");
-                    status.isFolderReady = true;
-                } catch (AVException e) {
-                    e.printStackTrace();
                 }
+                for (int i = 0; i < avObjects.size(); i++) {
+                    Folder folder = new Folder(avObjects.get(i).getObjectId()
+                            , avObjects.get(i).getString("folder_name")
+                            , avObjects.get(i).getInt("folder_contain"));
+//                        if (!isFolderContain(folder)) {
+                    listFolder.add(folder);
+//                        }
+                }
+                Collections.sort(listFolder, new Comparator<Folder>() {
+                    @Override
+                    public int compare(Folder lhs, Folder rhs) {
+                        if (lhs.getContain() < rhs.getContain())
+                            return 1;
+                        else
+                            return -1;
+                    }
+                });
+                Trace.d("isFolderReady", "true");
+                status.isFolderReady = true;
             }
         }).start();
     }
@@ -160,36 +169,35 @@ public class PrimaryData {
     /**
      * 网络获取Note
      */
-    private void getNotesFromCloud() {
+    private void getNotesFromCloud() throws AVException {
+        final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
+        //skip += avObjects.size();
+        Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
-                    //skip += avObjects.size();
-                    Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
-                    listNote.clear();
-                    for (int i = 0; i < avObjects.size(); i++) {
-                        listNote.add(new Note(avObjects.get(i).getObjectId()
-                                , avObjects.get(i).getString("note_title")
-                                , avObjects.get(i).getLong("note_editedAt")
-                                , avObjects.get(i).getString("note_content")
-                                , avObjects.get(i).getString("folder_name")
-                                , avObjects.get(i).getString("folder_id")
-                                , avObjects.get(i).getString("note_type")));
-                    }
-                    status.isNoteReady = true;
-                    Trace.d("isNoteReady", "true");
-                } catch (AVException e) {
-                    e.printStackTrace();
-//                    Trace.show(MyApplication.getContext(), "获取Note失败" + Trace.getErrorMsg(e));
+                listNote.clear();
+                for (int i = 0; i < avObjects.size(); i++) {
+                    listNote.add(new Note(avObjects.get(i).getObjectId()
+                            , avObjects.get(i).getString("note_title")
+                            , avObjects.get(i).getLong("note_editedAt")
+                            , avObjects.get(i).getString("note_content")
+                            , avObjects.get(i).getString("folder_name")
+                            , avObjects.get(i).getString("folder_id")
+                            , avObjects.get(i).getString("note_type")));
                 }
+                status.isNoteReady = true;
+                Trace.d("isNoteReady", "true");
             }
         }).start();
     }
 
-    public static void clearData() {
+    public void clearData() {
         data = null;
+        status = new PrimaryDataStatus();
+        listFolder = new ArrayList<Folder>();
+        listNote = new ArrayList<Note>();
+        mItems = new ArrayList<SimpleEntity>();
     }
 
     /**
@@ -242,7 +250,7 @@ public class PrimaryData {
         return listNote.get(position);
     }
 
-    public void refresh(final Handler handler, final byte handleCode) {
+    public void refresh(final Handler handler, final byte handleCode) throws AVException {
         outHandler = handler;
         outHandleCode = handleCode;
         status.isItemReady = false;
@@ -251,8 +259,18 @@ public class PrimaryData {
         Trace.d("refreshPrimaryData");
         getNotesFromCloud();
         getFolderFromCloud();
-        mItems.clear();
-        mHandler.post(runnableForSimple);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                getHeadersReady();//runnableForSimple
+//                getItemsReady();//runnableForSimple
+//                if (outHandler != null) {
+//                    outHandler.sendEmptyMessage(outHandleCode);
+//                    outHandler = null;
+//                }
+//            }
+//        }).start();
+        mHandler.post(runnableForSimple);//refresh
     }
 
     public void loadMore() {

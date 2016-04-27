@@ -43,7 +43,7 @@ public class MyApplication extends Application {
 //        crashHandler.init(context);
         configCollectCrashInfo();
         shared = new SecurePreferences(context);
-        user = shared.getString(Config.KEY_User, "");
+        user = shared.getString(Config.KEY_USER, "");
         isLogin = shared.getBoolean(Config.KEY_ISLOGIN, false);
         super.onCreate();
     }
@@ -77,7 +77,7 @@ public class MyApplication extends Application {
 
     public static void logout() {
         isLogin = false;
-        PrimaryData.clearData();
+        PrimaryData.getInstance().clearData();
         //清除密码缓存
         SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();
         editor.putBoolean(Config.KEY_ISLOGIN, isLogin);

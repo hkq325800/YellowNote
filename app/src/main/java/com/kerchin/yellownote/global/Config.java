@@ -14,9 +14,10 @@ public class Config {
     /**
      * Settings
      */
-    public static final String KEY_User = "xiaohuangjUser";
+    public static final String KEY_USER = "xiaohuangjUser";
     public static final String KEY_PASS = "xiaohuangjPass";
     public static final String KEY_ISLOGIN = "xiaohuangjIsLogin";
+    public static final String KEY_DEFAULT_FOLDER = "xiaohuangjDefaultFolder";
 //    public static final String KEY_CACHE_User = "cacheUser";
 //    public static final String KEY_CACHE_Pass = "cachePass";
 //    public static final String KEY_CACHE_RePass = "cacheRePass";

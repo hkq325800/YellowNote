@@ -3,6 +3,7 @@ package com.kerchin.yellownote.activity;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.view.KeyEvent;
@@ -18,10 +19,10 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
@@ -57,6 +58,8 @@ public class LoginActivity extends LoginAbstract {
     RelativeLayout mSignUpRelative;
     @Bind(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
+    private final static long runnableTimeout = 8000;
+    private final static long runnablePeriod = 200;
     private final static byte statusInit = -1;//未查询或查询中
     private final static byte statusFalse = 0;//查询结果为假
     private final static byte statusTrue = 1;//查询结果为真
@@ -65,7 +68,6 @@ public class LoginActivity extends LoginAbstract {
     private boolean smsStatus = false;
     private byte registerStatus = -1;
     private int repeatCount = 0;
-    private String objectId;
     private Handler handler = new Handler();
 
     @Override
@@ -151,7 +153,7 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @OnClick(R.id.mLoginBtn)
-    public void loginClick(){
+    public void loginClick() {
         //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
             mSignUpRelative.setVisibility(View.GONE);
@@ -180,7 +182,7 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @OnClick(R.id.mLoginSignUpBtn)
-    public void signUpClick(){
+    public void signUpClick() {
         if (mLoginSignUpBtn.getText().toString().equals("注册")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("忘记密码");
@@ -227,7 +229,7 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @OnClick(R.id.mLoginForgetBtn)
-    public void forgetSecretClick(){
+    public void forgetSecretClick() {
         if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("找回密码");
@@ -293,7 +295,7 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @OnClick(R.id.mLoginSendProvBtn)
-    public void sendProvClick(){
+    public void sendProvClick() {
         String txtForget = mLoginForgetBtn.getText().toString();
         final String txtUser = mLoginUserEdt.getText().toString();
         if (txtUser.equals("") || txtUser.length() != 11) {
@@ -516,7 +518,6 @@ public class LoginActivity extends LoginAbstract {
                     boolean flag = LoginService.isRegistered(txtUser);
                     if (flag) {
                         Trace.d("验证是否已经注册 查询到" + txtUser + "已注册");
-//                        objectId = a.getObjectId();
                         registerStatus = statusTrue;
                     } else
                         registerStatus = statusFalse;
@@ -554,23 +555,30 @@ public class LoginActivity extends LoginAbstract {
         }
     }
 
-    //缓存登录状态跳转主页面
+    //通过正常登陆、注册、找回密码登录 缓存状态并跳转主页面
     @Override
     protected void goToMain() {
-        runOnUiThread(new Runnable() {
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                PrimaryData.getInstance();
+                try {
+                    Looper.prepare();
+                    PrimaryData.getInstance().initData();
+                    Looper.loop();
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
             }
-        });
+        }).start();
         //存入shared
         MyApplication.setUser(mLoginUserEdt.getText().toString());
         SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
-        editor.putString(Config.KEY_User, mLoginUserEdt.getText().toString());
+        editor.putString(Config.KEY_USER, mLoginUserEdt.getText().toString());
+        editor.putString(Config.KEY_DEFAULT_FOLDER, MyApplication.userDefaultFolderId);
         editor.putBoolean(Config.KEY_ISLOGIN, true);
         editor.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString());
         editor.apply();
-        handler.post(runnableForData);
+        handler.post(runnableForData);//goToMain
     }
 
     private Runnable runnableForData = new Runnable() {
@@ -582,12 +590,15 @@ public class LoginActivity extends LoginAbstract {
                 Trace.d("runnableForData done");
                 NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
-            } else {//若一直未能进入需要处理 TODO
-                Trace.d("folder:" + PrimaryData.status.isFolderReady
-                        + "note:" + PrimaryData.status.isNoteReady
-                        + "items:" + PrimaryData.status.isItemReady);
-                handler.postDelayed(runnableForData, 200);
-                repeatCount++;
+            } else {
+                if (repeatCount * runnablePeriod <= runnableTimeout) {
+                    Trace.d("folder:" + PrimaryData.status.isFolderReady
+                            + "note:" + PrimaryData.status.isNoteReady
+                            + "items:" + PrimaryData.status.isItemReady);
+                    handler.postDelayed(runnableForData, runnablePeriod);
+                    repeatCount++;
+                } else
+                    repeatCount = 0;
             }
         }
     };

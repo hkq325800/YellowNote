@@ -102,7 +102,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
                                 SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
                                 //存入shared
                                 SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
-                                editor.putString(Config.KEY_User, MyApplication.user);
+                                editor.putString(Config.KEY_USER, MyApplication.user);
                                 editor.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString());
                                 editor.apply();
                                 //密码正确进行修改
