@@ -2,6 +2,7 @@ package com.kerchin.yellownote.fragment;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
@@ -11,7 +12,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -32,7 +32,6 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.helper.ItemDrag.ItemDragHelperCallback;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -83,8 +82,8 @@ public class FolderFragment extends BaseFragment {
 
     private void setRecycleView() {
         if (folderAdapter == null) {
-            ItemDragHelperCallback callback = new ItemDragHelperCallback();
-            final ItemTouchHelper helper = new ItemTouchHelper(callback);
+//            ItemDragHelperCallback callback = new ItemDragHelperCallback();
+//            final ItemTouchHelper helper = new ItemTouchHelper(callback);
             GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
             folderAdapter = new FolderShrinkAdapter(getActivity()
                     , primaryData.mItems, new IMulItemViewType<SimpleEntity>() {
@@ -109,27 +108,55 @@ public class FolderFragment extends BaseFragment {
             });
             folderAdapter.setOnHeaderClickListener(new FolderShrinkAdapter.OnHeaderClickListener() {
                 @Override
-                public void onItemClick(View v, int position, int viewType) {
+                public void onItemClick(View v, int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
                         folderAdapter.openFolder(position);
                     } else if (viewType == SimpleEntity.typeNote) {
-                        //TODO 菜单
+                        Trace.d("position:" + position
+                                + "list:" + primaryData.mItems.get(position).getName()
+                                + "adapter:" + item.getName());
+
                     }
                 }
 
                 @Override
-                public void onItemLongClick(View v, final int position, int viewType) {
-                    //reTitle+delete TODO 做成右键菜单的模式
+                public void onItemLongClick(View v, final int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
-                        if (!primaryData.getFolderAt(position).getName().equals("默认")) {
-                            MainActivity mainActivity = (MainActivity) getActivity();
-                            mainActivity.hideBtnAdd();
-                            reTitleDialogShow(position);
-                        } else {
-                            Trace.show(getActivity(), "默认笔记夹不许更名");
-                        }
+                        dialogMaker(getActivity(), "笔记夹操作", new String[]{"删除", "重命名"}
+                                , new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0://TODO delete 确认要删除笔记夹xxx
+                                        break;
+                                    case 1://rename
+                                        if (!primaryData.getFolderAt(position).getName().equals("默认")) {
+                                            MainActivity mainActivity = (MainActivity) getActivity();
+                                            mainActivity.hideBtnAdd();
+                                            reTitleDialogShow(position);
+                                        } else {
+                                            Trace.show(getActivity(), "默认笔记夹不许更名");
+                                        }
+                                        break;
+                                }
+                            }
+                        });
                     } else if (viewType == SimpleEntity.typeNote) {
-
+                        dialogMaker(getActivity(), "笔记操作", new String[]{"移动", "删除", "重命名"}
+                                , new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                switch (which) {
+                                    case 0://TODO move
+                                        noteMove(item);
+                                        break;
+                                    case 1://TODO delete 确认要删除笔记xxx
+                                        break;
+                                    case 2://TODO rename
+                                        break;
+                                }
+                            }
+                        });
                     }
                 }
             });
@@ -141,7 +168,7 @@ public class FolderFragment extends BaseFragment {
                 }
             });
             mRecyclerView.setLayoutManager(manager);
-            helper.attachToRecyclerView(mRecyclerView);
+//            helper.attachToRecyclerView(mRecyclerView);
             mRecyclerView.setAdapter(folderAdapter);
         } else {
             folderAdapter.setFolders(primaryData.mItems);
@@ -154,6 +181,35 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
+    private void dialogMaker(Context context, String title, CharSequence[] items
+            , final DialogInterface.OnClickListener listener){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setItems(items, listener);
+        builder.show();
+    }
+
+    private void noteMove(SimpleEntity item) {
+        //TODO 移至笔记夹
+        int sum = 0;
+        int size = primaryData.listFolder.size();
+        final String[] mFolder = new String[size - 1];
+        final String[] mFolderId = new String[size - 1];
+        for (int i = 0; i < size; i++) {
+            if (!primaryData.getFolderAt(i).getObjectId().equals(item.getFolderId())) {
+                mFolder[sum] = primaryData.getFolderAt(i).getName();
+                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
+                sum++;
+            }
+        }
+        dialogMaker(getActivity(), "选择移至笔记夹", mFolder, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Trace.show(getActivity(), "选择的笔记夹为：" + mFolder[which]);
+            }
+        });
+    }
+
     //重新获取mHeaders listNote和mItems isChanged4folder
     public void dataRefresh() {
         //防止重复刷新
@@ -163,12 +219,17 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
         } else {
-            try {
-                getDataHelper.refresh();//MainActivity dataGot
-                primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
-            } catch (AVException e) {
-                e.printStackTrace();
-            }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        getDataHelper.refresh();//MainActivity dataGot
+                        primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
     }
 

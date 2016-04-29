@@ -553,7 +553,6 @@ public class EditActivity extends BaseHasSwipeActivity {
                     .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            //TODO 新建笔记夹
                             addClick();
 //                            Trace.show(EditActivity.this, "确认");
                         }

@@ -3,13 +3,10 @@ package com.kerchin.yellownote.adapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.CountDownTimer;
-import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.LayoutInflater;
 import android.view.View;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleEntity;
-import com.kerchin.yellownote.utilities.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;
 import org.byteam.superadapter.SuperAdapter;
@@ -37,7 +34,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     boolean isFirst = true;//防止第一次的动画
 
     public FolderShrinkAdapter(Context context, List<SimpleEntity> items, IMulItemViewType<SimpleEntity> mulItemViewType
-            ) {
+    ) {
         super(context, items, mulItemViewType);
         this.context = context;
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
@@ -77,7 +74,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
                             }
                     }
                 }
-            else if(mItems.get(i).getFolderPosition() == shownFolderPosition)
+            else if (mItems.get(i).getFolderPosition() == shownFolderPosition)
                 mItems.get(i).setIsShown(true);
         }
 
@@ -101,9 +98,9 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     }
 
     public interface OnHeaderClickListener {
-        void onItemClick(View v, int position, int viewType);
+        void onItemClick(View v, int position, int viewType, SimpleEntity item);
 
-        void onItemLongClick(View v, int position, int viewType);
+        void onItemLongClick(View v, int position, int viewType, SimpleEntity item);
     }
 
     public void setOnHeaderClickListener(OnHeaderClickListener listener) {
@@ -112,50 +109,76 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 
     @Override
     public void onBind(SuperViewHolder holder, int viewType, final int position, final SimpleEntity item) {
-        if (viewType==SimpleEntity.typeFolder) {
+        if (viewType == SimpleEntity.typeFolder) {
             holder.setText(R.id.mFolderHeaderNameTxt, item.getName());
             holder.setText(R.id.mFolderHeaderContainTxt, item.getContain() + "");
             holder.setOnClickListener(R.id.mFolderHeaderNameTxt, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder, item);
                 }
             });
             holder.setOnClickListener(R.id.mFolderHeaderContainTxt, new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder, item);
                 }
             });
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeFolder, item);
                 }
             });
             holder.setOnLongClickListener(R.id.mFolderHeaderNameTxt, new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder, item);
                     return true;
                 }
             });
             holder.setOnLongClickListener(R.id.mFolderHeaderContainTxt, new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder, item);
                     return true;
                 }
             });
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder);
+                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeFolder, item);
                     return true;
                 }
             });
-        } else if (viewType==SimpleEntity.typeNote) {
+        } else if (viewType == SimpleEntity.typeNote) {
             holder.setText(R.id.mFolderItemTxt, item.getName());
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeNote, item);
+                }
+            });
+            holder.setOnClickListener(R.id.mFolderItemTxt, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mFolderItemClickListener.onItemClick(v, position, SimpleEntity.typeNote, item);
+                }
+            });
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeNote, item);
+                    return true;
+                }
+            });
+            holder.setOnLongClickListener(R.id.mFolderItemTxt, new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    mFolderItemClickListener.onItemLongClick(v, item.getGlobalId(), SimpleEntity.typeNote, item);
+                    return true;
+                }
+            });
             //应当为isShown的状态 目前是mHolder.isShown的状态
             if (!item.isShown()) {
                 //关闭动画
@@ -177,11 +200,6 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 //                        Trace.d(thisItem.getFolderPosition() + "开启2" + mHolder.isShown);
                     holder.getView(R.id.mFolderItemRelative).getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
                 }
-                holder.setOnClickListener(R.id.mFolderItemTxt, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                    }
-                });
             }
         }
     }
