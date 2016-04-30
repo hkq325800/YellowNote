@@ -122,12 +122,13 @@ public class FolderFragment extends BaseFragment {
                 @Override
                 public void onItemLongClick(View v, final int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
-                        dialogMaker(getActivity(), "笔记夹操作", new String[]{"删除", "重命名"}
+                        singleChooseDialogMaker(getActivity(), "笔记夹操作", new String[]{"删除", "重命名"}
                                 , new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case 0://TODO delete 确认要删除笔记夹xxx
+                                        deleteFolder(position);
                                         break;
                                     case 1://rename
                                         if (!primaryData.getFolderAt(position).getName().equals("默认")) {
@@ -142,7 +143,7 @@ public class FolderFragment extends BaseFragment {
                             }
                         });
                     } else if (viewType == SimpleEntity.typeNote) {
-                        dialogMaker(getActivity(), "笔记操作", new String[]{"移动", "删除", "重命名"}
+                        singleChooseDialogMaker(getActivity(), "笔记操作", new String[]{"移动", "删除", "重命名"}
                                 , new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -181,8 +182,8 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
-    private void dialogMaker(Context context, String title, CharSequence[] items
-            , final DialogInterface.OnClickListener listener){
+    private void singleChooseDialogMaker(Context context, String title, CharSequence[] items
+            , final DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         builder.setItems(items, listener);
@@ -202,7 +203,7 @@ public class FolderFragment extends BaseFragment {
                 sum++;
             }
         }
-        dialogMaker(getActivity(), "选择移至笔记夹", mFolder, new DialogInterface.OnClickListener() {
+        singleChooseDialogMaker(getActivity(), "选择移至笔记夹", mFolder, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Trace.show(getActivity(), "选择的笔记夹为：" + mFolder[which]);
@@ -241,6 +242,15 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessage(
                     getDataHelper.handleCode);
         }
+    }
+
+    public void singleEditTextDialogMaker(Context context, String title
+            , View view, final DialogInterface.OnCancelListener listener) {
+        alertDialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setView(view)
+                .setOnCancelListener(listener).create();
+        alertDialog.show();
     }
 
     /**
@@ -293,16 +303,6 @@ public class FolderFragment extends BaseFragment {
                 }
             }
         });
-        alertDialog = new AlertDialog.Builder(getActivity())
-                .setTitle("修改标题")
-                .setView(view)
-                .setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        MainActivity mainActivity = (MainActivity) getActivity();
-                        mainActivity.showBtnAdd();
-                    }
-                }).create();
         mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
@@ -312,7 +312,14 @@ public class FolderFragment extends BaseFragment {
                 }
             }
         });
-        alertDialog.show();
+        singleEditTextDialogMaker(getActivity(), "修改标题"
+                , view, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.showBtnAdd();
+            }
+        });
     }
 
     @Override
