@@ -352,7 +352,7 @@ public class NoteFragment extends BaseFragment
                                         for (int i = 0; i < num; i++) {
                                             final Note note = noteAdapter.getDeleteItem(i);
                                             //线上删除
-                                            Trace.d("delete", note.getTitle());
+                                            Trace.d("readyToDelete", note.getTitle());
                                             Message msg = new Message();
                                             msg.obj = note;
                                             msg.what = handle4explosion;//ui特效

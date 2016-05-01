@@ -232,7 +232,7 @@ public class Note implements Serializable {
                     PrimaryData primaryData = PrimaryData.getInstance();
                     NoteService.delete(objectId);//笔记网络删除
                     Folder folder = primaryData.getFolder(folderId);
-                    if (folder != null) {
+                    if (folder != null) {//TODO 分离
                         folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
                     }
 //                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
@@ -308,4 +308,24 @@ public class Note implements Serializable {
         }).start();
     }
 
+    public void reName(final Activity context, final String newTitle, final Handler handler
+            , final byte handle4respond){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    NoteService.reName(objectId, newTitle);
+                    Trace.d("reNameFolder 成功");
+                    //线下修改
+                    title = newTitle;
+                    Trace.show(context, "更名成功");
+                    NoteFragment.isChanged4note = true;//reName
+                    handler.sendEmptyMessage(handle4respond);
+                } catch (AVException e) {
+                    Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 }

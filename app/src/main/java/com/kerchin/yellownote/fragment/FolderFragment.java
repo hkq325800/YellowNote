@@ -28,6 +28,7 @@ import com.kerchin.yellownote.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.GetDataHelper;
+import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
@@ -134,7 +135,7 @@ public class FolderFragment extends BaseFragment {
                                         if (!primaryData.getFolderAt(position).getName().equals("默认")) {
                                             MainActivity mainActivity = (MainActivity) getActivity();
                                             mainActivity.hideBtnAdd();
-                                            reTitleDialogShow(position);
+                                            reTitleFolderDialogShow(position);
                                         } else {
                                             Trace.show(getActivity(), "默认笔记夹不许更名");
                                         }
@@ -152,8 +153,16 @@ public class FolderFragment extends BaseFragment {
                                         noteMove(item);
                                         break;
                                     case 1://TODO delete 确认要删除笔记xxx
+//                                        Trace.d("readyToDelete", item.getTitle());
+//                                        Message msg = new Message();
+//                                        msg.obj = note;
+//                                        msg.what = handle4explosion;//ui特效
+//                                        note.delete(getActivity(), handler, msg);
                                         break;
                                     case 2://TODO rename
+                                        MainActivity mainActivity = (MainActivity) getActivity();
+                                        mainActivity.hideBtnAdd();
+                                        reTitleNoteDialogShow(position);
                                         break;
                                 }
                             }
@@ -254,11 +263,80 @@ public class FolderFragment extends BaseFragment {
     }
 
     /**
-     * 重命名对话框
+     * 重命名Note对话框
      *
      * @param position 在列表中的位置
      */
-    private void reTitleDialogShow(final int position) {
+    private void reTitleNoteDialogShow(final int position) {
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
+        final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
+        final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
+        final Note note = primaryData.getNoteAt(position);
+        mEditEdt.setText(note.getTitle());
+        mEditEdt.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // et.getCompoundDrawables()得到一个长度为4的数组，分别表示左右上下四张图片
+                Drawable drawable = mEditEdt.getCompoundDrawables()[2];
+                //如果右边没有图片，不再处理
+                if (drawable == null)
+                    return false;
+                //如果不是按下事件，不再处理
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                    return false;
+                if (event.getX() > mEditEdt.getWidth()
+                        - mEditEdt.getPaddingRight()
+                        - drawable.getIntrinsicWidth()) {
+                    mEditEdt.setText("");
+                }
+                return false;
+            }
+        });
+        mEditEdt.setSelection(note.getTitle().length());
+        mConfirmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mEditEdt.getText().toString().equals("")) {
+                    Trace.show(getActivity(), "笔记夹名不宜为空");
+                } else if (mEditEdt.getText().toString().equals("默认")) {
+                    Trace.show(getActivity(), "不要与默认笔记夹重名");
+                } else {
+                    getDataHelper.respond();//reTitleNoteDialogShow->note.reName
+                    note.reName(getActivity()
+                            , mEditEdt.getText().toString()
+                            , handler, getDataHelper.handleCode);
+                    alertDialog.dismiss();
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    mainActivity.showBtnAdd();
+                }
+            }
+        });
+        mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    alertDialog.getWindow().setSoftInputMode(
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+        singleEditTextDialogMaker(getActivity(), "修改标题"
+                , view, new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.showBtnAdd();
+            }
+        });
+    }
+
+    /**
+     * 重命名Folder对话框
+     *
+     * @param position 在列表中的位置
+     */
+    private void reTitleFolderDialogShow(final int position) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
@@ -293,7 +371,7 @@ public class FolderFragment extends BaseFragment {
                 } else if (mEditEdt.getText().toString().equals("默认")) {
                     Trace.show(getActivity(), "不要与默认笔记夹重名");
                 } else {
-                    getDataHelper.respond();//reTitleDialogShow->folder.reName
+                    getDataHelper.respond();//reTitleFolderDialogShow->folder.reName
                     folder.reName(getActivity()
                             , mEditEdt.getText().toString()
                             , handler, getDataHelper.handleCode);
@@ -312,7 +390,7 @@ public class FolderFragment extends BaseFragment {
                 }
             }
         });
-        singleEditTextDialogMaker(getActivity(), "修改标题"
+        singleEditTextDialogMaker(getActivity(), "修改名称"
                 , view, new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {

@@ -87,4 +87,13 @@ public class NoteService {
         query.setSkip(isFirst ? skip : 0);
         return query.find();
     }
+
+    public static void reName(String objectId, String newName) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
+        AVObject note = query.get(objectId);
+        if (note != null) {
+            note.put("note_title", newName);
+            note.save();
+        }
+    }
 }
