@@ -2,9 +2,7 @@ package com.kerchin.yellownote.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.content.Context;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,9 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 /**
  * Activity
@@ -35,10 +31,15 @@ public class ProgressLayout extends RelativeLayout {
     private TextView mNoDataTxt;
     private LoadingAnimView mLoadingAnim;
     private Button mNoDataBtn;
+    private byte reachDelayStatus;
     private long timeStart;
     private long timeDismiss;
     private Context context;
     private volatile byte status;
+    private static final byte statusNoneReach = -1;//没有过任何调用的初始态
+    private static final byte statusReachStill = 0;//没有过任何调用的初始态
+    private static final byte statusReachEnd = 1;//没有过任何调用的初始态
+
     private static final byte statusNoneAnim = -1;//没有过任何调用的初始态
     private static final byte statusStart = 0;//界面调用了dismiss
     private static final byte statusStillAnim = 1;//数据还没加载好 继续动画
@@ -74,6 +75,7 @@ public class ProgressLayout extends RelativeLayout {
 
     private void initializeView(Context context) {
         status = statusNoneAnim;
+        reachDelayStatus = statusNoneReach;
         LayoutInflater.from(context).inflate(R.layout.widget_loading, this);
         mLoadingAnim = (LoadingAnimView) findViewById(R.id.mLoadingAnim);
         mNoDataImg = (ImageView) findViewById(R.id.mNoDataImg);
@@ -99,6 +101,9 @@ public class ProgressLayout extends RelativeLayout {
      * second
      */
     public void startProgress(boolean isFirst) {
+//        if (status >= statusStart)
+//            return;
+        dismissNoData();
         status = statusStart;
         timeStart = System.currentTimeMillis();
         Trace.d("ProgressRelativeLayout startProgress" + timeStart);
@@ -107,47 +112,52 @@ public class ProgressLayout extends RelativeLayout {
             public void run() {
                 long ex = timeDismiss - timeStart;
                 Trace.d("showLoadingAnim postDelayed" + System.currentTimeMillis() + " ex" + ex);
-                showSpecificView(mLoadingAnim, showDuration);
-                mLoadingAnim.startRotateAnimation();
                 if (ex < 0) {//数据还没加载好
-//                    status = statusStillAnim;
-                    Trace.d("stillAnim");
+                    reachDelayStatus = statusReachStill;
+                    status = statusNoneAnim;
+                    timeDismiss = 0;
+                    Trace.d("stillAnim" + reachDelayStatus);
                 } else {//数据加载好了且快于avoidBlockDelay 保持最少1200ms的动画
 //                    status = statusEndAnim;
-                    Trace.d("endAnim");
+                    reachDelayStatus = statusReachEnd;
+                    Trace.d("endAnim" + reachDelayStatus);
                     mLoadingAnim.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            dismiss();
                             if (status == statusShowList)
                                 showListView(views);
                             else if (status == statusShowNoData)
                                 showNoData(noDataText, noDataInterface);
+                            timeDismiss = 0;
+                            status = statusNoneAnim;
                         }
                     }, 1200);
                 }
+                showSpecificView(mLoadingAnim, showDuration);
+                mLoadingAnim.startRotateAnimation();
             }
-        }, isFirst ? avoidBlockDelay : 0);
+        }, isFirst ? avoidBlockDelay : 400);
     }
 
     /**
      * 隐藏过场
      */
     public void dismiss() {
-//        if (timeDismiss == 0L) {
-        timeDismiss = System.currentTimeMillis();
         Trace.d("dismiss" + timeDismiss);
-//        }
-        if (status > statusStart) {//已经运行到delay之后 ex<0
-//            status = statusDismiss;
-            hideAlphaView(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mLoadingAnim.stopRotateAnimation();
-                }
-            }, mLoadingAnim);
+        hideAlphaView(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mLoadingAnim.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mLoadingAnim.stopRotateAnimation();
+                        mLoadingAnim.init();
+                    }
+                }, hideDuration*5);
+            }
+        }, mLoadingAnim);
+        reachDelayStatus = statusNoneReach;
 //            dismissNoData();
-        }
     }
 
     /**
@@ -157,15 +167,15 @@ public class ProgressLayout extends RelativeLayout {
      * @param views
      */
     public void showListView(View... views) {
-        Trace.d("showListView");
-        if (status >= statusDismiss) {
-//            status = statusShowList;
+        Trace.d("showListView" + statusNoneReach);
+        status = statusShowList;
+        if (reachDelayStatus > statusNoneReach) {
+            dismiss();
             for (View view : views) {
                 showSpecificView(view, listViewShowDuration);
             }
-            status = statusNoneAnim;
-        }
-        status = statusShowList;
+        } else
+            timeDismiss = System.currentTimeMillis();
     }
 
     String noDataText;
@@ -180,16 +190,16 @@ public class ProgressLayout extends RelativeLayout {
     public void showNoData(String text, OnClickListener noDataInterface) {
         noDataText = text;
         this.noDataInterface = noDataInterface;
-        Trace.d("showNoData");
-        if (status >= statusDismiss) {
-//            status = statusShowNoData;
+        Trace.d("showNoData" + statusNoneReach);
+        status = statusShowNoData;
+        if (reachDelayStatus > statusNoneReach) {
+            dismiss();
             mNoDataBtn.setVisibility(View.GONE);
             mNoDataTxt.setText(noDataText);
             mNoDataTxt.setVisibility(View.VISIBLE);
             mNoDataTxt.setOnClickListener(this.noDataInterface);
-            status = statusNoneAnim;
-        }
-        status = statusShowNoData;
+        } else
+            timeDismiss = System.currentTimeMillis();
     }
 
     /**
@@ -203,16 +213,16 @@ public class ProgressLayout extends RelativeLayout {
     public void showRefresh(String text, String err,
                             OnClickListener noDataInterface) {
         Trace.d("showRefresh");
-        if (status >= statusDismiss) {
-//            status = statusShowRefresh;
+        status = statusShowRefresh;
+        if (reachDelayStatus > statusNoneReach) {
+            dismiss();
             Trace.d(err);
             mNoDataImg.setImageResource(R.mipmap.ic_no_network);
             mNoDataTxt.setText(text);
             showAlphaView(mNoDataTxt, mNoDataImg, mNoDataBtn);
             mNoDataBtn.setOnClickListener(noDataInterface);
-            status = statusNoneAnim;
-        }
-        status = statusShowRefresh;
+        } else
+            timeDismiss = System.currentTimeMillis();
     }
 
     /**

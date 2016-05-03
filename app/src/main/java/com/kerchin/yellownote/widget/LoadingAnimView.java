@@ -74,7 +74,7 @@ public class LoadingAnimView extends View {
         paint.setAntiAlias(true); // 消除锯齿
     }
 
-    private void init() {
+    public void init() {
         repeatTimes = 1;
         point = new Point[size];
         // 初始化点的半径
@@ -129,13 +129,13 @@ public class LoadingAnimView extends View {
                 }
             }
         } else {
-            final int zhongxin = (size - 1) / 2;
+            final int center = (size - 1) / 2;
             for (int i = 0; i < size; i++) {
-                if (i != zhongxin) {
-                    int juli = i - zhongxin;
+                if (i != center) {
+                    int juli = i - center;
                     point[i].x = centreX + juli * distance;
                 } else {
-                    point[zhongxin].x = centreX;
+                    point[center].x = centreX;
                 }
             }
         }
@@ -148,6 +148,7 @@ public class LoadingAnimView extends View {
      * 停止loading动画
      */
     public void stopRotateAnimation() {
+        //TODO not real
         for (int i = 0; i < size; i++) {
             if (valueAnimator[i] != null)
                 valueAnimator[i].removeAllUpdateListeners();//.cancel();//.end();

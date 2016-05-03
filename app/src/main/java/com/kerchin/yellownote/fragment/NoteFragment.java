@@ -81,7 +81,7 @@ public class NoteFragment extends BaseFragment
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
-            mProgress.dismiss();//handlerMessage
+//            mProgress.dismiss();//handlerMessage
 //            hideProgress();
             stopRefresh();
             switch (msg.what) {
