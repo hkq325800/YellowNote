@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.helper.ItemDrag;
+package com.kerchin.yellownote.helper.itemDrag;
 
 /**
  * ViewHolder 被选中 以及 拖拽释放 触发监听器

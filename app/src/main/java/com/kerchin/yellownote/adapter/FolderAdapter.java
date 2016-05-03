@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.SimpleFolder;
 import com.kerchin.yellownote.bean.SimpleNote;
-import com.kerchin.yellownote.helper.ItemDrag.OnDragVHListener;
+import com.kerchin.yellownote.helper.itemDrag.OnDragVHListener;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;

@@ -18,11 +18,13 @@ import com.kerchin.yellownote.utilities.NormalUtils;
  * More Code on hkq325800@163.com
  */
 public class LoadingAnimView extends View {
+    public static final byte typeLoading = 0;
+    public static final byte typeGuide = 1;
     static final double trans = 180 / Math.PI;// value()/trans = PI/2、PI、3PI/2
     Context context;
     Point[] point;
     ValueAnimator[] valueAnimator;
-    int type;// view的类型 0-loading 1-guide
+    byte type = typeLoading;// view的类型
     int size = 3;// 小点的数量
     int distance = 80;// 每两点间的距离
     int radius = 18;// 小点半径
@@ -114,15 +116,15 @@ public class LoadingAnimView extends View {
             point[i].y = centreY;
         }
         if (size % 2 == 0) {
-            final int zhongxinA = size / 2;// 中心后面那个数
-            final int zhongxinB = size / 2 - 1;// 中心前面那个数
+            final int centerA = size / 2;// 中心后面那个数
+            final int centerB = size / 2 - 1;// 中心前面那个数
             for (int i = 0; i < size; i++) {
-                if (i == zhongxinA) {
+                if (i == centerA) {
                     point[i].x = centreX + distance / 2;
-                } else if (i == zhongxinB) {
+                } else if (i == centerB) {
                     point[i].x = centreX - distance / 2;
                 } else {
-                    int juli = i - zhongxinA;
+                    int juli = i - centerA;
                     point[i].x = centreX + distance / 2 + distance * juli;
                 }
             }
@@ -148,8 +150,9 @@ public class LoadingAnimView extends View {
     public void stopRotateAnimation() {
         for (int i = 0; i < size; i++) {
             if (valueAnimator[i] != null)
-                valueAnimator[i].end();
+                valueAnimator[i].removeAllUpdateListeners();//.cancel();//.end();
         }
+        isStart = false;
     }
 
     /**
@@ -236,11 +239,11 @@ public class LoadingAnimView extends View {
      * guide类型入口
      *
      * @param focusPosition 焦点位置
-     * @param focusColor 焦点颜色
-     * @param unfocusColor 非焦点颜色
+     * @param focusColor    焦点颜色
+     * @param unFocusColor  非焦点颜色
      */
-    public void focusPoint(int focusPosition, int focusColor, int unfocusColor) {
-        paintUnFocus.setColor(getResources().getColor(unfocusColor));
+    public void focusPoint(int focusPosition, int focusColor, int unFocusColor) {
+        paintUnFocus.setColor(getResources().getColor(unFocusColor));
         paint.setColor(getResources().getColor(focusColor));
         this.focusPosition = focusPosition;
         invalidate();
@@ -249,7 +252,7 @@ public class LoadingAnimView extends View {
     /**
      * 设置点的个数
      *
-     * @param size
+     * @param size 点的个数
      */
     public void setSize(int size) {
         if (size < 1) {
@@ -262,21 +265,19 @@ public class LoadingAnimView extends View {
     /**
      * 设置每两点间的距离
      *
-     * @param distance
+     * @param distance xxdp
      */
     public void setDistance(int distance) {
-        int f = NormalUtils.dip2px(context, distance);
-        this.distance = f;
+        this.distance = NormalUtils.dip2px(context, distance);
     }
 
     /**
      * 设置半径
      *
-     * @param radius
+     * @param radius xxdp
      */
     public void setRadius(int radius) {
-        int r = NormalUtils.dip2px(context, radius);
-        this.radius = r;
+        this.radius = NormalUtils.dip2px(context, radius);
         // for (int i = 0; i < size; i++) {
         // point[i].r = radius;
         // }
@@ -285,10 +286,9 @@ public class LoadingAnimView extends View {
     /**
      * 设置类型
      *
-     * @param type
-     *            0-loading 1-guide
+     * @param type typeLoading typeGuide
      */
-    public void setType(int type) {
+    public void setType(byte type) {
         this.type = type;
     }
 

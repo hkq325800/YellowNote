@@ -83,6 +83,7 @@ public class ProgressLayout extends RelativeLayout {
 
     /**
      * 初始化将来需要隐藏的View
+     * first
      *
      * @param views
      */
@@ -95,8 +96,9 @@ public class ProgressLayout extends RelativeLayout {
 
     /**
      * 开启过场
+     * second
      */
-    public void startProgress() {
+    public void startProgress(boolean isFirst) {
         status = statusStart;
         timeStart = System.currentTimeMillis();
         Trace.d("ProgressRelativeLayout startProgress" + timeStart);
@@ -105,76 +107,94 @@ public class ProgressLayout extends RelativeLayout {
             public void run() {
                 long ex = timeDismiss - timeStart;
                 Trace.d("showLoadingAnim postDelayed" + System.currentTimeMillis() + " ex" + ex);
+                showSpecificView(mLoadingAnim, showDuration);
+                mLoadingAnim.startRotateAnimation();
                 if (ex < 0) {//数据还没加载好
-                    status = statusStillAnim;
+//                    status = statusStillAnim;
                     Trace.d("stillAnim");
-                    showSpecificView(mLoadingAnim, showDuration);
-                    mLoadingAnim.startRotateAnimation();
                 } else {//数据加载好了且快于avoidBlockDelay 保持最少1200ms的动画
-                    status = statusEndAnim;
+//                    status = statusEndAnim;
                     Trace.d("endAnim");
-                    showSpecificView(mLoadingAnim, showDuration);
-                    mLoadingAnim.startRotateAnimation();
                     mLoadingAnim.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             dismiss();
-                            showListView(views);
+                            if (status == statusShowList)
+                                showListView(views);
+                            else if (status == statusShowNoData)
+                                showNoData(noDataText, noDataInterface);
                         }
                     }, 1200);
                 }
             }
-        }, avoidBlockDelay);
+        }, isFirst ? avoidBlockDelay : 0);
     }
 
     /**
      * 隐藏过场
      */
     public void dismiss() {
-        if (timeDismiss == 0L) {
-            timeDismiss = System.currentTimeMillis();
-            Trace.d("dismiss" + timeDismiss);
-        }
+//        if (timeDismiss == 0L) {
+        timeDismiss = System.currentTimeMillis();
+        Trace.d("dismiss" + timeDismiss);
+//        }
         if (status > statusStart) {//已经运行到delay之后 ex<0
-            status = statusDismiss;
-            hideAlphaView(mLoadingAnim);
+//            status = statusDismiss;
+            hideAlphaView(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    mLoadingAnim.stopRotateAnimation();
+                }
+            }, mLoadingAnim);
 //            dismissNoData();
         }
     }
 
     /**
      * 可见设置、alpha动画设置
+     * fourth
      *
      * @param views
      */
     public void showListView(View... views) {
         Trace.d("showListView");
         if (status >= statusDismiss) {
-            status = statusShowList;
+//            status = statusShowList;
             for (View view : views) {
                 showSpecificView(view, listViewShowDuration);
             }
+            status = statusNoneAnim;
         }
+        status = statusShowList;
     }
+
+    String noDataText;
+    OnClickListener noDataInterface;
 
     /**
      * 只显示没有数据的文字
+     * fourth
      *
      * @param text 无数据时的文字
      */
     public void showNoData(String text, OnClickListener noDataInterface) {
+        noDataText = text;
+        this.noDataInterface = noDataInterface;
         Trace.d("showNoData");
         if (status >= statusDismiss) {
-            status = statusShowNoData;
+//            status = statusShowNoData;
             mNoDataBtn.setVisibility(View.GONE);
-            mNoDataTxt.setText(text);
+            mNoDataTxt.setText(noDataText);
             mNoDataTxt.setVisibility(View.VISIBLE);
-            mNoDataTxt.setOnClickListener(noDataInterface);
+            mNoDataTxt.setOnClickListener(this.noDataInterface);
+            status = statusNoneAnim;
         }
+        status = statusShowNoData;
     }
 
     /**
      * 出现异常情况下显示刷新
+     * fourth
      *
      * @param text
      * @param err
@@ -184,13 +204,15 @@ public class ProgressLayout extends RelativeLayout {
                             OnClickListener noDataInterface) {
         Trace.d("showRefresh");
         if (status >= statusDismiss) {
-            status = statusShowRefresh;
+//            status = statusShowRefresh;
             Trace.d(err);
             mNoDataImg.setImageResource(R.mipmap.ic_no_network);
             mNoDataTxt.setText(text);
             showAlphaView(mNoDataTxt, mNoDataImg, mNoDataBtn);
             mNoDataBtn.setOnClickListener(noDataInterface);
+            status = statusNoneAnim;
         }
+        status = statusShowRefresh;
     }
 
     /**
@@ -211,15 +233,6 @@ public class ProgressLayout extends RelativeLayout {
     private void showSpecificView(final View view, long duration) {
         view.setAlpha(0);
         view.setVisibility(View.VISIBLE);
-//        if (duration > 1000)
-//            view.animate().alpha(1).setDuration(duration)
-//                    .setListener(new AnimatorListenerAdapter() {
-//                        @Override
-//                        public void onAnimationEnd(Animator animation) {
-//                            view.setVisibility(GONE);
-//                        }
-//                    }).start();
-//        else
         view.animate().alpha(1).setDuration(duration).start();
     }
 
@@ -235,9 +248,10 @@ public class ProgressLayout extends RelativeLayout {
     }
 
     // 对view进行隐藏动画
-    private void hideAlphaView(View... views) {
+    private void hideAlphaView(AnimatorListenerAdapter listener, View... views) {
         for (final View view : views) {
-            view.animate().alpha(0).setDuration(hideDuration).start();
+            view.animate().alpha(0).setDuration(hideDuration)
+                    .setListener(listener).start();
         }
     }
 

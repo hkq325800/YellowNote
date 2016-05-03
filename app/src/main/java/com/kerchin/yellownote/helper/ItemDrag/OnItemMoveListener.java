@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.helper.ItemDrag;
+package com.kerchin.yellownote.helper.itemDrag;
 
 import android.support.v7.widget.RecyclerView;
 

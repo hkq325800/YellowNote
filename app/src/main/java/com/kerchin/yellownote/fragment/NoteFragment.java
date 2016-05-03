@@ -245,7 +245,7 @@ public class NoteFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         getDataHelper.firstGet();//first get
-        mProgress.startProgress();//getData
+        mProgress.startProgress(true);//getData
         getData(0);//statusFirstGet
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -567,19 +567,24 @@ public class NoteFragment extends BaseFragment
                     Trace.d("emptyClickCount" + emptyClickCount);
                     emptyClickCount++;
                     getDataHelper.respond();
-                    mProgress.startProgress();//getData
+                    mProgress.startProgress(false);//getData
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;
                 } else {
-                    try {
-                        getDataHelper.refresh();//MainActivity dataGot
-                        //重新获取mHeaders listNote和mItems
-                        primaryData.refresh(handler, noteAdapter == null//emptyClick
-                                ? GetDataHelper.handle4firstGet
-                                : GetDataHelper.handle4refresh);
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                    }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                getDataHelper.refresh();//MainActivity dataGot
+                                //重新获取mHeaders listNote和mItems
+                                primaryData.refresh(handler, noteAdapter == null//emptyClick
+                                        ? GetDataHelper.handle4firstGet
+                                        : GetDataHelper.handle4refresh);
+                            } catch (AVException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
                 }
             }
         }, 600);
