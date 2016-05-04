@@ -31,7 +31,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.ProgressLayout;
+import com.kerchin.yellownote.widget.OldProgress;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class NoteFragment extends BaseFragment
 //    @Bind(R.id.mNoteProgress)
 //    ProgressBar mNoteProgress;
     @Bind(R.id.mProgress)
-    ProgressLayout mProgress;
+    OldProgress mProgress;
     public static boolean isChanged4note = false;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
@@ -106,15 +106,12 @@ public class NoteFragment extends BaseFragment
                         mNoteWDList.setVisibility(View.GONE);
                     } else
                         mProgress.showListView();//handle4firstGet
-//                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-//                    mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);//TODO mNoteEmptyTxt
                     break;
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInNote", "handle4refresh");//TODO 可能为空
+                    Trace.d("handlerInNote", "handle4refresh");
                     getDataListFromNote(primaryData.listNote);//handle4refresh
                     if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-//                        mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);//TODO mNoteEmptyTxt
                     }
                     if (noteAdapter != null) {
                         noteAdapter.setList(list);
@@ -243,8 +240,13 @@ public class NoteFragment extends BaseFragment
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
         getDataHelper.firstGet();//first get
-        mProgress.startProgress(true);//getData
-        getData(0);//statusFirstGet
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mProgress.startProgress(true);//first get
+                getData(0);//statusFirstGet
+            }
+        }, 450);
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
@@ -565,11 +567,11 @@ public class NoteFragment extends BaseFragment
                     Trace.d("emptyClickCount" + emptyClickCount);
                     emptyClickCount++;
                     getDataHelper.respond();
-                    mProgress.startProgress(false);//getData
+                    mProgress.startProgress(false);//emptyClick
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;
                 } else {
-                    mProgress.startProgress(false);//getData
+                    mProgress.startProgress(false);//refresh
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
