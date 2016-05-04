@@ -6,7 +6,7 @@ package com.kerchin.yellownote.bean;
 public class GetDataHelper {
     public final static byte statusNone = -1;//整体获取
     public final static byte statusFirstGet = 0;//整体获取
-    public final static byte statusZero = 1;//数据为空
+//    public final static byte statusZero = 1;//数据为空
     public final static byte statusRespond = 2;//数据反馈
     public final static byte statusRefresh = 3;//数据刷新
     public final static byte statusLoadMore = 4;//获取更多
@@ -15,7 +15,7 @@ public class GetDataHelper {
     public final static byte handle4respond = 101;//由于新增、删除、修改影响note视图
     public final static byte handle4refresh = 102;//由于isChangedFolder refresh
     public final static byte handle4loadMore = 103;//手动获取更多
-    public final static byte handle4zero = 104;//从有到无
+//    public final static byte handle4zero = 104;//从有到无
     public final static byte handle4error = 105;//从有到无
     public byte status = 0;//当前状态
     public String statusName = "";//当前状态名
@@ -33,11 +33,11 @@ public class GetDataHelper {
         handleCode = handle4firstGet;
     }
 
-    public void zero(){
-        status = statusZero;
-        statusName = "zero";
-        handleCode = handle4zero;
-    }
+//    public void zero(){
+//        status = statusZero;
+//        statusName = "zero";
+//        handleCode = handle4zero;
+//    }
 
     public void respond(){
         status = statusRespond;

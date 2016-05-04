@@ -31,23 +31,22 @@ public class ProgressLayout extends RelativeLayout {
     private TextView mNoDataTxt;
     private LoadingAnimView mLoadingAnim;
     private Button mNoDataBtn;
-    private byte reachDelayStatus;
     private long timeStart;
     private long timeDismiss;
-    private Context context;
-    private volatile byte status;
+    private byte reachDelayStatus;
     private static final byte statusNoneReach = -1;//没有过任何调用的初始态
     private static final byte statusReachStill = 0;//没有过任何调用的初始态
     private static final byte statusReachEnd = 1;//没有过任何调用的初始态
 
+    private volatile byte status;
     private static final byte statusNoneAnim = -1;//没有过任何调用的初始态
     private static final byte statusStart = 0;//界面调用了dismiss
-    private static final byte statusStillAnim = 1;//数据还没加载好 继续动画
-    private static final byte statusEndAnim = 2;//数据加载好了且快于avoidBlockDelay 保持最少1000ms的动画
-    private static final byte statusDismiss = 3;//界面调用了dismiss
+    //    private static final byte statusStillAnim = 1;//数据还没加载好 继续动画
+//    private static final byte statusEndAnim = 2;//数据加载好了且快于avoidBlockDelay 保持最少1000ms的动画
+//    private static final byte statusDismiss = 3;//界面调用了dismiss
     private static final byte statusShowList = 4;//界面调用了显示列表
-    private static final byte statusShowNoData = 5;
-    private static final byte statusShowRefresh = 6;
+    private static final byte statusShowNoData = 5;//界面调用了没有数据
+    private static final byte statusShowRefresh = 6;//界面调用了需要刷新
 
     private static final long showDuration = 400;//内部控件显示的延迟
     private static final long hideDuration = 200;//
@@ -58,19 +57,16 @@ public class ProgressLayout extends RelativeLayout {
                           int defStyle) {
         super(context, attrs, defStyle);
         initializeView(context);
-        this.context = context;
     }
 
     public ProgressLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeView(context);
-        this.context = context;
     }
 
     public ProgressLayout(Context context) {
         super(context);
         initializeView(context);
-        this.context = context;
     }
 
     private void initializeView(Context context) {
@@ -136,7 +132,7 @@ public class ProgressLayout extends RelativeLayout {
                 showSpecificView(mLoadingAnim, showDuration);
                 mLoadingAnim.startRotateAnimation();
             }
-        }, isFirst ? avoidBlockDelay : 400);
+        }, isFirst ? avoidBlockDelay : 300);
     }
 
     /**
@@ -151,9 +147,8 @@ public class ProgressLayout extends RelativeLayout {
                     @Override
                     public void run() {
                         mLoadingAnim.stopRotateAnimation();
-                        mLoadingAnim.init();
                     }
-                }, hideDuration*5);
+                }, hideDuration * 5);
             }
         }, mLoadingAnim);
         reachDelayStatus = statusNoneReach;
@@ -167,7 +162,7 @@ public class ProgressLayout extends RelativeLayout {
      * @param views
      */
     public void showListView(View... views) {
-        Trace.d("showListView" + statusNoneReach);
+        Trace.d("showListView" + reachDelayStatus);
         status = statusShowList;
         if (reachDelayStatus > statusNoneReach) {
             dismiss();
@@ -176,6 +171,7 @@ public class ProgressLayout extends RelativeLayout {
             }
         } else
             timeDismiss = System.currentTimeMillis();
+        dismissNoData();
     }
 
     String noDataText;
@@ -190,9 +186,8 @@ public class ProgressLayout extends RelativeLayout {
     public void showNoData(String text, OnClickListener noDataInterface) {
         noDataText = text;
         this.noDataInterface = noDataInterface;
-        Trace.d("showNoData" + statusNoneReach);
-        status = statusShowNoData;
-        if (reachDelayStatus > statusNoneReach) {
+        Trace.d("showNoData" + reachDelayStatus);
+        if (reachDelayStatus > statusNoneReach || status == statusNoneAnim) {
             dismiss();
             mNoDataBtn.setVisibility(View.GONE);
             mNoDataTxt.setText(noDataText);
@@ -200,6 +195,13 @@ public class ProgressLayout extends RelativeLayout {
             mNoDataTxt.setOnClickListener(this.noDataInterface);
         } else
             timeDismiss = System.currentTimeMillis();
+        status = statusShowNoData;
+    }
+
+    public void setNoDataImgRes(int id, String text) {
+        mNoDataImg.setImageResource(id);
+        mNoDataTxt.setText(text);
+        showAlphaView(mNoDataTxt);
     }
 
     /**
@@ -267,11 +269,5 @@ public class ProgressLayout extends RelativeLayout {
 
     public void showNoDataImg() {
         showAlphaView(mNoDataImg);
-    }
-
-    public void setNoDataImgRes(int id, String text) {
-        mNoDataImg.setImageResource(id);
-        mNoDataTxt.setText(text);
-        showAlphaView(mNoDataTxt);
     }
 }

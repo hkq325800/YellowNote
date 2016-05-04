@@ -1,11 +1,9 @@
 package com.kerchin.yellownote.widget;
 
-import android.animation.Animator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -148,11 +146,11 @@ public class LoadingAnimView extends View {
      * 停止loading动画
      */
     public void stopRotateAnimation() {
-        //TODO not real
         for (int i = 0; i < size; i++) {
             if (valueAnimator[i] != null)
                 valueAnimator[i].removeAllUpdateListeners();//.cancel();//.end();
         }
+        init();
         isStart = false;
     }
 
@@ -174,7 +172,7 @@ public class LoadingAnimView extends View {
                 // valueAnimator[i].setRepeatMode(ValueAnimator.RESTART);
                 // valueAnimator[i].setRepeatCount(50);
                 valueAnimator[i].setDuration(duration);
-                ValueAnimator.setFrameDelay(50);
+//                ValueAnimator.setFrameDelay(50);
                 valueAnimator[i]
                         .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
@@ -192,41 +190,6 @@ public class LoadingAnimView extends View {
                             }
                         });
             }
-            valueAnimator[size - 1].addListener(new Animator.AnimatorListener() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationRepeat(Animator animation) {
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    CountDownTimer cdt = new CountDownTimer(500, 500) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            // Log.d("repeat", repeatTimes + "");
-                            // if (repeatTimes < limitTimes)
-                            for (int i = 0; i < size; i++) {
-                                valueAnimator[i].start();
-                            }
-                            // else
-                            // isStart = false;
-                            repeatTimes++;
-                        }
-                    };
-                    cdt.start();
-                }
-
-                @Override
-                public void onAnimationCancel(Animator animation) {
-                }
-            });
             for (int i = 1; i < size; i++) {
                 valueAnimator[i].setStartDelay(125 * i);
             }

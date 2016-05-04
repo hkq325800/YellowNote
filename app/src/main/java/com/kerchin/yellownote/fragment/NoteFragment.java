@@ -52,7 +52,7 @@ public class NoteFragment extends BaseFragment
         , View.OnCreateContextMenuListener, PopupMenu.OnMenuItemClickListener {
     @Bind(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
-//    @Bind(R.id.mNoteEmptyTxt)
+    //    @Bind(R.id.mNoteEmptyTxt)
 //    TextView mNoteEmptyTxt;
 //    @Bind(R.id.mNoteProgress)
 //    ProgressBar mNoteProgress;
@@ -81,21 +81,8 @@ public class NoteFragment extends BaseFragment
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
-//            mProgress.dismiss();//handlerMessage
-//            hideProgress();
             stopRefresh();
             switch (msg.what) {
-                case GetDataHelper.handle4zero:
-                    mProgress.showNoData("未找到用户的笔记数据", new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            emptyClick();
-                        }
-                    });//handlerMessage
-                    Trace.d("handlerInNote", "handle4zero");
-                    mNoteWDList.setVisibility(View.GONE);
-//                    mNoteEmptyTxt.setVisibility(View.VISIBLE);//TODO mNoteEmptyTxt
-                    break;
                 case GetDataHelper.handle4firstGet:
                     Trace.d("handlerInNote", "handle4firstGet");
                     //TODO 删除后避免滑动到顶部
@@ -108,7 +95,17 @@ public class NoteFragment extends BaseFragment
 //                        noteAdapter.initListDelete();
 //                        noteAdapter.setList(list);
 //                    }
-                    mProgress.showListView();//handle4firstGet
+                    if (primaryData.listNote.size() == 0) {
+                        mProgress.showNoData("未找到用户的笔记数据", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                emptyClick();
+                            }
+                        });
+                        Trace.d("handlerInNote", "handle4zero");
+                        mNoteWDList.setVisibility(View.GONE);
+                    } else
+                        mProgress.showListView();//handle4firstGet
 //                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
 //                    mNoteEmptyTxt.setVisibility(list.size() == 0 ? View.VISIBLE : View.GONE);//TODO mNoteEmptyTxt
                     break;
@@ -126,6 +123,7 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInNote", "handle4respond note:" + list.size());
                     mNoteWDList.setVisibility(View.VISIBLE);
+                    mProgress.dismissNoData();
 //                    mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
 //                    noteAdapter.initListDelete();
                     noteAdapter.setList(list);
@@ -152,7 +150,7 @@ public class NoteFragment extends BaseFragment
                     break;
                 case GetDataHelper.handle4error:
                     AVException e = (AVException) msg.obj;
-                    if(e.getMessage().contains("UnknownHostException")){
+                    if (e.getMessage().contains("UnknownHostException")) {
                         Trace.show(getActivity(), "网络不太通畅 请稍后再试");
                     }
                     break;
@@ -187,26 +185,26 @@ public class NoteFragment extends BaseFragment
     }
 
     private void sendMessage(long delay) {
-        if (primaryData.listNote.size() == 0) {
-            getDataHelper.zero();
-            handler.sendEmptyMessage(GetDataHelper.handle4zero);
-        } else {
-            switch (getDataHelper.status) {
-                case GetDataHelper.statusFirstGet:
-                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
-                    break;
-                case GetDataHelper.statusRespond:
-                    if (noteAdapter == null)
-                        handler.sendEmptyMessageDelayed(
-                                GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
-                    else
-                        handler.sendEmptyMessageDelayed(
-                                GetDataHelper.handle4respond, delay);
-                    break;
-                default:
-                    break;
-            }
+//        if (primaryData.listNote.size() == 0) {
+//            getDataHelper.zero();
+//            handler.sendEmptyMessage(GetDataHelper.handle4zero);
+//        } else {
+        switch (getDataHelper.status) {
+            case GetDataHelper.statusFirstGet:
+                handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
+                break;
+            case GetDataHelper.statusRespond:
+                if (primaryData.listNote.size() == 0)
+                    handler.sendEmptyMessageDelayed(
+                            GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
+                else
+                    handler.sendEmptyMessageDelayed(
+                            GetDataHelper.handle4respond, delay);
+                break;
+            default:
+                break;
         }
+//        }
     }
 
     /*create part*/
@@ -555,7 +553,7 @@ public class NoteFragment extends BaseFragment
         return true;
     }
 
-//    @OnClick(R.id.mNoteEmptyTxt)
+    //    @OnClick(R.id.mNoteEmptyTxt)
     public void emptyClick() {
 //        mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
 //        mNoteProgress.setVisibility(View.VISIBLE);//TODO mNoteProgress
@@ -571,13 +569,14 @@ public class NoteFragment extends BaseFragment
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;
                 } else {
+                    mProgress.startProgress(false);//getData
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 getDataHelper.refresh();//MainActivity dataGot
                                 //重新获取mHeaders listNote和mItems
-                                primaryData.refresh(handler, noteAdapter == null//emptyClick
+                                primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
                                         ? GetDataHelper.handle4firstGet
                                         : GetDataHelper.handle4refresh);
                             } catch (AVException e) {
@@ -646,11 +645,5 @@ public class NoteFragment extends BaseFragment
             } else
                 mNoteWDList.stopRefresh();
         }
-    }
-
-    private void hideProgress() {
-//        if (mNoteProgress.getVisibility() == View.VISIBLE) {
-//            mNoteProgress.setVisibility(View.GONE);
-//        }
     }
 }

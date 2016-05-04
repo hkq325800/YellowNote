@@ -259,17 +259,6 @@ public class PrimaryData {
         Trace.d("refreshPrimaryData");
         getNotesFromCloud();
         getFolderFromCloud();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                getHeadersReady();//runnableForSimple
-//                getItemsReady();//runnableForSimple
-//                if (outHandler != null) {
-//                    outHandler.sendEmptyMessage(outHandleCode);
-//                    outHandler = null;
-//                }
-//            }
-//        }).start();
         mHandler.post(runnableForSimple);//refresh
     }
 
