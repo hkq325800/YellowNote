@@ -1,1 +1,1 @@
-include ':app', ':SlidingLibrary', ':superadapter', ':JJSearchViewAnim'
+include ':app', ':SlidingLibrary', ':superadapter', ':JJSearchViewAnim', ':android-lite-orm'

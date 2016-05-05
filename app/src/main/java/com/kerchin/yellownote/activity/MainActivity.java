@@ -116,7 +116,6 @@ public class MainActivity extends BaseActivity
                     btnSort.setVisible(true);
                     btnDelete.setVisible(true);
                     btnSearch.setVisible(true);
-//                    mMainFab.setOnClickListener(noteFragment.getAddClickListener());
                     mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
 
@@ -135,7 +134,6 @@ public class MainActivity extends BaseActivity
                         if (getCurrentFocus() != null)
                             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
-//                    mMainFab.setOnClickListener(folderFragment.getAddClickListener());
                     mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
@@ -319,13 +317,6 @@ public class MainActivity extends BaseActivity
         return true;
     }
 
-    //    public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
-//        if (keyCode == KeyEvent.KEYCODE_MENU) {
-//            return true;
-//        }
-//        return super.onKeyDown(keyCode, event);
-//    }
-
     public static final int gotoSetting = 0;
     public static final int showBtnAdd = 1;
     public static final int hideBtnAdd = 2;
@@ -338,10 +329,14 @@ public class MainActivity extends BaseActivity
                 case gotoSecret:
                     hideBtnAdd();
                     SecretActivity.startMe(MainActivity.this);
+                    overridePendingTransition(R.anim.push_right_in,
+                            R.anim.push_right_out);
                     break;
                 case gotoSetting:
                     hideBtnAdd();
                     ShareSuggestActivity.startMe(MainActivity.this);
+                    overridePendingTransition(R.anim.push_right_in,
+                            R.anim.push_right_out);
                     break;
                 case showBtnAdd:
                     mMainFab.animate()
@@ -376,7 +371,6 @@ public class MainActivity extends BaseActivity
                 default:
                     break;
             }
-//            mMainFab.setVisibility(View.VISIBLE);
         }
     };
 
@@ -456,15 +450,7 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        /*if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-            *//*隐藏软键盘*//*
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            if (inputMethodManager.isActive()) {
-                //noinspection ConstantConditions
-                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-            }
-            return true;
-        } else */if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {//拦截menu按钮
+        if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {//拦截menu按钮
             //弹出侧边栏
             if (isDrawerOpen)
                 mMainDrawer.closeDrawers();
