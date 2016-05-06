@@ -31,6 +31,14 @@ public class Folder {
         contain--;
     }
 
+    public void addInList(){
+        contain++;
+    }
+
+    public void setContain(int contain){
+        this.contain = contain;
+    }
+
     public String getName() {
         return name;
     }
@@ -43,24 +51,29 @@ public class Folder {
         return objectId;
     }
 
+    /**
+     * @deprecated 1
+     * @param context
+     * @param amount
+     */
     //编辑界面的删除
-    public void dec(final Activity context, final int amount) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    FolderService.dec(objectId, amount);
-                    //刷新note界面
-                    FolderFragment.isChanged4folder = true;//edit delete
-                    contain -= amount;
-                    Trace.d("saveFolderNum-" + amount + "成功");
-                } catch (AVException e) {
-                    e.printStackTrace();
-                    Trace.show(context, "笔记夹内数量-" + amount + "失败" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
-                }
-            }
-        }).start();
-    }
+//    public void dec(final Activity context, final int amount) {
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    FolderService.dec(objectId, amount);
+//                    //刷新note界面
+//                    FolderFragment.isChanged4folder = true;//edit delete
+//                    contain -= amount;
+//                    Trace.d("saveFolderNum-" + amount + "成功");
+//                } catch (AVException e) {
+//                    e.printStackTrace();
+//                    Trace.show(context, "笔记夹内数量-" + amount + "失败" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+//                }
+//            }
+//        }).start();
+//    }
 
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {

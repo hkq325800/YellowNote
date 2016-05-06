@@ -30,9 +30,9 @@
     <com.kerchin.yellownote.widget.waterdrop.WaterDropListView
         android:id="@+id/mNoteWDList"
         android:layout_width="match_parent"
-        android:paddingTop="1dp"
         android:layout_height="match_parent"
         android:divider="@color/transparent"
+        android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
 
     <com.kerchin.yellownote.widget.OldProgress

@@ -19,7 +19,7 @@ public class SimpleEntity {
     public byte entityType;
     public final static byte typeFolder = 0;
     public final static byte typeNote = 1;
-
+    //folder
     public SimpleEntity(int globalId, int id, String name, int contain, String folderId) {
         this.objectId = "";
         entityType = typeFolder;
@@ -30,7 +30,7 @@ public class SimpleEntity {
         this.contain = contain;
         this.folderId = folderId;
     }
-
+    //note
     public SimpleEntity(String objectId, int globalId, int id,String name,String folderId){
         this.objectId = objectId;
         entityType = typeNote;

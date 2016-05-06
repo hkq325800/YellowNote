@@ -138,7 +138,7 @@ public class FolderFragment extends BaseFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    case 0:
+                                    case 0://delete
                                         deleteFolder(position);
                                         break;
                                     case 1://rename
@@ -162,7 +162,7 @@ public class FolderFragment extends BaseFragment {
                                     case 0://TODO move last
                                         noteMove(item);
                                         break;
-                                    case 1:
+                                    case 1://delete
                                         Note note = primaryData.getNote(item.getObjectId());
                                         Trace.d("readyToDelete", note.getTitle());
                                         Message msg = new Message();
@@ -170,7 +170,7 @@ public class FolderFragment extends BaseFragment {
                                         msg.what = handle4explosion;//ui特效
                                         note.delete(getActivity(), handler, msg);
                                         break;
-                                    case 2:
+                                    case 2://reTitle
                                         MainActivity mainActivity = (MainActivity) getActivity();
                                         mainActivity.hideBtnAdd();
                                         reTitleNoteDialogShow(position);

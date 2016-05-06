@@ -12,7 +12,9 @@ import com.kerchin.yellownote.utilities.Trace;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Kerchin on 2016/4/11 0011.
@@ -116,7 +118,7 @@ public class PrimaryData {
         for (int i = 0; i < listFolder.size(); i++) {
             mItems.add(new SimpleEntity(i, i + sum
                     , listFolder.get(i).getName()
-                    , listFolder.get(i).getContain()
+                    , listFolder.get(i).getContain()//TODO Contain
                     , listFolder.get(i).getObjectId()));
             sum += listFolder.get(i).getContain();
         }
@@ -128,25 +130,28 @@ public class PrimaryData {
      * 网络获取Folder
      */
     private void getFolderFromCloud() throws AVException {
-        final List<AVObject> avObjects = FolderService.getUserFolder(MyApplication.user);
+        final List<AVObject> avObjects = FolderService.getUserDefaultFolder(MyApplication.user);
         Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
                 listFolder.clear();
-                for (int i = 0; i < avObjects.size(); i++) {//sortByContain
-                    for (int j = i + 1; j < avObjects.size(); j++) {
-                        if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
-                            AVObject temp = avObjects.get(i);
-                            avObjects.set(i, avObjects.get(j));
-                            avObjects.set(j, temp);
-                        }
-                    }
-                }
-                for (int i = 0; i < avObjects.size(); i++) {
-                    Folder folder = new Folder(avObjects.get(i).getObjectId()
-                            , avObjects.get(i).getString("folder_name")
-                            , avObjects.get(i).getInt("folder_contain"));
+                //sortByContain
+//                for (int i = 0; i < avObjects.size(); i++) {
+//                    for (int j = i + 1; j < avObjects.size(); j++) {
+//                        if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
+//                            AVObject temp = avObjects.get(i);
+//                            avObjects.set(i, avObjects.get(j));
+//                            avObjects.set(j, temp);
+//                        }
+//                    }
+//                }
+                for (AVObject avObject : avObjects) {
+                    Folder folder = new Folder(avObject.getObjectId()
+                            , avObject.getString("folder_name")
+                            //, avObject.getInt("folder_contain"));
+                            , map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
+                    Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
 //                        if (!isFolderContain(folder)) {
                     listFolder.add(folder);
 //                        }
@@ -166,6 +171,8 @@ public class PrimaryData {
         }).start();
     }
 
+    Map<String, Integer> map = new HashMap<>();
+
     /**
      * 网络获取Note
      */
@@ -173,18 +180,23 @@ public class PrimaryData {
         final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
         //skip += avObjects.size();
         Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
+        map.clear();
         new Thread(new Runnable() {
             @Override
             public void run() {
                 listNote.clear();
-                for (int i = 0; i < avObjects.size(); i++) {
-                    listNote.add(new Note(avObjects.get(i).getObjectId()
-                            , avObjects.get(i).getString("note_title")
-                            , avObjects.get(i).getLong("note_editedAt")
-                            , avObjects.get(i).getString("note_content")
-                            , avObjects.get(i).getString("folder_name")
-                            , avObjects.get(i).getString("folder_id")
-                            , avObjects.get(i).getString("note_type")));
+                for (AVObject avObject : avObjects) {
+                    listNote.add(new Note(avObject.getObjectId()
+                            , avObject.getString("note_title")
+                            , avObject.getLong("note_editedAt")
+                            , avObject.getString("note_content")
+                            , avObject.getString("folder_name")
+                            , avObject.getString("folder_id")
+                            , avObject.getString("note_type")));
+                    int i = 0;
+                    if (map.get(avObject.getString("folder_id")) != null)
+                        i = map.get(avObject.getString("folder_id"));
+                    map.put(avObject.getString("folder_id"), ++i);
                 }
                 status.isNoteReady = true;
                 Trace.d("isNoteReady", "true");

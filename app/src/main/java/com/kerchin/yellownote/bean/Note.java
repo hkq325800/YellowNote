@@ -10,7 +10,6 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -134,23 +133,24 @@ public class Note implements Serializable {
                     }
                     Message msg = Message.obtain();
                     msg.what = handle4saveChange;
-                    try {
-                        //folderNum+1
-                        NoteService.saveFolderNumAdd(folderId);
-                        NoteFragment.isChanged4note = true;//saveChange
-                        title = newTitle;
-                        content = newContent;
-                        date = new Date();
-                        setPreview();
-                        Trace.d("saveFolderNum+1 成功");
-                        msg.obj = true;
-                        handler.sendMessage(msg);
-                    } catch (AVException e) {
-                        msg.obj = false;
-                        handler.sendMessage(msg);
-                        Trace.show(context, "笔记夹数目+1失败" + Trace.getErrorMsg(e));
-                        e.printStackTrace();
-                    }
+//                    try {
+                    //folderNum+1
+                    PrimaryData.getInstance().getFolder(folderId).addInList();
+//                        NoteService.saveFolderNumAdd(folderId);
+                    NoteFragment.isChanged4note = true;//saveChange
+                    title = newTitle;
+                    content = newContent;
+                    date = new Date();
+                    setPreview();
+                    Trace.d("saveFolderNum+1 成功");
+                    msg.obj = true;
+                    handler.sendMessage(msg);
+//                    } catch (AVException e) {
+//                        msg.obj = false;
+//                        handler.sendMessage(msg);
+//                        Trace.show(context, "笔记夹数目+1失败" + Trace.getErrorMsg(e));
+//                        e.printStackTrace();
+//                    }
                 }
             }).start();
         } else {//编辑
@@ -185,28 +185,29 @@ public class Note implements Serializable {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //num-1
-                try {
-                    FolderService.dec(folderId, 1);
-                    Trace.d(title + "num-1 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                    return;//终止下一步
-                }
+//                try {
+//                    FolderService.dec(folderId, 1);
+//                } catch (AVException e) {
+//                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+//                    e.printStackTrace();
+//                    return;//终止下一步
+//                }
                 try {
                     NoteService.delete(objectId);
                     Trace.d("deleteNote 成功");
+                    //线上num-1
+//                    PrimaryData.getInstance().getFolder(folderId).decInList();
+//                    Trace.d(title + "num-1 成功");
                     FolderFragment.isChanged4folder = true;//delete Main
                     handler.sendMessage(handle4explosion);
                 } catch (AVException e) {
                     Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
-                    //失败恢复
-                    try {
-                        FolderService.add(folderId, 1);
-                    } catch (AVException e1) {
-                        e1.printStackTrace();
-                    }
+//                    //失败恢复
+//                    try {
+//                        FolderService.add(folderId, 1);
+//                    } catch (AVException e1) {
+//                        e1.printStackTrace();
+//                    }
                     e.printStackTrace();
                 }
             }
@@ -233,7 +234,10 @@ public class Note implements Serializable {
                     NoteService.delete(objectId);//笔记网络删除
                     Folder folder = primaryData.getFolder(folderId);
                     if (folder != null) {//TODO 分离
-                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
+                        FolderFragment.isChanged4folder = true;//edit delete
+                        folder.setContain(folder.getContain() - 1);
+                        Trace.d("saveFolderNum-" + 1 + "成功");
+//                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
                     }
 //                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
                     primaryData.listNote.remove(Note.this);
@@ -268,20 +272,22 @@ public class Note implements Serializable {
                     e.printStackTrace();
                     return;//终止下一步
                 }
-                try {
-                    NoteService.saveFolderNumDec(folderId);
-                    Trace.d("saveFolderNum-1 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "saveFolderNum-1失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
-                try {
-                    NoteService.saveFolderNumAdd(newOne.getObjectId());
-                    Trace.d("saveFolderNum+1 成功");
-                } catch (AVException e) {
-                    Trace.show(context, "saveFolderNum+1失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
+//                try {
+                PrimaryData.getInstance().getFolder(folderId).decInList();
+//                    NoteService.saveFolderNumDec(folderId);
+                Trace.d("saveFolderNum-1 成功");
+//                } catch (AVException e) {
+//                    Trace.show(context, "saveFolderNum-1失败" + Trace.getErrorMsg(e));
+//                    e.printStackTrace();
+//                }
+//                try {
+                PrimaryData.getInstance().getFolder(newOne.getObjectId()).addInList();
+//                    NoteService.saveFolderNumAdd(newOne.getObjectId());
+                Trace.d("saveFolderNum+1 成功");
+//                } catch (AVException e) {
+//                    Trace.show(context, "saveFolderNum+1失败" + Trace.getErrorMsg(e));
+//                    e.printStackTrace();
+//                }
                 folder = newOne.getName();
                 folderId = newOne.getObjectId();
                 FolderFragment.isChanged4folder = true;//move2folder
@@ -309,7 +315,7 @@ public class Note implements Serializable {
     }
 
     public void reName(final Activity context, final String newTitle, final Handler handler
-            , final byte handle4respond){
+            , final byte handle4respond) {
         new Thread(new Runnable() {
             @Override
             public void run() {

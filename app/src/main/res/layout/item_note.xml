@@ -4,11 +4,18 @@
     android:layout_height="wrap_content"
     android:background="@color/textBackgroundColor">
 
+    <View
+        android:id="@+id/mNoteItemView"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@color/white" />
+
+    <!--android:layout_marginRight="7dp"-->
     <RelativeLayout
         android:id="@+id/relative_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginRight="7dp"
+        android:layout_below="@id/mNoteItemView"
         android:background="@color/lightSkyBlue">
 
         <TextView

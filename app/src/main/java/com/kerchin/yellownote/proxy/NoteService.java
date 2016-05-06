@@ -4,7 +4,6 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,25 +20,35 @@ public class NoteService {
         note.save();
     }
 
-    public static void saveFolderNumDec(String folderId) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
-        AVObject folder = query.get(folderId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num - 1);
-            folder.save();
-        }
-    }
+    /**
+     * @deprecated 1
+     * @param folderId
+     * @throws AVException
+     */
+//    public static void saveFolderNumDec(String folderId) throws AVException {
+//        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
+//        AVObject folder = query.get(folderId);
+//        if (folder != null) {
+//            int num = folder.getInt("folder_contain");
+//            folder.put("folder_contain", num - 1);
+//            folder.save();
+//        }
+//    }
 
-    public static void saveFolderNumAdd(String folderId) throws AVException {
-        AVQuery<AVObject> query2 = new AVQuery<AVObject>("Folder");
-        AVObject folder = query2.get(folderId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num + 1);
-            folder.save();
-        }
-    }
+    /**
+     * @deprecated 2
+     * @param folderId
+     * @throws AVException
+     */
+//    public static void saveFolderNumAdd(String folderId) throws AVException {
+//        AVQuery<AVObject> query2 = new AVQuery<AVObject>("Folder");
+//        AVObject folder = query2.get(folderId);
+//        if (folder != null) {
+//            int num = folder.getInt("folder_contain");
+//            folder.put("folder_contain", num + 1);
+//            folder.save();
+//        }
+//    }
 
     public static AVObject addNewNote(String user, String newTitle
             , String newContent, String folder, String folderId) throws AVException {

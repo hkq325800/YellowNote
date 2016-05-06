@@ -25,8 +25,8 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     public NoteShrinkAdapter(Context context, List<Note> items, int layoutResId) {
         super(context, items, layoutResId);
         mViews = new SparseArray<>();
-        colorA = context.getResources().getColor(R.color.black);
-        colorB = context.getResources().getColor(R.color.colorPrimary);
+        colorA = context.getResources().getColor(R.color.textContentColor);
+        colorB = context.getResources().getColor(R.color.textColor);
     }
 
     @Override
@@ -37,9 +37,9 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
         holder.setText(R.id.mNoteItemDateTxt, note.getShowDate());
         holder.setText(R.id.mNoteItemPreviewTxt, note.getPreview());
         if (note.getType().equals("audio")) {
-            holder.setTextColor(R.id.mNoteItemPreviewTxt, colorA);
+            holder.setTextColor(R.id.mNoteItemFolderTxt, colorA);
         } else {
-            holder.setTextColor(R.id.mNoteItemPreviewTxt, colorB);
+            holder.setTextColor(R.id.mNoteItemFolderTxt, colorB);
         }
         holder.setText(R.id.mNoteItemFolderTxt, note.getFolder());
         if (isDelete) {
