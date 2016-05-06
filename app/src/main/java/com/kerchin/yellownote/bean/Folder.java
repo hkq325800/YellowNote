@@ -27,6 +27,10 @@ public class Folder {
         this.objectId = objectId;
     }
 
+    public void decInList(){
+        contain--;
+    }
+
     public String getName() {
         return name;
     }

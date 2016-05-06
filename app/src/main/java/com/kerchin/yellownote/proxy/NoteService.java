@@ -4,6 +4,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -93,6 +94,7 @@ public class NoteService {
         AVObject note = query.get(objectId);
         if (note != null) {
             note.put("note_title", newName);
+            note.put("note_editedAt", System.currentTimeMillis());
             note.save();
         }
     }

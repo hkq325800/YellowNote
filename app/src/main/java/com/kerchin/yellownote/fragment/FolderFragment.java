@@ -46,15 +46,24 @@ public class FolderFragment extends BaseFragment {
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private ToolbarStatus mainStatus;
-    //    private List<SimpleEntity> mHeaders;
     private PrimaryData primaryData;
     private FolderShrinkAdapter folderAdapter;
     private AlertDialog alertDialog;
     private GetDataHelper getDataHelper;
+    private final static byte handle4explosion = 99;
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case handle4explosion:
+                    Note note = (Note) msg.obj;
+                    primaryData.listNote.remove(note);//列表中去除目标
+                    primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
+                    primaryData.getSimpleEntityFromList();
+                    NoteFragment.isChanged4note = true;
+//                    primaryData.getSimpleEntityFromList();
+                    setRecycleView();//refresh
+                    break;
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInFolder", "handle4refresh");
 //                    getHeaderListFromFolder();//handle4refresh
@@ -113,6 +122,7 @@ public class FolderFragment extends BaseFragment {
                     if (viewType == SimpleEntity.typeFolder) {
                         folderAdapter.openFolder(position);
                     } else if (viewType == SimpleEntity.typeNote) {
+                        //TODO 显示不可编辑的TextView
                         Trace.d("position:" + position
                                 + "list:" + primaryData.mItems.get(position).getName()
                                 + "adapter:" + item.getName());
@@ -128,7 +138,7 @@ public class FolderFragment extends BaseFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    case 0://TODO delete 确认要删除笔记夹xxx
+                                    case 0:
                                         deleteFolder(position);
                                         break;
                                     case 1://rename
@@ -149,17 +159,18 @@ public class FolderFragment extends BaseFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    case 0://TODO move
+                                    case 0://TODO move last
                                         noteMove(item);
                                         break;
-                                    case 1://TODO delete 确认要删除笔记xxx
-//                                        Trace.d("readyToDelete", item.getTitle());
-//                                        Message msg = new Message();
-//                                        msg.obj = note;
-//                                        msg.what = handle4explosion;//ui特效
-//                                        note.delete(getActivity(), handler, msg);
+                                    case 1:
+                                        Note note = primaryData.getNote(item.getObjectId());
+                                        Trace.d("readyToDelete", note.getTitle());
+                                        Message msg = new Message();
+                                        msg.obj = note;
+                                        msg.what = handle4explosion;//ui特效
+                                        note.delete(getActivity(), handler, msg);
                                         break;
-                                    case 2://TODO rename
+                                    case 2:
                                         MainActivity mainActivity = (MainActivity) getActivity();
                                         mainActivity.hideBtnAdd();
                                         reTitleNoteDialogShow(position);
@@ -204,11 +215,11 @@ public class FolderFragment extends BaseFragment {
         int sum = 0;
         int size = primaryData.listFolder.size();
         final String[] mFolder = new String[size - 1];
-        final String[] mFolderId = new String[size - 1];
+//        final String[] mFolderId = new String[size - 1];
         for (int i = 0; i < size; i++) {
             if (!primaryData.getFolderAt(i).getObjectId().equals(item.getFolderId())) {
                 mFolder[sum] = primaryData.getFolderAt(i).getName();
-                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
+//                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
                 sum++;
             }
         }

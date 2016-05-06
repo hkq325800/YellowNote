@@ -88,7 +88,7 @@
             android:paddingTop="10dp"
             android:text=""
             android:textColor="@color/skyblue"
-            android:textSize="18sp"
-            android:textStyle="italic" />
+            android:textSize="18sp" />
+        <!--android:textStyle="italic"-->
     </RelativeLayout>
 </RelativeLayout>

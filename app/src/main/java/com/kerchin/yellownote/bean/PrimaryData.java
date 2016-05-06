@@ -103,7 +103,7 @@ public class PrimaryData {
      */
     public void getItemsReady() {
         for (int i = 0; i < listNote.size(); i++) {
-            mItems.add(new SimpleEntity(i, i
+            mItems.add(new SimpleEntity(listNote.get(i).getObjectId(), i, i
                     , listNote.get(i).getTitle()
                     , listNote.get(i).getFolderId()));
         }

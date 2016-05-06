@@ -5,6 +5,7 @@ package com.kerchin.yellownote.bean;
  * More Code on hkq325800@163.com
  */
 public class SimpleEntity {
+    private String objectId;
     private int globalId;
     private int id;//真实id
     private int now;//用于确认note的真实id
@@ -20,6 +21,7 @@ public class SimpleEntity {
     public final static byte typeNote = 1;
 
     public SimpleEntity(int globalId, int id, String name, int contain, String folderId) {
+        this.objectId = "";
         entityType = typeFolder;
         this.globalId = globalId;
         now = 0;
@@ -29,7 +31,8 @@ public class SimpleEntity {
         this.folderId = folderId;
     }
 
-    public SimpleEntity(int globalId, int id,String name,String folderId){
+    public SimpleEntity(String objectId, int globalId, int id,String name,String folderId){
+        this.objectId = objectId;
         entityType = typeNote;
         this.globalId = globalId;
         this.id = id;
@@ -104,5 +107,13 @@ public class SimpleEntity {
 
     public void addNow() {
         now++;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 }

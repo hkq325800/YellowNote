@@ -20,10 +20,13 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     private SparseArray<View> mViews;
     public volatile List<Note> listDelete;//用于记录此次删除行为的note
     public volatile boolean isDelete = false;
+    private int colorA, colorB;
 
     public NoteShrinkAdapter(Context context, List<Note> items, int layoutResId) {
         super(context, items, layoutResId);
         mViews = new SparseArray<>();
+        colorA = context.getResources().getColor(R.color.black);
+        colorB = context.getResources().getColor(R.color.colorPrimary);
     }
 
     @Override
@@ -33,6 +36,11 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
         holder.setText(R.id.mNoteItemTitleTxt, note.getTitle());
         holder.setText(R.id.mNoteItemDateTxt, note.getShowDate());
         holder.setText(R.id.mNoteItemPreviewTxt, note.getPreview());
+        if (note.getType().equals("audio")) {
+            holder.setTextColor(R.id.mNoteItemPreviewTxt, colorA);
+        } else {
+            holder.setTextColor(R.id.mNoteItemPreviewTxt, colorB);
+        }
         holder.setText(R.id.mNoteItemFolderTxt, note.getFolder());
         if (isDelete) {
             if (listDelete.contains(note)) {
