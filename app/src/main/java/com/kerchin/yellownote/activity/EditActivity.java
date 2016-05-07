@@ -696,7 +696,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 , mEditContentEdt.getText().toString()
                 , handler, handle4saveChange);
         if (!isNew && isFolderChanged) {
-            mNote.move2folder(EditActivity.this, thisFolder);
+            mNote.move2folder(EditActivity.this, thisFolder, null, (byte) 0x0);
         }
         isFolderChanged = false;
     }

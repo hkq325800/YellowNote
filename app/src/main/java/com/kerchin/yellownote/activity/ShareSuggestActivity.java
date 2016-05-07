@@ -174,4 +174,10 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        System.gc();//TODO 泄漏
+    }
 }

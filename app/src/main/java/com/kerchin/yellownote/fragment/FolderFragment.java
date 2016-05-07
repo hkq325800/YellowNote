@@ -11,9 +11,7 @@ import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,12 +42,13 @@ public class FolderFragment extends BaseFragment {
     public static boolean hasRefresh = false;
     private RecyclerView mRecyclerView;
     private SearchView.OnQueryTextListener queryTextListener;
-    private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
+//    private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private ToolbarStatus mainStatus;
     private PrimaryData primaryData;
     private FolderShrinkAdapter folderAdapter;
     private AlertDialog alertDialog;
     private GetDataHelper getDataHelper;
+    private LayoutInflater inflater;
     private final static byte handle4explosion = 99;
     private SystemHandler handler = new SystemHandler(this) {
         @Override
@@ -90,6 +89,27 @@ public class FolderFragment extends BaseFragment {
         }
     };
 
+    public static FolderFragment newInstance(Bundle bundle) {
+        FolderFragment frag = new FolderFragment();
+        frag.setArguments(bundle);
+        return frag;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("refresh");
+        primaryData = PrimaryData.getInstance();//初始化列表
+        getDataHelper = new GetDataHelper();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.viewpager_folder, container, false);
+    }
+
     private void setRecycleView() {
         if (folderAdapter == null) {
 //            ItemDragHelperCallback callback = new ItemDragHelperCallback();
@@ -119,14 +139,20 @@ public class FolderFragment extends BaseFragment {
             folderAdapter.setOnHeaderClickListener(new FolderShrinkAdapter.OnHeaderClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewType, final SimpleEntity item) {
-                    if (viewType == SimpleEntity.typeFolder) {
+                    if (viewType == SimpleEntity.typeFolder) {//点击Folder打开
                         folderAdapter.openFolder(position);
-                    } else if (viewType == SimpleEntity.typeNote) {
-                        //TODO 显示不可编辑的TextView
-                        Trace.d("position:" + position
-                                + "list:" + primaryData.mItems.get(position).getName()
-                                + "adapter:" + item.getName());
-
+                    } else if (viewType == SimpleEntity.typeNote) {//点击Note显示内容
+                        Note note = primaryData.getNote(item.getObjectId());
+                        if (note.getType().equals("text")) {//文本
+                            @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_show_note, null);
+                            final EditText mDialogContentEdt = (EditText) view.findViewById(R.id.mDialogContentEdt);
+                            mDialogContentEdt.setText(note.getContent());
+//                            mDialogContentEdt.setKeyListener(null);//禁止输入法
+//                            et.setTextIsSelectable(true);//可以选择
+                            singleEditTextDialogMaker(getActivity(), note.getTitle(), view, null);
+                        } else if (note.getType().equals("audio")) {//音频
+                            Trace.d("audio");
+                        }
                     }
                 }
 
@@ -159,16 +185,27 @@ public class FolderFragment extends BaseFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
-                                    case 0://TODO move last
+                                    case 0:
                                         noteMove(item);
                                         break;
                                     case 1://delete
-                                        Note note = primaryData.getNote(item.getObjectId());
-                                        Trace.d("readyToDelete", note.getTitle());
-                                        Message msg = new Message();
-                                        msg.obj = note;
-                                        msg.what = handle4explosion;//ui特效
-                                        note.delete(getActivity(), handler, msg);
+                                        final Note note = primaryData.getNote(item.getObjectId());
+                                        reConfirmDialogMaker(getActivity(), "确认删除笔记的内容", note.getPreview()
+                                                , new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                            }
+                                        }, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                Trace.d("readyToDelete", note.getTitle());
+                                                Message msg = new Message();
+                                                msg.obj = note;
+                                                msg.what = handle4explosion;//ui特效
+                                                note.delete(getActivity(), handler, msg);
+                                            }
+                                        });
                                         break;
                                     case 2://reTitle
                                         MainActivity mainActivity = (MainActivity) getActivity();
@@ -202,6 +239,17 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
+    private void reConfirmDialogMaker(Context context, String title, String Message
+            , DialogInterface.OnClickListener negativeListener
+            , DialogInterface.OnClickListener positiveListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title);
+        builder.setMessage(Message);
+        builder.setNegativeButton("取消", negativeListener);
+        builder.setPositiveButton("确认", positiveListener);
+        builder.show();
+    }
+
     private void singleChooseDialogMaker(Context context, String title, CharSequence[] items
             , final DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -210,23 +258,26 @@ public class FolderFragment extends BaseFragment {
         builder.show();
     }
 
-    private void noteMove(SimpleEntity item) {
+    private void noteMove(final SimpleEntity item) {
         //TODO 移至笔记夹
         int sum = 0;
         int size = primaryData.listFolder.size();
         final String[] mFolder = new String[size - 1];
-//        final String[] mFolderId = new String[size - 1];
+        final String[] mFolderId = new String[size - 1];
         for (int i = 0; i < size; i++) {
             if (!primaryData.getFolderAt(i).getObjectId().equals(item.getFolderId())) {
                 mFolder[sum] = primaryData.getFolderAt(i).getName();
-//                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
+                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
                 sum++;
             }
         }
         singleChooseDialogMaker(getActivity(), "选择移至笔记夹", mFolder, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Trace.show(getActivity(), "选择的笔记夹为：" + mFolder[which]);
+                getDataHelper.respond();//reTitleNoteDialogShow->note.reName
+                primaryData.getNote(item.getObjectId()).move2folder(getActivity()
+                        , primaryData.getFolder(mFolderId[which]), handler, getDataHelper.handleCode);
+//                Trace.show(getActivity(), "选择的笔记夹为：" + mFolder[which]);
             }
         });
     }
@@ -264,6 +315,7 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
+    //
     public void singleEditTextDialogMaker(Context context, String title
             , View view, final DialogInterface.OnCancelListener listener) {
         alertDialog = new AlertDialog.Builder(context)
@@ -279,7 +331,6 @@ public class FolderFragment extends BaseFragment {
      * @param position 在列表中的位置
      */
     private void reTitleNoteDialogShow(final int position) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
@@ -348,7 +399,6 @@ public class FolderFragment extends BaseFragment {
      * @param position 在列表中的位置
      */
     private void reTitleFolderDialogShow(final int position) {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
@@ -414,6 +464,7 @@ public class FolderFragment extends BaseFragment {
     @Override
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        inflater = LayoutInflater.from(getActivity());
         mainStatus = new ToolbarStatus();
         mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
         getDataHelper.firstGet();//首次加载数据 dataGot
@@ -450,15 +501,13 @@ public class FolderFragment extends BaseFragment {
                 //笔记夹下如果还有笔记要么全部删除要么移至默认
                 Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
             else {
-                AlertDialog.Builder ad = new AlertDialog.Builder(getActivity());
-                ad.setTitle("确认删除?");
-                ad.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                reConfirmDialogMaker(getActivity(), "确认删除笔记夹", primaryData.getFolderAt(position).getName()
+                        , new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
                     }
-                });
-                ad.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                }, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -467,7 +516,6 @@ public class FolderFragment extends BaseFragment {
                                 .delete(getActivity(), position, handler, getDataHelper.handleCode);
                     }
                 });
-                ad.show();
             }
         } else {
             Trace.show(getActivity(), "默认笔记夹不许删除");
@@ -480,29 +528,7 @@ public class FolderFragment extends BaseFragment {
         else return new ToolbarStatus();
     }
 
-    public static FolderFragment newInstance(Bundle bundle) {
-        FolderFragment frag = new FolderFragment();
-        frag.setArguments(bundle);
-        return frag;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("refresh");
-        primaryData = PrimaryData.getInstance();//初始化列表
-        getDataHelper = new GetDataHelper();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.viewpager_folder, container, false);
-    }
-
     public void addClick() {
-        LayoutInflater inflater = LayoutInflater.from(getActivity());
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
@@ -545,7 +571,7 @@ public class FolderFragment extends BaseFragment {
                                 try {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.show(getActivity(), "保存成功");
-                                    Trace.d("saveNewFolder", "成功");//TODO
+                                    Trace.d("saveNewFolder", "成功");
                                     primaryData.listFolder.add(
                                             new Folder(objectId, newFolderName, 0));
                                     getDataHelper.respond();//addClick->getData
@@ -595,26 +621,25 @@ public class FolderFragment extends BaseFragment {
         return queryTextListener;
     }
 
-    public Toolbar.OnMenuItemClickListener getToolbarItemClickListener() {
-        if (toolbarItemClickListener == null)
-            toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
-                    String msg = "";
-                    switch (item.getItemId()) {
-                        case R.id.action_delete:
-                            msg += "1Click delete";
-                            // TODO 删除
-                            break;
-                    }
-                    if (!msg.equals("")) {
-                        Trace.show(getActivity(), msg);
-                    }
-                    return true;
-                }
-            };
-        return toolbarItemClickListener;
-    }
+//    public Toolbar.OnMenuItemClickListener getToolbarItemClickListener() {
+//        if (toolbarItemClickListener == null)
+//            toolbarItemClickListener = new Toolbar.OnMenuItemClickListener() {
+//                @Override
+//                public boolean onMenuItemClick(MenuItem item) {
+//                    String msg = "";
+//                    switch (item.getItemId()) {
+//                        case R.id.action_delete:
+//                            msg += "1Click delete";
+//                            break;
+//                    }
+//                    if (!msg.equals("")) {
+//                        Trace.show(getActivity(), msg);
+//                    }
+//                    return true;
+//                }
+//            };
+//        return toolbarItemClickListener;
+//    }
 
     @Override
     public void onDestroy() {

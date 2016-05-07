@@ -134,7 +134,7 @@ public class MainActivity extends BaseActivity
                         if (getCurrentFocus() != null)
                             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
-                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
+//                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     if (FolderFragment.isChanged4folder) {
                         Trace.d("isChanged4folder");
