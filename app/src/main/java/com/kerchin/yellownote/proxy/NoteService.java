@@ -13,42 +13,12 @@ public class NoteService {
 
     public static void move2folder(String objectId, String folderName, String folderId)
             throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
+        AVQuery<AVObject> query = new AVQuery<>("Note");
         AVObject note = query.get(objectId);
         note.put("folder_name", folderName);
         note.put("folder_id", folderId);
         note.save();
     }
-
-    /**
-     * @deprecated 1
-     * @param folderId
-     * @throws AVException
-     */
-//    public static void saveFolderNumDec(String folderId) throws AVException {
-//        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
-//        AVObject folder = query.get(folderId);
-//        if (folder != null) {
-//            int num = folder.getInt("folder_contain");
-//            folder.put("folder_contain", num - 1);
-//            folder.save();
-//        }
-//    }
-
-    /**
-     * @deprecated 2
-     * @param folderId
-     * @throws AVException
-     */
-//    public static void saveFolderNumAdd(String folderId) throws AVException {
-//        AVQuery<AVObject> query2 = new AVQuery<AVObject>("Folder");
-//        AVObject folder = query2.get(folderId);
-//        if (folder != null) {
-//            int num = folder.getInt("folder_contain");
-//            folder.put("folder_contain", num + 1);
-//            folder.save();
-//        }
-//    }
 
     public static AVObject addNewNote(String user, String newTitle
             , String newContent, String folder, String folderId) throws AVException {
@@ -67,7 +37,7 @@ public class NoteService {
 
     public static void saveEdit(String objectId, String newTitle, String newContent)
             throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
+        AVQuery<AVObject> query = new AVQuery<>("Note");
         AVObject note = query.get(objectId);
         note.put("note_title", newTitle);
         note.put("note_content", newContent);
@@ -76,7 +46,7 @@ public class NoteService {
     }
 
     public static void delete(String objectId) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
+        AVQuery<AVObject> query = new AVQuery<>("Note");
         AVObject note = query.get(objectId);
         note.delete();
     }
@@ -99,12 +69,42 @@ public class NoteService {
     }
 
     public static void reName(String objectId, String newName) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Note");
+        AVQuery<AVObject> query = new AVQuery<>("Note");
         AVObject note = query.get(objectId);
         if (note != null) {
             note.put("note_title", newName);
             note.put("note_editedAt", System.currentTimeMillis());
             note.save();
+        }
+    }
+
+    /**
+     * @deprecated 1
+     * @param folderId 笔记夹id
+     * @throws AVException
+     */
+    public static void saveFolderNumDec(String folderId) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("Folder");
+        AVObject folder = query.get(folderId);
+        if (folder != null) {
+            int num = folder.getInt("folder_contain");
+            folder.put("folder_contain", num - 1);
+            folder.save();
+        }
+    }
+
+    /**
+     * @deprecated 2
+     * @param folderId 笔记夹id
+     * @throws AVException
+     */
+    public static void saveFolderNumAdd(String folderId) throws AVException {
+        AVQuery<AVObject> query2 = new AVQuery<>("Folder");
+        AVObject folder = query2.get(folderId);
+        if (folder != null) {
+            int num = folder.getInt("folder_contain");
+            folder.put("folder_contain", num + 1);
+            folder.save();
         }
     }
 }

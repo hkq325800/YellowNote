@@ -89,19 +89,18 @@ public class EditActivity extends BaseHasSwipeActivity {
     private int funcHeight = 0;//工具条高度
     private int lastStepperValue = 0;//用来控制stepper
     private int index = 0;//用来记录当前在textOrder和textSelection中的位置
-//    private String target = "";
     private Double navRatio, funcRatio;//实践单动画修改两个属性
     //用于切换笔记夹
     private String[] mFolder;
     private String[] mFolderId;
-    private List<String> textOrder = new ArrayList<String>();//记录输入的顺序
-    private List<Integer> textSelection = new ArrayList<Integer>();//记录目标步数时的selection
+    private List<String> textOrder = new ArrayList<>();//记录输入的顺序
+    private List<Integer> textSelection = new ArrayList<>();//记录目标步数时的selection
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
     private Note mNote;//当前编辑的note
     private Folder thisFolder;//记录目前处在哪个笔记夹
     private AlertDialog ad;
     private PrimaryData primaryData;
-    private ArrayList<View> viewContainer = new ArrayList<View>();
+    private ArrayList<View> viewContainer = new ArrayList<>();
     private List<Integer> searchResult;//记录关键字所在的index
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     @SuppressWarnings("FieldCanBeLocal")
@@ -215,7 +214,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-        mEditCircleSearch.setText("共0个 当前第0个");
+        mEditCircleSearch.setText("共0当前第0");
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
         searchResult = new ArrayList<>();
@@ -278,12 +277,15 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onPageSelected(int position) {
 //                Trace.d(TAG, "------selected:" + position);
-//                if (position == 1) {
+                if (position == 1) {
+                    mEditCircleSearch.focusEditText();
 //                    mEditCircleSearch.startSearch();
-//                } else {
+                } else {
+                    mEditCircleSearch.clearFocusEditText();
+                    mEditContentEdt.requestFocusFromTouch();
 //                    mEditCircleSearch.setEditEmpty();
 //                    mEditCircleSearch.resetSearch();
-//                }
+                }
             }
 
             @Override
@@ -315,13 +317,13 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void upClick() {
                 String str = mEditContentEdt.getText().toString();
-                Trace.d(""+mEditContentEdt.isFocused());
+                Trace.d("" + mEditContentEdt.isFocused());
                 if (thisIndex >= 3) {
                     thisIndex--;
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
                     mEditContentEdt.requestFocusFromTouch();
                     mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
-                    mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    mEditCircleSearch.setText("共" + searchResult.size() + "当前第" + thisIndex);
                     if (thisIndex < searchResult.size())
                         mEditCircleSearch.setDownEnable(true);
                 } else if (thisIndex == 2) {
@@ -329,7 +331,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
                     mEditContentEdt.requestFocusFromTouch();
                     mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
-                    mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                    mEditCircleSearch.setText("共" + searchResult.size() + "当前第" + thisIndex);
                     mEditCircleSearch.setUpEnable(false);
                     if (thisIndex < searchResult.size())
                         mEditCircleSearch.setDownEnable(true);
@@ -339,14 +341,14 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void downClick() {
                 String str = mEditContentEdt.getText().toString();
-                Trace.d(""+mEditContentEdt.isFocused());
+                Trace.d("" + mEditContentEdt.isFocused());
                 if (thisIndex != -1) {
                     if (thisIndex < searchResult.size() - 1) {
                         thisIndex++;
                         Trace.d(searchResult.get(thisIndex - 1) + "/" + str.charAt(searchResult.get(thisIndex - 1)));
                         mEditContentEdt.requestFocusFromTouch();
                         mEditContentEdt.setSelection(searchResult.get(thisIndex - 1) + 1);
-                        mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                        mEditCircleSearch.setText("共" + searchResult.size() + "当前第" + thisIndex);
                         if (thisIndex >= 2)
                             mEditCircleSearch.setUpEnable(true);
                     } else if (thisIndex == searchResult.size() - 1) {
@@ -357,7 +359,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                         mEditCircleSearch.setDownEnable(false);
                         if (thisIndex >= 2)
                             mEditCircleSearch.setUpEnable(true);
-                        mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                        mEditCircleSearch.setText("共" + searchResult.size() + "当前第" + thisIndex);
                     }
                 }
             }
@@ -365,8 +367,8 @@ public class EditActivity extends BaseHasSwipeActivity {
         mEditReUnStepper.setOnValueChangeListener(new SnappingStepperValueChangeListener() {
             @Override
             public void onValueChange(View view, int value) {
-                if(isSearching)
-                    mEditCircleSearch.clearEditText();
+//                if (isSearching)
+//                    mEditCircleSearch.clearEditText();
                 if (value == 0 || value < lastStepperValue) {//撤销
                     if (index >= 2) {//相当于enable false
                         //右侧置白 左侧置灰 撤销到头
@@ -402,10 +404,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                         needReUn = false;
                     }
                 }
-                //TODO 撤销恢复时需要 文字改变时也需要
-//                if(isSearching) {
-//                    signTheTarget();//撤销恢复时
-//                }
+                if(isSearching) {
+                    signTheTarget(mEditCircleSearch.getSearchTarget());//撤销恢复时
+                }
                 lastStepperValue = value;
             }
         });
@@ -439,6 +440,11 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
+                if(isSearching&&!needReUn) {
+                    needReUn = true;
+                    signTheTarget(mEditCircleSearch.getSearchTarget());//输入时
+                    needReUn = false;
+                }
             }
         });
     }
@@ -456,7 +462,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             //置回全黑
             mEditContentEdt.setText(mEditContentEdt.getText().toString());
             thisIndex = -1;
-            mEditCircleSearch.setText("共0个 当前第0个");
+            mEditCircleSearch.setText("共0当前第0");
         }
         mEditContentEdt.setSelection(selection);
         needReUn = false;
@@ -511,13 +517,13 @@ public class EditActivity extends BaseHasSwipeActivity {
             }
             if (searchResult.size() != 0) {
                 thisIndex = 1;
-                mEditCircleSearch.setText("共" + searchResult.size() + "个 当前第" + thisIndex + "个");
+                mEditCircleSearch.setText("共" + searchResult.size() + "当前第" + thisIndex);
                 mEditCircleSearch.setUpEnable(false);
                 if (searchResult.size() != 1)
                     mEditCircleSearch.setDownEnable(true);
             } else {
                 thisIndex = -1;
-                mEditCircleSearch.setText("共0个 当前第0个");
+                mEditCircleSearch.setText("共0当前第0");
             }
         }
     }

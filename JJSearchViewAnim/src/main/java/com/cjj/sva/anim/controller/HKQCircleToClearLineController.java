@@ -18,7 +18,7 @@ public class HKQCircleToClearLineController extends JJBaseController {
     private RectF mRectF, mRectFLarge;
     private float tran = 200;
     private static float mGap = 2.5f;
-    private int widthRatio = 3;//用于高度固定 长度match_parent的场景
+    private int widthRatio = 2;//用于高度固定 长度match_parent的场景
 
     public HKQCircleToClearLineController() {
         mRectF = new RectF();

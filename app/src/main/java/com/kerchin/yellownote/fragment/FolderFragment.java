@@ -259,7 +259,6 @@ public class FolderFragment extends BaseFragment {
     }
 
     private void noteMove(final SimpleEntity item) {
-        //TODO 移至笔记夹
         int sum = 0;
         int size = primaryData.listFolder.size();
         final String[] mFolder = new String[size - 1];

@@ -167,6 +167,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        setSlidingModeRight();
     }
 
     public static void startMe(Context context) {

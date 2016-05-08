@@ -67,6 +67,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        setSlidingModeRight();
         mSecretPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassAgainEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});

@@ -10,40 +10,9 @@ import java.util.List;
  * Created by Kerchin on 2016/4/5 0005.
  */
 public class FolderService {
-    /**
-     * @deprecated 1
-     * @param objectId
-     * @param amount
-     * @throws AVException
-     */
-//    public static void add(String objectId, final int amount) throws AVException {
-//        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
-//        AVObject folder = query.get(objectId);
-//        if (folder != null) {
-//            int num = folder.getInt("folder_contain");
-//            folder.put("folder_contain", num + amount);
-//            folder.save();
-//        }
-//    }
-
-    /**
-     * @deprecated 2
-     * @param objectId
-     * @param amount
-     * @throws AVException
-     */
-//    public static synchronized void dec(String objectId, final int amount) throws AVException {
-//        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
-//        AVObject folder = query.get(objectId);
-//        if (folder != null) {
-//            int num = folder.getInt("folder_contain");
-//            folder.put("folder_contain", num - amount);
-//            folder.save();
-//        }
-//    }
 
     public static void reName(String objectId, String newName) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
+        AVQuery<AVObject> query = new AVQuery<>("Folder");
         AVObject folder = query.get(objectId);
         if (folder != null) {
             folder.put("folder_name", newName);
@@ -52,16 +21,23 @@ public class FolderService {
     }
 
     public static void delete(String objectId) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Folder");
+        AVQuery<AVObject> query = new AVQuery<>("Folder");
         AVObject folder = query.get(objectId);
         if (folder != null)
             folder.delete();
     }
 
+    public static List<AVObject> getUserDefaultFolder(String user) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("Folder");
+        query.whereEqualTo("user_tel", user);
+        query.orderByAscending("createdAt");
+        return query.find();
+    }
+
     /**
-     * @param user
-     * @param name
-     * @return
+     * @param user 用户
+     * @param name 名称
+     * @return String
      * @throws AVException
      */
     public static String newFolder(String user, String name) throws AVException {
@@ -74,11 +50,35 @@ public class FolderService {
         folder.save();
         return folder.getObjectId();
     }
-
-    public static List<AVObject> getUserDefaultFolder(String user) throws AVException {
+    /**
+     * @deprecated 1
+     * @param objectId id
+     * @param amount 数量
+     * @throws AVException
+     */
+    public static void add(String objectId, final int amount) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("Folder");
-        query.whereEqualTo("user_tel", user);
-        query.orderByAscending("createdAt");
-        return query.find();
+        AVObject folder = query.get(objectId);
+        if (folder != null) {
+            int num = folder.getInt("folder_contain");
+            folder.put("folder_contain", num + amount);
+            folder.save();
+        }
+    }
+
+    /**
+     * @deprecated 2
+     * @param objectId id
+     * @param amount 数量
+     * @throws AVException
+     */
+    public static synchronized void dec(String objectId, final int amount) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("Folder");
+        AVObject folder = query.get(objectId);
+        if (folder != null) {
+            int num = folder.getInt("folder_contain");
+            folder.put("folder_contain", num - amount);
+            folder.save();
+        }
     }
 }
