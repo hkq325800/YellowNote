@@ -11,6 +11,8 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
 
+import io.realm.Realm;
+
 public class MyApplication extends Application {
     /**
      * app在sd卡的主目录
@@ -37,6 +39,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         context = getApplicationContext();
+        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(context,
                 Config.APP_ID, Config.APP_KEY);
 //        CrashHandler crashHandler = CrashHandler.getInstance();

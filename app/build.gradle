@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 23
@@ -42,6 +43,7 @@ dependencies {
     compile 'tyrantgit:explosionfield:1.0.1'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.bigkoo:snappingstepper:1.0.2'
+    compile 'io.realm:realm-android:0.87.4'
     //    compile files('libs/android-async-http-1.4.8.jar')
     //    compile files('libs/avoscloud-sdk-v3.7.5.jar')
     //    compile files('libs/httpmime-4.2.4.jar')

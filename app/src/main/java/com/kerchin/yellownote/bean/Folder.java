@@ -11,11 +11,17 @@ import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.List;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
+
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
-public class Folder {
+public class Folder extends RealmObject {
+    @PrimaryKey
     String objectId;
+    @Required
     String name;
     int contain;
 
@@ -31,6 +37,14 @@ public class Folder {
 
     public void addInList(){
         contain++;
+    }
+
+    public void setObjectId(String objectId){
+        this.objectId = objectId;
+    }
+
+    public void setName(String name){
+        this.name = name;
     }
 
     public void setContain(int contain){

@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.realm.Realm;
+
 /**
  * Created by Kerchin on 2016/4/11 0011.
  */
@@ -147,6 +149,14 @@ public class PrimaryData {
 //                    }
 //                }
                 for (AVObject avObject : avObjects) {
+                    Realm realm = Realm.getInstance(MyApplication.getContext());
+                    realm.beginTransaction();
+                    Folder f = realm.createObject(Folder.class);
+                    f.setObjectId(avObject.getObjectId());
+                    f .setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
+                    f.setName(avObject.getString("folder_name"));
+                    realm.commitTransaction();
+
                     Folder folder = new Folder(avObject.getObjectId()
                             , avObject.getString("folder_name")
                             //, avObject.getInt("folder_contain"));
