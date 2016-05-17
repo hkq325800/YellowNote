@@ -27,7 +27,7 @@ public class FolderService {
             folder.delete();
     }
 
-    public static List<AVObject> getUserDefaultFolder(String user) throws AVException {
+    public static List<AVObject> getUserFolders(String user) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("Folder");
         query.whereEqualTo("user_tel", user);
         query.orderByAscending("createdAt");

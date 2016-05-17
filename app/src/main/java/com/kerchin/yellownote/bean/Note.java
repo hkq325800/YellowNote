@@ -14,6 +14,12 @@ import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
+import com.litesuits.orm.db.annotation.Column;
+import com.litesuits.orm.db.annotation.Ignore;
+import com.litesuits.orm.db.annotation.NotNull;
+import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.annotation.Table;
+import com.litesuits.orm.db.enums.AssignType;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
@@ -24,16 +30,46 @@ import java.util.Locale;
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
+//@Table("note")
 public class Note implements Serializable {
+    @PrimaryKey(AssignType.BY_MYSELF)
+    @Column("note_objectId")
     private String objectId;
+    @Column("note_title")
+    @NotNull
     private String title;
+    @Column("note_date")
+    @NotNull
     private Date date;
+    @Column("note_content")
     private String content;
+    @Column("note_preview")
+    @NotNull
     private String preview;
+    @Column("note_folder")
+    @NotNull
     private String folder;
+    @Column("folder_objectId")
+    @NotNull
     private String folderId;
+    @Column("note_type")
+    @NotNull
     private String type;
+    @Ignore
     private SimpleDateFormat myFmt;
+
+    public Note(String objectId, String title, Date date, String content, String preview
+            , String folder, String folderId, String type) {
+        myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
+        this.objectId = objectId;
+        this.title = title;
+        this.date = date;
+        this.content = content;
+        this.folder = folder;
+        this.folderId = folderId;
+        this.preview = preview;
+        this.type = type;
+    }
 
     public Note(String objectId, String title, Long date, String content
             , String folder, String folderId, String type) {
@@ -51,12 +87,20 @@ public class Note implements Serializable {
         this.type = type;
     }
 
-    public void setFolder(String folder) {
-        this.folder = folder;
+    public void setObjectId() {
+        this.objectId = objectId;
     }
 
-    public void setFolderId(String folderId) {
-        this.folderId = folderId;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 
     public void setPreview() {
@@ -66,12 +110,36 @@ public class Note implements Serializable {
             preview = content.replace("\n", " ");
     }
 
+    public void setFolder(String folder) {
+        this.folder = folder;
+    }
+
+    public void setFolderId(String folderId) {
+        this.folderId = folderId;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setMyFmt(SimpleDateFormat myFmt){
+        this.myFmt = myFmt;
+    }
+
     public String getType() {
         return type;
     }
 
     public String getTitle() {
         return title;
+    }
+
+    public SimpleDateFormat getMyFmt(){
+        return myFmt;
+    }
+
+    public Date getDate(){
+        return date;
     }
 
     public String getShowDate() {

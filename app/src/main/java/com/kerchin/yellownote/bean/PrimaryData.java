@@ -6,6 +6,7 @@ import android.os.Looper;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.base.BaseSqlHelper;
 import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
@@ -31,16 +32,19 @@ public class PrimaryData {
     private int outHandleCode;
     private Handler mHandler = new Handler();
     private LiteOrmHelper liteOrmHelper;
+    //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
+    Map<String, Integer> map = new HashMap<>();
 
     private PrimaryData() {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
+        liteOrmHelper = new LiteOrmHelper();
 //        Looper.prepare();
 //        mHandler = new Handler();
 //        Looper.loop();
-//        initData();//在首次手动调用
+//        initData();//在首次手动调用 为了catch
     }
 
     /**
@@ -56,26 +60,29 @@ public class PrimaryData {
         return data;
     }
 
+    public void initDataFromCloud() throws AVException {
+        Trace.d("loadDataFromCloud");
+        listNote.clear();
+        map.clear();
+        getNotesFromCloud();//initDataFromCloud
+        getFolderFromCloud();
+        mHandler.post(runnableForSimple);//initDataFromCloud
+    }
+
     /**
      * 网络获取初始化
      */
     public void initData() throws AVException {
-        Trace.d("loadPrimaryData");
+        Trace.d("loadData");
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
-        getNotesFromCloud();//initData
-        getFolderFromCloud();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                getHeadersReady();//runnableForSimple
-//                getItemsReady();//runnableForSimple
-//                if (outHandler != null) {
-//                    outHandler.sendEmptyMessage(outHandleCode);
-//                    outHandler = null;
-//                }
-//            }
-//        }).start();
+        listNote.clear();
+        map.clear();
+//        if (getNoteFromData())
+            getNotesFromCloud();//initData
+        listFolder.clear();
+//        if (getFolderFromData())
+            getFolderFromCloud();
         mHandler.post(runnableForSimple);//initData
     }
 
@@ -96,7 +103,7 @@ public class PrimaryData {
     private Runnable runnableForSimple = new Runnable() {
         @Override
         public void run() {
-            Trace.d("runnableForSimple");
+//            Trace.d("runnableForSimple");
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             if (status.isNoteReady && status.isFolderReady) {
                 getSimpleEntityFromList();
@@ -124,7 +131,7 @@ public class PrimaryData {
         for (int i = 0; i < listFolder.size(); i++) {
             mItems.add(new SimpleEntity(i, i + sum
                     , listFolder.get(i).getName()
-                    , listFolder.get(i).getContain()//TODO Contain
+                    , listFolder.get(i).getContain()
                     , listFolder.get(i).getObjectId()));
             sum += listFolder.get(i).getContain();
         }
@@ -133,31 +140,36 @@ public class PrimaryData {
     }
 
     /**
+     * 本地获取Folder
+     */
+    private boolean getFolderFromData() {
+        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
+        Trace.d("size" + list.size());
+        if(list.size() == 0){
+            return true;
+        }else {
+            listFolder.addAll(list);
+            Trace.d("isFolderReady", "true");
+            status.isFolderReady = true;
+            return false;
+        }
+    }
+
+    /**
      * 网络获取Folder
      */
     private void getFolderFromCloud() throws AVException {
-        final List<AVObject> avObjects = FolderService.getUserDefaultFolder(MyApplication.user);
+        final List<AVObject> avObjects = FolderService.getUserFolders(MyApplication.user);
         Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
-                listFolder.clear();
-                //sortByContain
-//                for (int i = 0; i < avObjects.size(); i++) {
-//                    for (int j = i + 1; j < avObjects.size(); j++) {
-//                        if (avObjects.get(i).getInt("folder_contain") < avObjects.get(j).getInt("folder_contain")) {
-//                            AVObject temp = avObjects.get(i);
-//                            avObjects.set(i, avObjects.get(j));
-//                            avObjects.set(j, temp);
-//                        }
-//                    }
-//                }
                 for (AVObject avObject : avObjects) {
 //                    Realm realm = Realm.getInstance(MyApplication.getContext());
 //                    realm.beginTransaction();
 //                    Folder f = realm.createObject(Folder.class);
 //                    f.setObjectId(avObject.getObjectId());
-//                    f .setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
+//                    f.setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
 //                    f.setName(avObject.getString("folder_name"));
 //                    realm.commitTransaction();
 
@@ -166,11 +178,10 @@ public class PrimaryData {
                             //, avObject.getInt("folder_contain"));
                             , map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
                     Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
-//                        if (!isFolderContain(folder)) {
                     listFolder.add(folder);
-//                        }
-//                    LiteOrmHelper.save(folder);
+                    long l = liteOrmHelper.save(folder);
                 }
+                //sortByContain
                 Collections.sort(listFolder, new Comparator<Folder>() {
                     @Override
                     public int compare(Folder lhs, Folder rhs) {
@@ -186,7 +197,21 @@ public class PrimaryData {
         }).start();
     }
 
-    Map<String, Integer> map = new HashMap<>();
+    /**
+     * 本地获取Note
+     */
+    private boolean getNoteFromData() {
+        ArrayList<Note> list = liteOrmHelper.query(Note.class);
+        Trace.d("size" + list.size());
+        if (list.size() == 0) {
+            return true;
+        } else {
+            listNote.addAll(list);
+            status.isNoteReady = true;
+            Trace.d("isNoteReady", "true");
+            return false;
+        }
+    }
 
     /**
      * 网络获取Note
@@ -195,23 +220,24 @@ public class PrimaryData {
         final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
         //skip += avObjects.size();
         Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
-        map.clear();
         new Thread(new Runnable() {
             @Override
             public void run() {
-                listNote.clear();
                 for (AVObject avObject : avObjects) {
-                    listNote.add(new Note(avObject.getObjectId()
+                    String folderId = avObject.getString("folder_id");
+                    Note note = new Note(avObject.getObjectId()
                             , avObject.getString("note_title")
                             , avObject.getLong("note_editedAt")
                             , avObject.getString("note_content")
                             , avObject.getString("folder_name")
-                            , avObject.getString("folder_id")
-                            , avObject.getString("note_type")));
+                            , folderId
+                            , avObject.getString("note_type"));
+                    listNote.add(note);
+                    long l = liteOrmHelper.save(note);
                     int i = 0;
-                    if (map.get(avObject.getString("folder_id")) != null)
-                        i = map.get(avObject.getString("folder_id"));
-                    map.put(avObject.getString("folder_id"), ++i);
+                    if (map.get(folderId) != null)
+                        i = map.get(folderId);
+                    map.put(folderId, ++i);
                 }
                 status.isNoteReady = true;
                 Trace.d("isNoteReady", "true");
@@ -225,6 +251,7 @@ public class PrimaryData {
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
+        map = new HashMap<>();
     }
 
     /**

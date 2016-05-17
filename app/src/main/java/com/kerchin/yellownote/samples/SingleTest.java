@@ -3,6 +3,7 @@ package com.kerchin.yellownote.samples;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
 import com.kerchin.yellownote.model.single.Address;
 import com.kerchin.yellownote.model.single.Boss;
 import com.kerchin.yellownote.model.single.Company;
@@ -24,7 +25,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SingleTest extends Base {
     //Timer    timer;
-    static LiteOrm liteOrm;
+    static LiteOrm helper;
+//    static LiteOrmHelper helper;
     static Man uComplex, uAlice, uMax, uMin;
     /**
      * object relation mapping test
@@ -53,10 +55,11 @@ public class SingleTest extends Base {
         setSubTitile(getString(R.string.sub_title));
         mockData();
         //初始化数据
-        if (liteOrm == null) {
-            liteOrm = LiteOrm.newSingleInstance(this, "liteorm.db");
+//        helper = new LiteOrmHelper();
+        if (helper == null) {
+            helper = LiteOrm.newSingleInstance(this, "liteorm.db");
         }
-        liteOrm.setDebugged(true); // open the log
+        helper.setDebugged(true); // open the log
     }
 
     @Override
@@ -152,21 +155,21 @@ public class SingleTest extends Base {
     }
 
     private void testSave() {
-        liteOrm.save(uMax);
-        liteOrm.save(uMin);
+        helper.save(uMax);
+        helper.save(uMin);
 
-        liteOrm.save(company);
+        helper.save(company);
 
-        liteOrm.save(wife1);
-        liteOrm.save(wife2);
+        helper.save(wife1);
+        helper.save(wife2);
         //保存任意集合
-        liteOrm.save(addrList);
-        liteOrm.save(bossList);
+        helper.save(addrList);
+        helper.save(bossList);
     }
 
     private void testInsert() {
-        liteOrm.insert(uAlice, ConflictAlgorithm.Replace);
-        liteOrm.insert(uComplex, ConflictAlgorithm.Rollback);
+        helper.insert(uAlice, ConflictAlgorithm.Replace);
+        helper.insert(uComplex, ConflictAlgorithm.Rollback);
     }
 
     private void testUpdate() {
@@ -177,17 +180,17 @@ public class SingleTest extends Base {
         uMin.setId(id);
 
         // save : 既可以当insert 也可以做update，非常灵活
-        long c = liteOrm.save(uMax);
+        long c = helper.save(uMax);
         OrmLog.i(this, "update User Max: " + c);
 
         // update：仅能在已经存在时更新
-        c = liteOrm.update(uMin, ConflictAlgorithm.Replace);
+        c = helper.update(uMin, ConflictAlgorithm.Replace);
         OrmLog.i(this, "update User Min: " + c);
 
         //更新任意的整个集合
         bossList.get(0).setName("Cang Jin Kong");
         bossList.get(1).setName("Song Dao Feng");
-        liteOrm.update(bossList, ConflictAlgorithm.Fail);
+        helper.update(bossList, ConflictAlgorithm.Fail);
     }
 
     /**
@@ -206,7 +209,7 @@ public class SingleTest extends Base {
         boss1.phone = "168 0000 0000";
 
         ColumnsValue cv = new ColumnsValue(new String[]{"phone"});
-        long c = liteOrm.update(bossList, cv, ConflictAlgorithm.None);
+        long c = helper.update(bossList, cv, ConflictAlgorithm.None);
         OrmLog.i(this, "update boss ：" + c);
 
 
@@ -215,17 +218,17 @@ public class SingleTest extends Base {
         wife1.bm = "实体自带值";
         wife1.age = 18;
         cv = new ColumnsValue(new String[]{"des", "bm", "age"}, new Object[]{"外部强制赋值地址", null, 20});
-        c = liteOrm.update(wife1, cv, ConflictAlgorithm.None);
+        c = helper.update(wife1, cv, ConflictAlgorithm.None);
         OrmLog.i(this, "update wife1 " + wife1.name + ": " + c);
     }
 
 
     private void testQueryAll() {
-        ArrayList<Man> query = liteOrm.query(Man.class);
-        ArrayList<Address> as = liteOrm.query(Address.class);
-        ArrayList<Wife> ws = liteOrm.query(Wife.class);
-        ArrayList<Company> cs = liteOrm.query(Company.class);
-        ArrayList<Boss> ts = liteOrm.query(Boss.class);
+        ArrayList<Man> query = helper.query(Man.class);
+        ArrayList<Address> as = helper.query(Address.class);
+        ArrayList<Wife> ws = helper.query(Wife.class);
+        ArrayList<Company> cs = helper.query(Company.class);
+        ArrayList<Boss> ts = helper.query(Boss.class);
         if (as != null) {
             for (Address uu : as) {
                 OrmLog.i(this, "query Address: " + uu);
@@ -257,26 +260,26 @@ public class SingleTest extends Base {
         // 模糊查询：所有带“山”字的地址
         QueryBuilder<Address> qb = new QueryBuilder<Address>(Address.class)
                 .where(Address.COL_ADDRESS + " LIKE ?", new String[]{"%山%"});
-        printAddress(liteOrm.query(qb));
+        printAddress(helper.query(qb));
 
         //AND关系 获取 南京的香港路
         qb = new QueryBuilder<Address>(Address.class)
                 .whereEquals(Address.COL_CITY, "南京")
                 .whereAppendAnd()
                 .whereEquals(Address.COL_ADDRESS, "香港路");
-        printAddress(liteOrm.query(qb));
+        printAddress(helper.query(qb));
 
         //OR关系 获取所有 地址为香港路 ，和 青岛 的所有地址
         qb = new QueryBuilder<Address>(Address.class)
                 .whereEquals(Address.COL_ADDRESS, "香港路")
                 .whereAppendOr()
                 .whereEquals(Address.COL_CITY, "青岛");
-        printAddress(liteOrm.query(qb));
+        printAddress(helper.query(qb));
 
         //IN语句 获取所有 城市为杭州 和 北京 的地址
         qb = new QueryBuilder<Address>(Address.class)
                 .whereIn(Address.COL_CITY, new String[]{"杭州", "北京"});
-        printAddress(liteOrm.query(qb));
+        printAddress(helper.query(qb));
 
         //IN语句 获取同时满足：非香港路 & ID>5 & address包含山
         qb = new QueryBuilder<Address>(Address.class)
@@ -285,17 +288,17 @@ public class SingleTest extends Base {
                 .whereGreaterThan(Address.COL_ID, 5)
                 .whereAppendAnd()
                 .whereAppend(Address.COL_ADDRESS + " LIKE ?", new String[]{"%山%"});
-        printAddress(liteOrm.query(qb));
+        printAddress(helper.query(qb));
     }
 
     private void testQueryByID() {
-        Man man = liteOrm.queryById(uComplex.getId(), Man.class);
+        Man man = helper.queryById(uComplex.getId(), Man.class);
         OrmLog.i(this, "query id: " + uComplex.getId() + ",MAN: " + man);
     }
 
     private void testQueryAnyUwant() {
 
-        long nums = liteOrm.queryCount(Address.class);
+        long nums = helper.queryCount(Address.class);
         OrmLog.i(this, "Address All Count : " + nums);
 
         QueryBuilder<Address> qb = new QueryBuilder<Address>(Address.class)
@@ -305,9 +308,9 @@ public class SingleTest extends Base {
                 .distinct(true)
                 .where(Address.COL_ADDRESS + "=?", new String[]{"香港路"});
 
-        nums = liteOrm.queryCount(qb);
+        nums = helper.queryCount(qb);
         OrmLog.i(this, "Address All Count : " + nums);
-        List<Address> addrList = liteOrm.query(qb);
+        List<Address> addrList = helper.query(qb);
         for (Address uu : addrList) {
             OrmLog.i(this, "Query Address: " + uu);
         }
@@ -317,16 +320,16 @@ public class SingleTest extends Base {
 
     private void testMapping() {
         // 先找出来相关的实体
-        ArrayList<Man> mans = liteOrm.query(Man.class);
-        ArrayList<Address> as = liteOrm.query(Address.class);
-        ArrayList<Wife> ws = liteOrm.query(Wife.class);
-        ArrayList<Company> cs = liteOrm.query(Company.class);
-        ArrayList<Boss> ts = liteOrm.query(Boss.class);
+        ArrayList<Man> mans = helper.query(Man.class);
+        ArrayList<Address> as = helper.query(Address.class);
+        ArrayList<Wife> ws = helper.query(Wife.class);
+        ArrayList<Company> cs = helper.query(Company.class);
+        ArrayList<Boss> ts = helper.query(Boss.class);
         // 为它们映射关系
-        liteOrm.mapping(mans, as);
-        liteOrm.mapping(mans, ws);
-        liteOrm.mapping(mans, cs);
-        liteOrm.mapping(mans, ts);
+        helper.mapping(mans, as);
+        helper.mapping(mans, ws);
+        helper.mapping(mans, cs);
+        helper.mapping(mans, ts);
         //可以看到与Man关联的Teacher、Company、Address都智能映射给Man对应的各个的实例了。
         for (Man uu : mans) {
             OrmLog.i(this, "query user: " + uu);
@@ -344,45 +347,45 @@ public class SingleTest extends Base {
     }
 
     private void testDelete() {
-        liteOrm.delete(uMin);
-        liteOrm.delete(uMax);
-        liteOrm.delete(uAlice);
-        liteOrm.delete(uComplex);
+        helper.delete(uMin);
+        helper.delete(uMax);
+        helper.delete(uAlice);
+        helper.delete(uComplex);
 
         // delete 任意 collection
-        liteOrm.delete(bossList);
+        helper.delete(bossList);
 
     }
 
     private void testDeleteByIndex() {
         // 最后一个参数可为null，默认按ID升序排列
         // 按id升序，删除[2, size-1]，结果：仅保留第一个和最后一个
-        liteOrm.delete(Address.class, 2, addrList.size() - 1, Address.COL_ID);
+        helper.delete(Address.class, 2, addrList.size() - 1, Address.COL_ID);
     }
 
     private void testDeleteByWhereBuilder() {
         //AND关系 删掉 南京 的 香港路
-        liteOrm.delete(WhereBuilder
+        helper.delete(WhereBuilder
                 .create(Address.class)
                 .equals(Address.COL_ADDRESS, "香港路")
                 .andEquals(Address.COL_CITY, "南京"));
         printAllAddress();
 
         //OR关系 删掉所有地址为 香港路 ，同时删掉 青岛的所有地址
-        liteOrm.delete(WhereBuilder
+        helper.delete(WhereBuilder
                 .create(Address.class)
                 .equals(Address.COL_ADDRESS, "香港路")
                 .orEquals(Address.COL_CITY, "青岛"));
         printAllAddress();
 
         //IN语句 删掉所有城市为 杭州 或 北京的地址
-        liteOrm.delete(WhereBuilder
+        helper.delete(WhereBuilder
                 .create(Address.class)
                 .in(Address.COL_CITY, new String[]{"杭州", "北京"}));
         printAllAddress();
 
         //IN语句 删掉所有 非香港路 并且 ID>10
-        liteOrm.delete(WhereBuilder
+        helper.delete(WhereBuilder
                 .create(Address.class)
                 .equals(Address.COL_ADDRESS, "夫子庙")
                 .and()
@@ -391,16 +394,16 @@ public class SingleTest extends Base {
     }
 
     private void testDeleteAll() {
-        liteOrm.deleteAll(Address.class);
-        liteOrm.deleteAll(Company.class);
-        liteOrm.deleteAll(Wife.class);
-        liteOrm.deleteAll(Man.class);
-        liteOrm.deleteAll(Boss.class);
+        helper.deleteAll(Address.class);
+        helper.deleteAll(Company.class);
+        helper.deleteAll(Wife.class);
+        helper.deleteAll(Man.class);
+        helper.deleteAll(Boss.class);
 
         // 顺带测试：连库文件一起删掉
-        liteOrm.deleteDatabase();
+        helper.deleteDatabase();
         // 顺带测试：然后重建一个新库
-        liteOrm.openOrCreateDatabase();
+        helper.openOrCreateDatabase();
         // 满血复活
     }
 
@@ -412,7 +415,7 @@ public class SingleTest extends Base {
 
     private void testLargeScaleUseLite() {
         // LiteOrm 插入10w条数的效率测试
-//        SqliteUtils.testLargeScaleUseLiteOrm(liteOrm, MAX);
+//        SqliteUtils.testLargeScaleUseLiteOrm(helper, MAX);
     }
 
     private void testLargeScaleUseSystem() {
@@ -421,7 +424,7 @@ public class SingleTest extends Base {
     }
 
     private void printAllAddress() {
-        printAddress(liteOrm.query(Address.class));
+        printAddress(helper.query(Address.class));
     }
 
     private void printAddress(List<Address> addrList) {

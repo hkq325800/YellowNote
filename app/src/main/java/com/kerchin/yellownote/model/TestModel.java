@@ -6,6 +6,7 @@ import com.litesuits.orm.db.enums.AssignType;
 /**
  * @author MaTianyu @http://litesuits.com
  * @date 2015-12-13
+ * @@deprecated
  */
 @Table("test_model")
 public class TestModel {

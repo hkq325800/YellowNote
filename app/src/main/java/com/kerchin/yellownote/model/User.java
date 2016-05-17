@@ -10,6 +10,7 @@ import java.util.ArrayList;
 /**
  * @author MaTianyu @http://litesuits.com
  * @date 2015-12-13
+ * @@deprecated
  */
 @Table("user")
 public class User {

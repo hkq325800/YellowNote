@@ -145,7 +145,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                     mCrashInfoFolder.mkdirs();
                 }
                 String timeStampString = DATE_FORMAT.format(new Date());//当先的时间格式化
-                String crashLogFileName = timeStampString + ".log";
+                String crashLogFileName = timeStampString + ".txt";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
 

@@ -8,23 +8,33 @@ import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
+import com.litesuits.orm.db.annotation.Column;
+import com.litesuits.orm.db.annotation.Default;
 import com.litesuits.orm.db.annotation.NotNull;
 import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.annotation.Table;
 import com.litesuits.orm.db.enums.AssignType;
 
+import java.io.Serializable;
 import java.util.List;
 
 
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
-public class Folder{
-//    @PrimaryKey
-    @PrimaryKey(AssignType.BY_MYSELF)
+@Table("folder")
+public class Folder implements Serializable {
+    //        @PrimaryKey
+    @PrimaryKey(AssignType.BY_MYSELF)//加了为null
+    int id;
+    @Column("folder_objectId")
     String objectId;
-//    @Required
+    //    @Required
     @NotNull
+    @Column("folder_name")
     String name;
+    @Default("0")
+    @Column("folder_contain")
     int contain;
 
     public Folder(String objectId, String name, int contain) {
@@ -33,23 +43,23 @@ public class Folder{
         this.objectId = objectId;
     }
 
-    public void decInList(){
+    public void decInList() {
         contain--;
     }
 
-    public void addInList(){
+    public void addInList() {
         contain++;
     }
 
-    public void setObjectId(String objectId){
+    public void setObjectId(String objectId) {
         this.objectId = objectId;
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public void setContain(int contain){
+    public void setContain(int contain) {
         this.contain = contain;
     }
 
@@ -80,7 +90,7 @@ public class Folder{
                         //将所有folder下的note移至新folder下 线上修改
                         if (contain != 0) {
                             List<Note> list = PrimaryData.getInstance().getNoteListInFolder(objectId);
-                            for (Note note : list){
+                            for (Note note : list) {
                                 note.move2folder(context, newName, objectId);
                             }
                             NoteFragment.isChanged4note = true;//reName
