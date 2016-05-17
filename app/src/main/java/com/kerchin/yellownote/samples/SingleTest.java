@@ -1,14 +1,20 @@
-package com.litesuits.orm.samples;
+package com.kerchin.yellownote.samples;
 
 import android.os.Bundle;
+
+import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.model.single.Address;
+import com.kerchin.yellownote.model.single.Boss;
+import com.kerchin.yellownote.model.single.Company;
+import com.kerchin.yellownote.model.single.Man;
+import com.kerchin.yellownote.model.single.Wife;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.assit.WhereBuilder;
 import com.litesuits.orm.db.model.ColumnsValue;
 import com.litesuits.orm.db.model.ConflictAlgorithm;
 import com.litesuits.orm.log.OrmLog;
-import com.litesuits.orm.model.single.*;
-import com.litesuits.orm.test.SqliteUtils;
+//import com.litesuits.orm.test.SqliteUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class SingleTestActivity extends BaseActivity {
+public class SingleTest extends Base {
     //Timer    timer;
     static LiteOrm liteOrm;
     static Man uComplex, uAlice, uMax, uMin;
@@ -39,14 +45,14 @@ public class SingleTestActivity extends BaseActivity {
     static Wife wife1, wife2;
 
     /**
-     * 在{@link com.litesuits.orm.samples.BaseActivity#onCreate(android.os.Bundle)}中设置视图
+     * 在{@link Base#onCreate(android.os.Bundle)}中设置视图
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setSubTitile(getString(R.string.sub_title));
         mockData();
-
+        //初始化数据
         if (liteOrm == null) {
             liteOrm = LiteOrm.newSingleInstance(this, "liteorm.db");
         }
@@ -406,12 +412,12 @@ public class SingleTestActivity extends BaseActivity {
 
     private void testLargeScaleUseLite() {
         // LiteOrm 插入10w条数的效率测试
-        SqliteUtils.testLargeScaleUseLiteOrm(liteOrm, MAX);
+//        SqliteUtils.testLargeScaleUseLiteOrm(liteOrm, MAX);
     }
 
     private void testLargeScaleUseSystem() {
         // 原生android代码 插入10w条数的效率测试
-        SqliteUtils.testLargeScaleUseDefault(SingleTestActivity.this, MAX);
+//        SqliteUtils.testLargeScaleUseDefault(SingleTestActivity.this, MAX);
     }
 
     private void printAllAddress() {

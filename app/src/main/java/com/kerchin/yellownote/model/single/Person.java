@@ -1,4 +1,4 @@
-package com.litesuits.orm.model.single;
+package com.kerchin.yellownote.model.single;
 
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Conflict;
@@ -11,6 +11,7 @@ import com.litesuits.orm.db.enums.Strategy;
  *
  * @author MaTianyu
  * 2014-3-7上午10:39:45
+ * Boss Man Wife
  */
 public class Person extends  BaseModel{
     @PrimaryKey(AssignType.AUTO_INCREMENT)

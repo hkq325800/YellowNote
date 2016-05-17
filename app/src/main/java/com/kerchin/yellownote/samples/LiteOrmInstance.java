@@ -1,4 +1,4 @@
-package com.litesuits.orm.samples;
+package com.kerchin.yellownote.samples;
 
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.DataBaseConfig;

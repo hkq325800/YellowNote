@@ -110,9 +110,9 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
         if (ex == null) {
             return;
         } else {
-            saveCrashInfoToFile(ex);
+            File file = saveCrashInfoToFile(ex);
 //            saveCatchInfo2File(ex);
-            sendCrashInfoToServer(ex);
+            sendCrashInfoToServer(file);
 
             //使用Toast来显示异常信息
             new Thread() {
@@ -135,7 +135,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
      *
      * @param ex
      */
-    private void saveCrashInfoToFile(Throwable ex) {
+    private File saveCrashInfoToFile(Throwable ex) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             try {
                 if (!mAppMainFolder.exists()) {//app目录不存在则先创建目录
@@ -166,23 +166,24 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 pw.append(time);
                 ex.printStackTrace(pw);//写入奔溃的日志信息
                 pw.close();
+                return crashLogFile;
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
+        return null;
     }
 
     /**
      * 发送发送闪退信息到远程服务器
      *
-     * @param ex
+     * @param file
      */
-    private void sendCrashInfoToServer(Throwable ex) {
+    private void sendCrashInfoToServer(File file) {
         if (mCrashExceptionRemoteReport != null) {
-            mCrashExceptionRemoteReport.onCrash(ex);
+            mCrashExceptionRemoteReport.onCrash(file);
         }
     }
 
@@ -193,9 +194,9 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
         /**
          * 当闪退发生时，回调此接口函数
          *
-         * @param ex
+         * @param file
          */
-        public void onCrash(Throwable ex);
+        public void onCrash(File file);
     }
 
 

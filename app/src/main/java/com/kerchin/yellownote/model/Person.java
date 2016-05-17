@@ -1,4 +1,4 @@
-package com.litesuits.orm.model;
+package com.kerchin.yellownote.model;
 
 import com.litesuits.orm.db.annotation.PrimaryKey;
 import com.litesuits.orm.db.enums.AssignType;
@@ -6,6 +6,8 @@ import com.litesuits.orm.db.enums.AssignType;
 /**
  * @author MaTianyu
  * @date 2015-03-22
+ * Student Teacher
+ * @deprecated
  */
 public abstract class Person {
     public static final String COL_NAME = "name";

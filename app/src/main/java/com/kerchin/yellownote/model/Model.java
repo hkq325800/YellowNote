@@ -1,8 +1,10 @@
-package com.litesuits.orm.model;
+package com.kerchin.yellownote.model;
 
 /**
  * @author MaTianyu
  * @date 2015-03-22
+ * book classes school
+ * @deprecated
  */
 public abstract class Model {
 

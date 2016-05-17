@@ -1,23 +1,29 @@
-package com.litesuits.orm.samples;
+package com.kerchin.yellownote.samples;
 
 import android.os.Bundle;
 import android.os.Environment;
+
+import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.model.Person;
+import com.kerchin.yellownote.model.cascade.Book;
+import com.kerchin.yellownote.model.cascade.Classes;
+import com.kerchin.yellownote.model.cascade.School;
+import com.kerchin.yellownote.model.cascade.Student;
+import com.kerchin.yellownote.model.cascade.Teacher;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.assit.WhereBuilder;
 import com.litesuits.orm.db.model.ColumnsValue;
 import com.litesuits.orm.db.model.ConflictAlgorithm;
 import com.litesuits.orm.log.OrmLog;
-import com.litesuits.orm.model.Person;
-import com.litesuits.orm.model.cascade.*;
-import com.litesuits.orm.test.SqliteUtils;
+//import com.litesuits.orm.test.SqliteUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class CascadeTestActivity extends BaseActivity {
+public class CascadeTest extends Base {
 
 
     public static final String SD_CARD = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -282,12 +288,12 @@ public class CascadeTestActivity extends BaseActivity {
      */
     private void testLargeScaleUseLite() {
         // LiteOrm 级联代码插入10w条数的效率测试
-        SqliteUtils.testLargeScaleUseLiteOrm(liteOrm, MAX);
+//        SqliteUtils.testLargeScaleUseLiteOrm(liteOrm, MAX);
     }
 
     private void testLargeScaleUseSystem() {
         // 原生android代码插入10w条数的效率测试
-        SqliteUtils.testLargeScaleUseDefault(CascadeTestActivity.this, MAX);
+//        SqliteUtils.testLargeScaleUseDefault(CascadeTestActivity.this, MAX);
     }
 
     private void queryAndPrintAll(Class claxx) {

@@ -1,4 +1,4 @@
-package com.litesuits.orm.samples;
+package com.kerchin.yellownote.samples;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,6 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.kerchin.yellownote.R;
 import com.litesuits.orm.log.OrmLog;
 
 /**
@@ -17,7 +19,7 @@ import com.litesuits.orm.log.OrmLog;
  * @author MaTianyu
  *         2014-2-25下午2:36:30
  */
-public abstract class BaseActivity extends Activity implements OnClickListener {
+public abstract class Base extends Activity implements OnClickListener {
     protected String TAG = "BaseActivity";
     private TextView mTvSubTitle;
     public LinearLayout container;

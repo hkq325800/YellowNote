@@ -1,4 +1,4 @@
-package com.litesuits.orm.model.single;
+package com.kerchin.yellownote.model.single;
 
 import com.litesuits.orm.db.annotation.Check;
 import com.litesuits.orm.db.annotation.Ignore;

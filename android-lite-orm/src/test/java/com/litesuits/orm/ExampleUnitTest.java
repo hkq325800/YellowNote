@@ -1,4 +1,4 @@
-package com.cjj.sva;
+package com.litesuits.orm;
 
 import org.junit.Test;
 

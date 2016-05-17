@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.fragment;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -29,6 +30,8 @@ import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
+import com.kerchin.yellownote.samples.Main;
+import com.kerchin.yellownote.samples.SingleTest;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.OldProgress;
@@ -303,12 +306,13 @@ public class NoteFragment extends BaseFragment
     /*menu*/
 
     public void addClick() {
-        if (PrimaryData.status.isFolderReady) {
-            MainActivity m = (MainActivity) getActivity();
-            m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), "");
-        } else
-            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+//        if (PrimaryData.status.isFolderReady) {
+//            MainActivity m = (MainActivity) getActivity();
+//            m.hideBtnAdd();
+//            EditActivity.startMe(getActivity(), "");
+//        } else
+//            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+        startActivity(new Intent(getActivity(), Main.class));
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {

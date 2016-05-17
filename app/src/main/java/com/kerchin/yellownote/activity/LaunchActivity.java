@@ -77,8 +77,8 @@ public class LaunchActivity extends BaseActivity {
                 public void run() {
                     getDataStart = System.currentTimeMillis();
                     try {
-                        Looper.prepare();
                         //一般而言登陆过的用户都有数据本地缓存
+                        Looper.prepare();
                         PrimaryData.getInstance().initData();
                         Looper.loop();
                     } catch (AVException e) {
@@ -146,6 +146,11 @@ public class LaunchActivity extends BaseActivity {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+            if(PrimaryData.status==null){
+                handler.postDelayed(runnableForData, runnablePeriod);
+                repeatCount++;
+                return;
+            }
             if (PrimaryData.status.isFolderReady
                     && PrimaryData.status.isNoteReady
                     && cycleTarget != null) {

@@ -8,20 +8,22 @@ import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
+import com.litesuits.orm.db.annotation.NotNull;
+import com.litesuits.orm.db.annotation.PrimaryKey;
+import com.litesuits.orm.db.enums.AssignType;
 
 import java.util.List;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-import io.realm.annotations.Required;
 
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
-public class Folder extends RealmObject {
-    @PrimaryKey
+public class Folder{
+//    @PrimaryKey
+    @PrimaryKey(AssignType.BY_MYSELF)
     String objectId;
-    @Required
+//    @Required
+    @NotNull
     String name;
     int contain;
 

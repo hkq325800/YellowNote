@@ -1,10 +1,12 @@
 package com.kerchin.yellownote.bean;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.Trace;
@@ -15,8 +17,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import io.realm.Realm;
 
 /**
  * Created by Kerchin on 2016/4/11 0011.
@@ -30,12 +30,16 @@ public class PrimaryData {
     private Handler outHandler;
     private int outHandleCode;
     private Handler mHandler = new Handler();
+    private LiteOrmHelper liteOrmHelper;
 
     private PrimaryData() {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
+//        Looper.prepare();
+//        mHandler = new Handler();
+//        Looper.loop();
 //        initData();//在首次手动调用
     }
 
@@ -149,13 +153,13 @@ public class PrimaryData {
 //                    }
 //                }
                 for (AVObject avObject : avObjects) {
-                    Realm realm = Realm.getInstance(MyApplication.getContext());
-                    realm.beginTransaction();
-                    Folder f = realm.createObject(Folder.class);
-                    f.setObjectId(avObject.getObjectId());
-                    f .setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
-                    f.setName(avObject.getString("folder_name"));
-                    realm.commitTransaction();
+//                    Realm realm = Realm.getInstance(MyApplication.getContext());
+//                    realm.beginTransaction();
+//                    Folder f = realm.createObject(Folder.class);
+//                    f.setObjectId(avObject.getObjectId());
+//                    f .setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
+//                    f.setName(avObject.getString("folder_name"));
+//                    realm.commitTransaction();
 
                     Folder folder = new Folder(avObject.getObjectId()
                             , avObject.getString("folder_name")
@@ -165,6 +169,7 @@ public class PrimaryData {
 //                        if (!isFolderContain(folder)) {
                     listFolder.add(folder);
 //                        }
+//                    LiteOrmHelper.save(folder);
                 }
                 Collections.sort(listFolder, new Comparator<Folder>() {
                     @Override
