@@ -74,6 +74,7 @@ public class PrimaryData {
      */
     public void initData() throws AVException {
         Trace.d("loadData");
+        status.clear();
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
         listNote.clear();
@@ -173,13 +174,13 @@ public class PrimaryData {
 //                    f.setName(avObject.getString("folder_name"));
 //                    realm.commitTransaction();
 
-                    Folder folder = new Folder(avObject.getObjectId()
+                    final Folder folder = new Folder(avObject.getObjectId()
                             , avObject.getString("folder_name")
                             //, avObject.getInt("folder_contain"));
                             , map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
                     Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
                     listFolder.add(folder);
-                    long l = liteOrmHelper.save(folder);
+//                    long l = liteOrmHelper.save(folder);
                 }
                 //sortByContain
                 Collections.sort(listFolder, new Comparator<Folder>() {
@@ -225,7 +226,7 @@ public class PrimaryData {
             public void run() {
                 for (AVObject avObject : avObjects) {
                     String folderId = avObject.getString("folder_id");
-                    Note note = new Note(avObject.getObjectId()
+                    final Note note = new Note(avObject.getObjectId()
                             , avObject.getString("note_title")
                             , avObject.getLong("note_editedAt")
                             , avObject.getString("note_content")
@@ -233,7 +234,7 @@ public class PrimaryData {
                             , folderId
                             , avObject.getString("note_type"));
                     listNote.add(note);
-                    long l = liteOrmHelper.save(note);
+//                    long l = liteOrmHelper.save(note);
                     int i = 0;
                     if (map.get(folderId) != null)
                         i = map.get(folderId);
@@ -247,7 +248,7 @@ public class PrimaryData {
 
     public void clearData() {
         data = null;
-        status = new PrimaryDataStatus();
+        status.clear();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
@@ -305,6 +306,9 @@ public class PrimaryData {
     }
 
     public void refresh(final Handler handler, final byte handleCode) throws AVException {
+        listNote.clear();
+        map.clear();
+        listFolder.clear();
         outHandler = handler;
         outHandleCode = handleCode;
         status.isItemReady = false;
@@ -426,5 +430,12 @@ public class PrimaryData {
         public boolean isFolderReady = false;
         public boolean isItemReady = false;
         public boolean isHeaderReady = false;
+
+        public void clear(){
+            isNoteReady = false;
+            isFolderReady = false;
+            isItemReady = false;
+            isHeaderReady = false;
+        }
     }
 }

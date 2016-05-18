@@ -47,7 +47,7 @@ public class FolderFragment extends BaseFragment {
     private PrimaryData primaryData;
     private FolderShrinkAdapter folderAdapter;
     private AlertDialog alertDialog;
-    private GetDataHelper getDataHelper;
+    public GetDataHelper getDataHelper;
     private LayoutInflater inflater;
     private final static byte handle4explosion = 99;
     private SystemHandler handler = new SystemHandler(this) {
@@ -230,7 +230,7 @@ public class FolderFragment extends BaseFragment {
             mRecyclerView.setAdapter(folderAdapter);
         } else {
             folderAdapter.setFolders(primaryData.mItems);
-            mRecyclerView.setAdapter(folderAdapter);
+//            mRecyclerView.setAdapter(folderAdapter);
             //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
 //            folderAdapter.setIsFirstTrue();
 //            Trace.d("scroll" + mHeaders.get(mHeaders.size() - 1).getId() + "/" + mHeaders.get(mHeaders.size() - 1).getName());

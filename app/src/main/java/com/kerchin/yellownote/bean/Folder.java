@@ -25,7 +25,7 @@ import java.util.List;
 @Table("folder")
 public class Folder implements Serializable {
     //        @PrimaryKey
-    @PrimaryKey(AssignType.BY_MYSELF)//加了为null
+    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
     int id;
     @Column("folder_objectId")
     String objectId;

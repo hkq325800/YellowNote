@@ -46,36 +46,37 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 
     private void initData(boolean isFirst) {
         //TODO 放到PrimaryData中
-        List<SimpleEntity> mNotes = new ArrayList<>();
+//        List<SimpleEntity> mNotes = new ArrayList<>();
         if (isFirst)
             shownFolderPosition = 0;
         //mItem复刻
-        for (int i = 0; i < mItems.size(); i++) {
-            if (mItems.get(i).entityType == SimpleEntity.typeNote)
-                mNotes.add(mItems.get(i));
-        }
+//        for (int i = 0; i < mItems.size(); i++) {
+//            if (mItems.get(i).entityType == SimpleEntity.typeNote)
+//                mNotes.add(mItems.get(i));
+//        }
         //设置ID和HeaderBefore
         for (int i = 0; i < mItems.size(); i++) {
             if (mItems.get(i).entityType == SimpleEntity.typeFolder
                     && mItems.get(i).getContain() != 0)
-                for (int j = 0; j < mNotes.size(); j++) {
-                    if (mNotes.get(j).getFolderId().equals(mItems.get(i).getFolderId())) {
+                for (int j = 0; j < mItems.size(); j++) {//可foreach
+                    if (mItems.get(j).getFolderId().equals(mItems.get(i).getFolderId())
+                            && mItems.get(j).entityType == SimpleEntity.typeNote) {
                         //设置noteItem的真实ID
-                        mNotes.get(j).setId(mItems.get(i).getId() + mItems.get(i).getNow() + 1);
+                        mItems.get(j).setId(mItems.get(i).getId() + mItems.get(i).getNow() + 1);
                         //找到一个数值+1
                         mItems.get(i).addNow();
-                        mNotes.get(j).setFolderPosition(mItems.get(i).getId());
+                        mItems.get(j).setFolderPosition(mItems.get(i).getId());
 //                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
                         //设置该noteItem前item的数量
-                        mNotes.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
+                        mItems.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
                         if (isFirst)
-                            if (mNotes.get(j).getHeaderBefore() == 1) {
-                                mNotes.get(j).setIsShown(true);
+                            if (mItems.get(j).getHeaderBefore() == 1) {
+                                mItems.get(j).setIsShown(true);
                             }
                     }
                 }
             else if (mItems.get(i).getFolderPosition() == shownFolderPosition)
-                mItems.get(i).setIsShown(true);
+                mItems.get(i).setIsShown(true);//初始化shownFolderPosition
         }
 
         //重排mNotes 非必须

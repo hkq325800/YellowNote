@@ -28,7 +28,7 @@ public class LiteOrmHelper extends BaseSqlHelper {
     private LiteOrm liteOrm;
 
     public LiteOrmHelper() {
-        liteOrm = LiteOrm.newSingleInstance(MyApplication.getContext(), "liteorm.db");
+        liteOrm = LiteOrm.newCascadeInstance(MyApplication.getContext(), "liteorm.db");
         liteOrm.setDebugged(true); // open the log
     }
 

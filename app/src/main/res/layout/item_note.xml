@@ -7,7 +7,7 @@
     <View
         android:id="@+id/mNoteItemView"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
+        android:layout_height="1dp"
         android:background="@color/white" />
 
     <!--android:layout_marginRight="7dp"-->

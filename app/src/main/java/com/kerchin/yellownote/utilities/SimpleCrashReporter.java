@@ -21,10 +21,10 @@ public class SimpleCrashReporter implements CrashExceptionHandler.CrashException
             try {
                 AVFile avFile = AVFile.withAbsoluteLocalPath(file.getName(), file.getAbsolutePath());
                 avFile.saveInBackground();
-                AVObject crash = new AVObject("Crash");
-                crash.put("user_tel", MyApplication.user);
-                crash.put("crash_log", avFile);
-                crash.saveInBackground();
+                // AVObject crash = new AVObject("Crash");
+                // crash.put("user_tel", MyApplication.user);
+                // crash.put("crash_log", avFile);
+                // crash.saveInBackground();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

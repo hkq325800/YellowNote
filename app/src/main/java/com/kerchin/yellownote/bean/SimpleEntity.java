@@ -5,43 +5,49 @@ package com.kerchin.yellownote.bean;
  * More Code on hkq325800@163.com
  */
 public class SimpleEntity {
-    private String objectId;
-    private int globalId;
-    private int id;//真实id
-    private int now;//用于确认note的真实id
+    private String objectId;//leanCloud上的id【note】
+    private int globalId;//
+    private int id;//mItems中的id 排序的主要依据
+    private int now;//用于确认note的真实id【folder】
     private String name;//名称
-    private int contain;//包含的子项数量
+    private int contain;//包含的子项数量【folder】
     private String folderId;//笔记夹id
-    private int folderPosition = 0;
-    private int headerBefore;//可能和folderPosition职能重复
-    private boolean isShown;//是否应当显示 解决动画的显示与否
-    private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复
+    private int folderPosition;//note的folder在mItems中的位置【note】
+    private int headerBefore;//可能和folderPosition职能重复【note】
+    private boolean isShown;//是否应当显示 解决动画的显示与否【note】
+    private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复 默认true openFolder时设为false 完成动画后设为true
     public byte entityType;
     public final static byte typeFolder = 0;
     public final static byte typeNote = 1;
+
     //folder
     public SimpleEntity(int globalId, int id, String name, int contain, String folderId) {
-        this.objectId = "";
+        this.objectId = "-1";
         entityType = typeFolder;
         this.globalId = globalId;
         now = 0;
         this.id = id;
+        folderPosition = -1;
+        headerBefore = -1;
         this.name = name;
         this.contain = contain;
         this.folderId = folderId;
     }
+
     //note
-    public SimpleEntity(String objectId, int globalId, int id,String name,String folderId){
+    public SimpleEntity(String objectId, int globalId, int id, String name, String folderId) {
         this.objectId = objectId;
         entityType = typeNote;
         this.globalId = globalId;
         this.id = id;
+        now = -1;
+        contain = -1;
         this.name = name;
         this.folderId = folderId;
         isShown = false;
     }
 
-    public int getGlobalId(){
+    public int getGlobalId() {
         return globalId;
     }
 

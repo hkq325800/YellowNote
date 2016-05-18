@@ -145,20 +145,20 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                     mCrashInfoFolder.mkdirs();
                 }
                 String timeStampString = DATE_FORMAT.format(new Date());//当先的时间格式化
-                String crashLogFileName = timeStampString + ".txt";
+                String crashLogFileName = MyApplication.user + "_" + timeStampString + ".log";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
 
                 //记录闪退环境的信息
                 RandomAccessFile randomAccessFile = new RandomAccessFile(crashLogFile, "rw");
-                randomAccessFile.writeChars("------------Crash Environment Info------------" + "\n");
-                randomAccessFile.writeChars("------------Manufacture: " + SystemUtils.getDeviceManufacture() + "------------" + "\n");
-                randomAccessFile.writeChars("------------DeviceName: " + SystemUtils.getDeviceName() + "------------" + "\n");
-                randomAccessFile.writeChars("------------SystemVersion: " + SystemUtils.getSystemVersion() + "------------" + "\n");
-                randomAccessFile.writeChars("------------DeviceIMEI: " + SystemUtils.getDeviceIMEI(mApplicationContext) + "------------" + "\n");
-                randomAccessFile.writeChars("------------AppVersion: " + SystemUtils.getAppVersion(mApplicationContext) + "------------" + "\n");
-                randomAccessFile.writeChars("------------Crash Environment Info------------" + "\n");
-                randomAccessFile.writeChars("\n");
+                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
+                randomAccessFile.writeUTF("------------Manufacture: " + SystemUtils.getDeviceManufacture() + "------------" + "\n");
+                randomAccessFile.writeUTF("------------DeviceName: " + SystemUtils.getDeviceName() + "------------" + "\n");
+                randomAccessFile.writeUTF("------------SystemVersion: " + SystemUtils.getSystemVersion() + "------------" + "\n");
+                randomAccessFile.writeUTF("------------DeviceIMEI: " + SystemUtils.getDeviceIMEI(mApplicationContext) + "------------" + "\n");
+                randomAccessFile.writeUTF("------------AppVersion: " + SystemUtils.getAppVersion(mApplicationContext) + "------------" + "\n");
+                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
+                randomAccessFile.writeUTF("\n");
                 randomAccessFile.close();
 
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(crashLogFile.getAbsolutePath(), true)), true);
