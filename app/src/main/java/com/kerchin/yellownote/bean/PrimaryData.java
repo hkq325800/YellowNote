@@ -87,6 +87,51 @@ public class PrimaryData {
         mHandler.post(runnableForSimple);//initData
     }
 
+    public void initData(boolean isFirst, int shownFolderPosition) {
+        //TODO 放到PrimaryData中
+//        List<SimpleEntity> mNotes = new ArrayList<>();
+        //mItem复刻
+//        for (int i = 0; i < mItems.size(); i++) {
+//            if (mItems.get(i).entityType == SimpleEntity.typeNote)
+//                mNotes.add(mItems.get(i));
+//        }
+        //设置ID和HeaderBefore
+        for (int i = 0; i < mItems.size(); i++) {
+            if (mItems.get(i).entityType == SimpleEntity.typeFolder
+                    && mItems.get(i).getContain() != 0)
+                for (int j = 0; j < mItems.size(); j++) {//可foreach
+                    if (mItems.get(j).getFolderId().equals(mItems.get(i).getFolderId())
+                            && mItems.get(j).entityType == SimpleEntity.typeNote) {
+                        //设置noteItem的真实ID
+                        mItems.get(j).setId(mItems.get(i).getId() + mItems.get(i).getNow() + 1);
+                        //找到一个数值+1
+                        mItems.get(i).addNow();
+                        mItems.get(j).setFolderPosition(mItems.get(i).getId());
+//                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
+                        //设置该noteItem前item的数量
+                        mItems.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
+                        if (isFirst)
+                            if (mItems.get(j).getHeaderBefore() == 1) {
+                                mItems.get(j).setIsShown(true);
+                            }
+                    }
+                }
+            else if (mItems.get(i).getFolderPosition() == shownFolderPosition)
+                mItems.get(i).setIsShown(true);//初始化shownFolderPosition
+        }
+
+        //重排mNotes 非必须
+        Collections.sort(mItems, new Comparator<SimpleEntity>() {
+            @Override
+            public int compare(SimpleEntity lhs, SimpleEntity rhs) {
+                if (lhs.getId() > rhs.getId())
+                    return 1;
+                else
+                    return -1;
+            }
+        });
+    }
+
     /**
      * 从本地的数据中加载Simple
      */
@@ -109,7 +154,7 @@ public class PrimaryData {
             if (status.isNoteReady && status.isFolderReady) {
                 getSimpleEntityFromList();
             } else {//若一直未能进入需要处理 TODO
-                mHandler.postDelayed(runnableForSimple, 250);
+                mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
             }
         }
     };
@@ -317,7 +362,11 @@ public class PrimaryData {
         Trace.d("refreshPrimaryData");
         getNotesFromCloud();
         getFolderFromCloud();
-        mHandler.post(runnableForSimple);//refresh
+        if (outHandler != null) {
+            outHandler.sendEmptyMessage(outHandleCode);
+            outHandler = null;
+        }
+//        mHandler.post(runnableForSimple);//refresh
     }
 
     public void loadMore() {

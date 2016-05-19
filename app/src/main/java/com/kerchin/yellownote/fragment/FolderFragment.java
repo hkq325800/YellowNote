@@ -73,13 +73,9 @@ public class FolderFragment extends BaseFragment {
                     Trace.d("handlerInFolder", "handle4firstGet");
                     setRecycleView();//firstGot
                     break;
-//                case GetDataHelper.handle4refresh:
-//                    Trace.d("handlerInFolder", "handle4refresh");
-//                    folderAdapter.notifyDataSetChanged();
-//                    break;
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInFolder", "handle4respond");
-                    primaryData.getSimpleEntityFromList();
+                    primaryData.getSimpleEntityFromList();//handle4respond
 //                    getHeaderListFromFolder();//handle4respond
                     setRecycleView();//respond
                     break;
@@ -275,7 +271,7 @@ public class FolderFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int which) {
                 getDataHelper.respond();//reTitleNoteDialogShow->note.reName
                 primaryData.getNote(item.getObjectId()).move2folder(getActivity()
-                        , primaryData.getFolder(mFolderId[which]), handler, getDataHelper.handleCode);
+                        , primaryData.getFolder(mFolderId[which]), handler, GetDataHelper.handle4respond);
 //                Trace.show(getActivity(), "选择的笔记夹为：" + mFolder[which]);
             }
         });
@@ -287,15 +283,15 @@ public class FolderFragment extends BaseFragment {
         if (hasRefresh) {
             hasRefresh = false;
             getDataHelper.respond();//dataRefresh
-            handler.sendEmptyMessage(
-                    getDataHelper.handleCode);
+            handler.sendEmptyMessageDelayed(
+                    GetDataHelper.handle4respond, 350);
         } else {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         getDataHelper.refresh();//MainActivity dataGot
-                        primaryData.refresh(handler, getDataHelper.handleCode);//isChanged4folder
+                        primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
                     } catch (AVException e) {
                         e.printStackTrace();
                     }
@@ -305,12 +301,13 @@ public class FolderFragment extends BaseFragment {
     }
 
     private void getData() {
-        Trace.d("getData status", getDataHelper.statusName);
         if (mRecyclerView != null) {
 //            getHeaderListFromFolder();//getData
-            primaryData.getSimpleEntityFromList();
+            getDataHelper.firstGet();//首次加载数据 dataGot
+            Trace.d("getData status", getDataHelper.statusName);
+            primaryData.getSimpleEntityFromList();//getData
             handler.sendEmptyMessage(
-                    getDataHelper.handleCode);
+                    GetDataHelper.handle4firstGet);
         }
     }
 
@@ -366,7 +363,7 @@ public class FolderFragment extends BaseFragment {
                     getDataHelper.respond();//reTitleNoteDialogShow->note.reName
                     note.reName(getActivity()
                             , mEditEdt.getText().toString()
-                            , handler, getDataHelper.handleCode);
+                            , handler, GetDataHelper.handle4respond);
                     alertDialog.dismiss();
                     MainActivity mainActivity = (MainActivity) getActivity();
                     mainActivity.showBtnAdd();
@@ -434,7 +431,7 @@ public class FolderFragment extends BaseFragment {
                     getDataHelper.respond();//reTitleFolderDialogShow->folder.reName
                     folder.reName(getActivity()
                             , mEditEdt.getText().toString()
-                            , handler, getDataHelper.handleCode);
+                            , handler, GetDataHelper.handle4respond);
                     alertDialog.dismiss();
                     MainActivity mainActivity = (MainActivity) getActivity();
                     mainActivity.showBtnAdd();
@@ -466,7 +463,6 @@ public class FolderFragment extends BaseFragment {
         inflater = LayoutInflater.from(getActivity());
         mainStatus = new ToolbarStatus();
         mRecyclerView = (RecyclerView) view.findViewById(R.id.mRecyclerView);
-        getDataHelper.firstGet();//首次加载数据 dataGot
         getData();//首次加载数据 firstGet
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -512,7 +508,7 @@ public class FolderFragment extends BaseFragment {
                         dialog.dismiss();
                         getDataHelper.respond();//deleteFolder->folder.delete
                         primaryData.getFolderAt(position)
-                                .delete(getActivity(), position, handler, getDataHelper.handleCode);
+                                .delete(getActivity(), position, handler, GetDataHelper.handle4respond);
                     }
                 });
             }
@@ -576,7 +572,7 @@ public class FolderFragment extends BaseFragment {
                                     getDataHelper.respond();//addClick->getData
 //                                getData();//add folder respond
                                     handler.sendEmptyMessage(
-                                            getDataHelper.handleCode);
+                                            GetDataHelper.handle4respond);
                                 } catch (AVException e) {
                                     Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
                                     e.printStackTrace();

@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -164,7 +165,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(crashLogFile.getAbsolutePath(), true)), true);
                 String time = "[" + NormalUtils.getNowDate("yyyy-MM-dd-HH-mm-ss") + "]";
                 pw.append(time);
-                ex.printStackTrace(pw);//写入奔溃的日志信息
+                ex.printStackTrace(pw);//写入崩溃的日志信息
                 pw.close();
                 return crashLogFile;
             } catch (IOException e) {

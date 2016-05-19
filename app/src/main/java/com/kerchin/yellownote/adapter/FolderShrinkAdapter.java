@@ -6,6 +6,7 @@ import android.os.CountDownTimer;
 import android.view.View;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 
 import org.byteam.superadapter.IMulItemViewType;
@@ -33,68 +34,22 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     private int lastFolderPosition = 0;//记录上一次展现的folder的位置 用于关闭动画
     boolean isFirst = true;//防止第一次的动画
 
-    public FolderShrinkAdapter(Context context, List<SimpleEntity> items, IMulItemViewType<SimpleEntity> mulItemViewType
-    ) {
+    public FolderShrinkAdapter(Context context, List<SimpleEntity> items
+            , IMulItemViewType<SimpleEntity> mulItemViewType) {
         super(context, items, mulItemViewType);
         this.context = context;
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
         this.mItems = items;
-        initData(true);
+        shownFolderPosition = 0;
+        PrimaryData.getInstance().initData(true, shownFolderPosition);
         mList = mItems;
         notifyDataSetChanged();
-    }
-
-    private void initData(boolean isFirst) {
-        //TODO 放到PrimaryData中
-//        List<SimpleEntity> mNotes = new ArrayList<>();
-        if (isFirst)
-            shownFolderPosition = 0;
-        //mItem复刻
-//        for (int i = 0; i < mItems.size(); i++) {
-//            if (mItems.get(i).entityType == SimpleEntity.typeNote)
-//                mNotes.add(mItems.get(i));
-//        }
-        //设置ID和HeaderBefore
-        for (int i = 0; i < mItems.size(); i++) {
-            if (mItems.get(i).entityType == SimpleEntity.typeFolder
-                    && mItems.get(i).getContain() != 0)
-                for (int j = 0; j < mItems.size(); j++) {//可foreach
-                    if (mItems.get(j).getFolderId().equals(mItems.get(i).getFolderId())
-                            && mItems.get(j).entityType == SimpleEntity.typeNote) {
-                        //设置noteItem的真实ID
-                        mItems.get(j).setId(mItems.get(i).getId() + mItems.get(i).getNow() + 1);
-                        //找到一个数值+1
-                        mItems.get(i).addNow();
-                        mItems.get(j).setFolderPosition(mItems.get(i).getId());
-//                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
-                        //设置该noteItem前item的数量
-                        mItems.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
-                        if (isFirst)
-                            if (mItems.get(j).getHeaderBefore() == 1) {
-                                mItems.get(j).setIsShown(true);
-                            }
-                    }
-                }
-            else if (mItems.get(i).getFolderPosition() == shownFolderPosition)
-                mItems.get(i).setIsShown(true);//初始化shownFolderPosition
-        }
-
-        //重排mNotes 非必须
-        Collections.sort(mItems, new Comparator<SimpleEntity>() {
-            @Override
-            public int compare(SimpleEntity lhs, SimpleEntity rhs) {
-                if (lhs.getId() > rhs.getId())
-                    return 1;
-                else
-                    return -1;
-            }
-        });
     }
 
     public void setFolders(List<SimpleEntity> items) {
         //shownFolderPosition会跟着改变切不确定会变成什么样故无法判断
         this.mItems = items;
-        initData(false);
+        PrimaryData.getInstance().initData(false, shownFolderPosition);
         notifyDataSetChanged();
     }
 

@@ -582,6 +582,7 @@ public class NoteFragment extends BaseFragment
                             try {
                                 getDataHelper.refresh();//MainActivity dataGot
                                 //重新获取mHeaders listNote和mItems
+                                FolderFragment.isChanged4folder = true;
                                 primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
                                         ? GetDataHelper.handle4firstGet
                                         : GetDataHelper.handle4refresh);
