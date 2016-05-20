@@ -73,7 +73,7 @@ public class NoteService {
         AVObject note = query.get(objectId);
         if (note != null) {
             note.put("note_title", newName);
-            note.put("note_editedAt", System.currentTimeMillis());
+//            note.put("note_editedAt", System.currentTimeMillis());
             note.save();
         }
     }

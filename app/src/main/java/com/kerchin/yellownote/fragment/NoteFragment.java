@@ -1,7 +1,6 @@
 package com.kerchin.yellownote.fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,8 +29,6 @@ import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
-import com.kerchin.yellownote.samples.Main;
-import com.kerchin.yellownote.samples.SingleTest;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.OldProgress;
@@ -113,9 +110,9 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInNote", "handle4refresh");
                     getDataListFromNote(primaryData.listNote);//handle4refresh
-                    if (MainActivity.thisPosition == 0) {
+//                    if (MainActivity.thisPosition == 0) {
                         mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-                    }
+//                    }
                     if (noteAdapter != null) {
                         noteAdapter.setList(list);
                     }
@@ -288,7 +285,7 @@ public class NoteFragment extends BaseFragment
 
     @Override
     public void onResume() {
-        respondForChange();
+        respondForChange();//onResume
         super.onResume();
     }
 
@@ -296,23 +293,22 @@ public class NoteFragment extends BaseFragment
         if (isChanged4note) {
             //被动刷新
             getDataHelper.respond();//isChanged4note
-            getData(0);//statusRespond onResume
+            getData(350);//statusRespond onResume
             if (mainStatus.isSearchMode())
                 doSearch();
-            isChanged4note = false;
+            isChanged4note = false;//respondForChange
         }
     }
 
     /*menu*/
 
     public void addClick() {
-//        if (PrimaryData.status.isFolderReady) {
-//            MainActivity m = (MainActivity) getActivity();
-//            m.hideBtnAdd();
-//            EditActivity.startMe(getActivity(), "");
-//        } else
-//            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
-        startActivity(new Intent(getActivity(), Main.class));
+        if (PrimaryData.status.isFolderReady) {
+            MainActivity m = (MainActivity) getActivity();
+            m.hideBtnAdd();
+            EditActivity.startMe(getActivity(), "");
+        } else
+            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {
@@ -559,10 +555,7 @@ public class NoteFragment extends BaseFragment
         return true;
     }
 
-    //    @OnClick(R.id.mNoteEmptyTxt)
     public void emptyClick() {
-//        mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
-//        mNoteProgress.setVisibility(View.VISIBLE);//TODO mNoteProgress
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -573,7 +566,7 @@ public class NoteFragment extends BaseFragment
                     getDataHelper.respond();
                     mProgress.startProgress(false);//emptyClick
                     getData(0);//statusRespond empty
-                    FolderFragment.isChanged4folder = true;
+                    FolderFragment.isChanged4folder = true;//emptyClick
                 } else {
                     mProgress.startProgress(false);//refresh
                     new Thread(new Runnable() {
@@ -582,7 +575,7 @@ public class NoteFragment extends BaseFragment
                             try {
                                 getDataHelper.refresh();//MainActivity dataGot
                                 //重新获取mHeaders listNote和mItems
-                                FolderFragment.isChanged4folder = true;
+                                FolderFragment.isChanged4folder = true;//emptyClick
                                 primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
                                         ? GetDataHelper.handle4firstGet
                                         : GetDataHelper.handle4refresh);
@@ -615,7 +608,7 @@ public class NoteFragment extends BaseFragment
                     msg.what = GetDataHelper.handle4error;
                     handler.sendMessage(msg);
                 } finally {
-                    isChanged4note = false;
+                    isChanged4note = false;//onRefresh
                     FolderFragment.hasRefresh = true;//onRefresh
                     FolderFragment.isChanged4folder = true;//onRefresh
                 }

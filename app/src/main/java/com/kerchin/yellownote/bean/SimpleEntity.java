@@ -6,14 +6,14 @@ package com.kerchin.yellownote.bean;
  */
 public class SimpleEntity {
     private String objectId;//leanCloud上的id【note】
-    private int globalId;//
+    private int globalId;//在primaryData中的position
     private int id;//mItems中的id 排序的主要依据
     private int now;//用于确认note的真实id【folder】
     private String name;//名称
     private int contain;//包含的子项数量【folder】
     private String folderId;//笔记夹id
     private int folderPosition;//note的folder在mItems中的位置【note】
-    private int headerBefore;//可能和folderPosition职能重复【note】
+    //    private int headerBefore;//可能和folderPosition职能重复【note】setIsShown
     private boolean isShown;//是否应当显示 解决动画的显示与否【note】
     private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复 默认true openFolder时设为false 完成动画后设为true
     public byte entityType;
@@ -28,7 +28,7 @@ public class SimpleEntity {
         now = 0;
         this.id = id;
         folderPosition = -1;
-        headerBefore = -1;
+//        headerBefore = -1;
         this.name = name;
         this.contain = contain;
         this.folderId = folderId;
@@ -69,14 +69,6 @@ public class SimpleEntity {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getHeaderBefore() {
-        return headerBefore;
-    }
-
-    public void setHeaderBefore(int headerBefore) {
-        this.headerBefore = headerBefore;
     }
 
     public boolean isShown() {
@@ -121,5 +113,19 @@ public class SimpleEntity {
 
     public void setObjectId(String objectId) {
         this.objectId = objectId;
+    }
+
+    public String toString() {
+        return "entityType" + entityType +
+                "id" + id +
+                "name" + name +
+                "folderPosition" + folderPosition +
+                "isShown" + isShown +
+                "folderId" + folderId +
+                "objectId" + objectId +
+                "isShown" + isShown +
+                "hasShownAnim" + hasShownAnim +
+                "contain" + contain +
+                "globalId" + globalId;
     }
 }

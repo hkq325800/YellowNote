@@ -177,7 +177,6 @@ public class Note implements Serializable {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    FolderFragment.isChanged4folder = true;//saveChange
                     try {
                         AVObject newNote = NoteService.addNewNote(
                                 MyApplication.user, newTitle, newContent, folder, folderId);
@@ -185,6 +184,7 @@ public class Note implements Serializable {
                         if (newNote != null) {
                             objectId = newNote.getObjectId();
                             Trace.d("saveNewNote 成功");
+                            FolderFragment.isChanged4folder = true;//saveChange add
                         }
                     } catch (AVException e) {
                         Message msg = Message.obtain();
@@ -224,6 +224,7 @@ public class Note implements Serializable {
                         setPreview();
                         NoteFragment.isChanged4note = true;//saveChange
                         Trace.d("saveModifyNote 成功");
+                        FolderFragment.isChanged4folder = true;//saveChange edit
                         msg.obj = true;
                         handler.sendMessage(msg);
                     } catch (AVException e) {

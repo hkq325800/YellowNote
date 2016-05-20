@@ -31,6 +31,7 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -112,7 +113,7 @@ public class MainActivity extends BaseActivity
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
                 if (position == 0) {
                     //delete初始化
-                    noteFragment.respondForChange();//数据按需刷新
+                    noteFragment.respondForChange();//onPageSelected
                     btnSort.setVisible(true);
                     btnDelete.setVisible(true);
                     btnSearch.setVisible(true);
@@ -136,12 +137,7 @@ public class MainActivity extends BaseActivity
                     }
 //                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
-                    if (FolderFragment.isChanged4folder
-                            && folderFragment.getDataHelper != null) {
-                        Trace.d("isChanged4folder");
-                        folderFragment.dataRefresh();
-                        FolderFragment.isChanged4folder = false;
-                    }
+                    folderFragment.respondForChange();
                     showBtnAdd();
                 }
             }
@@ -253,7 +249,6 @@ public class MainActivity extends BaseActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        Trace.d("onCreateOptionsMenu" + noteFragment.toString());
         getMenuInflater().inflate(R.menu.main, menu);
         btnSearch = mMainToolbar.getMenu().findItem(R.id.action_search);
         btnSort = mMainToolbar.getMenu().findItem(R.id.action_sort);
@@ -306,15 +301,13 @@ public class MainActivity extends BaseActivity
             startActivity(intent);
             finish();
         } else if (id == R.id.nav_setting) {
-            mMainDrawer.closeDrawers();
-            handler.sendEmptyMessageDelayed(gotoSetting, 300);
+            handler.sendEmptyMessage(gotoSetting);
+            return false;
         } else if (id == R.id.nav_resetSecret) {
-            mMainDrawer.closeDrawers();
-            handler.sendEmptyMessageDelayed(gotoSecret, 300);
+            startActivity(new Intent(MainActivity.this, Main.class));
+//            handler.sendEmptyMessage(gotoSecret);
+            return false;
         }
-
-        if (id != R.id.nav_logout)
-            mMainDrawer.closeDrawer(GravityCompat.START);
         return true;
     }
 

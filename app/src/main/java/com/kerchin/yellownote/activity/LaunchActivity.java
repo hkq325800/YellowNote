@@ -90,15 +90,7 @@ public class LaunchActivity extends BaseActivity {
                 }
             }).start();
         }
-        //TODO guidePage
-        if (MyApplication.getDefaultShared().getBoolean("isGuide", false)) {
-            loginVerify(MyApplication.user);
-
-//            startActivity(new Intent(this, GuideActivity.class));
-//            finish();
-        } else {
-            loginVerify(MyApplication.user);
-        }
+        loginVerify(MyApplication.user);
     }
 
     @Override
@@ -146,7 +138,7 @@ public class LaunchActivity extends BaseActivity {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-            if(PrimaryData.status==null){
+            if (PrimaryData.status == null) {
                 handler.postDelayed(runnableForData, runnablePeriod);
                 repeatCount++;
                 return;

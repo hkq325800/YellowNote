@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -152,15 +153,34 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
 
                 //记录闪退环境的信息
                 RandomAccessFile randomAccessFile = new RandomAccessFile(crashLogFile, "rw");
-                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
-                randomAccessFile.writeUTF("------------Manufacture: " + SystemUtils.getDeviceManufacture() + "------------" + "\n");
-                randomAccessFile.writeUTF("------------DeviceName: " + SystemUtils.getDeviceName() + "------------" + "\n");
-                randomAccessFile.writeUTF("------------SystemVersion: " + SystemUtils.getSystemVersion() + "------------" + "\n");
-                randomAccessFile.writeUTF("------------DeviceIMEI: " + SystemUtils.getDeviceIMEI(mApplicationContext) + "------------" + "\n");
-                randomAccessFile.writeUTF("------------AppVersion: " + SystemUtils.getAppVersion(mApplicationContext) + "------------" + "\n");
-                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
-                randomAccessFile.writeUTF("\n");
+//                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
+//                randomAccessFile.writeUTF("------------Manufacture: " + SystemUtils.getDeviceManufacture() + "------------" + "\n");
+//                randomAccessFile.writeUTF("------------DeviceName: " + SystemUtils.getDeviceName() + "------------" + "\n");
+//                randomAccessFile.writeUTF("------------SystemVersion: " + SystemUtils.getSystemVersion() + "------------" + "\n");
+//                randomAccessFile.writeUTF("------------DeviceIMEI: " + SystemUtils.getDeviceIMEI(mApplicationContext) + "------------" + "\n");
+//                randomAccessFile.writeUTF("------------AppVersion: " + SystemUtils.getAppVersion(mApplicationContext) + "------------" + "\n");
+//                randomAccessFile.writeUTF("------------Crash Environment Info------------" + "\n");
+//                randomAccessFile.writeUTF("\n");
+                String str = ("------------Crash Environment Info------------" + "\n") +
+                        "------------Manufacture: " +
+                        SystemUtils.getDeviceManufacture() +
+                        "------------" + "\n" +
+                        "------------DeviceName: " +
+                        SystemUtils.getDeviceName() +
+                        "------------" + "\n" +
+                        "------------SystemVersion: " +
+                        SystemUtils.getSystemVersion() +
+                        "------------" + "\n" +
+                        "------------DeviceIMEI: " +
+                        SystemUtils.getDeviceIMEI(mApplicationContext) +
+                        "------------" + "\n" +
+                        "------------AppVersion: " +
+                        SystemUtils.getAppVersion(mApplicationContext) +
+                        "------------" + "\n" +
+                        "------------Crash Environment Info------------" + "\n\n";
+                randomAccessFile.write(str.getBytes(Charset.forName("UTF-8")));
                 randomAccessFile.close();
+                
 
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(crashLogFile.getAbsolutePath(), true)), true);
                 String time = "[" + NormalUtils.getNowDate("yyyy-MM-dd-HH-mm-ss") + "]";

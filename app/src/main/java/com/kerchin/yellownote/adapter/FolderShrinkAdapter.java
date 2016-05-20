@@ -30,27 +30,30 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     // header点击事件
     private OnHeaderClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
-    public int shownFolderPosition = 0;//当前显示着的folder位置
-    private int lastFolderPosition = 0;//记录上一次展现的folder的位置 用于关闭动画
+//    private int shownFolderPosition = 0;
+    public String shownFolderId;//当前显示着的folder位置
+//    private int lastFolderPosition = 0;
+    private String lastFolderId;//记录上一次展现的folder的位置 用于关闭动画
     boolean isFirst = true;//防止第一次的动画
 
-    public FolderShrinkAdapter(Context context, List<SimpleEntity> items
+    public FolderShrinkAdapter(Context context, String shownFolderId
+            , List<SimpleEntity> items
             , IMulItemViewType<SimpleEntity> mulItemViewType) {
         super(context, items, mulItemViewType);
         this.context = context;
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
         this.mItems = items;
-        shownFolderPosition = 0;
-        PrimaryData.getInstance().initData(true, shownFolderPosition);
-        mList = mItems;
-        notifyDataSetChanged();
+        this.shownFolderId = shownFolderId;
+//        PrimaryData.getInstance().initData(true, shownFolderId);
+//        mList = mItems;
+//        notifyDataSetChanged();
     }
 
     public void setFolders(List<SimpleEntity> items) {
         //shownFolderPosition会跟着改变切不确定会变成什么样故无法判断
+        mList.clear();
         this.mItems = items;
-        PrimaryData.getInstance().initData(false, shownFolderPosition);
-        notifyDataSetChanged();
+        addAll(items);
     }
 
     public interface OnHeaderClickListener {
@@ -138,21 +141,21 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
             //应当为isShown的状态 目前是mHolder.isShown的状态
             if (!item.isShown()) {
                 //关闭动画
-                if (item.getFolderPosition() == lastFolderPosition && !item.isHasShownAnim()) {
+                if (item.getFolderId().equals(lastFolderId) && !item.isHasShownAnim()) {
 //                        Trace.d(thisItem.getFolderPosition() + "关闭1" + mHolder.isShown);
                     runAnimator(false, holder);
                     item.setHasShownAnim(true);
-                } else if (shownFolderPosition != item.getFolderPosition()) {
+                } else if (!shownFolderId.equals(item.getFolderId())) {
 //                        Trace.d(thisItem.getFolderPosition() + "关闭2" + mHolder.isShown);
                     holder.getView(R.id.mFolderItemRelative).getLayoutParams().height = 0;
                 }
             } else {
                 //开启动画
-                if (!isFirst && item.getFolderPosition() == shownFolderPosition && !item.isHasShownAnim()) {
+                if (!isFirst && shownFolderId.equals(item.getFolderId()) && !item.isHasShownAnim()) {
 //                        Trace.d(thisItem.getFolderPosition() + "开启1" + mHolder.isShown);
                     runAnimator(true, holder);//后行 等待关闭动画结束
                     item.setHasShownAnim(true);
-                } else if (shownFolderPosition != item.getFolderPosition()) {
+                } else if (!shownFolderId.equals(item.getFolderId())) {
 //                        Trace.d(thisItem.getFolderPosition() + "开启2" + mHolder.isShown);
                     holder.getView(R.id.mFolderItemRelative).getLayoutParams().height = (int) context.getResources().getDimension(R.dimen.folder_item_height);
                 }
@@ -180,39 +183,43 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
         valueAnimator.start();
     }
 
-    public void openFolder(int position) {
+    public void openFolder(SimpleEntity item) {
         isFirst = false;
         if (!isAnimating) {
             isAnimating = true;
-            if (position != shownFolderPosition) {//点击了其他目标
+            if (!shownFolderId.equals(item.getFolderId())) {//点击了其他目标
                 for (int i = 0; i < mItems.size(); i++) {
                     if (mItems.get(i).entityType == SimpleEntity.typeNote) {
                         //-1
-                        if (mItems.get(i).getFolderPosition() == position) {
+                        if (mItems.get(i).getFolderId().equals(item.getFolderId())) {
                             mItems.get(i).setIsShown(true);
                             mItems.get(i).setHasShownAnim(false);
                         }
                         //+1
-                        if (mItems.get(i).getFolderPosition() == shownFolderPosition) {
+                        if (mItems.get(i).getFolderId().equals(shownFolderId)) {
                             mItems.get(i).setIsShown(false);
                             mItems.get(i).setHasShownAnim(false);
                         }
                     }
                 }
-                lastFolderPosition = shownFolderPosition;
-                shownFolderPosition = position;
+                lastFolderId = shownFolderId;
+//                lastFolderPosition = shownFolderPosition;
+//                shownFolderPosition = position;
+                shownFolderId = item.getFolderId();
 //            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
                 notifyDataSetChanged();
             } else {//点击开启着的自身
                 for (int i = 0; i < mItems.size(); i++) {
                     if (mItems.get(i).entityType == SimpleEntity.typeNote)
-                        if (mItems.get(i).getFolderPosition() == position) {
+                        if (mItems.get(i).getFolderId().equals(shownFolderId)) {
                             mItems.get(i).setIsShown(false);
                             mItems.get(i).setHasShownAnim(false);
                         }
                 }
-                lastFolderPosition = shownFolderPosition;
-                shownFolderPosition = -1;
+                lastFolderId = shownFolderId;
+//                lastFolderPosition = shownFolderPosition;
+//                shownFolderPosition = -1;
+                shownFolderId = "";
                 notifyDataSetChanged();
             }
             int duration = animDuration + 150;

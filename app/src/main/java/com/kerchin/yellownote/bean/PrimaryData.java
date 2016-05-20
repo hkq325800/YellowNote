@@ -1,12 +1,10 @@
 package com.kerchin.yellownote.bean;
 
 import android.os.Handler;
-import android.os.Looper;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.helper.base.BaseSqlHelper;
 import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
@@ -80,21 +78,14 @@ public class PrimaryData {
         listNote.clear();
         map.clear();
 //        if (getNoteFromData())
-            getNotesFromCloud();//initData
+        getNotesFromCloud();//initData
         listFolder.clear();
 //        if (getFolderFromData())
-            getFolderFromCloud();
+        getFolderFromCloud();
         mHandler.post(runnableForSimple);//initData
     }
 
-    public void initData(boolean isFirst, int shownFolderPosition) {
-        //TODO 放到PrimaryData中
-//        List<SimpleEntity> mNotes = new ArrayList<>();
-        //mItem复刻
-//        for (int i = 0; i < mItems.size(); i++) {
-//            if (mItems.get(i).entityType == SimpleEntity.typeNote)
-//                mNotes.add(mItems.get(i));
-//        }
+    public void initData(String shownFolderId) {
         //设置ID和HeaderBefore
         for (int i = 0; i < mItems.size(); i++) {
             if (mItems.get(i).entityType == SimpleEntity.typeFolder
@@ -107,17 +98,17 @@ public class PrimaryData {
                         //找到一个数值+1
                         mItems.get(i).addNow();
                         mItems.get(j).setFolderPosition(mItems.get(i).getId());
-//                    mNotes.get(j).setBrotherCount(mFoldersTrans.get(i).getContain());
-                        //设置该noteItem前item的数量
-                        mItems.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
-                        if (isFirst)
-                            if (mItems.get(j).getHeaderBefore() == 1) {
-                                mItems.get(j).setIsShown(true);
-                            }
+//                        mItems.get(j).setHeaderBefore(i + 1);//mFolders.get(i).getId()
+                        if (mItems.get(j).getFolderId().equals(shownFolderId)) {
+                            Trace.d("setIsShown1" + mItems.get(j).getName());
+                            mItems.get(j).setIsShown(true);
+                        }
                     }
                 }
-            else if (mItems.get(i).getFolderPosition() == shownFolderPosition)
-                mItems.get(i).setIsShown(true);//初始化shownFolderPosition
+//            else if (mItems.get(i).getFolderId().equals(shownFolderId)) {
+//                Trace.d("setIsShown2" + mItems.get(i).getName());
+//                mItems.get(i).setIsShown(true);//初始化shownFolderPosition
+//            }
         }
 
         //重排mNotes 非必须
@@ -135,11 +126,12 @@ public class PrimaryData {
     /**
      * 从本地的数据中加载Simple
      */
-    public void getSimpleEntityFromList() {
+    public void getSimpleEntityFromList(String shownFolderId) {
         Trace.d("getSimpleEntityFromList");
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
+        initData(shownFolderId);
         if (outHandler != null) {
             outHandler.sendEmptyMessage(outHandleCode);
             outHandler = null;
@@ -152,7 +144,7 @@ public class PrimaryData {
 //            Trace.d("runnableForSimple");
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             if (status.isNoteReady && status.isFolderReady) {
-                getSimpleEntityFromList();
+                getSimpleEntityFromList(MyApplication.userDefaultFolderId);
             } else {//若一直未能进入需要处理 TODO
                 mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
             }
@@ -191,9 +183,9 @@ public class PrimaryData {
     private boolean getFolderFromData() {
         ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
         Trace.d("size" + list.size());
-        if(list.size() == 0){
+        if (list.size() == 0) {
             return true;
-        }else {
+        } else {
             listFolder.addAll(list);
             Trace.d("isFolderReady", "true");
             status.isFolderReady = true;
@@ -223,20 +215,20 @@ public class PrimaryData {
                             , avObject.getString("folder_name")
                             //, avObject.getInt("folder_contain"));
                             , map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
-                    Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
+//                    Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
                     listFolder.add(folder);
 //                    long l = liteOrmHelper.save(folder);
                 }
                 //sortByContain
-                Collections.sort(listFolder, new Comparator<Folder>() {
-                    @Override
-                    public int compare(Folder lhs, Folder rhs) {
-                        if (lhs.getContain() < rhs.getContain())
-                            return 1;
-                        else
-                            return -1;
-                    }
-                });
+//                Collections.sort(listFolder, new Comparator<Folder>() {
+//                    @Override
+//                    public int compare(Folder lhs, Folder rhs) {
+//                        if (lhs.getContain() < rhs.getContain())
+//                            return 1;
+//                        else
+//                            return -1;
+//                    }
+//                });
                 Trace.d("isFolderReady", "true");
                 status.isFolderReady = true;
             }
@@ -480,7 +472,7 @@ public class PrimaryData {
         public boolean isItemReady = false;
         public boolean isHeaderReady = false;
 
-        public void clear(){
+        public void clear() {
             isNoteReady = false;
             isFolderReady = false;
             isItemReady = false;
