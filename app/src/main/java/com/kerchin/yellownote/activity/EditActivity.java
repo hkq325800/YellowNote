@@ -31,17 +31,20 @@ import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
-import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -75,6 +78,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4finish = 1;
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
+    private static final byte handle4last = 4;
     //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
     private boolean isNew = false;//是否为新笔记
@@ -137,6 +141,13 @@ public class EditActivity extends BaseHasSwipeActivity {
                     } else if (userConfirm)
                         userConfirm = false;
                     break;
+                case handle4last:
+                    if (isNew)
+                        primaryData.newNote(mNote);
+                    else
+                        primaryData.editNote(mNote);
+                    finish();
+                    break;
                 default:
                     break;
             }
@@ -164,6 +175,29 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_edit);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
+    }
+
+    @Override
+    public void onOpened() {
+        final String content = mEditContentEdt.getText().toString();
+        final String title = mNavigationTitleEdt.getText().toString();
+        if (!content.trim().equals("")
+                && !title.trim().equals("")) {
+            if (!content.equals(mNote.getContent())
+                    || !title.equals(mNote.getTitle())
+                    || isFolderChanged) {
+                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        saveDifference(true);
+                    }
+                });
+            } else
+                finish();
+        } else
+            finish();
     }
 
     @Override
@@ -404,7 +438,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                         needReUn = false;
                     }
                 }
-                if(isSearching) {
+                if (isSearching) {
                     signTheTarget(mEditCircleSearch.getSearchTarget());//撤销恢复时
                 }
                 lastStepperValue = value;
@@ -440,7 +474,7 @@ public class EditActivity extends BaseHasSwipeActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(isSearching&&!needReUn) {
+                if (isSearching && !needReUn) {
                     needReUn = true;
                     signTheTarget(mEditCircleSearch.getSearchTarget());//输入时
                     needReUn = false;
@@ -470,7 +504,8 @@ public class EditActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mNavigationRightBtn)
     public void saveChanges() {
-        if (mEditContentEdt.getText().toString().trim().equals("") || mNavigationTitleEdt.getText().toString().equals("")) {
+        if (mEditContentEdt.getText().toString().trim().equals("")
+                || mNavigationTitleEdt.getText().toString().equals("")) {
             Trace.show(EditActivity.this, "请输入标题和内容");
         } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
@@ -478,7 +513,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             mNavigationRightBtn.setText("保存中..");
             closeSliding();
             mNavigationRightBtn.setEnabled(false);
-            saveDifference();
+            saveDifference(false);
         } else {
             Trace.show(EditActivity.this, "内容未修改");
         }
@@ -538,7 +573,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     public Spannable replace(String target, String content) {
         spanText = new SpannableString(content);
 //        int index = -1;
-        for(Integer i: searchResult){
+        for (Integer i : searchResult) {
             spanText.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.minionYellow))
                     , i, i + target.length(),
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -696,11 +731,11 @@ public class EditActivity extends BaseHasSwipeActivity {
         ad.show();
     }
 
-    private void saveDifference() {
+    private void saveDifference(boolean isLast) {
         mNote.saveChange(EditActivity.this
                 , mNavigationTitleEdt.getText().toString()
                 , mEditContentEdt.getText().toString()
-                , handler, handle4saveChange);
+                , handler, isLast ? handle4last : handle4saveChange);
         if (!isNew && isFolderChanged) {
             mNote.move2folder(EditActivity.this, thisFolder, null, (byte) 0x0);
         }

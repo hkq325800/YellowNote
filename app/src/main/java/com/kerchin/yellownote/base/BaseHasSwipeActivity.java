@@ -3,7 +3,6 @@ package com.kerchin.yellownote.base;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
@@ -24,24 +23,12 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(savedInstanceState);
-        NormalUtils.immerge(BaseHasSwipeActivity.this, R.color.lightSkyBlue);
-
-//        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//        }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//            ViewGroup contentView = (ViewGroup) findViewById(android.R.id.content);
-//            contentView.setBackgroundColor(getResources().getColor(R.color.lightSkyBlue));
-//            contentView.setPadding(0, NormalUtils.getStatusBarHeight(this), 0 ,0);
-//        }
 
 //        initTitleView();
 //        onTitleClick();
         initializeView(savedInstanceState);
         initializeData(savedInstanceState);
         initializeEvent(savedInstanceState);
-//        initSwipeBackFinish();
     }
 
     protected abstract void setContentView(Bundle savedInstanceState);
@@ -69,53 +56,9 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 
     protected abstract void initializeView(Bundle savedInstanceState);
 
-    /**
-     * 初始化滑动返回
-     */
-//    private void initSwipeBackFinish() {
-//        if (isSupportSwipeBack) {
-//            SlidingPaneLayout slidingPaneLayout = new SlidingPaneLayout(this);
-//            //通过反射改变mOverhangSize的值为0，这个mOverhangSize值为菜单到右边屏幕的最短距离，默认
-//            //是32dp，现在给它改成0
-//            try {
-//                //属性
-//                Field f_overHang = SlidingPaneLayout.class.getDeclaredField("mOverhangSize");
-//                f_overHang.setAccessible(true);
-//                f_overHang.set(slidingPaneLayout, 0);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//            slidingPaneLayout.setPanelSlideListener(BaseActivity.this);
-//            slidingPaneLayout.setSliderFadeColor(getResources().getColor(android.R.color.transparent));
-//            //slidingPaneLayout.setLayoutParams(new SlidingPaneLayout.LayoutParams(100,SlidingPaneLayout.LayoutParams.MATCH_PARENT));
-//            View leftView = new View(this);
-//            leftView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//            slidingPaneLayout.addView(leftView, 0);
-//
-//            ViewGroup decor = (ViewGroup) getWindow().getDecorView();
-//            ViewGroup decorChild = (ViewGroup) decor.getChildAt(0);
-//            //decorChild.setBackgroundColor(getResources().getColor(android.R.color.white));
-//            decor.removeView(decorChild);
-//            decor.addView(slidingPaneLayout);
-//            slidingPaneLayout.addView(decorChild, 1);
-//        }
-//    }
-
-//    @Override
-//    public void onPanelClosed(View view) {
-////        Log.d("onPanelClosed", "getX:" + view.getX());
-//    }
-//
-//    @Override
-//    public void onPanelOpened(View view) {
-//        Log.d("onPanelOpened","getX:"+view.getX());
-//        finish();
-//        this.overridePendingTransition(0, R.anim.slide_out_right);
-//    }
-//
-//    @Override
-//    public void onPanelSlide(View view, float slideOffset) {
-//        Log.d("onPanelSlide","x:"+view.getX()+" slideOffset:"+slideOffset);
-//    }
+    @Override
+    public void finish() {
+        super.finish();
+        this.overridePendingTransition(0, R.anim.slide_out_right);
+    }
 }

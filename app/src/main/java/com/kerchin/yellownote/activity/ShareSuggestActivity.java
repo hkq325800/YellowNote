@@ -18,6 +18,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.ShareSuggetService;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
@@ -65,6 +66,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_share_suggest);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @OnClick(R.id.mShareSuggetCodeImg)

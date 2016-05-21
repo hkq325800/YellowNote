@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;
-import com.kerchin.yellownote.R;
 
 import static com.kerchin.yellownote.R.drawable.slide_shadow;
 
@@ -23,6 +22,9 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
 
+    /**
+     * 禁止滑动退出
+     */
     public void closeSliding(){
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
     }
@@ -165,11 +167,5 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity
     @Override
     public void onOpened() {
         this.finish();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        this.overridePendingTransition(0, R.anim.slide_out_right);
     }
 }

@@ -1,8 +1,7 @@
 package com.kerchin.yellownote.utilities;
 
 import com.avos.avoscloud.AVFile;
-import com.avos.avoscloud.AVObject;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.Config;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,7 +15,7 @@ public class SimpleCrashReporter implements CrashExceptionHandler.CrashException
 
     @Override
     public void onCrash(File file) {
-        if (file != null) {
+        if (file != null && !Config.isDebugMode) {
             //接下来要在此处加入将闪退日志回传到服务器的功能
             try {
                 AVFile avFile = AVFile.withAbsoluteLocalPath(file.getName(), file.getAbsolutePath());
