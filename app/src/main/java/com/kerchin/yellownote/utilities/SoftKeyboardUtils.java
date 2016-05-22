@@ -9,7 +9,7 @@ import android.view.inputmethod.InputMethodManager;
  */
 public class SoftKeyboardUtils {
 
-    private void hideInputMode(Activity activity, InputMethodManager inputManager) {
+    public static void hideInputMode(Activity activity, InputMethodManager inputManager) {
         if (activity.getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
             if (activity.getCurrentFocus() != null)
                 inputManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);

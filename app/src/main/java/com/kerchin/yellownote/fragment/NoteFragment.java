@@ -142,6 +142,7 @@ public class NoteFragment extends BaseFragment
                             break;
                         }
                     }
+                    primaryData.getFolder(note.getFolderId()).decInList();
                     primaryData.listNote.remove(note);//从数据源中删除
                     noteAdapter.getListDelete().remove(note);
                     break;

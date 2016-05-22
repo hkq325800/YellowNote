@@ -136,6 +136,7 @@ public class MainActivity extends BaseActivity
                     }
 //                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
                     mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
+                    FolderFragment.hasRefresh = true;
                     folderFragment.respondForChange();
                     showBtnAdd();
                 }

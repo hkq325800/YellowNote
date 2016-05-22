@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -37,6 +38,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
@@ -187,6 +189,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged) {
+                SoftKeyboardUtils.hideInputMode(EditActivity.this, (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.execute(new Runnable() {
                     @Override
