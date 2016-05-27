@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
@@ -50,13 +50,13 @@ import tyrantgit.explosionfield.ExplosionField;
 public class NoteFragment extends BaseFragment
         implements WaterDropListView.IWaterDropListViewListener
         , View.OnCreateContextMenuListener, PopupMenu.OnMenuItemClickListener {
-    @Bind(R.id.mNoteWDList)
+    @BindView(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
-    //    @Bind(R.id.mNoteEmptyTxt)
+    //    @BindView(R.id.mNoteEmptyTxt)
 //    TextView mNoteEmptyTxt;
-//    @Bind(R.id.mNoteProgress)
+//    @BindView(R.id.mNoteProgress)
 //    ProgressBar mNoteProgress;
-    @Bind(R.id.mProgress)
+    @BindView(R.id.mProgress)
     OldProgress mProgress;
     public static boolean isChanged4note = false;
     private SearchView.OnQueryTextListener queryTextListener;

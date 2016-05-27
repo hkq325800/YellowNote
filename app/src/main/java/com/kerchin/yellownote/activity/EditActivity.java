@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -56,19 +56,19 @@ import butterknife.OnClick;
  * Created by Kerchin on 2015/9/30 0030.
  */
 public class EditActivity extends BaseHasSwipeActivity {
-    @Bind(R.id.mNavigationTitleLinear)
+    @BindView(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
-    @Bind(R.id.mEditNavLinear)
+    @BindView(R.id.mEditNavLinear)
     LinearLayout mEditNavLinear;
-    @Bind(R.id.mNavigationTitleEdt)
+    @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
-    @Bind(R.id.mEditContentEdt)
+    @BindView(R.id.mEditContentEdt)
     EditText mEditContentEdt;
-    @Bind(R.id.mNavigationRightBtn)
+    @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
-    @Bind(R.id.mEditScroll)
+    @BindView(R.id.mEditScroll)
     ScrollView mEditScroll;
-    @Bind(R.id.mEditFuncViP)
+    @BindView(R.id.mEditFuncViP)
     ViewPager mEditFuncViP;
 
     private CircleSearchView mEditCircleSearch;

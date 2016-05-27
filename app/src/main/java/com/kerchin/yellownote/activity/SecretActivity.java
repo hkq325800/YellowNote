@@ -23,7 +23,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -32,15 +32,15 @@ import butterknife.OnClick;
  * More Code on hkq325800@163.com
  */
 public class SecretActivity extends BaseHasSwipeActivity {
-    @Bind(R.id.mNavigationTitleEdt)
+    @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
-    @Bind(R.id.mNavigationRightBtn)
+    @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
-    @Bind(R.id.mSecretPassEdt)
+    @BindView(R.id.mSecretPassEdt)
     EditText mSecretPassEdt;
-    @Bind(R.id.mSecretNewPassEdt)
+    @BindView(R.id.mSecretNewPassEdt)
     EditText mSecretNewPassEdt;
-    @Bind(R.id.mSecretNewPassAgainEdt)
+    @BindView(R.id.mSecretNewPassAgainEdt)
     EditText mSecretNewPassAgainEdt;
 
     @Override

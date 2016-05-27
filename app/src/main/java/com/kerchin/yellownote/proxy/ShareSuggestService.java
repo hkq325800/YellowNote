@@ -9,7 +9,7 @@ import com.kerchin.yellownote.utilities.Trace;
 /**
  * Created by Kerchin on 2016/4/5 0005.
  */
-public class ShareSuggetService {
+public class ShareSuggestService {
 
     public static void setUnableToSuggest(String txtUser){
         AVQuery<AVObject> query = new AVQuery<>("mUser");

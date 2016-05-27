@@ -38,21 +38,21 @@ import com.kerchin.yellownote.widget.DepthPageTransformer;
 
 import java.util.ArrayList;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-    @Bind(R.id.mMainPager)
+    @BindView(R.id.mMainPager)
     ViewPager mMainPager;
-    @Bind(R.id.mMainFab)
+    @BindView(R.id.mMainFab)
     public FloatingActionButton mMainFab;
-    @Bind(R.id.mMainNav)
+    @BindView(R.id.mMainNav)
     NavigationView mMainNav;
-    @Bind(R.id.mMainDrawer)
+    @BindView(R.id.mMainDrawer)
     DrawerLayout mMainDrawer;
-    @Bind(R.id.mMainToolbar)
+    @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
 
     public static int thisPosition = 0;

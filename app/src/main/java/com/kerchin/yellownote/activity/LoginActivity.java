@@ -28,7 +28,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -36,27 +36,27 @@ import butterknife.OnClick;
  * Created by Kerchin on 2015/8/1 0005.
  */
 public class LoginActivity extends LoginAbstract {
-    @Bind(R.id.mLoginScV)
+    @BindView(R.id.mLoginScV)
     ScrollView mLoginScV;
-    @Bind(R.id.mLoginUserEdt)
+    @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
-    @Bind(R.id.mLoginPassEdt)
+    @BindView(R.id.mLoginPassEdt)
     EditText mLoginPassEdt;
-    @Bind(R.id.mLoginProveEdt)
+    @BindView(R.id.mLoginProveEdt)
     EditText mLoginProveEdt;
-    @Bind(R.id.mLoginRePassEdt)
+    @BindView(R.id.mLoginRePassEdt)
     EditText mLoginRePassEdt;
-    @Bind(R.id.mLoginSendProvBtn)
+    @BindView(R.id.mLoginSendProvBtn)
     Button mLoginSendProvBtn;
-    @Bind(R.id.mLoginBtn)
+    @BindView(R.id.mLoginBtn)
     Button mLoginBtn;
-    @Bind(R.id.mLoginSignUpBtn)
+    @BindView(R.id.mLoginSignUpBtn)
     Button mLoginSignUpBtn;
-    @Bind(R.id.mLoginForgetBtn)
+    @BindView(R.id.mLoginForgetBtn)
     Button mLoginForgetBtn;
-    @Bind(R.id.mSignUpRelative)
+    @BindView(R.id.mSignUpRelative)
     RelativeLayout mSignUpRelative;
-    @Bind(R.id.mLoginFunLiL)
+    @BindView(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
     private final static long runnableTimeout = 8000;
     private final static long runnablePeriod = 200;

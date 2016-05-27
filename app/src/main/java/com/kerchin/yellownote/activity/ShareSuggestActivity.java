@@ -17,7 +17,7 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.proxy.ShareSuggetService;
+import com.kerchin.yellownote.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -25,7 +25,7 @@ import com.securepreferences.SecurePreferences;
 
 import java.util.Date;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -34,18 +34,18 @@ import butterknife.OnClick;
  */
 public class ShareSuggestActivity extends BaseHasSwipeActivity {
     private final static int hideSaveBtn = 0;
-    @Bind(R.id.mNavigationRightBtn)
+    @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
-    @Bind(R.id.mNavigationTitleEdt)
+    @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
-    @Bind(R.id.mShareSuggetCodeImg)
-    ImageView mShareSuggetCodeImg;
-    @Bind(R.id.mShareSuggetContentEdt)
-    EditText mShareSuggetContentEdt;
-    @Bind(R.id.mShareSuggetTouchEdt)
-    EditText mShareSuggetTouchEdt;
-    @Bind(R.id.mShareSuggetScV)
-    ScrollView mShareSuggetScV;
+    @BindView(R.id.mShareSuggestCodeImg)
+    ImageView mShareSuggestCodeImg;
+    @BindView(R.id.mShareSuggestContentEdt)
+    EditText mShareSuggestContentEdt;
+    @BindView(R.id.mShareSuggestTouchEdt)
+    EditText mShareSuggestTouchEdt;
+    @BindView(R.id.mShareSuggestScV)
+    ScrollView mShareSuggestScV;
     //防止多次提交数据
     private boolean isPosting = false;
     int quickSuggestTimes = MyApplication.getDefaultShared().getInt("quickSuggestTimes", 0);
@@ -69,7 +69,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
-    @OnClick(R.id.mShareSuggetCodeImg)
+    @OnClick(R.id.mShareSuggestCodeImg)
     public void download(){
         Uri uri = Uri.parse(getString(R.string.uri_download));//指定网址
         Intent intent = new Intent();
@@ -80,7 +80,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mNavigationRightBtn)
     public void submit(){
-        final String msg = mShareSuggetContentEdt.getText().toString();
+        final String msg = mShareSuggestContentEdt.getText().toString();
         if (msg.equals("")) {
             Trace.show(ShareSuggestActivity.this, "请输入具体的意见");
         } else {
@@ -91,7 +91,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     @Override
                     public void run() {
                         try {
-                            ShareSuggetService.pushSuggest(MyApplication.user, msg, mShareSuggetTouchEdt.getText().toString());
+                            ShareSuggestService.pushSuggest(MyApplication.user, msg, mShareSuggestTouchEdt.getText().toString());
                             long thisSuggestTime = new Date().getTime();
                             long lastSuggestTime = MyApplication.getDefaultShared().getLong("lastSuggestTime", thisSuggestTime);
                             SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
@@ -116,7 +116,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                 Trace.show(ShareSuggestActivity.this, "您宝贵的意见正在提交中···");
             }
             if (quickSuggestTimes >= 2) {
-                ShareSuggetService.setUnableToSuggest(MyApplication.user);
+                ShareSuggestService.setUnableToSuggest(MyApplication.user);
             }
         }
     }
@@ -134,13 +134,13 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         mNavigationTitleEdt.setEnabled(false);
         mNavigationTitleEdt.setFocusable(false);
         mNavigationTitleEdt.setFocusableInTouchMode(false);
-        mShareSuggetCodeImg.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        mShareSuggestCodeImg.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mShareSuggetScV.smoothScrollTo(0, mShareSuggetScV.getHeight());
+                        mShareSuggestScV.smoothScrollTo(0, mShareSuggestScV.getHeight());
                     }
                 }, 400);
             }
@@ -153,7 +153,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
             @Override
             public void run() {
                 try {
-                    AVObject a = ShareSuggetService.isAbleToSuggest(MyApplication.user);
+                    AVObject a = ShareSuggestService.isAbleToSuggest(MyApplication.user);
                     boolean flag = a.getBoolean("isAbleToSuggest");
                     Trace.d("查询isAbleToSuggest 查询到" + a.get("user_tel") + " 的记录为" + flag);
                     if (!flag) {
