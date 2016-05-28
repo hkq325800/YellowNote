@@ -401,7 +401,10 @@ public class MainActivity extends BaseActivity
                         Trace.show(this, "再点击一次退出应用");
                         mExitTime = System.currentTimeMillis();
                     } else {
-                        finish();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        startActivity(intent);
                     }
                 }
             } else {
@@ -409,7 +412,10 @@ public class MainActivity extends BaseActivity
                     Trace.show(this, "再点击一次退出应用");
                     mExitTime = System.currentTimeMillis();
                 } else {
-                    finish();
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
                 }
             }
         }
