@@ -58,7 +58,7 @@ public class FolderFragment extends BaseFragment {
                     Note note = (Note) msg.obj;
                     primaryData.listNote.remove(note);//列表中去除目标
                     primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
-                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);
+                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
                     NoteFragment.isChanged4note = true;//handle4explosion
 //                    primaryData.getSimpleEntityFromList();
                     setRecycleView();//refresh
@@ -66,7 +66,7 @@ public class FolderFragment extends BaseFragment {
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInFolder", "handle4refresh");
 //                    getHeaderListFromFolder();//handle4refresh
-                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);
+                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4refresh
                     setRecycleView();//refresh
                     break;
                 case GetDataHelper.handle4firstGet:

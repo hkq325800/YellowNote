@@ -1,11 +1,11 @@
 package com.kerchin.yellownote.bean;
 
+import android.os.Bundle;
 import android.os.Handler;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.Trace;
@@ -25,11 +25,11 @@ public class PrimaryData {
     public static PrimaryDataStatus status;
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
-    public volatile List<SimpleEntity> mItems;//note&folder
+    public volatile ArrayList<SimpleEntity> mItems;//note&folder
     private Handler outHandler;
     private int outHandleCode;
     private Handler mHandler = new Handler();
-    private LiteOrmHelper liteOrmHelper;
+//    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
 
@@ -38,7 +38,7 @@ public class PrimaryData {
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
         mItems = new ArrayList<SimpleEntity>();
-        liteOrmHelper = new LiteOrmHelper();
+//        liteOrmHelper = new LiteOrmHelper();
 //        Looper.prepare();
 //        mHandler = new Handler();
 //        Looper.loop();
@@ -56,6 +56,13 @@ public class PrimaryData {
                 }
             }
         return data;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void giveBackData(Bundle data) {
+        listNote = (ArrayList<Note>) data.getSerializable("note");
+        listFolder = (ArrayList<Folder>) data.getSerializable("folder");
+        mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
     }
 
     public void initDataFromCloud() throws AVException {
@@ -132,7 +139,7 @@ public class PrimaryData {
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
         initData(shownFolderId);
-        if (outHandler != null) {
+        if (outHandler != null) {//getSimpleEntityFromList
             outHandler.sendEmptyMessage(outHandleCode);
             outHandler = null;
         }
@@ -144,7 +151,7 @@ public class PrimaryData {
 //            Trace.d("runnableForSimple");
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             if (status.isNoteReady && status.isFolderReady) {
-                getSimpleEntityFromList(MyApplication.userDefaultFolderId);
+                getSimpleEntityFromList(MyApplication.userDefaultFolderId);//runnableForSimple
             } else {//若一直未能进入需要处理 TODO
                 mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
             }
@@ -180,18 +187,34 @@ public class PrimaryData {
     /**
      * 本地获取Folder
      */
-    private boolean getFolderFromData() {
-        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-        Trace.d("size" + list.size());
-        if (list.size() == 0) {
-            return true;
-        } else {
-            listFolder.addAll(list);
-            Trace.d("isFolderReady", "true");
-            status.isFolderReady = true;
-            return false;
-        }
-    }
+//    private boolean getFolderFromData() {
+//        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
+//        Trace.d("size" + list.size());
+//        if (list.size() == 0) {
+//            return true;
+//        } else {
+//            listFolder.addAll(list);
+//            Trace.d("isFolderReady", "true");
+//            status.isFolderReady = true;
+//            return false;
+//        }
+//    }
+
+    /**
+     * 本地获取Note
+     */
+//    private boolean getNoteFromData() {
+//        ArrayList<Note> list = liteOrmHelper.query(Note.class);
+//        Trace.d("size" + list.size());
+//        if (list.size() == 0) {
+//            return true;
+//        } else {
+//            listNote.addAll(list);
+//            status.isNoteReady = true;
+//            Trace.d("isNoteReady", "true");
+//            return false;
+//        }
+//    }
 
     /**
      * 网络获取Folder
@@ -233,22 +256,6 @@ public class PrimaryData {
                 status.isFolderReady = true;
             }
         }).start();
-    }
-
-    /**
-     * 本地获取Note
-     */
-    private boolean getNoteFromData() {
-        ArrayList<Note> list = liteOrmHelper.query(Note.class);
-        Trace.d("size" + list.size());
-        if (list.size() == 0) {
-            return true;
-        } else {
-            listNote.addAll(list);
-            status.isNoteReady = true;
-            Trace.d("isNoteReady", "true");
-            return false;
-        }
     }
 
     /**
@@ -346,7 +353,7 @@ public class PrimaryData {
         listNote.clear();
         map.clear();
         listFolder.clear();
-        outHandler = handler;
+        outHandler = handler;//refresh
         outHandleCode = handleCode;
         status.isItemReady = false;
         status.isNoteReady = false;

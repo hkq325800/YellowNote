@@ -1,10 +1,12 @@
 package com.kerchin.yellownote.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by Administrator on 2016/4/24 0024.
  * More Code on hkq325800@163.com
  */
-public class SimpleEntity {
+public class SimpleEntity implements Serializable {
     private String objectId;//leanCloud上的id【note】
     private int globalId;//在primaryData中的position
     private int id;//mItems中的id 排序的主要依据

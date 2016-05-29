@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -88,29 +89,31 @@ public class EditActivity extends BaseHasSwipeActivity {
     private boolean isSearching = false;//是否search in edit
     private boolean isFolderChanged = false;
     private boolean userConfirm = false;//保存并退出
-    private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
-    private boolean isLeftGray = true;//左侧的控制
-    private boolean isRightGray = true;//右侧的控制
-    private int navLinearHeight = 0;//导航条高度
-    private int funcHeight = 0;//工具条高度
     private int lastStepperValue = 0;//用来控制stepper
     private int index = 0;//用来记录当前在textOrder和textSelection中的位置
-    private Double navRatio, funcRatio;//实践单动画修改两个属性
     //用于切换笔记夹
     private String[] mFolder;
     private String[] mFolderId;
     private List<String> textOrder = new ArrayList<>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<>();//记录目标步数时的selection
-    private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
     private Note mNote;//当前编辑的note
     private Folder thisFolder;//记录目前处在哪个笔记夹
-    private AlertDialog ad;
     private PrimaryData primaryData;
-    private ArrayList<View> viewContainer = new ArrayList<>();
-    private List<Integer> searchResult;//记录关键字所在的index
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
+    private List<Integer> searchResult;//记录关键字所在的index
+
+    private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
+    private boolean isLeftGray = true;//左侧的控制
+    private boolean isRightGray = true;//右侧的控制
+    //用于显示隐藏两栏
+    private int navLinearHeight = 0;//导航条高度
+    private int funcHeight = 0;//工具条高度
+    private Double navRatio, funcRatio;//实践单动画修改两个属性
+    private AlertDialog ad;
+    private ArrayList<View> viewContainer = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
-    private Spannable spanText;//带span的字符
+//    private Spannable spanText;//带span的字符
+    private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
     private SystemHandler handler = new SystemHandler(EditActivity.this) {
         @Override
         public void handlerMessage(Message msg) {
@@ -156,12 +159,18 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     };
 
-    public static void startMe(Context context, String noteId) {
+    public static void startMe(Context context, Note note) {
         // 指定下拉列表的显示数据
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("noteId", noteId);
+        intent.putExtra("mNote", note);
         context.startActivity(intent);
+    }
+
+    @Override
+     protected void onSaveInstanceState(Bundle outState) {
+        Trace.d("onSaveInstanceState");
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -189,7 +198,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged) {
-                SoftKeyboardUtils.hideInputMode(EditActivity.this, (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE));
+                SoftKeyboardUtils.hideInputMode(EditActivity.this, (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.execute(new Runnable() {
                     @Override
@@ -254,41 +263,59 @@ public class EditActivity extends BaseHasSwipeActivity {
         mEditCircleSearch.setText("共0当前第0");
         //初始化笔记夹选择
         primaryData = PrimaryData.getInstance();
-        searchResult = new ArrayList<>();
-        String noteId = getIntent().getStringExtra("noteId");
-        if (noteId.equals("")) {
-            isNew = true;
-            mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                    , MyApplication.userDefaultFolderId, "text");
-        } else {
-            isNew = false;
-            mNote = primaryData.getNote(noteId);
-        }
-        mFolder = new String[primaryData.listFolder.size() - 1];
-        mFolderId = new String[primaryData.listFolder.size() - 1];
-        thisFolder = primaryData.getFolder(mNote.getFolderId());
+        if (primaryData.listFolder.size() == 0) {
+            //恢复primaryData
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Looper.prepare();
+                        PrimaryData.getInstance().initData();
+                        Looper.loop();
+                        //最后还需要primaryData = PrimaryData.getInstance();
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            //从savedInstanceState中恢复数据
+        }else {
+            searchResult = new ArrayList<>();
+            mNote = (Note) getIntent().getSerializableExtra("mNote");
+            if (mNote == null) {
+                isNew = true;
+                mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
+                        , MyApplication.userDefaultFolderId, "text");
+            } else {
+                isNew = false;
+//            mNote = primaryData.getNote(noteId);
+            }
+            mFolder = new String[primaryData.listFolder.size() - 1];
+            mFolderId = new String[primaryData.listFolder.size() - 1];
+            thisFolder = primaryData.getFolder(mNote.getFolderId());
 //        mNavigationPager.setVisibility(View.GONE);
-        mNavigationTitleLinear.setVisibility(View.VISIBLE);
-        mNavigationRightBtn.setVisibility(View.VISIBLE);
-        mEditContentEdt.setText(mNote.getContent());
-        if (!isNew) {
-            textOrder.add(mNote.getContent());
-            textSelection.add(index, 0);
-            index++;
-            mNavigationTitleEdt.setText(mNote.getTitle());
-            mNavigationTitleEdt.setSelection(mNote.getTitle().length());
+            mNavigationTitleLinear.setVisibility(View.VISIBLE);
+            mNavigationRightBtn.setVisibility(View.VISIBLE);
+            mEditContentEdt.setText(mNote.getContent());
+            if (!isNew) {
+                textOrder.add(mNote.getContent());
+                textSelection.add(index, 0);
+                index++;
+                mNavigationTitleEdt.setText(mNote.getTitle());
+                mNavigationTitleEdt.setSelection(mNote.getTitle().length());
 //            mEditContentEdt.requestFocusFromTouch();
 //            mEditContentEdt.setSelection(mNote.getContent().length());
-        } else {
-            textOrder.add(mNote.getContent());
-            textSelection.add(index, 0);
-            index++;
-            mNavigationTitleEdt.setText(mNote.getTitle());
-            mNavigationTitleEdt.setSelection(mNote.getTitle().length());
-        }
-        if (mNote.getType().equals("text")) {
-            if (isNew)
-                mEditDeleteLinear.setVisibility(View.INVISIBLE);
+            } else {
+                textOrder.add(mNote.getContent());
+                textSelection.add(index, 0);
+                index++;
+                mNavigationTitleEdt.setText(mNote.getTitle());
+                mNavigationTitleEdt.setSelection(mNote.getTitle().length());
+            }
+            if (mNote.getType().equals("text")) {
+                if (isNew)
+                    mEditDeleteLinear.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -574,7 +601,7 @@ public class EditActivity extends BaseHasSwipeActivity {
      * @return 设置好背景色的text
      */
     public Spannable replace(String target, String content) {
-        spanText = new SpannableString(content);
+        Spannable spanText = new SpannableString(content);
 //        int index = -1;
         for (Integer i : searchResult) {
             spanText.setSpan(new BackgroundColorSpan(getResources().getColor(R.color.minionYellow))
@@ -676,8 +703,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.d("saveNewFolder", "成功");
                                     Folder newFolder = new Folder(objectId, newFolderName, 0);
-                                    primaryData.listFolder.add(
-                                            newFolder);
+                                    primaryData.listFolder.add(newFolder);
                                     //添加进
                                     mFolder = new String[primaryData.listFolder.size() - 1];
                                     thisFolder = newFolder;
@@ -758,7 +784,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 userConfirm = true;
-                mNavigationRightBtn.callOnClick();
+                saveChanges();
             }
         });
         ad.show();

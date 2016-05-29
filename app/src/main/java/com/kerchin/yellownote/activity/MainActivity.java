@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.BaseActivity;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
@@ -88,6 +89,7 @@ public class MainActivity extends BaseActivity
             folderFragment = FolderFragment.newInstance(null);
         } else {
             Trace.d("initializeData else");
+            PrimaryData.getInstance().giveBackData(savedInstanceState);
             noteFragment = NoteFragment.newInstance(null);
             folderFragment = FolderFragment.newInstance(null);
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
@@ -212,6 +214,14 @@ public class MainActivity extends BaseActivity
             }
         });
         toggle.syncState();
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Trace.d("onSaveInstanceState");
+        outState.putSerializable("note", PrimaryData.getInstance().listNote);
+        outState.putSerializable("folder", PrimaryData.getInstance().listFolder);
+        outState.putSerializable("items", PrimaryData.getInstance().mItems);
+        super.onSaveInstanceState(outState);
     }
 
     private ToolbarStatus getFragmentStatus() {

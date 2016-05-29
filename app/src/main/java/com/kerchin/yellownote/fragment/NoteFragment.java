@@ -307,7 +307,7 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), "");
+            EditActivity.startMe(getActivity(), null);
         } else
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
     }
@@ -438,7 +438,7 @@ public class NoteFragment extends BaseFragment
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MainActivity m = (MainActivity) getActivity();
                     m.hideBtnAdd();
-                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1).getObjectId());
+                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
                 }
             });
             //叉号隐藏
@@ -539,7 +539,7 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1).getObjectId());
+            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
         } else {
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
         }
