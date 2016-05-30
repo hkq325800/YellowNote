@@ -105,10 +105,12 @@ public class MainActivity extends BaseActivity
         } else {
             Trace.d("initializeData else");
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
-            noteFragment = NoteFragment.newInstance(null);
-            folderFragment = FolderFragment.newInstance(null);
-//            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
-//            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
+            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
+            if (noteFragment == null)
+                noteFragment = NoteFragment.newInstance(null);
+            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
+            if (folderFragment == null)
+                folderFragment = FolderFragment.newInstance(null);
         }
         fragments.add(noteFragment);
         fragments.add(folderFragment);
