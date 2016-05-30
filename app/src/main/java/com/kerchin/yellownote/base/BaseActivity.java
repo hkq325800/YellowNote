@@ -13,11 +13,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 //    public boolean isExisTitle = true;
     public final static String TAG = BaseActivity.class.getCanonicalName();
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Trace.d("onSaveInstanceState");
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        Trace.d("onSaveInstanceState");
+//        super.onSaveInstanceState(outState);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

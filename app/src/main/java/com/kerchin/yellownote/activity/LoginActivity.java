@@ -569,7 +569,7 @@ public class LoginActivity extends LoginAbstract {
             public void run() {
                 try {
                     Looper.prepare();
-                    PrimaryData.getInstance().initData();
+                    PrimaryData.getInstance().initData(null, 0);
                     Looper.loop();
                 } catch (AVException e) {
                     e.printStackTrace();
@@ -593,7 +593,7 @@ public class LoginActivity extends LoginAbstract {
             if (PrimaryData.status.isFolderReady
                     && PrimaryData.status.isItemReady
                     && PrimaryData.status.isNoteReady) {
-                Trace.d("runnableForData done");
+                Trace.d("runnableForData done Login");
                 NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
             } else {

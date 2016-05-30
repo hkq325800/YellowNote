@@ -79,7 +79,7 @@ public class LaunchActivity extends BaseActivity {
                     try {
                         //一般而言登陆过的用户都有数据本地缓存
                         Looper.prepare();
-                        PrimaryData.getInstance().initData();
+                        PrimaryData.getInstance().initData(null, 0);
                         Looper.loop();
                     } catch (AVException e) {
                         e.printStackTrace();

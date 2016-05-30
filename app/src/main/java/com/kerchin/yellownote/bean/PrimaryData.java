@@ -29,7 +29,7 @@ public class PrimaryData {
     private Handler outHandler;
     private int outHandleCode;
     private Handler mHandler = new Handler();
-//    private LiteOrmHelper liteOrmHelper;//随用随停 单例
+    //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
 
@@ -60,7 +60,12 @@ public class PrimaryData {
 
     @SuppressWarnings("unchecked")
     public void giveBackData(Bundle data) {
-        listNote = (ArrayList<Note>) data.getSerializable("note");
+        int noteSize = data.getInt("noteSize", 0);
+        int i = 0;
+        listNote = new ArrayList<>();
+        for (int j = 0; j < noteSize; j++) {
+            listNote.add(j, (Note) data.getSerializable("note" + i));
+        }
         listFolder = (ArrayList<Folder>) data.getSerializable("folder");
         mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
     }
@@ -77,8 +82,12 @@ public class PrimaryData {
     /**
      * 网络获取初始化
      */
-    public void initData() throws AVException {
+    public void initData(final Handler handler, final int handleCode) throws AVException {
         Trace.d("loadData");
+        if (handler != null) {
+            outHandler = handler;
+            outHandleCode = handleCode;
+        }
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
@@ -359,8 +368,8 @@ public class PrimaryData {
         status.isNoteReady = false;
         status.isFolderReady = false;
         Trace.d("refreshPrimaryData");
-        getNotesFromCloud();
-        getFolderFromCloud();
+        getNotesFromCloud();//refresh
+        getFolderFromCloud();//refresh
         if (outHandler != null) {
             outHandler.sendEmptyMessage(outHandleCode);
             outHandler = null;

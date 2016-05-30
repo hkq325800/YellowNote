@@ -71,7 +71,6 @@ public class EditActivity extends BaseHasSwipeActivity {
     ScrollView mEditScroll;
     @BindView(R.id.mEditFuncViP)
     ViewPager mEditFuncViP;
-
     private CircleSearchView mEditCircleSearch;
     private LinearLayout mEditDeleteLinear;
     private SnappingStepper mEditReUnStepper;
@@ -82,8 +81,11 @@ public class EditActivity extends BaseHasSwipeActivity {
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
     private static final byte handle4last = 4;
+    private static final byte handle4reGet = 5;
     //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
+
+    //需要保存的部分
     private boolean isNew = false;//是否为新笔记
     private boolean isShown = true;//func条是否显示
     private boolean isSearching = false;//是否search in edit
@@ -101,6 +103,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     private PrimaryData primaryData;
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     private List<Integer> searchResult;//记录关键字所在的index
+    private int listFolderSize;
 
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
     private boolean isLeftGray = true;//左侧的控制
@@ -118,6 +121,9 @@ public class EditActivity extends BaseHasSwipeActivity {
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case handle4reGet:
+                    primaryData = PrimaryData.getInstance();
+                    break;
                 case handle4finish:
                     finish();
                     break;
@@ -139,7 +145,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     openSliding();
                     if ((boolean) msg.obj) {//操作是否成功便于回滚
                         Trace.show(EditActivity.this, "保存成功");
-                        mEditDeleteLinear.setVisibility(View.VISIBLE);
+                        mEditDeleteLinear.setEnabled(true);
                         if (userConfirm) {
                             finish();
                         }
@@ -159,18 +165,13 @@ public class EditActivity extends BaseHasSwipeActivity {
         }
     };
 
-    public static void startMe(Context context, Note note) {
+    public static void startMe(Context context, Note note, int listFolderSize) {
         // 指定下拉列表的显示数据
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("mNote", note);
+        intent.putExtra("listFolderSize", listFolderSize);
         context.startActivity(intent);
-    }
-
-    @Override
-     protected void onSaveInstanceState(Bundle outState) {
-        Trace.d("onSaveInstanceState");
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -215,14 +216,18 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        View view1 = LayoutInflater.from(this).inflate(R.layout.viewpager_function_first, null);
-        View view2 = LayoutInflater.from(this).inflate(R.layout.viewpager_function_second, null);
+        @SuppressLint("InflateParams") View view1 = LayoutInflater.from(this)
+                .inflate(R.layout.viewpager_function_first, null);
+        @SuppressLint("InflateParams") View view2 = LayoutInflater.from(this)
+                .inflate(R.layout.viewpager_function_second, null);
         mEditReUnStepper = (SnappingStepper) view1.findViewById(R.id.mEditReUnStepper);
         mEditMoveLinear = (LinearLayout) view1.findViewById(R.id.mEditMoveLinear);
         mEditDeleteLinear = (LinearLayout) view1.findViewById(R.id.mEditDeleteLinear);
         mEditCircleSearch = (CircleSearchView) view2.findViewById(R.id.mEditCircleSearch);
         viewContainer.add(view1);
         viewContainer.add(view2);
+        mNavigationTitleLinear.setVisibility(View.VISIBLE);
+        mNavigationRightBtn.setVisibility(View.VISIBLE);
         mEditFuncViP.setAdapter(new PagerAdapter() {
             @Override
             public int getCount() {
@@ -259,28 +264,55 @@ public class EditActivity extends BaseHasSwipeActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        Trace.d("onSaveInstanceState");
+//        outState.putInt("noteSize", PrimaryData.getInstance().listNote.size());
+//        int i = 0;
+//        for (Note note : PrimaryData.getInstance().listNote) {
+//            outState.putSerializable("note" + i, note);
+//            i++;
+//        }
+//        outState.putSerializable("folder", PrimaryData.getInstance().listFolder);
+//        outState.putSerializable("items", PrimaryData.getInstance().mItems);
+        outState.putSerializable("mNote", mNote);
+        outState.putSerializable("thisFolder", thisFolder);
+        outState.putSerializable("mFolder", mFolder);
+        outState.putSerializable("mFolderId", mFolderId);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     protected void initializeData(Bundle savedInstanceState) {
         mEditCircleSearch.setText("共0当前第0");
         //初始化笔记夹选择
-        primaryData = PrimaryData.getInstance();
-        if (primaryData.listFolder.size() == 0) {
+        if (savedInstanceState != null) {
+            Trace.d("initDataFromBundle" + EditActivity.class.getSimpleName());
             //恢复primaryData
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Looper.prepare();
-                        PrimaryData.getInstance().initData();
+                        PrimaryData.getInstance().initData(handler, handle4reGet);
                         Looper.loop();
-                        //最后还需要primaryData = PrimaryData.getInstance();
                     } catch (AVException e) {
                         e.printStackTrace();
                     }
                 }
             }).start();
+            mNote = (Note) savedInstanceState.getSerializable("mNote");
+            if (mNote == null) {
+                isNew = true;
+                mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
+                        , MyApplication.userDefaultFolderId, "text");
+            } else {
+                isNew = false;
+            }
+            thisFolder = (Folder) savedInstanceState.getSerializable("thisFolder");
+            mFolder = savedInstanceState.getStringArray("mFolder");
+            mFolderId = savedInstanceState.getStringArray("mFolderId");
             //从savedInstanceState中恢复数据
-        }else {
-            searchResult = new ArrayList<>();
+        } else {
             mNote = (Note) getIntent().getSerializableExtra("mNote");
             if (mNote == null) {
                 isNew = true;
@@ -288,34 +320,34 @@ public class EditActivity extends BaseHasSwipeActivity {
                         , MyApplication.userDefaultFolderId, "text");
             } else {
                 isNew = false;
-//            mNote = primaryData.getNote(noteId);
             }
-            mFolder = new String[primaryData.listFolder.size() - 1];
-            mFolderId = new String[primaryData.listFolder.size() - 1];
+            listFolderSize = getIntent().getIntExtra("listFolderSize", 0);
+            mFolder = new String[listFolderSize - 1];
+            mFolderId = new String[listFolderSize - 1];
+            primaryData = PrimaryData.getInstance();
             thisFolder = primaryData.getFolder(mNote.getFolderId());
+        }
+        searchResult = new ArrayList<>();
 //        mNavigationPager.setVisibility(View.GONE);
-            mNavigationTitleLinear.setVisibility(View.VISIBLE);
-            mNavigationRightBtn.setVisibility(View.VISIBLE);
-            mEditContentEdt.setText(mNote.getContent());
-            if (!isNew) {
-                textOrder.add(mNote.getContent());
-                textSelection.add(index, 0);
-                index++;
-                mNavigationTitleEdt.setText(mNote.getTitle());
-                mNavigationTitleEdt.setSelection(mNote.getTitle().length());
+        mEditContentEdt.setText(mNote.getContent());
+        if (!isNew) {
+            textOrder.add(mNote.getContent());
+            textSelection.add(index, 0);
+            index++;
+            mNavigationTitleEdt.setText(mNote.getTitle());
+            mNavigationTitleEdt.setSelection(mNote.getTitle().length());
 //            mEditContentEdt.requestFocusFromTouch();
 //            mEditContentEdt.setSelection(mNote.getContent().length());
-            } else {
-                textOrder.add(mNote.getContent());
-                textSelection.add(index, 0);
-                index++;
-                mNavigationTitleEdt.setText(mNote.getTitle());
-                mNavigationTitleEdt.setSelection(mNote.getTitle().length());
-            }
-            if (mNote.getType().equals("text")) {
-                if (isNew)
-                    mEditDeleteLinear.setVisibility(View.INVISIBLE);
-            }
+        } else {
+            textOrder.add(mNote.getContent());
+            textSelection.add(index, 0);
+            index++;
+            mNavigationTitleEdt.setText(mNote.getTitle());
+            mNavigationTitleEdt.setSelection(mNote.getTitle().length());
+        }
+        if (mNote.getType().equals("text")
+                && isNew) {
+            mEditDeleteLinear.setEnabled(false);
         }
     }
 
@@ -637,13 +669,12 @@ public class EditActivity extends BaseHasSwipeActivity {
         } else {
             builder.setTitle("选择移至笔记夹");
             int sum = 0;
-            int size = primaryData.listFolder.size();
-            mFolder = new String[size - 1];
-            mFolderId = new String[size - 1];
-            for (int i = 0; i < size; i++) {
-                if (!primaryData.getFolderAt(i).getObjectId().equals(mNote.getFolderId())) {
-                    mFolder[sum] = primaryData.getFolderAt(i).getName();
-                    mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
+            mFolder = new String[listFolderSize - 1];
+            mFolderId = new String[listFolderSize - 1];
+            for (Folder folder : primaryData.listFolder) {
+                if (!folder.getObjectId().equals(mNote.getFolderId())) {
+                    mFolder[sum] = folder.getName();
+                    mFolderId[sum] = folder.getObjectId();
                     sum++;
                 }
             }
@@ -704,8 +735,9 @@ public class EditActivity extends BaseHasSwipeActivity {
                                     Trace.d("saveNewFolder", "成功");
                                     Folder newFolder = new Folder(objectId, newFolderName, 0);
                                     primaryData.listFolder.add(newFolder);
+                                    listFolderSize++;
                                     //添加进
-                                    mFolder = new String[primaryData.listFolder.size() - 1];
+                                    mFolder = new String[listFolderSize - 1];
                                     thisFolder = newFolder;
                                     isFolderChanged = true;
                                     Trace.show(EditActivity.this, "选择的笔记夹为：" + newFolderName);

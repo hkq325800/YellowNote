@@ -12,11 +12,11 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 
     public final static String TAG = BaseHasSwipeActivity.class.getCanonicalName();
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Trace.d("onSaveInstanceState");
-        super.onSaveInstanceState(outState);
-    }
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        Trace.d("onSaveInstanceState");
+//        super.onSaveInstanceState(outState);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

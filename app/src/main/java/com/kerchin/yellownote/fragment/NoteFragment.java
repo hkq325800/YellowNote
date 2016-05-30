@@ -111,7 +111,7 @@ public class NoteFragment extends BaseFragment
                     Trace.d("handlerInNote", "handle4refresh");
                     getDataListFromNote(primaryData.listNote);//handle4refresh
 //                    if (MainActivity.thisPosition == 0) {
-                        mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
+                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
 //                    }
                     if (noteAdapter != null) {
                         noteAdapter.setList(list);
@@ -307,7 +307,7 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), null);
+            EditActivity.startMe(getActivity(), null, primaryData.listFolder.size());
         } else
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
     }
@@ -438,7 +438,8 @@ public class NoteFragment extends BaseFragment
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MainActivity m = (MainActivity) getActivity();
                     m.hideBtnAdd();
-                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
+                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1)
+                            , primaryData.listFolder.size());
                 }
             });
             //叉号隐藏
@@ -539,7 +540,8 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1));
+            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1)
+                    , primaryData.listFolder.size());
         } else {
             Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
         }
