@@ -59,7 +59,7 @@ public class MainActivity extends BaseActivity
 
     public static int thisPosition = 0;
     public boolean isHide = false;
-    private static Long mExitTime = (long) 0;//退出时间
+//    private static Long mExitTime = (long) 0;//退出时间
     private boolean isDrawerOpen = false;
     public SearchView mSearchView;
     public MenuItem btnSearch, btnSort, btnDelete;
@@ -85,6 +85,7 @@ public class MainActivity extends BaseActivity
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
+        outState.putString("user", MyApplication.user);
 //        outState.putInt("noteSize", PrimaryData.getInstance().listNote.size());
 //        int i = 0;
 //        for (Note note : PrimaryData.getInstance().listNote) {
@@ -104,6 +105,7 @@ public class MainActivity extends BaseActivity
             folderFragment = FolderFragment.newInstance(null);
         } else {
             Trace.d("initializeData else");
+            MyApplication.setUser(savedInstanceState.getString("user"));
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
             noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
             if (noteFragment == null)
@@ -416,26 +418,26 @@ public class MainActivity extends BaseActivity
                 if (getFragmentStatus().isDeleteMode()) {
                     noteFragment.deleteViewHide();
                 } else {
-                    if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
-                        Trace.show(this, "再点击一次退出应用");
-                        mExitTime = System.currentTimeMillis();
-                    } else {
+//                    if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
+//                        Trace.show(this, "再点击一次退出应用");
+//                        mExitTime = System.currentTimeMillis();
+//                    } else {
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         startActivity(intent);
-                    }
+//                    }
                 }
             } else {
-                if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
-                    Trace.show(this, "再点击一次退出应用");
-                    mExitTime = System.currentTimeMillis();
-                } else {
+//                if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
+//                    Trace.show(this, "再点击一次退出应用");
+//                    mExitTime = System.currentTimeMillis();
+//                } else {
                     Intent intent = new Intent(Intent.ACTION_MAIN);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.addCategory(Intent.CATEGORY_HOME);
                     startActivity(intent);
-                }
+//                }
             }
         }
     }
