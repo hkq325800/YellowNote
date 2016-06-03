@@ -326,7 +326,8 @@ public class MainActivity extends BaseActivity
             handler.sendEmptyMessage(gotoSetting);
             return false;
         } else if (id == R.id.nav_resetSecret) {
-            startActivity(new Intent(MainActivity.this, Main.class));
+            startActivity(new Intent(MainActivity.this, SetPatternActivity.class));//for test pattern
+//            startActivity(new Intent(MainActivity.this, Main.class));//for test ormLite
 //            handler.sendEmptyMessage(gotoSecret);
             return false;
         }

@@ -20,4 +20,8 @@
     <dimen name="common_title">20sp</dimen>
     <dimen name="common_text">16sp</dimen>
 
+    <!--Pattern-->
+    <dimen name="screen_edge_horizontal_margin">16dp</dimen>
+    <dimen name="screen_edge_vertical_margin">16dp</dimen>
+    <dimen name="horizontal_divider_height">1dp</dimen>
 </resources>
