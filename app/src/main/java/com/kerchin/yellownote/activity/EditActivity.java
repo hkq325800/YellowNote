@@ -128,10 +128,10 @@ public class EditActivity extends BaseHasSwipeActivity {
                     finish();
                     break;
                 case handle4noTitle:
-                    Trace.show(EditActivity.this, "标题不应为空");
+                    Trace.show(getApplicationContext(), "标题不应为空");
                     break;
                 case handle4noContent:
-                    Trace.show(EditActivity.this, "内容不应为空");
+                    Trace.show(getApplicationContext(), "内容不应为空");
                     break;
                 case handle4saveChange:
                     //respond
@@ -144,7 +144,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     mNavigationRightBtn.setText("保存");
                     openSliding();
                     if ((boolean) msg.obj) {//操作是否成功便于回滚
-                        Trace.show(EditActivity.this, "保存成功");
+                        Trace.show(getApplicationContext(), "保存成功");
                         mEditDeleteLinear.setEnabled(true);
                         if (userConfirm) {
                             finish();
@@ -568,7 +568,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     public void saveChanges() {
         if (mEditContentEdt.getText().toString().trim().equals("")
                 || mNavigationTitleEdt.getText().toString().equals("")) {
-            Trace.show(EditActivity.this, "请输入标题和内容");
+            Trace.show(getApplicationContext(), "请输入标题和内容");
         } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                 || isFolderChanged) {
@@ -577,7 +577,7 @@ public class EditActivity extends BaseHasSwipeActivity {
             mNavigationRightBtn.setEnabled(false);
             saveDifference(false);
         } else {
-            Trace.show(EditActivity.this, "内容未修改");
+            Trace.show(getApplicationContext(), "内容未修改");
         }
     }
 
@@ -657,12 +657,12 @@ public class EditActivity extends BaseHasSwipeActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             addClick();
-//                            Trace.show(EditActivity.this, "确认");
+//                            Trace.show(getApplicationContext(), "确认");
                         }
                     }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-//                    Trace.show(EditActivity.this, "算了吧");
+//                    Trace.show(getApplicationContext(), "算了吧");
                 }
             });
             builder.create().show();
@@ -683,7 +683,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 @Override
                 public void onClick(DialogInterface dialog, final int which) {
                     isFolderChanged = true;
-                    Trace.show(EditActivity.this, "选择的笔记夹为：" + mFolder[which]);
+                    Trace.show(getApplicationContext(), "选择的笔记夹为：" + mFolder[which]);
                     //Folder newOne = null;
 //                    final String oldName = thisFolder.getName();
 //                    final String oldId = thisFolder.getObjectId();
@@ -714,7 +714,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
-        final AlertDialog alertDialog = new AlertDialog.Builder(this)
+        final AlertDialog alertDialog = new AlertDialog.Builder(EditActivity.this)
                 .setTitle("新增笔记夹")
                 .setView(view).create();
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
@@ -724,7 +724,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 mEditEdt.setEnabled(false);
                 if (!newFolderName.equals("")) {
                     if (primaryData.isFolderNameContain(newFolderName)) {
-                        Trace.show(EditActivity.this, "该笔记夹名称已存在");
+                        Trace.show(getApplicationContext(), "该笔记夹名称已存在");
                         mEditEdt.setEnabled(true);
                     } else {
                         new Thread(new Runnable() {
@@ -755,7 +755,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                         mEditEdt.setEnabled(true);
                     }
                 } else {
-                    Trace.show(EditActivity.this, "笔记夹名不能为空");
+                    Trace.show(getApplicationContext(), "笔记夹名不能为空");
                     mEditEdt.setEnabled(true);
                 }
             }
@@ -798,7 +798,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 , mEditContentEdt.getText().toString()
                 , handler, isLast ? handle4last : handle4saveChange);
         if (!isNew && isFolderChanged) {
-            mNote.move2folder(EditActivity.this, thisFolder, null, (byte) 0x0);
+            mNote.move2folder(EditActivity.this, thisFolder, null, (byte) 0x0);//byte的正确传入方式
         }
         isFolderChanged = false;
     }

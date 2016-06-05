@@ -246,6 +246,12 @@ public class MainActivity extends BaseActivity
         return new ToolbarStatus();
     }
 
+    public static void startMe(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();

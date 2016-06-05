@@ -172,9 +172,9 @@ public class LoginActivity extends LoginAbstract {
         String txtUser = mLoginUserEdt.getText().toString();
         String txtPass = mLoginPassEdt.getText().toString();
         if (txtUser.equals("")) {
-            Trace.show(LoginActivity.this, "请输入手机号");
+            Trace.show(getApplicationContext(), "请输入手机号");
         } else if (txtPass.equals("")) {
-            Trace.show(LoginActivity.this, "请输入密码");
+            Trace.show(getApplicationContext(), "请输入密码");
         } else {
             //登录验证
             loginVerify(txtUser, txtPass);
@@ -234,7 +234,7 @@ public class LoginActivity extends LoginAbstract {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("找回密码");
             mSignUpRelative.setVisibility(View.VISIBLE);
-            //Toast.makeText(LoginActivity.this, "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
         } else {
             forgetSecret();
         }
@@ -258,7 +258,7 @@ public class LoginActivity extends LoginAbstract {
                         cancel();
                         Trace.d("CDTimer is registered server echo " + millisUntilFinished);
                         if (registerStatus == statusFalse) {
-                            Trace.show(LoginActivity.this, "该帐号尚未注册");
+                            Trace.show(getApplicationContext(), "该帐号尚未注册");
                         } else {
                             if (Config.isDebugMode)
                                 forgetVerify(txtUser, txtPass);
@@ -299,7 +299,7 @@ public class LoginActivity extends LoginAbstract {
         String txtForget = mLoginForgetBtn.getText().toString();
         final String txtUser = mLoginUserEdt.getText().toString();
         if (txtUser.equals("") || txtUser.length() != 11) {
-            Trace.show(LoginActivity.this, "请先填写11位手机号");
+            Trace.show(getApplicationContext(), "请先填写11位手机号");
         } else {
             if (txtForget.equals("找回密码")) {//忘记密码
                 //是否注册查询
@@ -313,7 +313,7 @@ public class LoginActivity extends LoginAbstract {
                             if (registerStatus == statusTrue) {
                                 sendProv(false, txtUser, Config.timeout_prov);
                             } else {
-                                Trace.show(LoginActivity.this, "该帐号未注册,请先注册");
+                                Trace.show(getApplicationContext(), "该帐号未注册,请先注册");
                             }
                             registerStatus = statusInit;
                         }
@@ -335,7 +335,7 @@ public class LoginActivity extends LoginAbstract {
                             if (registerStatus == statusFalse) {
                                 sendProv(true, txtUser, Config.timeout_prov);
                             } else {
-                                Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
+                                Trace.show(getApplicationContext(), "该帐号已注册,请直接登录");
                             }
                             registerStatus = statusInit;
                         }
@@ -410,7 +410,7 @@ public class LoginActivity extends LoginAbstract {
                 if (registerStatus > statusInit) {
                     Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                     if (registerStatus == statusFalse) {
-                        Trace.show(LoginActivity.this, "该帐号尚未注册");
+                        Trace.show(getApplicationContext(), "该帐号尚未注册");
                     } else {
                         //密码查询
                         new Thread(new Runnable() {
@@ -536,19 +536,19 @@ public class LoginActivity extends LoginAbstract {
         if (Config.isDebugMode)
             return true;
         if (txtUser.equals("") || txtUser.length() != 11) {
-            Trace.show(LoginActivity.this, "请输入11位手机号并接收验证码");
+            Trace.show(getApplicationContext(), "请输入11位手机号并接收验证码");
             return false;
         } else if (txtRePass.equals("") | txtPass.equals("")) {
-            Trace.show(LoginActivity.this, "请输入密码并重复一次");
+            Trace.show(getApplicationContext(), "请输入密码并重复一次");
             return false;
         } else if (!txtRePass.equals(txtPass)) {
-            Trace.show(LoginActivity.this, "两次输入的密码不同");
+            Trace.show(getApplicationContext(), "两次输入的密码不同");
             return false;
         } else if (txtPass.length() < 6 || txtPass.length() > 13) {
-            Trace.show(LoginActivity.this, "密码长度控制在6-13位");
+            Trace.show(getApplicationContext(), "密码长度控制在6-13位");
             return false;
         } else if (txtProv.length() != 6) {
-            Trace.show(LoginActivity.this, "请输入6位验证码");
+            Trace.show(getApplicationContext(), "请输入6位验证码");
             return false;
         } else {
             return true;
@@ -594,7 +594,8 @@ public class LoginActivity extends LoginAbstract {
                     && PrimaryData.status.isItemReady
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
-                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
+                MainActivity.startMe(getApplicationContext());
+//                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
             } else {
                 if (repeatCount * runnablePeriod <= runnableTimeout) {
@@ -612,7 +613,7 @@ public class LoginActivity extends LoginAbstract {
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
-                Trace.show(LoginActivity.this, "再点击一次退出应用");
+                Trace.show(getApplicationContext(), "再点击一次退出应用");
                 mExitTime = System.currentTimeMillis();
             } else {
                 Trace.i(TAG, "exit Main");

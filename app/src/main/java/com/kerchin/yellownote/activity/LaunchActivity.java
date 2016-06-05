@@ -123,7 +123,8 @@ public class LaunchActivity extends BaseActivity {
                             R.anim.push_left_out);
                     break;
                 case next://缓存正确 直接进入
-                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
+                    MainActivity.startMe(getApplicationContext());
+//                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
                     finish();
                     overridePendingTransition(R.anim.push_left_in,
                             R.anim.push_left_out);
