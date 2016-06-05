@@ -149,7 +149,7 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4error:
                     AVException e = (AVException) msg.obj;
                     if (e.getMessage().contains("UnknownHostException")) {
-                        Trace.show(getActivity(), "网络不太通畅 请稍后再试");
+                        Trace.show(getActivity().getApplicationContext(), "网络不太通畅 请稍后再试");
                     }
                     break;
                 default:
@@ -307,9 +307,9 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), null, primaryData.listFolder.size());
+            EditActivity.startMe(getActivity().getApplicationContext(), null, primaryData.listFolder.size());
         } else
-            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+            Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {
@@ -438,7 +438,7 @@ public class NoteFragment extends BaseFragment
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     MainActivity m = (MainActivity) getActivity();
                     m.hideBtnAdd();
-                    EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1)
+                    EditActivity.startMe(getActivity().getApplicationContext(), noteAdapter.getItem(position - 1)
                             , primaryData.listFolder.size());
                 }
             });
@@ -540,10 +540,10 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity(), noteAdapter.getItem(position - 1)
+            EditActivity.startMe(getActivity().getApplicationContext(), noteAdapter.getItem(position - 1)
                     , primaryData.listFolder.size());
         } else {
-            Trace.show(getActivity(), "笔记夹加载中\n稍后重试咯~");
+            Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
         }
     }
 
@@ -644,7 +644,7 @@ public class NoteFragment extends BaseFragment
             if (emptyClickCount >= 2) {
                 emptyClickCount = 0;
                 if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                    Trace.show(getActivity(), "这个真没有");
+                    Trace.show(getActivity().getApplicationContext(), "这个真没有");
             } else
                 mNoteWDList.stopRefresh();
         }

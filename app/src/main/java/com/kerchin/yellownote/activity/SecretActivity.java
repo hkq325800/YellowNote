@@ -69,7 +69,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        setSlidingModeRight();
+//        setSlidingModeRight();
         mSecretPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassAgainEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
@@ -121,7 +121,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
                         }
                     } catch (AVException e) {
                         e.printStackTrace();
-                        Trace.show(SecretActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
                 }
             }).start();
@@ -135,13 +135,13 @@ public class SecretActivity extends BaseHasSwipeActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case secretError:
-                    Trace.show(SecretActivity.this, "你输入的旧密码出错啦");
+                    Trace.show(getApplicationContext(), "你输入的旧密码出错啦");
                     break;
                 case reLogForFrozen:
-                    Trace.show(SecretActivity.this, "您操作的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
+                    Trace.show(getApplicationContext(), "您操作的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
                     break;
                 case trueForSecret:
-                    Trace.show(SecretActivity.this, "密码修改成功");
+                    Trace.show(getApplicationContext(), "密码修改成功");
                     mSecretNewPassEdt.setText("");
                     mSecretPassEdt.setText("");
                     mSecretNewPassAgainEdt.setText("");
@@ -155,13 +155,13 @@ public class SecretActivity extends BaseHasSwipeActivity {
         if (mSecretPassEdt.getText().toString().equals("")
                 || mSecretNewPassEdt.getText().toString().equals("")
                 || mSecretNewPassAgainEdt.getText().toString().equals("")) {
-            Trace.show(SecretActivity.this, "请将信息填写完整");
+            Trace.show(getApplicationContext(), "请将信息填写完整");
             return false;
         } else if (!mSecretNewPassEdt.getText().toString().equals(mSecretNewPassAgainEdt.getText().toString())) {
-            Trace.show(SecretActivity.this, "两次填写的新密码不一致");
+            Trace.show(getApplicationContext(), "两次填写的新密码不一致");
             return false;
         } else if (mSecretNewPassEdt.getText().toString().length() < 6 || mSecretNewPassEdt.getText().toString().length() > 13) {
-            Trace.show(SecretActivity.this, "密码长度控制在6-13位");
+            Trace.show(getApplicationContext(), "密码长度控制在6-13位");
             return false;
         }
         return true;

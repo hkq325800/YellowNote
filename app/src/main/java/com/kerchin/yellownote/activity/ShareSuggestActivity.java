@@ -82,7 +82,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     public void submit(){
         final String msg = mShareSuggestContentEdt.getText().toString();
         if (msg.equals("")) {
-            Trace.show(ShareSuggestActivity.this, "请输入具体的意见");
+            Trace.show(getApplicationContext(), "请输入具体的意见");
         } else {
             if (!isPosting) {
                 isPosting = true;
@@ -113,7 +113,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     }
                 }).start();
             } else {
-                Trace.show(ShareSuggestActivity.this, "您宝贵的意见正在提交中···");
+                Trace.show(getApplicationContext(), "您宝贵的意见正在提交中···");
             }
             if (quickSuggestTimes >= 2) {
                 ShareSuggestService.setUnableToSuggest(MyApplication.user);
@@ -169,7 +169,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        setSlidingModeRight();
+//        setSlidingModeRight();
     }
 
     public static void startMe(Context context) {

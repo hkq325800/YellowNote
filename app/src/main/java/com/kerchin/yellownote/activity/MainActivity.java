@@ -26,13 +26,10 @@ import android.view.inputmethod.InputMethodManager;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.BaseActivity;
-import com.kerchin.yellownote.bean.Note;
-import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -191,7 +188,7 @@ public class MainActivity extends BaseActivity
 //                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
                     }
                 } else {
-                    Trace.show(MainActivity.this, "过久未使用 资源被回收");
+                    Trace.show(getApplicationContext(), "过久未使用 资源被回收");
                 }
             }
         });
@@ -326,9 +323,9 @@ public class MainActivity extends BaseActivity
             handler.sendEmptyMessage(gotoSetting);
             return false;
         } else if (id == R.id.nav_resetSecret) {
-            startActivity(new Intent(MainActivity.this, SetPatternActivity.class));//for test pattern
-//            startActivity(new Intent(MainActivity.this, Main.class));//for test ormLite
-//            handler.sendEmptyMessage(gotoSecret);
+//            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
+//            startActivity(new Intent(getApplicationContext(), Main.class));//for test ormLite
+            handler.sendEmptyMessage(gotoSecret);
             return false;
         }
         mMainDrawer.closeDrawers();
@@ -345,14 +342,14 @@ public class MainActivity extends BaseActivity
         public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case gotoSecret:
-                    hideBtnAdd();
-                    SecretActivity.startMe(MainActivity.this);
+                    hideBtnAdd();//使进入
+                    SecretActivity.startMe(getApplicationContext());
                     overridePendingTransition(R.anim.push_right_in,
                             R.anim.push_right_out);
                     break;
                 case gotoSetting:
                     hideBtnAdd();
-                    ShareSuggestActivity.startMe(MainActivity.this);
+                    ShareSuggestActivity.startMe(getApplicationContext());
                     overridePendingTransition(R.anim.push_right_in,
                             R.anim.push_right_out);
                     break;

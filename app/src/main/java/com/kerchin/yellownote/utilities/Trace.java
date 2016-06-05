@@ -88,13 +88,11 @@ public class Trace {
     }
 
     public static String getErrorMsg(Exception e) {
-        if (e.getMessage() != null) {
-            if (Config.isDebugMode)
-                return e.getMessage();
-            else
-                return "";
-        } else {
+        if (e.getMessage() != null
+                && Config.isDebugMode)
+            return e.getMessage();
+        else
             return "";
-        }
+
     }
 }

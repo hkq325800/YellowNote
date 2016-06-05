@@ -96,7 +96,7 @@ public class LaunchActivity extends BaseActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.gc();
+        System.gc();//用于icon的回收
     }
 
     private Handler handler = new Handler() {
