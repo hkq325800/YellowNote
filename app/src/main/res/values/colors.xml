@@ -9,11 +9,13 @@
     <color name="backgroundPrimary">#FDEB6D</color>
     <color name="backgroundLight">#FAFAD2</color><!--亮金黄色 -->
     <color name="textColor">#FFFFF0</color><!--象牙色-->
-    <color name="textHintColor">#D2E2F5</color><!--minionYellow_pressed-->
+    <color name="textHintColor">#D2E2F5</color><!--light_gray-->
     <color name="textContentColor">#000000</color>
     <color name="textBackgroundColor">#FFFFFF</color>
     <color name="backgroundFunctionBar">#D2E2F5</color><!--light_gray-->
     <color name="whiteFocus">#DDDDDD</color><!--bg_focus-->
+	<color name="listItemBlankBackgroundColor">#D3D3D3</color><!--亮灰色-->
+	<color name="pageDefaultColor">#DCDCDC</color><!--淡灰色-->
 
 	<color name="minionYellow">#FDEB6D</color><!--小黄人色-->
 	<color name="minionYellow_pressed">#E3D573</color>
@@ -111,7 +113,6 @@
 	<color name="greenyellow">#ADFF2F</color><!--黄绿色 -->
 	<color name="lightblue">#ADD8E6</color><!--亮蓝色 -->
 	<color name="darkgray">#A9A9A9</color><!--暗灰色 -->
-	<color name="darkgrey">#A9A9A9</color><!--暗灰色 -->
 	<color name="brown">#A52A2A</color><!--褐色 -->
 	<color name="sienna">#A0522D</color><!--赭色 -->
 	<color name="darkorchid">#9932CC</color><!--暗紫色 -->

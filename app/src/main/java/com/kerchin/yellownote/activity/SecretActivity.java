@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -51,19 +52,12 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mNavigationTitleEdt.setText("密码相关");
-        mNavigationRightBtn.setText("提交");
-        mNavigationRightBtn.setVisibility(View.VISIBLE);
-        mNavigationTitleEdt.setEnabled(false);
-        mNavigationTitleEdt.setFocusable(false);
-        mNavigationTitleEdt.setFocusableInTouchMode(false);
-        mNavigationRightBtn.setFocusable(true);
-        mNavigationRightBtn.setFocusableInTouchMode(true);
     }
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-
+        mNavigationTitleEdt.setText("密码相关");
+        mNavigationRightBtn.setText("提交");
     }
 
     @Override
@@ -73,6 +67,12 @@ public class SecretActivity extends BaseHasSwipeActivity {
         mSecretPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mSecretNewPassAgainEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+        mNavigationRightBtn.setVisibility(View.VISIBLE);
+        mNavigationTitleEdt.setEnabled(false);
+        mNavigationTitleEdt.setFocusable(false);
+        mNavigationTitleEdt.setFocusableInTouchMode(false);
+        mNavigationRightBtn.setFocusable(true);
+        mNavigationRightBtn.setFocusableInTouchMode(true);
     }
 
     public static void startMe(Context context) {

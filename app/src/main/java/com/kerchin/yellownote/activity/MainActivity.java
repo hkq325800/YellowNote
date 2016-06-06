@@ -349,7 +349,7 @@ public class MainActivity extends BaseActivity
             switch (msg.what) {
                 case gotoSecret:
                     hideBtnAdd();//使进入
-                    SecretActivity.startMe(getApplicationContext());
+                    SecretMenuActivity.startMe(getApplicationContext());
                     overridePendingTransition(R.anim.push_right_in,
                             R.anim.push_right_out);
                     break;

@@ -5,6 +5,9 @@
 
 package com.kerchin.yellownote.activity;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -41,6 +44,12 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 //                return super.onOptionsItemSelected(item);
 //        }
 //    }
+
+    public static void startMe(Activity activity, int requestCode) {
+        Intent intent = new Intent(activity, SetPatternActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivityForResult(intent, requestCode);
+    }
 
     //两次绘制相同后返回
     @Override
