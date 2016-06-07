@@ -84,15 +84,6 @@ public class MainActivity extends BaseActivity
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
         outState.putString("user", MyApplication.user);
         thisPosition = 0;
-//        outState.putInt("noteSize", PrimaryData.getInstance().listNote.size());
-//        int i = 0;
-//        for (Note note : PrimaryData.getInstance().listNote) {
-//            outState.putSerializable("note" + i, note);
-//            i++;
-//        }
-//        outState.putSerializable("folder", PrimaryData.getInstance().listFolder);
-//        outState.putSerializable("items", PrimaryData.getInstance().mItems);
-
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -289,14 +280,14 @@ public class MainActivity extends BaseActivity
         btnSearch = mMainToolbar.getMenu().findItem(R.id.action_search);
         btnSort = mMainToolbar.getMenu().findItem(R.id.action_sort);
         btnDelete = mMainToolbar.getMenu().findItem(R.id.action_delete);
-        mSearchView = (SearchView) MenuItemCompat.getActionView(btnSearch);
+        mSearchView = (SearchView) btnSearch.getActionView();
         mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getFragmentStatus().setIsSearchMode(true);
                 //开启搜索模式
                 hideBtnAdd();
-                noteFragment.disableLoad();//TODO
+                noteFragment.disableLoad();
             }
         });
         mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
@@ -380,13 +371,13 @@ public class MainActivity extends BaseActivity
                                 @Override
                                 public void onAnimationStart(Animator animation) {
                                     super.onAnimationStart(animation);
-                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
                                         mMainFab.setVisibility(View.VISIBLE);
                                 }
                             })
                             .setDuration(300).start();
                     break;
-                case hideBtnAdd:
+                case hideBtnAdd://必须使用animate直接设置会丢失十字
                     mMainFab.animate()
                             .scaleX(0)
                             .scaleY(0)
@@ -395,11 +386,11 @@ public class MainActivity extends BaseActivity
                                 @Override
                                 public void onAnimationEnd(Animator animation) {
                                     super.onAnimationEnd(animation);
-                                    if (mMainFab.getVisibility() == View.VISIBLE)
+//                                    if (mMainFab.getVisibility() == View.VISIBLE)
                                         mMainFab.setVisibility(View.INVISIBLE);
                                 }
                             })
-                            .setDuration(200).start();
+                            .setDuration(50).start();
                     break;
                 default:
                     break;
@@ -426,7 +417,7 @@ public class MainActivity extends BaseActivity
         } else if (getFragmentStatus().isSearchMode()) {
             mSearchView.onActionViewCollapsed();
             showBtnAdd();
-            if (thisPosition == 0)
+            if (thisPosition == 0)//应该只有note有搜索
                 noteFragment.restore();
             getFragmentStatus().setIsSearchMode(false);
         } else {

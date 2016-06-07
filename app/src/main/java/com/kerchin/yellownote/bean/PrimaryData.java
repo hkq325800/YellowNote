@@ -70,14 +70,14 @@ public class PrimaryData {
         mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
     }
 
-    public void initDataFromCloud() throws AVException {
-        Trace.d("loadDataFromCloud");
-        listNote.clear();
-        map.clear();
-        getNotesFromCloud();//initDataFromCloud
-        getFolderFromCloud();
-        mHandler.post(runnableForSimple);//initDataFromCloud
-    }
+//    public void initDataFromCloud() throws AVException {
+//        Trace.d("loadDataFromCloud");
+//        listNote.clear();
+//        map.clear();
+//        getNotesFromCloud();//initDataFromCloud
+//        getFolderFromCloud();
+//        mHandler.post(runnableForSimple);//initDataFromCloud
+//    }
 
     /**
      * 网络获取初始化
@@ -91,11 +91,11 @@ public class PrimaryData {
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
-        listNote.clear();
-        map.clear();
+//        listNote.clear();
+//        map.clear();
 //        if (getNoteFromData())
         getNotesFromCloud();//initData
-        listFolder.clear();
+//        listFolder.clear();
 //        if (getFolderFromData())
         getFolderFromCloud();
         mHandler.post(runnableForSimple);//initData
@@ -234,6 +234,7 @@ public class PrimaryData {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                listFolder.clear();
                 for (AVObject avObject : avObjects) {
 //                    Realm realm = Realm.getInstance(MyApplication.getContext());
 //                    realm.beginTransaction();
@@ -277,6 +278,8 @@ public class PrimaryData {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                listNote.clear();
+                map.clear();
                 for (AVObject avObject : avObjects) {
                     String folderId = avObject.getString("folder_id");
                     final Note note = new Note(avObject.getObjectId()
@@ -359,9 +362,6 @@ public class PrimaryData {
     }
 
     public void refresh(final Handler handler, final byte handleCode) throws AVException {
-        listNote.clear();
-        map.clear();
-        listFolder.clear();
         outHandler = handler;//refresh
         outHandleCode = handleCode;
         status.isItemReady = false;

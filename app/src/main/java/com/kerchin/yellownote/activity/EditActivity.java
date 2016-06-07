@@ -278,6 +278,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         outState.putSerializable("thisFolder", thisFolder);
         outState.putSerializable("mFolder", mFolder);
         outState.putSerializable("mFolderId", mFolderId);
+        outState.putInt("listFolderSize", listFolderSize);
         super.onSaveInstanceState(outState);
     }
 
@@ -309,6 +310,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 isNew = false;
             }
             thisFolder = (Folder) savedInstanceState.getSerializable("thisFolder");
+            listFolderSize = savedInstanceState.getInt("listFolderSize");
             mFolder = savedInstanceState.getStringArray("mFolder");
             mFolderId = savedInstanceState.getStringArray("mFolderId");
             //从savedInstanceState中恢复数据

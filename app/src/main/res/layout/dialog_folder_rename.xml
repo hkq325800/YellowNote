@@ -14,6 +14,7 @@
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
         android:inputType="text"
+        android:textColor="@color/black"
         android:textColorHint="@color/backgroundFunctionBar"
         android:textSize="16sp" />
 

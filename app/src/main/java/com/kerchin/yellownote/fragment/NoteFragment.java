@@ -96,7 +96,7 @@ public class NoteFragment extends BaseFragment
 //                        noteAdapter.setList(list);
 //                    }
                     if (primaryData.listNote.size() == 0) {
-                        mProgress.showNoData("未找到用户的笔记数据", new View.OnClickListener() {
+                        mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 emptyClick();
@@ -393,7 +393,6 @@ public class NoteFragment extends BaseFragment
     }
 
     public void closeClick() {
-        mainStatus.setIsSearchMode(false);
         restore();
         MainActivity main = (MainActivity) getActivity();
         main.showBtnAdd();
