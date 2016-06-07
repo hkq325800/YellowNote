@@ -272,8 +272,7 @@ public class Note implements Serializable {
                         Trace.d("saveFolderNum-" + 1 + "成功");
 //                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
                     }
-//                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
-                    primaryData.listNote.remove(Note.this);
+                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
                     Trace.show(context, "删除成功");
                     Trace.d("deleteNote 成功");
                     NoteFragment.isChanged4note = true;//delete edit

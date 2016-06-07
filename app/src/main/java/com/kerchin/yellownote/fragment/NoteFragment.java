@@ -323,7 +323,8 @@ public class NoteFragment extends BaseFragment
                 @Override
                 public boolean onQueryTextChange(String newText) {
                     mSearchText = newText;
-                    doSearch();//onQueryTextChange
+                    if (list != null)//restart problem
+                        doSearch();//onQueryTextChange
                     return true;
                 }
             };

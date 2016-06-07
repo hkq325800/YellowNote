@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity
 
     public static int thisPosition = 0;
     public boolean isHide = false;
-//    private static Long mExitTime = (long) 0;//退出时间
+    //    private static Long mExitTime = (long) 0;//退出时间
     private boolean isDrawerOpen = false;
     public SearchView mSearchView;
     public MenuItem btnSearch, btnSort, btnDelete;
@@ -83,6 +83,7 @@ public class MainActivity extends BaseActivity
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
         outState.putString("user", MyApplication.user);
+        thisPosition = 0;
 //        outState.putInt("noteSize", PrimaryData.getInstance().listNote.size());
 //        int i = 0;
 //        for (Note note : PrimaryData.getInstance().listNote) {
@@ -91,7 +92,8 @@ public class MainActivity extends BaseActivity
 //        }
 //        outState.putSerializable("folder", PrimaryData.getInstance().listFolder);
 //        outState.putSerializable("items", PrimaryData.getInstance().mItems);
-        super.onSaveInstanceState(outState);
+
+//        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
     @Override
@@ -105,11 +107,15 @@ public class MainActivity extends BaseActivity
             MyApplication.setUser(savedInstanceState.getString("user"));
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
             noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
-            if (noteFragment == null)
+            if (noteFragment == null) {
+                Trace.d("noteFragment null");
                 noteFragment = NoteFragment.newInstance(null);
+            }
             folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
-            if (folderFragment == null)
+            if (folderFragment == null) {
+                Trace.d("folderFragment null");
                 folderFragment = FolderFragment.newInstance(null);
+            }
         }
         fragments.add(noteFragment);
         fragments.add(folderFragment);
@@ -128,7 +134,7 @@ public class MainActivity extends BaseActivity
             public void onPageSelected(int position) {
                 thisPosition = position;
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
-                if (position == 0) {
+                if (position == 0 && btnDelete != null) {
                     //delete初始化
                     noteFragment.respondForChange();//onPageSelected
                     btnSort.setVisible(true);
@@ -270,6 +276,12 @@ public class MainActivity extends BaseActivity
     public Toolbar getToolbar() {
         return mMainToolbar;
     }
+
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
+//        return super.onPrepareOptionsMenu(menu);
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -426,10 +438,10 @@ public class MainActivity extends BaseActivity
 //                        Trace.show(this, "再点击一次退出应用");
 //                        mExitTime = System.currentTimeMillis();
 //                    } else {
-                        Intent intent = new Intent(Intent.ACTION_MAIN);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.addCategory(Intent.CATEGORY_HOME);
-                        startActivity(intent);
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
 //                    }
                 }
             } else {
@@ -437,10 +449,10 @@ public class MainActivity extends BaseActivity
 //                    Trace.show(this, "再点击一次退出应用");
 //                    mExitTime = System.currentTimeMillis();
 //                } else {
-                    Intent intent = new Intent(Intent.ACTION_MAIN);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addCategory(Intent.CATEGORY_HOME);
-                    startActivity(intent);
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                startActivity(intent);
 //                }
             }
         }
