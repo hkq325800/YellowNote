@@ -17,6 +17,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
+import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.Trace;
 
@@ -177,6 +178,7 @@ public class LaunchActivity extends BaseActivity {
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
                         AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
+                        Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));//TODO
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");

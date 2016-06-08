@@ -58,7 +58,7 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity
         mSlidingMenu.setMode(SlidingMenu.LEFT);
         //因为微信是只有边缘滑动，我们设置成TOUCHMODE_MARGIN模式，如果你想要全屏幕滑动，只需要把这个改成TOUCHMODE_FULLSCREEN就OK了
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        setSlidingMargin(20f);
+        setSlidingMargin(50f);
         super.onCreate(savedInstanceState);
     }
 

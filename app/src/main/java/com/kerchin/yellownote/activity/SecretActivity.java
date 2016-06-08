@@ -1,11 +1,11 @@
 package com.kerchin.yellownote.activity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.view.View;
 import android.widget.Button;
@@ -43,10 +43,18 @@ public class SecretActivity extends BaseHasSwipeActivity {
     EditText mSecretNewPassEdt;
     @BindView(R.id.mSecretNewPassAgainEdt)
     EditText mSecretNewPassAgainEdt;
+    @BindView(R.id.mSecretPassTextInput)
+    TextInputLayout mSecretPassTextInput;
+    @BindView(R.id.mSecretRePassTextInput)
+    TextInputLayout mSecretRePassTextInput;
+    @BindView(R.id.mSecretRePassAgainTextInput)
+    TextInputLayout mSecretRePassAgainTextInput;
+    boolean isForget;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_secret);
+        isForget = getIntent().getBooleanExtra("isForget", false);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
@@ -56,8 +64,13 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
-        mNavigationTitleEdt.setText("密码相关");
+        mNavigationTitleEdt.setText(isForget ? "忘记密码" : "登录密码修改");
         mNavigationRightBtn.setText("提交");
+        if (isForget) {
+            mSecretPassTextInput.setHint("输入用户名");
+            mSecretRePassTextInput.setHint("输入密码");
+            mSecretRePassAgainTextInput.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -89,42 +102,45 @@ public class SecretActivity extends BaseHasSwipeActivity {
     @OnClick(R.id.mNavigationRightBtn)
     public void submit() {
         if (tableCheck()) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        AVObject avObjects = LoginService.loginVerify(MyApplication.user, mSecretPassEdt.getText().toString());
-                        if (avObjects != null) {
-                            Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
-                            boolean isFrozen = avObjects.getBoolean("isFrozen");
-                            if (isFrozen) {//冻结修改不成功
-                                Message message = Message.obtain();//由于账户冻结重新登陆
-                                message.what = reLogForFrozen;
-                                handler.sendMessage(message);
+            if (isForget) {
+                //TODO
+            } else
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            AVObject avObjects = LoginService.loginVerify(MyApplication.user, mSecretPassEdt.getText().toString());
+                            if (avObjects != null) {
+                                Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
+                                boolean isFrozen = avObjects.getBoolean("isFrozen");
+                                if (isFrozen) {//冻结修改不成功
+                                    Message message = Message.obtain();//由于账户冻结重新登陆
+                                    message.what = reLogForFrozen;
+                                    handler.sendMessage(message);
+                                } else {
+                                    SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
+                                    //存入shared
+                                    SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
+                                    editor.putString(Config.KEY_USER, MyApplication.user);
+                                    editor.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString());
+                                    editor.apply();
+                                    //密码正确进行修改
+                                    Message message = Message.obtain();//直接进入
+                                    message.what = trueForSecret;
+                                    handler.sendMessage(message);
+                                }
                             } else {
-                                SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
-                                //存入shared
-                                SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
-                                editor.putString(Config.KEY_USER, MyApplication.user);
-                                editor.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString());
-                                editor.apply();
-                                //密码正确进行修改
-                                Message message = Message.obtain();//直接进入
-                                message.what = trueForSecret;
+                                //缓存错误重新登录
+                                Message message = Message.obtain();//由于密码错误重新登陆
+                                message.what = secretError;
                                 handler.sendMessage(message);
                             }
-                        } else {
-                            //缓存错误重新登录
-                            Message message = Message.obtain();//由于密码错误重新登陆
-                            message.what = secretError;
-                            handler.sendMessage(message);
+                        } catch (AVException e) {
+                            e.printStackTrace();
+                            Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                         }
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                        Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
-                }
-            }).start();
+                }).start();
         }
     }
 

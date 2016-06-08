@@ -31,6 +31,10 @@ public class PatternLockUtils {
                 PatternUtils.patternToSha1String(pattern), context);
     }
 
+    public static String getStrFromPattern(List<PatternView.Cell> pattern){
+        return PatternUtils.patternToSha1String(pattern);
+    }
+
     /**
      * 获取保存在Preference中的加密密码
      */
@@ -43,14 +47,15 @@ public class PatternLockUtils {
      * 判断是否有密码
      */
     public static boolean hasPattern(Context context) {
-        return !TextUtils.isEmpty(getPatternSha1(context));
+        return !TextUtils.isEmpty(getPatternSha1(context));//hasPattern
     }
 
     /**
      * 校验密码
      */
     public static boolean isPatternCorrect(List<PatternView.Cell> pattern, Context context) {
-        return TextUtils.equals(PatternUtils.patternToSha1String(pattern), getPatternSha1(context));
+        return TextUtils.equals(PatternUtils.patternToSha1String(pattern)
+                , getPatternSha1(context));//isPatternCorrect
     }
 
     /**

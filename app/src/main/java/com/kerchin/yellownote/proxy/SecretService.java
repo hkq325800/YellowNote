@@ -18,4 +18,19 @@ public class SecretService {
         user.put("user_pass", MyApplication.Secret(txtPass));
         user.save();
     }
+
+    public static String getPatternStr(String txtUser) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("mUser");
+        query.whereEqualTo("user_tel", txtUser);
+        AVObject user = query.getFirst();
+        return user.getString("user_read_pass");
+    }
+
+    public static void setPatternStr(String txtUser, String patternStr) throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("mUser");
+        query.whereEqualTo("user_tel", txtUser);
+        AVObject user = query.getFirst();
+        user.put("user_read_pass", patternStr);
+        user.save();
+    }
 }

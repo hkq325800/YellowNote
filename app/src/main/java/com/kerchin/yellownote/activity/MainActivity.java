@@ -107,6 +107,15 @@ public class MainActivity extends BaseActivity
                 Trace.d("folderFragment null");
                 folderFragment = FolderFragment.newInstance(null);
             }
+            if(MyApplication.user.equals("")){
+                Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
+                MyApplication.logout();
+                Intent intent = new Intent();
+                intent.setClass(this, LoginActivity.class);
+                intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+                startActivity(intent);
+                finish();
+            }
         }
         fragments.add(noteFragment);
         fragments.add(folderFragment);

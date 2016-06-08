@@ -68,7 +68,7 @@
 
 
     <!--SlideActivity-->
-    <style name="JK.SwipeBack.Transparent.Theme" parent="AppTheme.NoActionBar">
+    <style name="JK.SwipeBack.Transparent.Theme" parent="AppTheme">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@style/JK.Animation.SlidingBack</item>-->
@@ -99,7 +99,7 @@
     </style>-->
     <!--SlideActivity-->
 
-    <style name="AppTheme.Pattern" parent="AppTheme.NoActionBar">
+    <style name="AppTheme.Pattern" parent="AppTheme">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <item name="colorPrimary">#ff263238</item>
