@@ -102,9 +102,9 @@
     <style name="AppTheme.Pattern" parent="AppTheme">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
-        <item name="colorPrimary">#ff263238</item>
+        <!--<item name="colorPrimary">#ff263238</item>-->
         <item name="colorPrimaryDark">#ff21272b</item>
         <item name="colorControlNormal">@color/material_blue_grey_800</item>
-        <item name="android:windowBackground">@android:color/white</item>
+        <!--<item name="android:windowBackground">@android:color/white</item>-->
     </style>
 </resources>

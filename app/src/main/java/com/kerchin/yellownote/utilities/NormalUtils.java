@@ -112,7 +112,7 @@ public class NormalUtils {
      * @param context  上下文
      * @param activity 目标activity
      */
-    public static void goToActivity(Activity context, Class activity) {
+    public static void goToActivity(Context context, Class activity) {
         Intent intent = new Intent();
         intent.setClass(context, activity);
         context.startActivity(intent);//首页面转换

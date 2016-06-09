@@ -19,6 +19,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.Trace;
 
 /**
@@ -104,21 +105,21 @@ public class LaunchActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case wel://首次登陆
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    NormalUtils.goToActivity(getApplicationContext(), LoginActivity.class);
                     finish();
                     overridePendingTransition(R.anim.push_left_in,
                             R.anim.push_left_out);
                     break;
                 case reLog://由于密码错误重新登陆
                     Trace.show(LaunchActivity.this, "你的密码已被修改,请重新登录", Toast.LENGTH_LONG);
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    NormalUtils.goToActivity(getApplicationContext(), LoginActivity.class);
                     finish();
                     overridePendingTransition(R.anim.push_left_in,
                             R.anim.push_left_out);
                     break;
                 case reLogForFrozen://账户冻结
                     Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    NormalUtils.goToActivity(getApplicationContext(), LoginActivity.class);
                     finish();
                     overridePendingTransition(R.anim.push_left_in,
                             R.anim.push_left_out);
@@ -178,7 +179,10 @@ public class LaunchActivity extends BaseActivity {
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
                         AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
-                        Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));//TODO
+                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
+                            PatternLockUtils.setPattern(SecretService.getPatternStr(txtUser), getApplicationContext());
+                            Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
+                        }
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");

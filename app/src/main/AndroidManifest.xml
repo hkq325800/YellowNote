@@ -39,12 +39,12 @@
             android:name=".activity.SetPatternActivity"
             android:screenOrientation="portrait"
             android:label="设置密码"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.Pattern" />
         <activity
             android:name=".activity.ConfirmPatternActivity"
             android:label="确认密码"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme.Pattern" />
         <activity
             android:name=".activity.EditActivity"
             android:launchMode="singleTask"

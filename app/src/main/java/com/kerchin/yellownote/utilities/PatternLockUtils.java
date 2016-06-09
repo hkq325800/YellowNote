@@ -5,19 +5,21 @@
 
 package com.kerchin.yellownote.utilities;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
 
+import com.avos.avoscloud.AVException;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.PreferenceContract;
+import com.kerchin.yellownote.proxy.SecretService;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
-//import me.zhanghai.android.patternlock.sample.app.ConfirmPatternActivity;
-//import me.zhanghai.android.patternlock.sample.app.SetPatternActivity;
 
 public class PatternLockUtils {
 
@@ -27,11 +29,44 @@ public class PatternLockUtils {
      * 设置密码
      */
     public static void setPattern(List<PatternView.Cell> pattern, Context context) {
+//        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
+//                PatternUtils.patternToSha1String(pattern), context);
+        SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        String dateStr = myFmt.format(new Date());
+        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
+                dateStr, context);
         PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
                 PatternUtils.patternToSha1String(pattern), context);
     }
 
-    public static String getStrFromPattern(List<PatternView.Cell> pattern){
+    /**
+     * 本地设置密码
+     */
+    public static void setPattern(String patternStr, Context context) {
+//        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
+//                PatternUtils.patternToSha1String(pattern), context);
+        SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        String dateStr = myFmt.format(new Date());
+        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
+                dateStr, context);
+        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
+                patternStr, context);
+    }
+
+    public static boolean isDateTooLong(Context context) {
+        Date date = new Date();
+        SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+        Integer dateNowStr = Integer.valueOf(myFmt.format(date));
+        Integer dateStr = Integer.valueOf(PreferenceUtils.getString(PreferenceContract.KEY_PATTERN_DATE, myFmt.format(date), context));
+        return (dateNowStr - dateStr >= 1);
+    }
+
+    public static boolean isStealthModeEnabled(Context context) {
+        return !PreferenceUtils.getBoolean(PreferenceContract.KEY_PATTERN_VISIBLE,
+                PreferenceContract.DEFAULT_PATTERN_VISIBLE, context);
+    }
+
+    public static String getStrFromPattern(List<PatternView.Cell> pattern) {
         return PatternUtils.patternToSha1String(pattern);
     }
 
@@ -59,9 +94,10 @@ public class PatternLockUtils {
     }
 
     /**
-     * 忘记密码
+     * 本地+网络清除密码
      */
-    public static void clearPattern(Context context) {
+    public static void clearPattern(final Context context) throws AVException {
+        SecretService.setPatternStr(MyApplication.user, "");
         PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
     }
 
@@ -96,7 +132,6 @@ public class PatternLockUtils {
 //            confirmPattern(activity);
 //        }
 //    }
-
     private PatternLockUtils() {
     }
 }

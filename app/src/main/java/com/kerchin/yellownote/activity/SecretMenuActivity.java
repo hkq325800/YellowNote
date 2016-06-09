@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
@@ -17,10 +16,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.PreferenceUtils;
 import com.kerchin.yellownote.utilities.Trace;
-
-import org.w3c.dom.Text;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -41,7 +37,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     LinearLayout mSecretMenuPatternEditLiL;
     @BindView(R.id.mSecretMenuPatternEditTxt)
     TextView mSecretMenuPatternEditTxt;
-    private final static int requestCodeForPattern = 1;
+    private final static int requestCodeForPattern = 1;//手势开关
     private final static int requestCodeForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
     private final static int requestCodeForConfirmPattern = 3;
     private final static int requestCodeForEditPattern = 4;
@@ -123,8 +119,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
      */
     @OnClick(R.id.mSecretMenuPatternEditLiL)
     public void gotoSecretModify() {
-        Intent intent = new Intent(SecretMenuActivity.this
-                , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
+        Intent intent = new Intent(SecretMenuActivity.this, ConfirmPatternActivity.class );
         startActivityForResult(intent, requestCodeForConfirmPattern);
     }
 
@@ -134,28 +129,91 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                 .getColor(enable ? R.color.textContentColor : R.color.light_gray));
     }
 
+    public static String patternFromOthers;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == requestCodeForPattern && resultCode == RESULT_OK) {//创建成功
-            enablePattern(!hasPattern);
-            hasPattern = !hasPattern;
-            if (!hasPattern)
-                PatternLockUtils.clearPattern(getApplicationContext());
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (!hasPattern) {//开启手势
+                            SecretService.setPatternStr(MyApplication.user, patternFromOthers);
+                            PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
+                            Trace.show(SecretMenuActivity.this, patternFromOthers);
+                            hasPattern = true;
+                        } else {//关闭手势
+                            PatternLockUtils.clearPattern(getApplicationContext());
+                            patternFromOthers = "";
+                            hasPattern = false;
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                enablePattern(hasPattern);
+                            }
+                        });
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                        Trace.show(SecretMenuActivity.this, "请在联网状态下进行此操作");
+                    } finally {
+                        patternFromOthers = "";
+                    }
+                }
+            }).start();
         } else if (requestCode == requestCodeForPattern && resultCode == RESULT_CANCELED) {
+            //手势开关失败
 //            mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
-        } else if (requestCode == requestCodeForForget && resultCode == RESULT_OK) {//忘记密码
-//            mSecretMenuPatternToggle.setChecked(false);
-            enablePattern(false);
-            PatternLockUtils.clearPattern(getApplicationContext());
-            hasPattern = !hasPattern;
-        } else if (requestCode == requestCodeForConfirmPattern && resultCode == RESULT_OK) {//修改密码
-            Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
-            startActivityForResult(intent, requestCodeForEditPattern);
         } else if (resultCode == ConfirmPatternActivity.RESULT_FORGOT_PASSWORD) {
+            //忘记密码跳转验证
             Intent intent = new Intent(SecretMenuActivity.this, SecretActivity.class);
             intent.putExtra("isForget", true);
             startActivityForResult(intent, requestCodeForForget);
+        } else if (requestCode == requestCodeForForget && resultCode == RESULT_OK) {
+            //忘记密码验证成功清除密码
+//            mSecretMenuPatternToggle.setChecked(false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        PatternLockUtils.clearPattern(getApplicationContext());
+                        hasPattern = false;
+                        enablePattern(false);
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else if (requestCode == requestCodeForConfirmPattern && resultCode == RESULT_OK) {
+            //修改手势密码验证成功跳转设置
+            Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
+            startActivityForResult(intent, requestCodeForEditPattern);
+        } else if(requestCode == requestCodeForEditPattern && resultCode == RESULT_OK){
+            //修改手势密码成功
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        SecretService.setPatternStr(MyApplication.user, patternFromOthers);
+                        PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
+                        Trace.show(SecretMenuActivity.this, patternFromOthers);
+                        hasPattern = true;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                enablePattern(true);
+                            }
+                        });
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                        Trace.show(SecretMenuActivity.this, "请在联网状态下进行此操作");
+                    } finally {
+                        patternFromOthers = "";
+                    }
+                }
+            }).start();
         }
     }
 }

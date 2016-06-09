@@ -7,20 +7,11 @@ package com.kerchin.yellownote.activity;
 
 import android.os.Bundle;
 
-import com.avos.avoscloud.AVException;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.global.PreferenceContract;
-import com.kerchin.yellownote.proxy.SecretService;
+import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.PreferenceUtils;
-import com.kerchin.yellownote.utilities.Trace;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
 
 /**
@@ -30,10 +21,9 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-//        ThemeUtils.applyTheme(this);
-
+//        NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
         super.onCreate(savedInstanceState);
+        mMessageText.setTextColor(getResources().getColor(R.color.colorPrimary));
 //        AppUtils.setActionBarDisplayUp(this);
     }
 
@@ -62,23 +52,7 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
     @Override
     protected void onSetPattern(final List<PatternView.Cell> pattern) {
 //        PatternLockUtils.setPattern(pattern, this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    SecretService.setPatternStr(MyApplication.user, PatternLockUtils.getStrFromPattern(pattern));
-                    SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
-                    String dateStr = myFmt.format(new Date());
-                    PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
-                            dateStr, getApplicationContext());
-                    PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
-                            PatternUtils.patternToSha1String(pattern), getApplicationContext());
-                    Trace.show(SetPatternActivity.this, PatternLockUtils.getStrFromPattern(pattern)+"date"+dateStr);
-                } catch (AVException e) {
-                    e.printStackTrace();
-                    Trace.show(SetPatternActivity.this, "保存失败");
-                }
-            }
-        }).start();
+        //TODO 数据传输有问题
+        SecretMenuActivity.patternFromOthers = PatternLockUtils.getStrFromPattern(pattern);
     }
 }

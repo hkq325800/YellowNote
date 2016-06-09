@@ -143,7 +143,7 @@ public class OldProgress extends RelativeLayout {
         postDelayed(new Runnable() {
             @Override
             public void run() {
-                dismissAnim();
+                dismissAnim();//showListView
                 for (View view : mViews) {
                     showSpecificView(view, listViewShowDuration);
                 }
@@ -170,7 +170,7 @@ public class OldProgress extends RelativeLayout {
         postDelayed(new Runnable() {
             @Override
             public void run() {
-                dismissAnim();
+                dismissAnim();//showNoData
                 mNoDataBtn.setVisibility(View.GONE);
                 mNoDataTxt.setText(text);
                 mNoDataTxt.setVisibility(View.VISIBLE);
@@ -200,7 +200,7 @@ public class OldProgress extends RelativeLayout {
         Trace.d("showRefresh");
         status = statusShowRefresh;
         timeDismiss = System.currentTimeMillis();
-        dismissAnim();
+        dismissAnim();//showRefresh
         Trace.d(err);
         mNoDataImg.setImageResource(R.mipmap.ic_no_network);
         mNoDataTxt.setText(text);

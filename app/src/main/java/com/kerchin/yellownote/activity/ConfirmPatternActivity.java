@@ -5,22 +5,15 @@
 
 package com.kerchin.yellownote.activity;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
-import com.kerchin.yellownote.global.PreferenceContract;
+import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.PreferenceUtils;
 
 import java.util.List;
 
 import me.zhanghai.android.patternlock.PatternView;
-//import me.zhanghai.android.patternlock.sample.util.PatternLockUtils;
-//import me.zhanghai.android.patternlock.sample.util.PreferenceContract;
-//import me.zhanghai.android.patternlock.sample.util.PreferenceUtils;
-//import me.zhanghai.android.patternlock.sample.util.ThemeUtils;
 
 /**
  * 确认密码界面
@@ -36,9 +29,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-//        ThemeUtils.applyTheme(this);
-
+        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         super.onCreate(savedInstanceState);
     }
 
@@ -47,8 +38,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
      */
     @Override
     protected boolean isStealthModeEnabled() {
-        return !PreferenceUtils.getBoolean(PreferenceContract.KEY_PATTERN_VISIBLE,
-                PreferenceContract.DEFAULT_PATTERN_VISIBLE, this);
+        return PatternLockUtils.isStealthModeEnabled(this);
     }
 
     @Override
