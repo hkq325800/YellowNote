@@ -57,7 +57,8 @@ public class PatternLockUtils {
         Date date = new Date();
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
         Integer dateNowStr = Integer.valueOf(myFmt.format(date));
-        Integer dateStr = Integer.valueOf(PreferenceUtils.getString(PreferenceContract.KEY_PATTERN_DATE, myFmt.format(date), context));
+        Integer dateStr = Integer.valueOf(
+                PreferenceUtils.getString(PreferenceContract.KEY_PATTERN_DATE, "0", context));
         return (dateNowStr - dateStr >= 1);
     }
 

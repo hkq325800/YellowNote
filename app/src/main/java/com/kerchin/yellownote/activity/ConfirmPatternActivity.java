@@ -26,11 +26,23 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             mMessageText.setText("");
         }
     };
+    boolean isFromLaunch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
+        isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onConfirmed() {
+        if(isFromLaunch){
+            MainActivity.startMe(getApplicationContext());
+        } else {
+            setResult(RESULT_OK);
+        }
+        finish();
     }
 
     /**

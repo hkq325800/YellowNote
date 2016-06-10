@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -125,7 +126,12 @@ public class LaunchActivity extends BaseActivity {
                             R.anim.push_left_out);
                     break;
                 case next://缓存正确 直接进入
-                    MainActivity.startMe(getApplicationContext());
+                    if (PatternLockUtils.hasPattern(getApplicationContext())) {
+                        Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class );
+                        intent.putExtra("isFromLaunch", true);
+                        startActivity(intent);
+                    } else
+                        MainActivity.startMe(getApplicationContext());
 //                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
                     finish();
                     overridePendingTransition(R.anim.push_left_in,

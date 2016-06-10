@@ -307,7 +307,8 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity().getApplicationContext(), null, primaryData.listFolder.size());
+            EditActivity.startMe(getActivity().getApplicationContext()//addClick
+                    , null, primaryData.listFolder.size());
         } else
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
     }
@@ -436,10 +437,7 @@ public class NoteFragment extends BaseFragment
             mNoteWDList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    MainActivity m = (MainActivity) getActivity();
-                    m.hideBtnAdd();
-                    EditActivity.startMe(getActivity().getApplicationContext(), noteAdapter.getItem(position - 1)
-                            , primaryData.listFolder.size());
+                    listItemClick(position);
                 }
             });
             //叉号隐藏
@@ -540,7 +538,8 @@ public class NoteFragment extends BaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity().getApplicationContext(), noteAdapter.getItem(position - 1)
+            EditActivity.startMe(getActivity().getApplicationContext()//OnItemClick
+                    , noteAdapter.getItem(position - 1)
                     , primaryData.listFolder.size());
         } else {
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");

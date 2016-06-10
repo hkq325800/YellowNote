@@ -166,7 +166,6 @@ public class EditActivity extends BaseHasSwipeActivity {
     };
 
     public static void startMe(Context context, Note note, int listFolderSize) {
-        // 指定下拉列表的显示数据
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("mNote", note);

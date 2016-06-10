@@ -37,10 +37,10 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     LinearLayout mSecretMenuPatternEditLiL;
     @BindView(R.id.mSecretMenuPatternEditTxt)
     TextView mSecretMenuPatternEditTxt;
-    private final static int requestCodeForPattern = 1;//手势开关
-    private final static int requestCodeForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
-    private final static int requestCodeForConfirmPattern = 3;
-    private final static int requestCodeForEditPattern = 4;
+    private final static int requestForPattern = 1;//手势开关
+    private final static int requestForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
+    private final static int requestForConfirmPattern = 3;
+    private final static int requestForEditPattern = 4;
 
     boolean hasPattern;
 
@@ -100,7 +100,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
 //    public void toggleClick() {
 //        Intent intent = new Intent(SecretMenuActivity.this
 //                , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
-//        startActivityForResult(intent, requestCodeForPattern);
+//        startActivityForResult(intent, requestForPattern);
 //    }
 
     /**
@@ -111,7 +111,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
 //        mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
         Intent intent = new Intent(SecretMenuActivity.this
                 , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
-        startActivityForResult(intent, requestCodeForPattern);
+        startActivityForResult(intent, requestForPattern);
     }
 
     /**
@@ -120,7 +120,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     @OnClick(R.id.mSecretMenuPatternEditLiL)
     public void gotoSecretModify() {
         Intent intent = new Intent(SecretMenuActivity.this, ConfirmPatternActivity.class );
-        startActivityForResult(intent, requestCodeForConfirmPattern);
+        startActivityForResult(intent, requestForConfirmPattern);
     }
 
     private void enablePattern(boolean enable) {
@@ -134,7 +134,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == requestCodeForPattern && resultCode == RESULT_OK) {//创建成功
+        if (requestCode == requestForPattern && resultCode == RESULT_OK) {//创建成功
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -163,15 +163,15 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     }
                 }
             }).start();
-        } else if (requestCode == requestCodeForPattern && resultCode == RESULT_CANCELED) {
+        } else if (requestCode == requestForPattern && resultCode == RESULT_CANCELED) {
             //手势开关失败
 //            mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
         } else if (resultCode == ConfirmPatternActivity.RESULT_FORGOT_PASSWORD) {
             //忘记密码跳转验证
             Intent intent = new Intent(SecretMenuActivity.this, SecretActivity.class);
             intent.putExtra("isForget", true);
-            startActivityForResult(intent, requestCodeForForget);
-        } else if (requestCode == requestCodeForForget && resultCode == RESULT_OK) {
+            startActivityForResult(intent, requestForForget);
+        } else if (requestCode == requestForForget && resultCode == RESULT_OK) {
             //忘记密码验证成功清除密码
 //            mSecretMenuPatternToggle.setChecked(false);
             new Thread(new Runnable() {
@@ -186,11 +186,11 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     }
                 }
             }).start();
-        } else if (requestCode == requestCodeForConfirmPattern && resultCode == RESULT_OK) {
+        } else if (requestCode == requestForConfirmPattern && resultCode == RESULT_OK) {
             //修改手势密码验证成功跳转设置
             Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
-            startActivityForResult(intent, requestCodeForEditPattern);
-        } else if(requestCode == requestCodeForEditPattern && resultCode == RESULT_OK){
+            startActivityForResult(intent, requestForEditPattern);
+        } else if(requestCode == requestForEditPattern && resultCode == RESULT_OK){
             //修改手势密码成功
             new Thread(new Runnable() {
                 @Override
