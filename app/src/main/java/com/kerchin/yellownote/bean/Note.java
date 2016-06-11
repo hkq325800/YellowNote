@@ -18,7 +18,6 @@ import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Ignore;
 import com.litesuits.orm.db.annotation.NotNull;
 import com.litesuits.orm.db.annotation.PrimaryKey;
-import com.litesuits.orm.db.annotation.Table;
 import com.litesuits.orm.db.enums.AssignType;
 
 import java.io.Serializable;
@@ -173,6 +172,7 @@ public class Note implements Serializable {
     //保存更改
     public void saveChange(final Activity context, final String newTitle, final String newContent
             , final Handler handler, final byte handle4saveChange) {
+        //use PatternUtils.patternToSha1String(str) to save
         if (objectId.equals("")) {//新增
             new Thread(new Runnable() {
                 @Override
