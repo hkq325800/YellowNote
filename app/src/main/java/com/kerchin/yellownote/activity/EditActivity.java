@@ -136,7 +136,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                 case handle4saveChange:
                     //respond
                     if (isNew)
-                        primaryData.newNote(mNote);
+                        primaryData.newNote(mNote);//handle4saveChange
                     else
                         primaryData.editNote(mNote);
                     isNew = false;
@@ -154,7 +154,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                     break;
                 case handle4last:
                     if (isNew)
-                        primaryData.newNote(mNote);
+                        primaryData.newNote(mNote);//handle4last
                     else
                         primaryData.editNote(mNote);
                     finish();

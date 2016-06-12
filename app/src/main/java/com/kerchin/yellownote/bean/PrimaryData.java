@@ -26,7 +26,7 @@ public class PrimaryData {
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
     public volatile ArrayList<SimpleEntity> mItems;//note&folder
-    private Handler outHandler;
+    private Handler outHandler;//outHandler为了initData、getSimpleEntityFromList而存在
     private int outHandleCode;
     private Handler mHandler = new Handler();
     //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
@@ -85,7 +85,7 @@ public class PrimaryData {
     public void initData(final Handler handler, final int handleCode) throws AVException {
         Trace.d("loadData");
         if (handler != null) {
-            outHandler = handler;
+            outHandler = handler;//initData
             outHandleCode = handleCode;
         }
         status.clear();
@@ -101,7 +101,22 @@ public class PrimaryData {
         mHandler.post(runnableForSimple);//initData
     }
 
-    public void initData(String shownFolderId) {
+    public void refresh(final Handler handler, final byte handleCode) throws AVException {
+//        outHandler = handler;//refresh
+//        outHandleCode = handleCode;
+        status.clear();
+        Trace.d("refreshPrimaryData");
+        getNotesFromCloud();//refresh
+        getFolderFromCloud();//refresh
+        if (handler != null) {
+            handler.sendEmptyMessage(handleCode);//refresh
+//            handler = null;
+//            outHandleCode = 0;
+        }
+//        mHandler.post(runnableForSimple);//refresh
+    }
+
+    public void configData(String shownFolderId) {
         //设置ID和HeaderBefore
         for (int i = 0; i < mItems.size(); i++) {
             if (mItems.get(i).entityType == SimpleEntity.typeFolder
@@ -147,10 +162,10 @@ public class PrimaryData {
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
-        initData(shownFolderId);
+        configData(shownFolderId);
         if (outHandler != null) {//getSimpleEntityFromList
-            outHandler.sendEmptyMessage(outHandleCode);
-            outHandler = null;
+            outHandler.sendEmptyMessage(outHandleCode);//getSimpleEntityFromList
+            outHandler = null;//getSimpleEntityFromList
             outHandleCode = 0;
         }
     }
@@ -193,38 +208,6 @@ public class PrimaryData {
         status.isHeaderReady = true;
         Trace.d("isHeaderReady", "true");
     }
-
-    /**
-     * 本地获取Folder
-     */
-//    private boolean getFolderFromData() {
-//        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-//        Trace.d("size" + list.size());
-//        if (list.size() == 0) {
-//            return true;
-//        } else {
-//            listFolder.addAll(list);
-//            Trace.d("isFolderReady", "true");
-//            status.isFolderReady = true;
-//            return false;
-//        }
-//    }
-
-    /**
-     * 本地获取Note
-     */
-//    private boolean getNoteFromData() {
-//        ArrayList<Note> list = liteOrmHelper.query(Note.class);
-//        Trace.d("size" + list.size());
-//        if (list.size() == 0) {
-//            return true;
-//        } else {
-//            listNote.addAll(list);
-//            status.isNoteReady = true;
-//            Trace.d("isNoteReady", "true");
-//            return false;
-//        }
-//    }
 
     /**
      * 网络获取Folder
@@ -305,7 +288,7 @@ public class PrimaryData {
 
     public void clearData() {
         data = null;
-        outHandler = null;
+        outHandler = null;//clearData
         status.clear();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
@@ -363,23 +346,6 @@ public class PrimaryData {
         return listNote.get(position);
     }
 
-    public void refresh(final Handler handler, final byte handleCode) throws AVException {
-        outHandler = handler;//refresh
-        outHandleCode = handleCode;
-        status.isItemReady = false;
-        status.isNoteReady = false;
-        status.isFolderReady = false;
-        Trace.d("refreshPrimaryData");
-        getNotesFromCloud();//refresh
-        getFolderFromCloud();//refresh
-        if (outHandler != null) {
-            outHandler.sendEmptyMessage(outHandleCode);
-            outHandler = null;
-            outHandleCode = 0;
-        }
-//        mHandler.post(runnableForSimple);//refresh
-    }
-
     public void loadMore() {
 
     }
@@ -392,7 +358,7 @@ public class PrimaryData {
         int pos = getNotePosition(note.getObjectId());
         if (pos != -1) {
             listNote.remove(pos);
-            newNote(note);
+            newNote(note);//editNote
         } else {
             Trace.e("没有在listNote中找到对应的note");
         }
@@ -407,6 +373,7 @@ public class PrimaryData {
         }
     }
 
+    //获取特定folderId下的所有note
     public List<Note> getNoteListInFolder(String objectId) {
         List<Note> list = new ArrayList<>();
         for (Note note : listNote) {
@@ -428,21 +395,6 @@ public class PrimaryData {
     }
 
     /**
-     * 目标Folder是否在现有列表中
-     *
-     * @param folder 目标Folder
-     * @return isFolderContain
-     */
-    public boolean isFolderContain(Folder folder) {
-        for (int i = 0; i < listFolder.size(); i++) {
-            if (listFolder.get(i).getObjectId().equals(folder.getObjectId())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * 目标Folder名称是否在现有列表中
      *
      * @param name 目标Folder名称
@@ -451,21 +403,6 @@ public class PrimaryData {
     public boolean isFolderNameContain(String name) {
         for (int i = 0; i < listFolder.size(); i++) {
             if (listFolder.get(i).getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 目标Note是否在现有列表中
-     *
-     * @param note 目标Note
-     * @return isNoteContain
-     */
-    public boolean isNoteContain(Note note) {
-        for (int i = 0; i < listNote.size(); i++) {
-            if (listNote.get(i).getObjectId().equals(note.getObjectId())) {
                 return true;
             }
         }
@@ -484,6 +421,38 @@ public class PrimaryData {
         }
         return list;
     }
+
+    /**
+     * 本地获取Folder
+     */
+//    private boolean getFolderFromData() {
+//        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
+//        Trace.d("size" + list.size());
+//        if (list.size() == 0) {
+//            return true;
+//        } else {
+//            listFolder.addAll(list);
+//            Trace.d("isFolderReady", "true");
+//            status.isFolderReady = true;
+//            return false;
+//        }
+//    }
+
+    /**
+     * 本地获取Note
+     */
+//    private boolean getNoteFromData() {
+//        ArrayList<Note> list = liteOrmHelper.query(Note.class);
+//        Trace.d("size" + list.size());
+//        if (list.size() == 0) {
+//            return true;
+//        } else {
+//            listNote.addAll(list);
+//            status.isNoteReady = true;
+//            Trace.d("isNoteReady", "true");
+//            return false;
+//        }
+//    }
 
     public class PrimaryDataStatus {
         public boolean isNoteReady = false;
