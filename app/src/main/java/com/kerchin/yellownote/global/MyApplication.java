@@ -8,8 +8,10 @@ import com.avos.avoscloud.AVOSCloud;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.PreferenceUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
+import com.squareup.leakcanary.LeakCanary;
 
 //import io.realm.Realm;
 
@@ -42,6 +44,7 @@ public class MyApplication extends Application {
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(context,
                 Config.APP_ID, Config.APP_KEY);
+        LeakCanary.install(this);
 //        CrashHandler crashHandler = CrashHandler.getInstance();
 //        crashHandler.init(context);
         configCollectCrashInfo();
@@ -81,9 +84,10 @@ public class MyApplication extends Application {
     public static void logout() {
         isLogin = false;
         PrimaryData.getInstance().clearData();
+        PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
         //清除密码缓存
         SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();
-        editor.putBoolean(Config.KEY_ISLOGIN, isLogin);
+        editor.putBoolean(Config.KEY_ISLOGIN, false);
         editor.putString(Config.KEY_PASS, "");
         editor.apply();
     }

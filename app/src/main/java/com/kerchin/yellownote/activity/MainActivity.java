@@ -96,17 +96,18 @@ public class MainActivity extends BaseActivity
             Trace.d("initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
-            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
-            if (noteFragment == null) {
-                Trace.d("noteFragment null");
-                noteFragment = NoteFragment.newInstance(null);
-            }
-            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
-            if (folderFragment == null) {
-                Trace.d("folderFragment null");
-                folderFragment = FolderFragment.newInstance(null);
-            }
-            if(MyApplication.user.equals("")){
+//            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
+//            if (noteFragment == null) {
+//                Trace.d("noteFragment null");
+            noteFragment = NoteFragment.newInstance(null);
+//            }
+//            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
+//            if (folderFragment == null) {
+//                Trace.d("folderFragment null");
+            folderFragment = FolderFragment.newInstance(null);
+//            }
+            Trace.show(getApplicationContext(), MyApplication.user);
+            if (MyApplication.user.equals("")) {
                 Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
                 MyApplication.logout();
                 Intent intent = new Intent();
@@ -380,7 +381,7 @@ public class MainActivity extends BaseActivity
                                 public void onAnimationStart(Animator animation) {
                                     super.onAnimationStart(animation);
 //                                    if (mMainFab.getVisibility() == View.INVISIBLE)
-                                        mMainFab.setVisibility(View.VISIBLE);
+                                    mMainFab.setVisibility(View.VISIBLE);
                                 }
                             })
                             .setDuration(300).start();
@@ -395,7 +396,7 @@ public class MainActivity extends BaseActivity
                                 public void onAnimationEnd(Animator animation) {
                                     super.onAnimationEnd(animation);
 //                                    if (mMainFab.getVisibility() == View.VISIBLE)
-                                        mMainFab.setVisibility(View.INVISIBLE);
+                                    mMainFab.setVisibility(View.INVISIBLE);
                                 }
                             })
                             .setDuration(50).start();

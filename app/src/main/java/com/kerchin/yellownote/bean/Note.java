@@ -70,15 +70,15 @@ public class Note implements Serializable {
         this.type = type;
     }
 
-    public Note(String objectId, String title, Long date, String content
+    public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
         myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         this.objectId = objectId;
         this.title = title;
         this.date = new Date(date);
-        this.content = content;
         this.folder = folder;
         this.folderId = folderId;
+        this.content = NormalUtils.sha1StringToString(contentCode);
         if (content.length() > 70)
             preview = content.substring(0, 70).replace("\n", " ");
         else
@@ -179,7 +179,8 @@ public class Note implements Serializable {
                 public void run() {
                     try {
                         AVObject newNote = NoteService.addNewNote(
-                                MyApplication.user, newTitle, newContent, folder, folderId);
+                                MyApplication.user, newTitle
+                                , NormalUtils.stringToSha1String(newContent), folder, folderId);
                         //取回objectId
                         if (newNote != null) {
                             objectId = newNote.getObjectId();
@@ -199,7 +200,6 @@ public class Note implements Serializable {
                     msg.what = handle4saveChange;
                     //folderNum+1
                     PrimaryData.getInstance().getFolder(folderId).addInList();
-//                        NoteService.saveFolderNumAdd(folderId);
                     NoteFragment.isChanged4note = true;//saveChange
                     title = newTitle;
                     content = newContent;
@@ -217,7 +217,8 @@ public class Note implements Serializable {
                     Message msg = Message.obtain();
                     msg.what = handle4saveChange;
                     try {
-                        NoteService.saveEdit(objectId, newTitle, newContent);
+                        NoteService.saveEdit(objectId, newTitle
+                                , NormalUtils.stringToSha1String(newContent));
                         title = newTitle;
                         content = newContent;
                         date = new Date();

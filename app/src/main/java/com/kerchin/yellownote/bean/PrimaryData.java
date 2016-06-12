@@ -151,6 +151,7 @@ public class PrimaryData {
         if (outHandler != null) {//getSimpleEntityFromList
             outHandler.sendEmptyMessage(outHandleCode);
             outHandler = null;
+            outHandleCode = 0;
         }
     }
 
@@ -304,6 +305,7 @@ public class PrimaryData {
 
     public void clearData() {
         data = null;
+        outHandler = null;
         status.clear();
         listFolder = new ArrayList<Folder>();
         listNote = new ArrayList<Note>();
@@ -373,6 +375,7 @@ public class PrimaryData {
         if (outHandler != null) {
             outHandler.sendEmptyMessage(outHandleCode);
             outHandler = null;
+            outHandleCode = 0;
         }
 //        mHandler.post(runnableForSimple);//refresh
     }

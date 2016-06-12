@@ -24,7 +24,9 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
+import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -424,6 +426,9 @@ public class LoginActivity extends LoginAbstract {
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
+                                            PatternLockUtils.setPattern(SecretService.getPatternStr(txtUser), getApplicationContext());
+                                            if (Config.isDebugMode)
+                                                Trace.show(LoginActivity.this, SecretService.getPatternStr(txtUser));
                                             goToMain();//正常登陆
                                         }
                                     } else {

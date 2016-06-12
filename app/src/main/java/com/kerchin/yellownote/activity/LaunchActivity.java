@@ -78,6 +78,7 @@ public class LaunchActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Trace.d("PrimaryData" + Thread.currentThread().getId());
                     getDataStart = System.currentTimeMillis();
                     try {
                         //一般而言登陆过的用户都有数据本地缓存
@@ -127,7 +128,7 @@ public class LaunchActivity extends BaseActivity {
                     break;
                 case next://缓存正确 直接进入
                     if (PatternLockUtils.hasPattern(getApplicationContext())) {
-                        Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class );
+                        Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class);
                         intent.putExtra("isFromLaunch", true);
                         startActivity(intent);
                     } else
@@ -146,6 +147,7 @@ public class LaunchActivity extends BaseActivity {
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
+            Trace.d("runnableForData" + Thread.currentThread().getId());
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (PrimaryData.status == null) {
                 handler.postDelayed(runnableForData, runnablePeriod);
@@ -182,12 +184,14 @@ public class LaunchActivity extends BaseActivity {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Trace.d("loginVerify" + Thread.currentThread().getId());
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
                         AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
                         if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
                             PatternLockUtils.setPattern(SecretService.getPatternStr(txtUser), getApplicationContext());
-                            Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
+                            if (Config.isDebugMode)
+                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
                         }
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
