@@ -131,6 +131,8 @@ public class LaunchActivity extends BaseActivity {
                         Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class);
                         intent.putExtra("isFromLaunch", true);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_right_in,
+                                R.anim.push_right_out);
                     } else
                         MainActivity.startMe(getApplicationContext());
 //                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);

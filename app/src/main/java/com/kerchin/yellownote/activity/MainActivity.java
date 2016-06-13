@@ -362,14 +362,14 @@ public class MainActivity extends BaseActivity
                 case gotoSecret:
                     hideBtnAdd();//使进入
                     SecretMenuActivity.startMe(getApplicationContext());
-                    overridePendingTransition(R.anim.push_right_in,
-                            R.anim.push_right_out);
+                    overridePendingTransition(R.anim.push_left_in,
+                            R.anim.push_left_out);
                     break;
                 case gotoSetting:
                     hideBtnAdd();
                     ShareSuggestActivity.startMe(getApplicationContext());
-                    overridePendingTransition(R.anim.push_right_in,
-                            R.anim.push_right_out);
+                    overridePendingTransition(R.anim.push_left_in,
+                            R.anim.push_left_out);
                     break;
                 case showBtnAdd:
                     mMainFab.animate()

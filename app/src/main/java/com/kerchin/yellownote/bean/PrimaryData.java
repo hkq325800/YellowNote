@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 数据的集中处理 采用单例模式
  * Created by Kerchin on 2016/4/11 0011.
  */
 public class PrimaryData {
@@ -28,22 +29,18 @@ public class PrimaryData {
     public volatile ArrayList<Note> listNote;
     public volatile ArrayList<SimpleEntity> mItems;//note&folder
 //    public DoAfter mDoAfter;
-    private Handler outHandler;//outHandler为了initData、getSimpleEntityFromList而存在
-    private int outHandleCode;
-    //    private Handler mHandler = new Handler();
+//    private Handler outHandler;//outHandler为了initData、getSimpleEntityFromList而存在
+//    private int outHandleCode;
     //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
 
     private PrimaryData() {
         status = new PrimaryDataStatus();
-        listFolder = new ArrayList<Folder>();
-        listNote = new ArrayList<Note>();
-        mItems = new ArrayList<SimpleEntity>();
+        listFolder = new ArrayList<>();
+        listNote = new ArrayList<>();
+        mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-//        Looper.prepare();
-//        mHandler = new Handler();
-//        Looper.loop();
 //        initData();//在首次手动调用 为了catch
     }
 
@@ -110,40 +107,6 @@ public class PrimaryData {
         waitForFlag(doAfter);
 //        mHandler.post(runnableForSimple);//initData
     }
-
-//    /**
-//     * @deprecated
-//     * 网络获取初始化
-//     */
-//    public void initData(final Handler handler, final int handleCode) throws AVException {
-//        Trace.d("loadData");
-//        if (handler != null) {
-//            outHandler = handler;//initData
-//            outHandleCode = handleCode;
-//        }
-//        status.clear();
-//        //TODO getNote和getFolder在同一个线程下
-//        // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
-////        listNote.clear();
-////        map.clear();
-////        if (getNoteFromData())
-//        getNotesFromCloud();//initData
-////        listFolder.clear();
-////        if (getFolderFromData())
-//        getFolderFromCloud();
-//        waitForFlag(null);
-////        mHandler.post(runnableForSimple);//initData
-//    }
-
-//    public void refresh(final Handler handler, final byte handleCode) throws AVException {
-//        status.clear();
-//        Trace.d("refreshPrimaryData");
-//        getNotesFromCloud();//refresh
-//        getFolderFromCloud();//refresh
-//        if (handler != null) {
-//            handler.sendEmptyMessage(handleCode);//refresh
-//        }
-//    }
 
     public void refresh(DoAfter doAfter) throws AVException {
         status.clear();
@@ -215,22 +178,6 @@ public class PrimaryData {
             doAfter.justNow();
         }
     }
-
-//    /**
-//     * @deprecated 从本地的数据中加载Simple
-//     */
-//    public void getSimpleEntityFromList(String shownFolderId) {
-//        Trace.d("getSimpleEntityFromList");
-//        mItems.clear();
-//        getHeadersReady();//getSimpleEntityFromList
-//        getItemsReady();//getSimpleEntityFromList
-//        configData(shownFolderId);
-//        if (outHandler != null) {//getSimpleEntityFromList refresh是需要调用
-//            outHandler.sendEmptyMessage(outHandleCode);//getSimpleEntityFromList
-//            outHandler = null;//getSimpleEntityFromList
-//            outHandleCode = 0;
-//        }
-//    }
 
     private void waitForFlag() {
         while (true) {
@@ -372,11 +319,10 @@ public class PrimaryData {
 
     public void clearData() {
         data = null;
-        outHandler = null;//clearData
         status.clear();
-        listFolder = new ArrayList<Folder>();
-        listNote = new ArrayList<Note>();
-        mItems = new ArrayList<SimpleEntity>();
+        listFolder = new ArrayList<>();
+        listNote = new ArrayList<>();
+        mItems = new ArrayList<>();
         map = new HashMap<>();
     }
 
@@ -505,19 +451,6 @@ public class PrimaryData {
         }
         return list;
     }
-
-//    private Runnable runnableForSimple = new Runnable() {
-//        @Override
-//        public void run() {
-////            Trace.d("runnableForSimple");
-//            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
-//            if (status.isNoteReady && status.isFolderReady) {
-//                getSimpleEntityFromList(MyApplication.userDefaultFolderId);//runnableForSimple
-//            } else {//若一直未能进入需要处理 TODO
-//                mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
-//            }
-//        }
-//    };
 
     @SuppressWarnings("unchecked")
     public void giveBackData(Bundle data) {

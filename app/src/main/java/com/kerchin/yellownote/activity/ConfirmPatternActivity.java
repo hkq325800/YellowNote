@@ -5,11 +5,13 @@
 
 package com.kerchin.yellownote.activity;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.List;
 
@@ -33,11 +35,13 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
         NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
         super.onCreate(savedInstanceState);
+//        ActivityInfo ActivityManager
+//        Trace.show(this, "" + getApplicationInfo().loadLabel(ConfirmPatternActivity.this.getPackageManager()));
     }
 
     @Override
     protected void onConfirmed() {
-        if(isFromLaunch){
+        if (isFromLaunch) {
             MainActivity.startMe(getApplicationContext());
         } else {
             setResult(RESULT_OK);
