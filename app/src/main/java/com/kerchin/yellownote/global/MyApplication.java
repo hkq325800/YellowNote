@@ -44,7 +44,8 @@ public class MyApplication extends Application {
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(context,
                 Config.APP_ID, Config.APP_KEY);
-        LeakCanary.install(this);
+        if (Config.isLeakCanary)
+            LeakCanary.install(this);
 //        CrashHandler crashHandler = CrashHandler.getInstance();
 //        crashHandler.init(context);
         configCollectCrashInfo();

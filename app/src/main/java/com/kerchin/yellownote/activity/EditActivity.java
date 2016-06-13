@@ -292,9 +292,14 @@ public class EditActivity extends BaseHasSwipeActivity {
                 @Override
                 public void run() {
                     try {
-                        Looper.prepare();
-                        PrimaryData.getInstance().initData(handler, handle4reGet);
-                        Looper.loop();
+//                        Looper.prepare();
+                        PrimaryData.getInstance().initData(new PrimaryData.DoAfter() {
+                            @Override
+                            public void justNow() {
+                                handler.sendEmptyMessage(handle4reGet);
+                            }
+                        });
+//                        Looper.loop();
                     } catch (AVException e) {
                         e.printStackTrace();
                     }
@@ -733,7 +738,7 @@ public class EditActivity extends BaseHasSwipeActivity {
                             public void run() {
                                 try {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
-                                    Trace.d("saveNewFolder", "成功");
+                                    Trace.d("saveNewFolder 成功");
                                     Folder newFolder = new Folder(objectId, newFolderName, 0);
                                     primaryData.listFolder.add(newFolder);
                                     listFolderSize++;

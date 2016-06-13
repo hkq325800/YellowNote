@@ -84,7 +84,7 @@ public class NoteFragment extends BaseFragment
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4firstGet:
-                    Trace.d("handlerInNote", "handle4firstGet");
+                    Trace.d("handlerInNote handle4firstGet");
                     //TODO 删除后避免滑动到顶部
 //                    if (noteAdapter == null) {
                     noteAdapter = new NoteShrinkAdapter(
@@ -102,13 +102,13 @@ public class NoteFragment extends BaseFragment
                                 emptyClick();
                             }
                         });
-                        Trace.d("handlerInNote", "handle4zero");
+                        Trace.d("handlerInNote handle4zero");
                         mNoteWDList.setVisibility(View.GONE);
                     } else
                         mProgress.showListView();//handle4firstGet
                     break;
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInNote", "handle4refresh");
+                    Trace.d("handlerInNote handle4refresh");
                     getDataListFromNote(primaryData.listNote);//handle4refresh
 //                    if (MainActivity.thisPosition == 0) {
                     mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
@@ -118,7 +118,7 @@ public class NoteFragment extends BaseFragment
                     }
                     break;
                 case GetDataHelper.handle4respond:
-                    Trace.d("handlerInNote", "handle4respond note:" + list.size());
+                    Trace.d("handlerInNote handle4respond note:" + list.size());
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mProgress.dismissNoData();
 //                    mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
@@ -127,11 +127,11 @@ public class NoteFragment extends BaseFragment
                     mNoteWDList.setAdapter(noteAdapter);
                     break;
                 case GetDataHelper.handle4loadMore:
-                    Trace.d("handlerInNote", "handle4loadMore");
+                    Trace.d("handlerInNote handle4loadMore");
                     mNoteWDList.stopLoadMore();
                     break;
                 case handle4explosion:
-                    Trace.d("handlerInNote", "handle4explosion");
+                    Trace.d("handlerInNote handle4explosion");
                     Note note = (Note) msg.obj;
                     for (int i = 0; i < noteAdapter.getCount(); i++) {
                         if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
@@ -161,7 +161,7 @@ public class NoteFragment extends BaseFragment
     /*data part*/
 
     private void getData(int delay) {
-        Trace.d("getData status", getDataHelper.statusName);
+        Trace.d("getData status " + getDataHelper.statusName);
         if (mNoteWDList != null) {
             getDataListFromNote(primaryData.listNote);//getList
             sendMessage(delay);//getData
@@ -355,7 +355,7 @@ public class NoteFragment extends BaseFragment
                                         for (int i = 0; i < num; i++) {
                                             final Note note = noteAdapter.getDeleteItem(i);
                                             //线上删除
-                                            Trace.d("readyToDelete", note.getTitle());
+                                            Trace.d("readyToDelete " + note.getTitle());
                                             Message msg = new Message();
                                             msg.obj = note;
                                             msg.what = handle4explosion;//ui特效
@@ -523,12 +523,12 @@ public class NoteFragment extends BaseFragment
     //从搜索状态中恢复
     public void restore() {
 //        mNoteWDList.setPullLoadEnable(true);
-        Trace.d("restore", "true");
+        Trace.d("restore true");
         mNoteWDList.setPullRefreshEnable(true);
         mSearchText = "";
         doSearch();//restore
         mainStatus.setIsSearchMode(false);
-        Trace.d("restore", "finish");
+        Trace.d("restore finish");
     }
 
     /*list part*/
@@ -578,9 +578,17 @@ public class NoteFragment extends BaseFragment
                                 getDataHelper.refresh();//MainActivity dataGot
                                 //重新获取mHeaders listNote和mItems
                                 FolderFragment.isChanged4folder = true;//emptyClick
-                                primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
-                                        ? GetDataHelper.handle4firstGet
-                                        : GetDataHelper.handle4refresh);
+                                primaryData.refresh(new PrimaryData.DoAfter() {//emptyClick
+                                    @Override
+                                    public void justNow() {
+                                        handler.sendEmptyMessage(primaryData.listNote.size() == 0
+                                                ? GetDataHelper.handle4firstGet
+                                                : GetDataHelper.handle4refresh);
+                                    }
+                                });
+//                                primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
+//                                        ? GetDataHelper.handle4firstGet
+//                                        : GetDataHelper.handle4refresh);
                             } catch (AVException e) {
                                 e.printStackTrace();
                             }
@@ -593,7 +601,7 @@ public class NoteFragment extends BaseFragment
 
     @Override
     public void onRefresh() {
-        Trace.d("onRefresh", "true");
+        Trace.d("onRefresh");
         //单例服务
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         executorService.execute(new Runnable() {
@@ -602,7 +610,13 @@ public class NoteFragment extends BaseFragment
                 try {
                     getDataHelper.refresh();//MainActivity dataGot
                     //重新获取mHeaders listNote和mItems
-                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
+                    primaryData.refresh(new PrimaryData.DoAfter() {//onRefresh
+                        @Override
+                        public void justNow() {
+                            handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                        }
+                    });
+//                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
                 } catch (AVException e) {
                     e.printStackTrace();
                     Message msg = Message.obtain();

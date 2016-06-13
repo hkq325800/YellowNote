@@ -5,6 +5,7 @@ package com.kerchin.yellownote.global;
  */
 public class Config {
 
+    public static boolean isLeakCanary = false;
     public static boolean isDebugMode = false;
     /**
      * LeanCloud所需配置

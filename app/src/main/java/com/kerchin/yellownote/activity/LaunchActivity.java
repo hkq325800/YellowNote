@@ -82,9 +82,9 @@ public class LaunchActivity extends BaseActivity {
                     getDataStart = System.currentTimeMillis();
                     try {
                         //一般而言登陆过的用户都有数据本地缓存
-                        Looper.prepare();
-                        PrimaryData.getInstance().initData(null, 0);//isNeedToRefresh
-                        Looper.loop();
+//                        Looper.prepare();
+                        PrimaryData.getInstance().initData();//isNeedToRefresh
+//                        Looper.loop();
                     } catch (AVException e) {
                         e.printStackTrace();
                         isNeedToRefresh = true;

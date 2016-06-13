@@ -21,14 +21,16 @@ import java.util.Map;
  * Created by Kerchin on 2016/4/11 0011.
  */
 public class PrimaryData {
+
     private static PrimaryData data;
     public static PrimaryDataStatus status;
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
     public volatile ArrayList<SimpleEntity> mItems;//note&folder
+//    public DoAfter mDoAfter;
     private Handler outHandler;//outHandler为了initData、getSimpleEntityFromList而存在
     private int outHandleCode;
-    private Handler mHandler = new Handler();
+    //    private Handler mHandler = new Handler();
     //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
@@ -58,17 +60,9 @@ public class PrimaryData {
         return data;
     }
 
-    @SuppressWarnings("unchecked")
-    public void giveBackData(Bundle data) {
-        int noteSize = data.getInt("noteSize", 0);
-        int i = 0;
-        listNote = new ArrayList<>();
-        for (int j = 0; j < noteSize; j++) {
-            listNote.add(j, (Note) data.getSerializable("note" + i));
-        }
-        listFolder = (ArrayList<Folder>) data.getSerializable("folder");
-        mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
-    }
+//    public void setDoAfter(DoAfter doAfter) {
+//        mDoAfter = doAfter;
+//    }
 
 //    public void initDataFromCloud() throws AVException {
 //        Trace.d("loadDataFromCloud");
@@ -82,12 +76,8 @@ public class PrimaryData {
     /**
      * 网络获取初始化
      */
-    public void initData(final Handler handler, final int handleCode) throws AVException {
+    public void initData() throws AVException {
         Trace.d("loadData");
-        if (handler != null) {
-            outHandler = handler;//initData
-            outHandleCode = handleCode;
-        }
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
@@ -98,22 +88,69 @@ public class PrimaryData {
 //        listFolder.clear();
 //        if (getFolderFromData())
         getFolderFromCloud();
-        mHandler.post(runnableForSimple);//initData
+        waitForFlag();
+//        mHandler.post(runnableForSimple);//initData
     }
 
-    public void refresh(final Handler handler, final byte handleCode) throws AVException {
-//        outHandler = handler;//refresh
-//        outHandleCode = handleCode;
+    /**
+     * 网络获取初始化
+     */
+    public void initData(DoAfter doAfter) throws AVException {
+        Trace.d("loadData");
+        status.clear();
+        //TODO getNote和getFolder在同一个线程下
+        // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
+//        listNote.clear();
+//        map.clear();
+//        if (getNoteFromData())
+        getNotesFromCloud();//initData
+//        listFolder.clear();
+//        if (getFolderFromData())
+        getFolderFromCloud();
+        waitForFlag(doAfter);
+//        mHandler.post(runnableForSimple);//initData
+    }
+
+//    /**
+//     * @deprecated
+//     * 网络获取初始化
+//     */
+//    public void initData(final Handler handler, final int handleCode) throws AVException {
+//        Trace.d("loadData");
+//        if (handler != null) {
+//            outHandler = handler;//initData
+//            outHandleCode = handleCode;
+//        }
+//        status.clear();
+//        //TODO getNote和getFolder在同一个线程下
+//        // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
+////        listNote.clear();
+////        map.clear();
+////        if (getNoteFromData())
+//        getNotesFromCloud();//initData
+////        listFolder.clear();
+////        if (getFolderFromData())
+//        getFolderFromCloud();
+//        waitForFlag(null);
+////        mHandler.post(runnableForSimple);//initData
+//    }
+
+//    public void refresh(final Handler handler, final byte handleCode) throws AVException {
+//        status.clear();
+//        Trace.d("refreshPrimaryData");
+//        getNotesFromCloud();//refresh
+//        getFolderFromCloud();//refresh
+//        if (handler != null) {
+//            handler.sendEmptyMessage(handleCode);//refresh
+//        }
+//    }
+
+    public void refresh(DoAfter doAfter) throws AVException {
         status.clear();
         Trace.d("refreshPrimaryData");
         getNotesFromCloud();//refresh
         getFolderFromCloud();//refresh
-        if (handler != null) {
-            handler.sendEmptyMessage(handleCode);//refresh
-//            handler = null;
-//            outHandleCode = 0;
-        }
-//        mHandler.post(runnableForSimple);//refresh
+        doAfter.justNow();
     }
 
     public void configData(String shownFolderId) {
@@ -163,25 +200,72 @@ public class PrimaryData {
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
         configData(shownFolderId);
-        if (outHandler != null) {//getSimpleEntityFromList
-            outHandler.sendEmptyMessage(outHandleCode);//getSimpleEntityFromList
-            outHandler = null;//getSimpleEntityFromList
-            outHandleCode = 0;
+    }
+
+    /**
+     * 从本地的数据中加载Simple
+     */
+    public void getSimpleEntityFromList(String shownFolderId, DoAfter doAfter) {
+        Trace.d("getSimpleEntityFromList");
+        mItems.clear();
+        getHeadersReady();//getSimpleEntityFromList
+        getItemsReady();//getSimpleEntityFromList
+        configData(shownFolderId);
+        if (doAfter != null) {
+            doAfter.justNow();
         }
     }
 
-    private Runnable runnableForSimple = new Runnable() {
-        @Override
-        public void run() {
-//            Trace.d("runnableForSimple");
-            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//    /**
+//     * @deprecated 从本地的数据中加载Simple
+//     */
+//    public void getSimpleEntityFromList(String shownFolderId) {
+//        Trace.d("getSimpleEntityFromList");
+//        mItems.clear();
+//        getHeadersReady();//getSimpleEntityFromList
+//        getItemsReady();//getSimpleEntityFromList
+//        configData(shownFolderId);
+//        if (outHandler != null) {//getSimpleEntityFromList refresh是需要调用
+//            outHandler.sendEmptyMessage(outHandleCode);//getSimpleEntityFromList
+//            outHandler = null;//getSimpleEntityFromList
+//            outHandleCode = 0;
+//        }
+//    }
+
+    private void waitForFlag() {
+        while (true) {
+            Trace.d("waitForFlag");
             if (status.isNoteReady && status.isFolderReady) {
-                getSimpleEntityFromList(MyApplication.userDefaultFolderId);//runnableForSimple
-            } else {//若一直未能进入需要处理 TODO
-                mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
+                getSimpleEntityFromList(MyApplication.userDefaultFolderId);
+                break;
+            } else {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
             }
         }
-    };
+    }
+
+    private void waitForFlag(DoAfter doAfter) {
+        while (true) {
+            Trace.d("waitForFlag");
+            if (status.isNoteReady && status.isFolderReady) {
+                getSimpleEntityFromList(MyApplication.userDefaultFolderId, doAfter);
+                break;
+            } else {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }
+    }
+
 
     /**
      * 将listNote中信息提炼到mItems中
@@ -193,7 +277,7 @@ public class PrimaryData {
                     , listNote.get(i).getFolderId()));
         }
         status.isItemReady = true;
-        Trace.d("isItemReady", "true");
+        Trace.d("isItemReady");
     }
 
     public void getHeadersReady() {
@@ -206,7 +290,7 @@ public class PrimaryData {
             sum += listFolder.get(i).getContain();
         }
         status.isHeaderReady = true;
-        Trace.d("isHeaderReady", "true");
+        Trace.d("isHeaderReady");
     }
 
     /**
@@ -214,7 +298,7 @@ public class PrimaryData {
      */
     private void getFolderFromCloud() throws AVException {
         final List<AVObject> avObjects = FolderService.getUserFolders(MyApplication.user);
-        Trace.d("getData4Folder成功", "查询到" + avObjects.size() + " 条符合条件的数据");
+        Trace.d("getData4Folder成功 查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -246,7 +330,7 @@ public class PrimaryData {
 //                            return -1;
 //                    }
 //                });
-                Trace.d("isFolderReady", "true");
+                Trace.d("isFolderReady true");
                 status.isFolderReady = true;
             }
         }).start();
@@ -258,7 +342,7 @@ public class PrimaryData {
     private void getNotesFromCloud() throws AVException {
         final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
         //skip += avObjects.size();
-        Trace.d("getData4Note成功", "查询到" + avObjects.size() + " 条符合条件的数据");
+        Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -281,7 +365,7 @@ public class PrimaryData {
                     map.put(folderId, ++i);
                 }
                 status.isNoteReady = true;
-                Trace.d("isNoteReady", "true");
+                Trace.d("isNoteReady true");
             }
         }).start();
     }
@@ -422,6 +506,31 @@ public class PrimaryData {
         return list;
     }
 
+//    private Runnable runnableForSimple = new Runnable() {
+//        @Override
+//        public void run() {
+////            Trace.d("runnableForSimple");
+//            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
+//            if (status.isNoteReady && status.isFolderReady) {
+//                getSimpleEntityFromList(MyApplication.userDefaultFolderId);//runnableForSimple
+//            } else {//若一直未能进入需要处理 TODO
+//                mHandler.postDelayed(runnableForSimple, 250);//runnableForSimple
+//            }
+//        }
+//    };
+
+    @SuppressWarnings("unchecked")
+    public void giveBackData(Bundle data) {
+        int noteSize = data.getInt("noteSize", 0);
+        int i = 0;
+        listNote = new ArrayList<>();
+        for (int j = 0; j < noteSize; j++) {
+            listNote.add(j, (Note) data.getSerializable("note" + i));
+        }
+        listFolder = (ArrayList<Folder>) data.getSerializable("folder");
+        mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
+    }
+
     /**
      * 本地获取Folder
      */
@@ -466,5 +575,9 @@ public class PrimaryData {
             isItemReady = false;
             isHeaderReady = false;
         }
+    }
+
+    public interface DoAfter {
+        void justNow();
     }
 }

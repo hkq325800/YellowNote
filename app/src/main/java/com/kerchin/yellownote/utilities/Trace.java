@@ -19,6 +19,9 @@ public class Trace {
         }
     }
 
+    /**
+     * @deprecated
+     */
     public static void d(String TAG, String msg) {
         if (Config.isDebugMode) {
             Log.d(TAG, msg);

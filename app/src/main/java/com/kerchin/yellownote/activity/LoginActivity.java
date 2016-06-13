@@ -573,9 +573,9 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    Looper.prepare();
-                    PrimaryData.getInstance().initData(null, 0);
-                    Looper.loop();
+//                    Looper.prepare();
+                    PrimaryData.getInstance().initData();
+//                    Looper.loop();
                 } catch (AVException e) {
                     e.printStackTrace();
                 }

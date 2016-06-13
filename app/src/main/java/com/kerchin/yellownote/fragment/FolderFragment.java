@@ -55,6 +55,7 @@ public class FolderFragment extends BaseFragment {
         public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case handle4explosion:
+                    Trace.d("handlerInFolder handle4explosion");
                     Note note = (Note) msg.obj;
                     primaryData.listNote.remove(note);//列表中去除目标
                     primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
@@ -64,17 +65,17 @@ public class FolderFragment extends BaseFragment {
                     setRecycleView();//refresh
                     break;
                 case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInFolder", "handle4refresh");
+                    Trace.d("handlerInFolder handle4refresh");
 //                    getHeaderListFromFolder();//handle4refresh
                     primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4refresh
                     setRecycleView();//refresh
                     break;
                 case GetDataHelper.handle4firstGet:
-                    Trace.d("handlerInFolder", "handle4firstGet");
+                    Trace.d("handlerInFolder handle4firstGet");
                     setRecycleView();//firstGot
                     break;
                 case GetDataHelper.handle4respond:
-                    Trace.d("handlerInFolder", "handle4respond");
+                    Trace.d("handlerInFolder handle4respond");
                     primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4respond
 //                    getHeaderListFromFolder();//handle4respond
                     setRecycleView();//respond
@@ -201,7 +202,7 @@ public class FolderFragment extends BaseFragment {
                                                         }, new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialog, int which) {
-                                                                Trace.d("readyToDelete", note.getTitle());
+                                                                Trace.d("readyToDelete " + note.getTitle());
                                                                 Message msg = new Message();
                                                                 msg.obj = note;
                                                                 msg.what = handle4explosion;//ui特效
@@ -298,7 +299,13 @@ public class FolderFragment extends BaseFragment {
                 public void run() {
                     try {
                         getDataHelper.refresh();//MainActivity dataGot
-                        primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
+                        primaryData.refresh(new PrimaryData.DoAfter() {
+                            @Override
+                            public void justNow() {
+                                handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                            }
+                        });
+//                        primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
                     } catch (AVException e) {
                         e.printStackTrace();
                     }
@@ -311,7 +318,7 @@ public class FolderFragment extends BaseFragment {
         if (mRecyclerView != null) {
 //            getHeaderListFromFolder();//getData
             getDataHelper.firstGet();//首次加载数据 dataGot
-            Trace.d("getData status", getDataHelper.statusName);
+            Trace.d("getData status " + getDataHelper.statusName);
 //            primaryData.getSimpleEntityFromList();//getData
             handler.sendEmptyMessage(
                     GetDataHelper.handle4firstGet);
@@ -580,7 +587,7 @@ public class FolderFragment extends BaseFragment {
                                 try {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.show(getActivity(), "保存成功");
-                                    Trace.d("saveNewFolder", "成功");
+                                    Trace.d("saveNewFolder 成功");
                                     primaryData.listFolder.add(
                                             new Folder(objectId, newFolderName, 0));
                                     getDataHelper.respond();//addClick->getData
