@@ -33,8 +33,8 @@ public class PatternLockUtils {
 //                PatternUtils.patternToSha1String(pattern), context);
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
         String dateStr = myFmt.format(new Date());
-        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
-                dateStr, context);
+//        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
+//                dateStr, context);
         PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
                 PatternUtils.patternToSha1String(pattern), context);
     }
@@ -47,20 +47,20 @@ public class PatternLockUtils {
 //                PatternUtils.patternToSha1String(pattern), context);
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
         String dateStr = myFmt.format(new Date());
-        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
-                dateStr, context);
+//        PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_DATE,
+//                dateStr, context);
         PreferenceUtils.putString(PreferenceContract.KEY_PATTERN_SHA1,
                 patternStr, context);
     }
 
-    public static boolean isDateTooLong(Context context) {
-        Date date = new Date();
-        SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
-        Integer dateNowStr = Integer.valueOf(myFmt.format(date));
-        Integer dateStr = Integer.valueOf(
-                PreferenceUtils.getString(PreferenceContract.KEY_PATTERN_DATE, "0", context));
-        return (dateNowStr - dateStr >= 1);
-    }
+//    public static boolean isDateTooLong(Context context) {
+//        Date date = new Date();
+//        SimpleDateFormat myFmt = new SimpleDateFormat("yyyyMMdd", Locale.CHINA);
+//        Integer dateNowStr = Integer.valueOf(myFmt.format(date));
+//        Integer dateStr = Integer.valueOf(
+//                PreferenceUtils.getString(PreferenceContract.KEY_PATTERN_DATE, "0", context));
+//        return (dateNowStr - dateStr >= 1);
+//    }
 
     public static boolean isStealthModeEnabled(Context context) {
         return !PreferenceUtils.getBoolean(PreferenceContract.KEY_PATTERN_VISIBLE,
@@ -99,6 +99,13 @@ public class PatternLockUtils {
      */
     public static void clearPattern(final Context context) throws AVException {
         SecretService.setPatternStr(MyApplication.user, "");
+        PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
+    }
+
+    /**
+     * 本地清除密码
+     */
+    public static void clearLocalPattern(final Context context){
         PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
     }
 

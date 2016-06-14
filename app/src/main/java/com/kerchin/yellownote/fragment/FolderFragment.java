@@ -87,6 +87,7 @@ public class FolderFragment extends BaseFragment {
     };
 
     public static FolderFragment newInstance(Bundle bundle) {
+        Trace.d("FolderFragment newInstance");
         FolderFragment frag = new FolderFragment();
         frag.setArguments(bundle);
         return frag;
@@ -94,6 +95,7 @@ public class FolderFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Trace.d("FolderFragment onCreate");
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");

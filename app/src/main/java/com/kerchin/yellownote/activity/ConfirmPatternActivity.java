@@ -5,13 +5,12 @@
 
 package com.kerchin.yellownote.activity;
 
-import android.content.pm.ActivityInfo;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
+//        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
         super.onCreate(savedInstanceState);
 //        ActivityInfo ActivityManager
@@ -66,13 +65,22 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
         return flag;
     }
 
+    private final static int requestForForget = 1;//校验用户名密码 然后清除密码并关闭手势密码
+
     @Override
     protected void onForgotPassword() {
-
+        if (isFromLaunch) {
+            //忘记密码跳转验证
+            Intent intent = new Intent(ConfirmPatternActivity.this, SecretActivity.class);
+            intent.putExtra("isForget", true);
+            startActivityForResult(intent, requestForForget);
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.push_left_out);
+        } else
 //        startActivity(new Intent(this, ResetPatternActivity.class));
-        //PatternLockUtils.clearPattern(ResetPatternActivity.this);
-        // Finish with RESULT_FORGOT_PASSWORD.
-        super.onForgotPassword();
+            //PatternLockUtils.clearPattern(ResetPatternActivity.this);
+            // Finish with RESULT_FORGOT_PASSWORD.
+            super.onForgotPassword();
     }
 
     /**
@@ -84,5 +92,14 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
                 .getString(me.zhanghai.android.patternlock.R.string.pl_draw_pattern_to_unlock)))
             mMessageText.setText("");
         super.onPatternStart();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == requestForForget && resultCode == RESULT_OK) {
+            MainActivity.startMe(getApplicationContext());
+            finish();
+        }
     }
 }

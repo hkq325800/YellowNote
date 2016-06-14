@@ -572,13 +572,7 @@ public class LoginActivity extends LoginAbstract {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-//                    Looper.prepare();
-                    PrimaryData.getInstance().initData();
-//                    Looper.loop();
-                } catch (AVException e) {
-                    e.printStackTrace();
-                }
+                PrimaryData.getInstance();
             }
         }).start();
         //存入shared

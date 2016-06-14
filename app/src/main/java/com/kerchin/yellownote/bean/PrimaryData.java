@@ -35,13 +35,31 @@ public class PrimaryData {
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
 
-    private PrimaryData() {
+//    private PrimaryData() {
+//        status = new PrimaryDataStatus();
+//        listFolder = new ArrayList<>();
+//        listNote = new ArrayList<>();
+//        mItems = new ArrayList<>();
+////        liteOrmHelper = new LiteOrmHelper();
+////        initData();//在首次手动调用 为了catch
+//    }
+
+    private PrimaryData() throws AVException {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<>();
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-//        initData();//在首次手动调用 为了catch
+        initData();//在首次手动调用 为了catch
+    }
+
+    private PrimaryData(DoAfter doAfter) throws AVException {
+        status = new PrimaryDataStatus();
+        listFolder = new ArrayList<>();
+        listNote = new ArrayList<>();
+        mItems = new ArrayList<>();
+//        liteOrmHelper = new LiteOrmHelper();
+        initData(doAfter);//在首次手动调用 为了catch
     }
 
     /**
@@ -51,7 +69,50 @@ public class PrimaryData {
         if (data == null)
             synchronized (PrimaryData.class) {
                 if (data == null) {
-                    data = new PrimaryData();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                data = new PrimaryData();
+                            } catch (AVException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            }
+        return data;
+    }
+
+    public static PrimaryData getInstance(final DoAfter doAfter) {
+        if (data == null)
+            synchronized (PrimaryData.class) {
+                if (data == null) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                data = new PrimaryData(doAfter);
+                            } catch (AVException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            }
+        return data;
+    }
+
+    public static PrimaryData getInstance(DoAfterWithEx doAfter) {
+        if (data == null)
+            synchronized (PrimaryData.class) {
+                if (data == null) {
+                    try {
+                        data = new PrimaryData();
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                        doAfter.justNowWithEx(e);
+                    }
                 }
             }
         return data;
@@ -73,7 +134,7 @@ public class PrimaryData {
     /**
      * 网络获取初始化
      */
-    public void initData() throws AVException {
+    private void initData() throws AVException {
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
@@ -512,5 +573,9 @@ public class PrimaryData {
 
     public interface DoAfter {
         void justNow();
+    }
+
+    public interface DoAfterWithEx{
+        void justNowWithEx(Exception e);
     }
 }

@@ -38,7 +38,7 @@ public class LaunchActivity extends BaseActivity {
     private LinearLayout mLoginRetryLinear;
     private boolean isNeedToRefresh = false;
     private int repeatCount = 0;
-    private long getDataStart;
+    private long getDataStart;//用于配置launch页时间
     private Message cycleTarget;
 //    View view;
 
@@ -80,17 +80,15 @@ public class LaunchActivity extends BaseActivity {
                 public void run() {
                     Trace.d("PrimaryData" + Thread.currentThread().getId());
                     getDataStart = System.currentTimeMillis();
-                    try {
-                        //一般而言登陆过的用户都有数据本地缓存
-//                        Looper.prepare();
-                        PrimaryData.getInstance().initData();//isNeedToRefresh
-//                        Looper.loop();
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                        isNeedToRefresh = true;
-                        //TODO 在完善了本地存储后可以取消 因为那时必定有数据
-                        Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
-                    }
+                    //一般而言登陆过的用户都有数据本地缓存
+                    PrimaryData.getInstance(new PrimaryData.DoAfterWithEx() {
+                        @Override
+                        public void justNowWithEx(Exception e) {
+                            isNeedToRefresh = true;
+                            //TODO 在完善了本地存储后可以取消 因为那时必定有数据
+                            Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        }
+                    });//isNeedToRefresh
                 }
             }).start();
         }
@@ -190,14 +188,14 @@ public class LaunchActivity extends BaseActivity {
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
                         AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
-                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
-                            PatternLockUtils.setPattern(SecretService.getPatternStr(txtUser), getApplicationContext());
-                            if (Config.isDebugMode)
-                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
-                        }
+//                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
+//                        }
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");
+                            PatternLockUtils.setPattern(avObjects.getString("user_read_pass"), getApplicationContext());
+                            if (Config.isDebugMode)
+                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
                             if (isFrozen) {
                                 //由于账户冻结重新登陆
                                 Message message = Message.obtain();

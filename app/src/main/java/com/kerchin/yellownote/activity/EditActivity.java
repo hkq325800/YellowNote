@@ -286,23 +286,17 @@ public class EditActivity extends BaseHasSwipeActivity {
         mEditCircleSearch.setText("共0当前第0");
         //初始化笔记夹选择
         if (savedInstanceState != null) {
-            Trace.d("initDataFromBundle" + EditActivity.class.getSimpleName());
+            Trace.d("EditActivity initDataFromBundle");
             //恢复primaryData
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-//                        Looper.prepare();
-                        PrimaryData.getInstance().initData(new PrimaryData.DoAfter() {
-                            @Override
-                            public void justNow() {
-                                handler.sendEmptyMessage(handle4reGet);
-                            }
-                        });
-//                        Looper.loop();
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                    }
+                    PrimaryData.getInstance(new PrimaryData.DoAfter() {
+                        @Override
+                        public void justNow() {
+                            handler.sendEmptyMessage(handle4reGet);
+                        }
+                    });
                 }
             }).start();
             mNote = (Note) savedInstanceState.getSerializable("mNote");

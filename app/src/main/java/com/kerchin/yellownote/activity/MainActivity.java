@@ -89,11 +89,11 @@ public class MainActivity extends BaseActivity
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            Trace.d("initializeData null");
+            Trace.d("MainActivity initializeData null");
             noteFragment = NoteFragment.newInstance(null);
             folderFragment = FolderFragment.newInstance(null);
         } else {
-            Trace.d("initializeData else");
+            Trace.d("MainActivity initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
@@ -107,15 +107,15 @@ public class MainActivity extends BaseActivity
             folderFragment = FolderFragment.newInstance(null);
 //            }
             Trace.show(getApplicationContext(), MyApplication.user);
-            if (MyApplication.user.equals("")) {
-                Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
-                MyApplication.logout();
-                Intent intent = new Intent();
-                intent.setClass(this, LoginActivity.class);
-                intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-                startActivity(intent);
-                finish();
-            }
+//            if (MyApplication.user.equals("")) {
+//                Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
+//                MyApplication.logout();
+//                Intent intent = new Intent();
+//                intent.setClass(this, LoginActivity.class);
+//                intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+//                startActivity(intent);
+//                finish();
+//            }
         }
         fragments.add(noteFragment);
         fragments.add(folderFragment);

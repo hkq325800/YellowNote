@@ -7,6 +7,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +23,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -68,6 +71,8 @@ public class SecretActivity extends BaseHasSwipeActivity {
         mNavigationRightBtn.setText("提交");
         if (isForget) {
             mSecretPassTextInput.setHint("输入用户名");
+            //noinspection ConstantConditions
+            mSecretPassTextInput.getEditText().setInputType(InputType.TYPE_CLASS_PHONE);
             mSecretRePassTextInput.setHint("输入密码");
             mSecretRePassAgainTextInput.setVisibility(View.INVISIBLE);
         }
@@ -101,22 +106,26 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mNavigationRightBtn)
     public void submit() {
-        if (tableCheck()) {
-            if (isForget) {
-                //TODO
-            } else
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            AVObject avObjects = LoginService.loginVerify(MyApplication.user, mSecretPassEdt.getText().toString());
-                            if (avObjects != null) {
-                                Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
-                                boolean isFrozen = avObjects.getBoolean("isFrozen");
-                                if (isFrozen) {//冻结修改不成功
-                                    Message message = Message.obtain();//由于账户冻结重新登陆
-                                    message.what = reLogForFrozen;
-                                    handler.sendMessage(message);
+        if (tableCheck(isForget)) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        AVObject avObjects = isForget
+                                ? LoginService.loginVerify(mSecretPassEdt.getText().toString(), mSecretNewPassEdt.getText().toString())
+                                : LoginService.loginVerify(MyApplication.user, mSecretPassEdt.getText().toString());
+                        if (avObjects != null) {
+                            Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
+                            boolean isFrozen = avObjects.getBoolean("isFrozen");
+                            if (isFrozen) {//冻结修改不成功
+                                Message message = Message.obtain();//由于账户冻结重新登陆
+                                message.what = reLogForFrozen;
+                                handler.sendMessage(message);
+                            } else {
+                                if (isForget) {
+                                    setResult(RESULT_OK);
+                                    PatternLockUtils.clearPattern(getApplicationContext());
+                                    finish();
                                 } else {
                                     SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
                                     //存入shared
@@ -129,18 +138,19 @@ public class SecretActivity extends BaseHasSwipeActivity {
                                     message.what = trueForSecret;
                                     handler.sendMessage(message);
                                 }
-                            } else {
-                                //缓存错误重新登录
-                                Message message = Message.obtain();//由于密码错误重新登陆
-                                message.what = secretError;
-                                handler.sendMessage(message);
                             }
-                        } catch (AVException e) {
-                            e.printStackTrace();
-                            Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        } else {
+                            //缓存错误重新登录
+                            Message message = Message.obtain();//由于密码错误重新登陆
+                            message.what = secretError;
+                            handler.sendMessage(message);
                         }
+                    } catch (AVException e) {
+                        e.printStackTrace();
+                        Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
-                }).start();
+                }
+            }).start();
         }
     }
 
@@ -167,19 +177,31 @@ public class SecretActivity extends BaseHasSwipeActivity {
         }
     };
 
-    private boolean tableCheck() {
-        if (mSecretPassEdt.getText().toString().equals("")
-                || mSecretNewPassEdt.getText().toString().equals("")
-                || mSecretNewPassAgainEdt.getText().toString().equals("")) {
-            Trace.show(getApplicationContext(), "请将信息填写完整");
-            return false;
-        } else if (!mSecretNewPassEdt.getText().toString().equals(mSecretNewPassAgainEdt.getText().toString())) {
-            Trace.show(getApplicationContext(), "两次填写的新密码不一致");
-            return false;
-        } else if (mSecretNewPassEdt.getText().toString().length() < 6 || mSecretNewPassEdt.getText().toString().length() > 13) {
-            Trace.show(getApplicationContext(), "密码长度控制在6-13位");
-            return false;
+    private boolean tableCheck(boolean isForget) {
+        if (isForget) {
+            if (TextUtils.isEmpty(mSecretPassEdt.getText())
+                    || TextUtils.isEmpty(mSecretNewPassEdt.getText())) {
+                Trace.show(getApplicationContext(), "请将信息填写完整");
+                return false;
+            } else if (!mSecretPassEdt.getText().toString().equals(MyApplication.user)) {
+                Trace.show(getApplicationContext(), "用户名与本地不同");
+                return false;
+            }
+            return true;
+        } else {
+            if (mSecretPassEdt.getText().toString().equals("")
+                    || mSecretNewPassEdt.getText().toString().equals("")
+                    || mSecretNewPassAgainEdt.getText().toString().equals("")) {
+                Trace.show(getApplicationContext(), "请将信息填写完整");
+                return false;
+            } else if (!mSecretNewPassEdt.getText().toString().equals(mSecretNewPassAgainEdt.getText().toString())) {
+                Trace.show(getApplicationContext(), "两次填写的新密码不一致");
+                return false;
+            } else if (mSecretNewPassEdt.getText().toString().length() < 6 || mSecretNewPassEdt.getText().toString().length() > 13) {
+                Trace.show(getApplicationContext(), "密码长度控制在6-13位");
+                return false;
+            }
+            return true;
         }
-        return true;
     }
 }

@@ -208,6 +208,7 @@ public class NoteFragment extends BaseFragment
     /*create part*/
 
     public static NoteFragment newInstance(Bundle bundle) {
+        Trace.d("NoteFragment newInstance");
         NoteFragment frag = new NoteFragment();
         frag.setArguments(bundle);
         return frag;
@@ -221,6 +222,7 @@ public class NoteFragment extends BaseFragment
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Trace.d("NoteFragment onCreate");
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
