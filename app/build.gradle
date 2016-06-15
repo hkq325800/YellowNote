@@ -39,6 +39,7 @@ dependencies {
     compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
     compile 'cn.leancloud.android:fastjson:1.1.40-leancloud'
+
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //    compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
@@ -55,7 +56,7 @@ dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
     //已经停止更新
     compile 'com.bigkoo:snappingstepper:1.0.2'
-    //已经停止更新
+    //已经停止更新 有时间改造一波
     compile 'me.zhanghai.android.patternlock:library:2.0.2'
     //中国 有时修复bug
     compile project(':SlidingLibrary')

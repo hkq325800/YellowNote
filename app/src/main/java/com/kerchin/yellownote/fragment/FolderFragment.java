@@ -99,7 +99,6 @@ public class FolderFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
-        primaryData = PrimaryData.getInstance();//初始化列表
         getDataHelper = new GetDataHelper();
     }
 
@@ -321,9 +320,14 @@ public class FolderFragment extends BaseFragment {
 //            getHeaderListFromFolder();//getData
             getDataHelper.firstGet();//首次加载数据 dataGot
             Trace.d("getData status " + getDataHelper.statusName);
+            primaryData = PrimaryData.getInstance(new PrimaryData.DoAfter() {
+                @Override
+                public void justNow() {
+                    handler.sendEmptyMessage(
+                            GetDataHelper.handle4firstGet);
+                }
+            });//初始化列表
 //            primaryData.getSimpleEntityFromList();//getData
-            handler.sendEmptyMessage(
-                    GetDataHelper.handle4firstGet);
         }
     }
 

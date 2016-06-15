@@ -100,6 +100,8 @@ public class PrimaryData {
                     }).start();
                 }
             }
+        else
+            doAfter.justNow();
         return data;
     }
 

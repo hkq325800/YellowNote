@@ -84,6 +84,7 @@ public class NoteFragment extends BaseFragment
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4firstGet:
+                    getDataListFromNote(primaryData.listNote);//getList
                     Trace.d("handlerInNote handle4firstGet");
                     //TODO 删除后避免滑动到顶部
 //                    if (noteAdapter == null) {
@@ -163,7 +164,7 @@ public class NoteFragment extends BaseFragment
     private void getData(int delay) {
         Trace.d("getData status " + getDataHelper.statusName);
         if (mNoteWDList != null) {
-            getDataListFromNote(primaryData.listNote);//getList
+
             sendMessage(delay);//getData
         }
 //        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
@@ -228,7 +229,6 @@ public class NoteFragment extends BaseFragment
         filter.addAction("refresh");
         mainStatus = new ToolbarStatus();
         list = new ArrayList<>();
-        primaryData = PrimaryData.getInstance();
         getDataHelper = new GetDataHelper();
     }
 
@@ -242,12 +242,17 @@ public class NoteFragment extends BaseFragment
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        getDataHelper.firstGet();//first get
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mProgress.startProgress(true);//first get
-                getData(0);//statusFirstGet
+                primaryData = PrimaryData.getInstance(new PrimaryData.DoAfter() {
+                    @Override
+                    public void justNow() {
+                        getDataHelper.firstGet();//first get
+                        getData(0);//statusFirstGet
+                    }
+                });
             }
         }, 450);
         mNoteWDList.setOnScrollListener(new AbsListView.OnScrollListener() {
