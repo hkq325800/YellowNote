@@ -44,77 +44,127 @@ public class PrimaryData {
 ////        initData();//在首次手动调用 为了catch
 //    }
 
-    private PrimaryData() throws AVException {
+//    private PrimaryData() throws AVException {
+//        status = new PrimaryDataStatus();
+//        listFolder = new ArrayList<>();
+//        listNote = new ArrayList<>();
+//        mItems = new ArrayList<>();
+////        liteOrmHelper = new LiteOrmHelper();
+//        initData();//在首次手动调用 为了catch
+//    }
+
+    private PrimaryData(final DoAfter doAfter) {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<>();
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        initData();//在首次手动调用 为了catch
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Trace.d("PrimaryData initDataWithDoAfter");
+                    initData(doAfter);//在首次手动调用 为了catch
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
-    private PrimaryData(DoAfter doAfter) throws AVException {
+    private PrimaryData(final DoAfterWithEx doAfterWithEx) {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<>();
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        initData(doAfter);//在首次手动调用 为了catch
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    initData();//在首次手动调用 为了catch
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    doAfterWithEx.justNowWithEx(e);
+                }
+            }
+        }).start();
     }
 
     /**
+     * 只用于获取实例 讲道理是不可能返回null的
      * @return PrimaryData
      */
     public static PrimaryData getInstance() {
         if (data == null)
             synchronized (PrimaryData.class) {
                 if (data == null) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                data = new PrimaryData();
-                            } catch (AVException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+                    throw new NullPointerException();
+//                    return null;
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            try {
+//                                data = new PrimaryData();
+//                            } catch (AVException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }).start();
                 }
             }
         return data;
     }
 
+    /**
+     * 用于获取数据
+     * edit folder note
+     * @param doAfter
+     * @return
+     */
     public static PrimaryData getInstance(final DoAfter doAfter) {
         if (data == null)
             synchronized (PrimaryData.class) {
                 if (data == null) {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                data = new PrimaryData(doAfter);
-                            } catch (AVException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }).start();
+                    Trace.d("getInstance null");
+                    data = new PrimaryData(doAfter);
                 }
             }
-        else
-            doAfter.justNow();
+        else {
+            Trace.d("getInstance doAfter");
+            waitForDataReady(doAfter);
+        }
         return data;
     }
 
-    public static PrimaryData getInstance(DoAfterWithEx doAfter) {
+    public static void waitForDataReady(DoAfter doAfter){
+        while (true) {
+            Trace.d("waitForDataReady");
+            if (status.isNoteReady && status.isFolderReady) {
+                doAfter.justNow();
+                break;
+            } else {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * 用于获取数据
+     * launch
+     * @param doAfterWithEx
+     * @return
+     */
+    public static PrimaryData getInstance(DoAfterWithEx doAfterWithEx) {
         if (data == null)
             synchronized (PrimaryData.class) {
                 if (data == null) {
-                    try {
-                        data = new PrimaryData();
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                        doAfter.justNowWithEx(e);
-                    }
+                    data = new PrimaryData(doAfterWithEx);
                 }
             }
         return data;
@@ -176,7 +226,8 @@ public class PrimaryData {
         Trace.d("refreshPrimaryData");
         getNotesFromCloud();//refresh
         getFolderFromCloud();//refresh
-        doAfter.justNow();
+        waitForDataReady(doAfter);
+//        doAfter.justNow();
     }
 
     public void configData(String shownFolderId) {

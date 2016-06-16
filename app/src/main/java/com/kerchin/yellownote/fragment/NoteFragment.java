@@ -84,7 +84,8 @@ public class NoteFragment extends BaseFragment
             stopRefresh();
             switch (msg.what) {
                 case GetDataHelper.handle4firstGet:
-                    getDataListFromNote(primaryData.listNote);//getList
+                    primaryData = PrimaryData.getInstance();
+                    getDataListFromNote(primaryData.listNote);//handle4firstGet
                     Trace.d("handlerInNote handle4firstGet");
                     //TODO 删除后避免滑动到顶部
 //                    if (noteAdapter == null) {
@@ -120,6 +121,7 @@ public class NoteFragment extends BaseFragment
                     break;
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInNote handle4respond note:" + list.size());
+                    getDataListFromNote(primaryData.listNote);//handle4respond
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mProgress.dismissNoData();
 //                    mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
@@ -161,17 +163,14 @@ public class NoteFragment extends BaseFragment
 
     /*data part*/
 
-    private void getData(int delay) {
-        Trace.d("getData status " + getDataHelper.statusName);
-        if (mNoteWDList != null) {
-
-            sendMessage(delay);//getData
-        }
-//        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
-//            getDataListFromNote(primaryData.listNote);
-//            handler.sendEmptyMessage(GetDataHelper.handle4loadMore);
-//        }
-    }
+//    private void getData(int delay) {
+//
+//        sendMessage(delay);//getData
+////        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
+////            getDataListFromNote(primaryData.listNote);
+////            handler.sendEmptyMessage(GetDataHelper.handle4loadMore);
+////        }
+//    }
 
     /**
      * list的获取
@@ -183,25 +182,28 @@ public class NoteFragment extends BaseFragment
         }
     }
 
-    private void sendMessage(long delay) {
+    private void getData(long delay) {
+        Trace.d("getData status " + getDataHelper.statusName);
+        if (mNoteWDList != null) {
 //        if (primaryData.listNote.size() == 0) {
 //            getDataHelper.zero();
 //            handler.sendEmptyMessage(GetDataHelper.handle4zero);
 //        } else {
-        switch (getDataHelper.status) {
-            case GetDataHelper.statusFirstGet:
-                handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
-                break;
-            case GetDataHelper.statusRespond:
-                if (primaryData.listNote.size() == 0)
-                    handler.sendEmptyMessageDelayed(
-                            GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
-                else
-                    handler.sendEmptyMessageDelayed(
-                            GetDataHelper.handle4respond, delay);
-                break;
-            default:
-                break;
+            switch (getDataHelper.status) {
+                case GetDataHelper.statusFirstGet:
+                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
+                    break;
+                case GetDataHelper.statusRespond:
+                    if (primaryData.listNote.size() == 0)
+                        handler.sendEmptyMessageDelayed(
+                                GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
+                    else
+                        handler.sendEmptyMessageDelayed(
+                                GetDataHelper.handle4respond, delay);
+                    break;
+                default:
+                    break;
+            }
         }
 //        }
     }

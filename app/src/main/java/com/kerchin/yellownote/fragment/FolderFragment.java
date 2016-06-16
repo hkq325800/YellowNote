@@ -72,6 +72,7 @@ public class FolderFragment extends BaseFragment {
                     break;
                 case GetDataHelper.handle4firstGet:
                     Trace.d("handlerInFolder handle4firstGet");
+                    primaryData = PrimaryData.getInstance();
                     setRecycleView();//firstGot
                     break;
                 case GetDataHelper.handle4respond:

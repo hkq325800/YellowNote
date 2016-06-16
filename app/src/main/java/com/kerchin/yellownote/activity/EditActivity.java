@@ -265,14 +265,6 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         Trace.d("onSaveInstanceState");
-//        outState.putInt("noteSize", PrimaryData.getInstance().listNote.size());
-//        int i = 0;
-//        for (Note note : PrimaryData.getInstance().listNote) {
-//            outState.putSerializable("note" + i, note);
-//            i++;
-//        }
-//        outState.putSerializable("folder", PrimaryData.getInstance().listFolder);
-//        outState.putSerializable("items", PrimaryData.getInstance().mItems);
         outState.putSerializable("mNote", mNote);
         outState.putSerializable("thisFolder", thisFolder);
         outState.putSerializable("mFolder", mFolder);
@@ -288,17 +280,12 @@ public class EditActivity extends BaseHasSwipeActivity {
         if (savedInstanceState != null) {
             Trace.d("EditActivity initDataFromBundle");
             //恢复primaryData
-            new Thread(new Runnable() {
+            PrimaryData.getInstance(new PrimaryData.DoAfter() {
                 @Override
-                public void run() {
-                    PrimaryData.getInstance(new PrimaryData.DoAfter() {
-                        @Override
-                        public void justNow() {
-                            handler.sendEmptyMessage(handle4reGet);
-                        }
-                    });
+                public void justNow() {
+                    handler.sendEmptyMessage(handle4reGet);
                 }
-            }).start();
+            });
             mNote = (Note) savedInstanceState.getSerializable("mNote");
             if (mNote == null) {
                 isNew = true;

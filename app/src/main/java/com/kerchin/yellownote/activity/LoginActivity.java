@@ -563,16 +563,14 @@ public class LoginActivity extends LoginAbstract {
     //通过正常登陆、注册、找回密码登录 缓存状态并跳转主页面
     @Override
     protected void goToMain() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                PrimaryData.getInstance();
-            }
-        });
         new Thread(new Runnable() {
             @Override
             public void run() {
-                PrimaryData.getInstance();
+                PrimaryData.getInstance(new PrimaryData.DoAfterWithEx() {
+                    @Override
+                    public void justNowWithEx(Exception e) {
+                    }
+                });
             }
         }).start();
         //存入shared
