@@ -88,9 +88,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
         mNavigationRightBtn.setVisibility(View.VISIBLE);
         mNavigationTitleEdt.setEnabled(false);
         mNavigationTitleEdt.setFocusable(false);
-        mNavigationTitleEdt.setFocusableInTouchMode(false);
-        mNavigationRightBtn.setFocusable(true);
-        mNavigationRightBtn.setFocusableInTouchMode(true);
+        mNavigationTitleEdt.setFocusableInTouchMode(true);
     }
 
     public static void startMe(Context context) {
