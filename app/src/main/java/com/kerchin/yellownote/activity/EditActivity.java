@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.os.Message;
@@ -186,7 +187,8 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_edit);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override

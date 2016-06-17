@@ -3,6 +3,7 @@ package com.kerchin.yellownote.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -66,7 +67,8 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_share_suggest);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @OnClick(R.id.mShareSuggestCodeImg)

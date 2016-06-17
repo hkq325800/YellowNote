@@ -15,7 +15,6 @@ public class SimpleEntity implements Serializable {
     private int contain;//包含的子项数量【folder】
     private String folderId;//笔记夹id
     private int folderPosition;//note的folder在mItems中的位置【note】
-    //    private int headerBefore;//可能和folderPosition职能重复【note】setIsShown
     private boolean isShown;//是否应当显示 解决动画的显示与否【note】
     private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复 默认true openFolder时设为false 完成动画后设为true
     public byte entityType;
@@ -30,7 +29,6 @@ public class SimpleEntity implements Serializable {
         now = 0;
         this.id = id;
         folderPosition = -1;
-//        headerBefore = -1;
         this.name = name;
         this.contain = contain;
         this.folderId = folderId;

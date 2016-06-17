@@ -1,7 +1,6 @@
 package com.kerchin.yellownote.bean;
 
 import android.os.Bundle;
-import android.os.Handler;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -28,21 +27,9 @@ public class PrimaryData {
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
     public volatile ArrayList<SimpleEntity> mItems;//note&folder
-//    public DoAfter mDoAfter;
-//    private Handler outHandler;//outHandler为了initData、getSimpleEntityFromList而存在
-//    private int outHandleCode;
     //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
-
-//    private PrimaryData() {
-//        status = new PrimaryDataStatus();
-//        listFolder = new ArrayList<>();
-//        listNote = new ArrayList<>();
-//        mItems = new ArrayList<>();
-////        liteOrmHelper = new LiteOrmHelper();
-////        initData();//在首次手动调用 为了catch
-//    }
 
 //    private PrimaryData() throws AVException {
 //        status = new PrimaryDataStatus();
@@ -100,7 +87,6 @@ public class PrimaryData {
             synchronized (PrimaryData.class) {
                 if (data == null) {
                     throw new NullPointerException();
-//                    return null;
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -119,8 +105,8 @@ public class PrimaryData {
     /**
      * 用于获取数据
      * edit folder note
-     * @param doAfter
-     * @return
+     * @param doAfter 接口
+     * @return 实例
      */
     public static PrimaryData getInstance(final DoAfter doAfter) {
         if (data == null)
@@ -157,8 +143,8 @@ public class PrimaryData {
     /**
      * 用于获取数据
      * launch
-     * @param doAfterWithEx
-     * @return
+     * @param doAfterWithEx 带Exception的接口
+     * @return 实例
      */
     public static PrimaryData getInstance(DoAfterWithEx doAfterWithEx) {
         if (data == null)
@@ -170,19 +156,6 @@ public class PrimaryData {
         return data;
     }
 
-//    public void setDoAfter(DoAfter doAfter) {
-//        mDoAfter = doAfter;
-//    }
-
-//    public void initDataFromCloud() throws AVException {
-//        Trace.d("loadDataFromCloud");
-//        listNote.clear();
-//        map.clear();
-//        getNotesFromCloud();//initDataFromCloud
-//        getFolderFromCloud();
-//        mHandler.post(runnableForSimple);//initDataFromCloud
-//    }
-
     /**
      * 网络获取初始化
      */
@@ -190,16 +163,11 @@ public class PrimaryData {
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
-        // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
-//        listNote.clear();
-//        map.clear();
 //        if (getNoteFromData())
         getNotesFromCloud();//initData
-//        listFolder.clear();
 //        if (getFolderFromData())
         getFolderFromCloud();
         waitForFlag();
-//        mHandler.post(runnableForSimple);//initData
     }
 
     /**
@@ -210,15 +178,11 @@ public class PrimaryData {
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         // 由于AVException不能在runnable中抛出 只好让最外层的getInstance在runnable中
-//        listNote.clear();
-//        map.clear();
 //        if (getNoteFromData())
         getNotesFromCloud();//initData
-//        listFolder.clear();
 //        if (getFolderFromData())
         getFolderFromCloud();
         waitForFlag(doAfter);
-//        mHandler.post(runnableForSimple);//initData
     }
 
     public void refresh(DoAfter doAfter) throws AVException {
@@ -227,7 +191,6 @@ public class PrimaryData {
         getNotesFromCloud();//refresh
         getFolderFromCloud();//refresh
         waitForDataReady(doAfter);
-//        doAfter.justNow();
     }
 
     public void configData(String shownFolderId) {
@@ -294,37 +257,47 @@ public class PrimaryData {
     }
 
     private void waitForFlag() {
-        while (true) {
-            Trace.d("waitForFlag");
-            if (status.isNoteReady && status.isFolderReady) {
-                getSimpleEntityFromList(MyApplication.userDefaultFolderId);
-                break;
-            } else {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Trace.d("waitForFlag");
+                    if (status.isNoteReady && status.isFolderReady) {
+                        getSimpleEntityFromList(MyApplication.userDefaultFolderId);
+                        break;
+                    } else {
+                        try {
+                            Thread.sleep(250);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
                 }
             }
-        }
+        }).start();
     }
 
-    private void waitForFlag(DoAfter doAfter) {
-        while (true) {
-            Trace.d("waitForFlag");
-            if (status.isNoteReady && status.isFolderReady) {
-                getSimpleEntityFromList(MyApplication.userDefaultFolderId, doAfter);
-                break;
-            } else {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
+    private void waitForFlag(final DoAfter doAfter) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Trace.d("waitForFlag");
+                    if (status.isNoteReady && status.isFolderReady) {
+                        getSimpleEntityFromList(MyApplication.userDefaultFolderId, doAfter);
+                        break;
+                    } else {
+                        try {
+                            Thread.sleep(250);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
                 }
             }
-        }
+        }).start();
     }
 
 
@@ -564,18 +537,6 @@ public class PrimaryData {
             }
         }
         return list;
-    }
-
-    @SuppressWarnings("unchecked")
-    public void giveBackData(Bundle data) {
-        int noteSize = data.getInt("noteSize", 0);
-        int i = 0;
-        listNote = new ArrayList<>();
-        for (int j = 0; j < noteSize; j++) {
-            listNote.add(j, (Note) data.getSerializable("note" + i));
-        }
-        listFolder = (ArrayList<Folder>) data.getSerializable("folder");
-        mItems = (ArrayList<SimpleEntity>) data.getSerializable("items");
     }
 
     /**

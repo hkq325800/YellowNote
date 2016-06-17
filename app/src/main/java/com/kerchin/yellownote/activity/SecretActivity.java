@@ -2,6 +2,7 @@ package com.kerchin.yellownote.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -58,7 +59,8 @@ public class SecretActivity extends BaseHasSwipeActivity {
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_secret);
         isForget = getIntent().getBooleanExtra("isForget", false);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
