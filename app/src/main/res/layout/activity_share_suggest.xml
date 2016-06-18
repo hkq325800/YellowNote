@@ -18,6 +18,13 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/mShareSuggestVersionTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="30dp"
+                android:text="最新版本：1.05->来查看都更新了些啥吧"/>
 
             <TextView
                 android:id="@+id/mShareSuggestTipsTxt"
@@ -25,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="60dp"
-                android:text="点击下载最新版或者分享给你的朋友吧" />
+                android:text="点击下载最新版或者分享给你的朋友" />
 
             <ImageView
                 android:id="@+id/mShareSuggestCodeImg"

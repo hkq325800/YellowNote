@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -35,6 +36,8 @@ import butterknife.OnClick;
  */
 public class ShareSuggestActivity extends BaseHasSwipeActivity {
     private final static int hideSaveBtn = 0;
+    @BindView(R.id.mShareSuggestVersionTxt)
+    TextView mShareSuggestVersionTxt;
     @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
     @BindView(R.id.mNavigationTitleEdt)
