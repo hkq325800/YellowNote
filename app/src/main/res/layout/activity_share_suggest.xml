@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="30dp"
-                android:text="最新版本：1.05->来查看都更新了些啥吧"/>
+                android:text=""/>
 
             <TextView
                 android:id="@+id/mShareSuggestTipsTxt"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="60dp"
-                android:text="点击下载最新版或者分享给你的朋友" />
+                android:text="点击二维码下载或者分享给你的朋友" />
 
             <ImageView
                 android:id="@+id/mShareSuggestCodeImg"

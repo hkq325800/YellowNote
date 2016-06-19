@@ -36,9 +36,14 @@ public class ShareSuggestService {
         suggest.save();
     }
 
-    public static AVObject isAbleToSuggest(String txtUser) throws AVException {
+    public static boolean isAbleToSuggest(String txtUser) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
-        return query.getFirst();
+        return query.getFirst().getBoolean("isAbleToSuggest");
+    }
+
+    public static AVObject getVersionInfo() throws AVException {
+        AVQuery<AVObject> app = new AVQuery<>("Version");
+        return app.getFirst();
     }
 }

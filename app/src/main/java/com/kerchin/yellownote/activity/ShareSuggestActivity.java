@@ -22,6 +22,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.SystemUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -38,6 +39,8 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     private final static int hideSaveBtn = 0;
     @BindView(R.id.mShareSuggestVersionTxt)
     TextView mShareSuggestVersionTxt;
+    @BindView(R.id.mShareSuggestTipsTxt)
+    TextView mShareSuggestTipsTxt;
     @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
     @BindView(R.id.mNavigationTitleEdt)
@@ -54,6 +57,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     private boolean isPosting = false;
     int quickSuggestTimes = MyApplication.getDefaultShared().getInt("quickSuggestTimes", 0);
     final static int deadLine = 30000;
+    String appVersionNow;
 
     private SystemHandler handler = new SystemHandler(this) {
 
@@ -75,7 +79,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     }
 
     @OnClick(R.id.mShareSuggestCodeImg)
-    public void download(){
+    public void download() {
         Uri uri = Uri.parse(getString(R.string.uri_download));//指定网址
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);//指定Action
@@ -84,7 +88,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     }
 
     @OnClick(R.id.mNavigationRightBtn)
-    public void submit(){
+    public void submit() {
         final String msg = mShareSuggestContentEdt.getText().toString();
         if (msg.equals("")) {
             Trace.show(getApplicationContext(), "请输入具体的意见");
@@ -127,7 +131,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     }
 
     @OnClick(R.id.mNavigationLeftBtn)
-    public void back(){
+    public void back() {
         finish();
     }
 
@@ -154,16 +158,42 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
+        appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    AVObject a = ShareSuggestService.isAbleToSuggest(MyApplication.user);
-                    boolean flag = a.getBoolean("isAbleToSuggest");
-                    Trace.d("查询isAbleToSuggest 查询到" + a.get("user_tel") + " 的记录为" + flag);
+                    boolean flag = ShareSuggestService.isAbleToSuggest(MyApplication.user);
+                    Trace.d("查询isAbleToSuggest 查询到" + MyApplication.user + " 的记录为" + flag);
                     if (!flag) {
                         handler.sendEmptyMessage(hideSaveBtn);
                     }
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVObject version = ShareSuggestService.getVersionInfo();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            String code = version.getString("version_name");
+                            if (code.compareTo(appVersionNow) > 0) {
+                                String str = "最新版本：" + code + "->来查看都更新了些啥吧";
+                                mShareSuggestVersionTxt.setText(str);
+                                Trace.show(getApplicationContext(), version.getString("version_content"));
+                            } else {
+                                String str = "当前版本：" + appVersionNow + " 已经是最新的啦";
+                                mShareSuggestVersionTxt.setText(str);
+                                mShareSuggestTipsTxt.setText("分享给你的朋友们吧！");
+                                mShareSuggestCodeImg.setOnClickListener(null);
+                            }
+                        }
+                    });
                 } catch (AVException e) {
                     e.printStackTrace();
                 }
@@ -184,7 +214,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     }
 
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
         System.gc();//TODO 泄漏
     }
