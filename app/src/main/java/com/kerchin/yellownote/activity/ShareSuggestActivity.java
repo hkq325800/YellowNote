@@ -1,6 +1,8 @@
 package com.kerchin.yellownote.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -181,14 +183,33 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            String code = version.getString("version_name");
+                            final String code = version.getString("version_name");
                             if (code.compareTo(appVersionNow) > 0) {
-                                String str = "最新版本：" + code + "->来查看都更新了些啥吧";
+                                String str = "最新版本:" + code + "[查看内容]";
                                 mShareSuggestVersionTxt.setText(str);
-                                Trace.show(getApplicationContext(), version.getString("version_content"));
+                                mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
+                                                .setTitle("版本:" + code)
+                                                .setMessage(version.getString("version_content"))
+//                                        .setView(view)
+//                                        .setOnCancelListener(listener)
+                                                .setPositiveButton("下载", new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        download();
+                                                    }
+                                                })
+                                                .create();
+                                        alertDialog.show();
+                                    }
+                                });
+//                                Trace.show(getApplicationContext(), version.getString("version_content"));
                             } else {
-                                String str = "当前版本：" + appVersionNow + " 已经是最新的啦";
+                                String str = "当前版本：" + appVersionNow + " 已是最新";
                                 mShareSuggestVersionTxt.setText(str);
+                                mShareSuggestVersionTxt.setTextColor(getResources().getColor(R.color.black));
                                 mShareSuggestTipsTxt.setText("分享给你的朋友们吧！");
                                 mShareSuggestCodeImg.setOnClickListener(null);
                             }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.text.InputFilter;
 import android.view.KeyEvent;
@@ -411,6 +410,9 @@ public class LoginActivity extends LoginAbstract {
     //登录操作确认
     @Override
     protected void loginVerify(final String txtUser, final String txtPass) {
+        SoftKeyboardUtils.hideInputMode(LoginActivity.this
+                , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+        mSVProgressHUD.showWithStatus("加载中...");
         isRegistered(txtUser);//是否注册查询
         new CountDownTimer(Config.timeout_avod, 250) {
             @Override
@@ -419,11 +421,9 @@ public class LoginActivity extends LoginAbstract {
                     Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                     if (registerStatus == statusFalse) {
                         Trace.show(getApplicationContext(), "该帐号尚未注册");
+                        dismissProgress();
                     } else {
                         //密码查询
-                        SoftKeyboardUtils.hideInputMode(LoginActivity.this
-                                , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
-                        mSVProgressHUD.showWithStatus("加载中...");
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -432,13 +432,14 @@ public class LoginActivity extends LoginAbstract {
                                     if (avObjects != null) {
                                         boolean isFrozen = avObjects.getBoolean("isFrozen");
                                         if (isFrozen) {
-                                            mSVProgressHUD.dismiss();
+                                            dismissProgress();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
-                                            PatternLockUtils.setPattern(SecretService.getPatternStr(txtUser), getApplicationContext());
+                                            String pattern = SecretService.getPatternStr(txtUser);
+                                            PatternLockUtils.setPattern(pattern, getApplicationContext());
                                             if (Config.isDebugMode)
-                                                Trace.show(LoginActivity.this, SecretService.getPatternStr(txtUser));
+                                                Trace.show(LoginActivity.this, pattern);
                                             goToMain();//正常登陆
                                         }
                                     } else {
@@ -446,7 +447,7 @@ public class LoginActivity extends LoginAbstract {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                mSVProgressHUD.dismiss();
+                                                dismissProgress();
                                                 mLoginPassEdt.setText("");
                                             }
                                         });
@@ -458,7 +459,7 @@ public class LoginActivity extends LoginAbstract {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            mSVProgressHUD.dismiss();
+                                            dismissProgress();
                                         }
                                     });
                                     Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
@@ -546,6 +547,12 @@ public class LoginActivity extends LoginAbstract {
                 } catch (AVException e) {
                     Trace.e("验证是否注册失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dismissProgress();
+                        }
+                    });
                     Trace.show(LoginActivity.this, "验证是否注册失败" + Trace.getErrorMsg(e));
                 }
             }
@@ -586,6 +593,7 @@ public class LoginActivity extends LoginAbstract {
                 PrimaryData.getInstance(new PrimaryData.DoAfterWithEx() {
                     @Override
                     public void justNowWithEx(Exception e) {
+                        dismissProgress();
                     }
                 });
             }
@@ -623,6 +631,11 @@ public class LoginActivity extends LoginAbstract {
             }
         }
     };
+
+    private void dismissProgress(){
+        if(mSVProgressHUD.isShowing())
+            mSVProgressHUD.dismiss();
+    }
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

@@ -3,7 +3,6 @@ package com.kerchin.yellownote.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.view.View;
@@ -19,7 +18,6 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
-import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.Trace;
@@ -56,7 +54,6 @@ public class LaunchActivity extends BaseActivity {
     protected void initializeView(Bundle savedInstanceState) {
         mWelcomeRetryReL = (RelativeLayout) findViewById(R.id.mWelcomeRetryReL);
         mWelcomeTxt = (TextView) findViewById(R.id.mWelcomeTxt);
-        mWelcomeTxt.setText("网络交互中 请稍候...");
 //        ButterKnife.bind(this);
     }
 
