@@ -216,6 +216,6 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        System.gc();//TODO 泄漏
+        NormalUtils.clearTextLineCache();
     }
 }

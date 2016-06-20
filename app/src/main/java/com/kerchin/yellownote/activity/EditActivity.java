@@ -32,6 +32,7 @@ import android.widget.ScrollView;
 import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
+import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.bean.Folder;
@@ -180,7 +181,10 @@ public class EditActivity extends BaseHasSwipeActivity {
 //                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())) {
 //            //保存至草稿箱 数据库
 //        }
-        System.gc();
+        if(mSVProgressHUD.isShowing())
+            mSVProgressHUD.dismiss();
+        viewContainer.clear();
+        NormalUtils.clearTextLineCache();
         super.onDestroy();
     }
 
@@ -191,8 +195,11 @@ public class EditActivity extends BaseHasSwipeActivity {
             NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
+    private SVProgressHUD mSVProgressHUD;
+
     @Override
     public void onOpened() {
+        mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
         final String content = mEditContentEdt.getText().toString();
         final String title = mNavigationTitleEdt.getText().toString();
         if (!content.trim().equals("")
@@ -200,7 +207,8 @@ public class EditActivity extends BaseHasSwipeActivity {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged) {
-                SoftKeyboardUtils.hideInputMode(EditActivity.this, (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+                SoftKeyboardUtils.hideInputMode(EditActivity.this
+                        , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                 executorService.execute(new Runnable() {
                     @Override
@@ -217,6 +225,7 @@ public class EditActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        mSVProgressHUD = new SVProgressHUD(this);
         @SuppressLint("InflateParams") View view1 = LayoutInflater.from(this)
                 .inflate(R.layout.viewpager_function_first, null);
         @SuppressLint("InflateParams") View view2 = LayoutInflater.from(this)

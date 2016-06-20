@@ -7,7 +7,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -35,7 +36,8 @@ public class LaunchActivity extends BaseActivity {
     private static final byte next = 1;
     private static final byte reLog = 2;
     private static final byte reLogForFrozen = 4;
-    private LinearLayout mLoginRetryLinear;
+    private RelativeLayout mWelcomeRetryReL;
+    private TextView mWelcomeTxt;
     private boolean isNeedToRefresh = false;
     private int repeatCount = 0;
     private long getDataStart;//用于配置launch页时间
@@ -52,13 +54,15 @@ public class LaunchActivity extends BaseActivity {
 
     @Override
     protected void initializeView(Bundle savedInstanceState) {
-        mLoginRetryLinear = (LinearLayout) findViewById(R.id.mLoginRetryLinear);
+        mWelcomeRetryReL = (RelativeLayout) findViewById(R.id.mWelcomeRetryReL);
+        mWelcomeTxt = (TextView) findViewById(R.id.mWelcomeTxt);
+        mWelcomeTxt.setText("网络交互中 请稍候...");
 //        ButterKnife.bind(this);
     }
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        mLoginRetryLinear.setOnClickListener(new View.OnClickListener() {
+        mWelcomeRetryReL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isNeedToRefresh) {
@@ -86,7 +90,13 @@ public class LaunchActivity extends BaseActivity {
                         public void justNowWithEx(Exception e) {
                             isNeedToRefresh = true;
                             //TODO 在完善了本地存储后可以取消 因为那时必定有数据
-                            Trace.show(LaunchActivity.this, "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mWelcomeTxt.setText("请检查网络后点击屏幕重试");
+                                }
+                            });
+                            Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                         }
                     });//isNeedToRefresh
                 }
@@ -152,8 +162,16 @@ public class LaunchActivity extends BaseActivity {
             if (PrimaryData.status == null) {
                 handler.postDelayed(runnableForData, runnablePeriod);
                 repeatCount++;
-                return;
             }
+            if (Config.isDebugMode)
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String str = PrimaryData.status.toString();
+                        if (!str.equals(""))
+                            mWelcomeTxt.setText(str);
+                    }
+                });
             if (PrimaryData.status.isFolderReady
                     && PrimaryData.status.isNoteReady
                     && cycleTarget != null) {
@@ -181,6 +199,7 @@ public class LaunchActivity extends BaseActivity {
         //缓存查询流程
         if (!txtUser.equals("") && !MyApplication.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
             //密码查询
+            mWelcomeTxt.setText("查询到缓存 正在进行验证...");
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -192,10 +211,16 @@ public class LaunchActivity extends BaseActivity {
 //                        }
                         if (avObjects != null) {
                             Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mWelcomeTxt.setText("登录成功 正在获取数据...");
+                                }
+                            });
                             boolean isFrozen = avObjects.getBoolean("isFrozen");
                             PatternLockUtils.setPattern(avObjects.getString("user_read_pass"), getApplicationContext());
-                            if (Config.isDebugMode)
-                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
+//                            if (Config.isDebugMode)
+//                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
                             if (isFrozen) {
                                 //由于账户冻结重新登陆
                                 Message message = Message.obtain();

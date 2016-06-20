@@ -33,7 +33,7 @@ public class LoginService {
      * @param txtPass 用户密码
      * @throws AVException
      */
-    public static void forgetVerify(String txtUser, String txtPass) throws AVException {
+    public static void forgetSave(String txtUser, String txtPass) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
         AVObject user = query.getFirst();//query.get(objectId);

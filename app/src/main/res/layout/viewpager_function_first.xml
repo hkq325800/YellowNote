@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:stepper="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="@dimen/edit_function_height"
+    xmlns:stepper="http://schemas.android.com/apk/res-auto"
     android:background="@color/backgroundFunctionBar"
     android:baselineAligned="false">
 
@@ -17,7 +17,7 @@
             android:id="@+id/mEditReUnStepper"
             android:layout_width="120dp"
             android:layout_height="30dp"
-            stepper:mode="custom"
+            stepper:stepper_mode="custom"
             stepper:stepper_leftButtonBackground="@color/backgroundFunctionBar"
             stepper:stepper_leftButtonResources="@mipmap/ic_undo_gray"
             stepper:stepper_rightButtonBackground="@color/backgroundFunctionBar"

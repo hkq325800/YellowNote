@@ -80,6 +80,7 @@ public class PrimaryData {
 
     /**
      * 只用于获取实例 讲道理是不可能返回null的
+     *
      * @return PrimaryData
      */
     public static PrimaryData getInstance() {
@@ -105,6 +106,7 @@ public class PrimaryData {
     /**
      * 用于获取数据
      * edit folder note
+     *
      * @param doAfter 接口
      * @return 实例
      */
@@ -123,7 +125,7 @@ public class PrimaryData {
         return data;
     }
 
-    public static void waitForDataReady(DoAfter doAfter){
+    public static void waitForDataReady(DoAfter doAfter) {
         while (true) {
             Trace.d("waitForDataReady");
             if (status.isNoteReady && status.isFolderReady) {
@@ -143,6 +145,7 @@ public class PrimaryData {
     /**
      * 用于获取数据
      * launch
+     *
      * @param doAfterWithEx 带Exception的接口
      * @return 实例
      */
@@ -583,13 +586,21 @@ public class PrimaryData {
             isItemReady = false;
             isHeaderReady = false;
         }
+
+        public String toString() {
+            String noteReady = isNoteReady ? "noteReady\n" : "";
+            String folderReady = isFolderReady ? "folderReady\n" : "";
+            String itemReady = isItemReady ? "itemReady\n" : "";
+            String headerReady = isHeaderReady ? "headerRead\n" : "";
+            return noteReady + folderReady + itemReady + headerReady;
+        }
     }
 
     public interface DoAfter {
         void justNow();
     }
 
-    public interface DoAfterWithEx{
+    public interface DoAfterWithEx {
         void justNowWithEx(Exception e);
     }
 }

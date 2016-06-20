@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.activity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -9,6 +10,7 @@ import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.bean.PrimaryData;
@@ -27,6 +30,7 @@ import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -60,6 +64,7 @@ public class LoginActivity extends LoginAbstract {
     RelativeLayout mSignUpRelative;
     @BindView(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
+    private SVProgressHUD mSVProgressHUD;
     private final static long runnableTimeout = 8000;
     private final static long runnablePeriod = 200;
     private final static byte statusInit = -1;//未查询或查询中
@@ -81,6 +86,7 @@ public class LoginActivity extends LoginAbstract {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        mSVProgressHUD = new SVProgressHUD(this);
     }
 
     @Override
@@ -415,6 +421,9 @@ public class LoginActivity extends LoginAbstract {
                         Trace.show(getApplicationContext(), "该帐号尚未注册");
                     } else {
                         //密码查询
+                        SoftKeyboardUtils.hideInputMode(LoginActivity.this
+                                , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+                        mSVProgressHUD.showWithStatus("加载中...");
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -423,6 +432,7 @@ public class LoginActivity extends LoginAbstract {
                                     if (avObjects != null) {
                                         boolean isFrozen = avObjects.getBoolean("isFrozen");
                                         if (isFrozen) {
+                                            mSVProgressHUD.dismiss();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
@@ -436,6 +446,7 @@ public class LoginActivity extends LoginAbstract {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
+                                                mSVProgressHUD.dismiss();
                                                 mLoginPassEdt.setText("");
                                             }
                                         });
@@ -444,6 +455,12 @@ public class LoginActivity extends LoginAbstract {
                                 } catch (AVException e) {
                                     Trace.e("登陆验证失败" + Trace.getErrorMsg(e));
                                     e.printStackTrace();
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mSVProgressHUD.dismiss();
+                                        }
+                                    });
                                     Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
                                 }
                             }
@@ -499,7 +516,7 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    LoginService.forgetVerify(txtUser, txtPass);
+                    LoginService.forgetSave(txtUser, txtPass);
                     Trace.show(LoginActivity.this, "修改成功");
                     goToMain();//找回密码登录
                 } catch (AVException e) {

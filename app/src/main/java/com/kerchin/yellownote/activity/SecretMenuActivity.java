@@ -103,6 +103,12 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
         context.startActivity(intent);
     }
 
+    @Override
+    protected void onDestroy() {
+        NormalUtils.clearTextLineCache();
+        super.onDestroy();
+    }
+
     @OnClick(R.id.mNavigationLeftBtn)
     public void back() {
         finish();
