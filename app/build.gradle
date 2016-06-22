@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.getkeepsafe.dexcount'
 //apply plugin: 'realm-android'
 
 android {
@@ -70,4 +71,6 @@ dependencies {
     //    compile 'io.realm:realm-android:0.87.4'
     compile project(':snappingstepper')
     //已经停止更新 有时间改造一波
+    compile files('libs/ormlite-android-4.49-SNAPSHOT.jar')
+    compile files('libs/ormlite-core-4.49-SNAPSHOT.jar')
 }

@@ -67,7 +67,9 @@
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:theme="@style/JK.SwipeBack.Transparent.Theme" />
         <activity android:name=".samples.SingleTest"/>
+        <activity android:name=".samples.SingleTestFolder"/>
         <activity android:name=".samples.CascadeTest"/>
+        <activity android:name=".samples.HelloAndroid"/>
         <activity android:name=".samples.Main"/>
         <!--<activity android:name=".activities.MaterialActivity" />-->
     </application>

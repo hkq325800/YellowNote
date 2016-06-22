@@ -1,10 +1,10 @@
 package com.kerchin.yellownote.bean;
 
-import android.os.Bundle;
-
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.Trace;
@@ -21,7 +21,6 @@ import java.util.Map;
  * Created by Kerchin on 2016/4/11 0011.
  */
 public class PrimaryData {
-
     private static PrimaryData data;
     public static PrimaryDataStatus status;
     public volatile ArrayList<Folder> listFolder;
@@ -40,6 +39,9 @@ public class PrimaryData {
 //        initData();//在首次手动调用 为了catch
 //    }
 
+    /**
+     * edit folder note
+     */
     private PrimaryData(final DoAfter doAfter) {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<>();
@@ -59,7 +61,7 @@ public class PrimaryData {
         }).start();
     }
 
-    private PrimaryData(final DoAfterWithEx doAfterWithEx) {
+    private PrimaryData(final OrmLiteHelper helper, final DoAfterWithEx doAfterWithEx) {
         status = new PrimaryDataStatus();
         listFolder = new ArrayList<>();
         listNote = new ArrayList<>();
@@ -69,7 +71,7 @@ public class PrimaryData {
             @Override
             public void run() {
                 try {
-                    initData();//在首次手动调用 为了catch
+                    initData(helper);//在首次手动调用 为了catch
                 } catch (AVException e) {
                     e.printStackTrace();
                     doAfterWithEx.justNowWithEx(e);
@@ -149,11 +151,11 @@ public class PrimaryData {
      * @param doAfterWithEx 带Exception的接口
      * @return 实例
      */
-    public static PrimaryData getInstance(DoAfterWithEx doAfterWithEx) {
+    public static PrimaryData getInstance(OrmLiteHelper helper, DoAfterWithEx doAfterWithEx) {
         if (data == null)
             synchronized (PrimaryData.class) {
                 if (data == null) {
-                    data = new PrimaryData(doAfterWithEx);
+                    data = new PrimaryData(helper, doAfterWithEx);
                 }
             }
         return data;
@@ -162,19 +164,64 @@ public class PrimaryData {
     /**
      * 网络获取初始化
      */
-    private void initData() throws AVException {
+    private void initData(OrmLiteHelper helper) throws AVException {
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
 //        if (getNoteFromData())
         getNotesFromCloud();//initData
 //        if (getFolderFromData())
-        getFolderFromCloud();
+        getFolderFromCloud();//initData
+        saveInDataBase(helper);
         waitForFlag();
+    }
+
+    private void saveInDataBase(final OrmLiteHelper helper) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Trace.d("waitForFlag");
+                    if (status.isNoteReady && status.isFolderReady) {
+                        //TODO
+                        RuntimeExceptionDao<Note, Integer> simpleDaoForNote = null;
+                        RuntimeExceptionDao<Folder, Integer> simpleDaoForFolder = null;
+                        if (helper != null) {
+                            simpleDaoForNote = helper.getNoteDao();
+                            simpleDaoForFolder = helper.getFolderDao();
+                        }
+                        if (simpleDaoForNote != null
+                                && simpleDaoForFolder != null) {
+                            for (Note note : listNote) {
+                                if (simpleDaoForNote.queryForSameId(note) == null)
+                                    simpleDaoForNote.create(note);
+                                else
+                                    simpleDaoForNote.update(note);
+                            }
+                            for (Folder folder : listFolder) {
+                                if (simpleDaoForFolder.queryForSameId(folder) == null)
+                                    simpleDaoForFolder.create(folder);
+                                else
+                                    simpleDaoForFolder.update(folder);
+                            }
+                        }
+                        break;
+                    } else {
+                        try {
+                            Thread.sleep(250);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
+                }
+            }
+        }).start();
     }
 
     /**
      * 网络获取初始化
+     * edit folder note
      */
     public void initData(DoAfter doAfter) throws AVException {
         Trace.d("loadData");
@@ -184,7 +231,7 @@ public class PrimaryData {
 //        if (getNoteFromData())
         getNotesFromCloud();//initData
 //        if (getFolderFromData())
-        getFolderFromCloud();
+        getFolderFromCloud();//initData doAfter
         waitForFlag(doAfter);
     }
 
@@ -348,7 +395,6 @@ public class PrimaryData {
 //                    f.setContain(map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
 //                    f.setName(avObject.getString("folder_name"));
 //                    realm.commitTransaction();
-
                     final Folder folder = new Folder(avObject.getObjectId()
                             , avObject.getString("folder_name")
                             //, avObject.getInt("folder_contain"));

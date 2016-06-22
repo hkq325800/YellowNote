@@ -22,7 +22,7 @@ public class Main extends Activity {
     }
 
     public void clickSingle(View view) {
-        startActivity(new Intent(this, SingleTest.class));
+        startActivity(new Intent(this, HelloAndroid.class));
     }
 
     public void clickCascade(View view) {

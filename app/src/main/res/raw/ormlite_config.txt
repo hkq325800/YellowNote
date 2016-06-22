@@ -1,0 +1,84 @@
+#
+# generated on 2012/06/06 05:55:57
+#
+# --table-start--
+#dataClass=com.kerchin.yellownote.samples.SimpleData
+#tableName=simpledata
+# --table-fields-start--
+# --field-start--
+#fieldName=id
+#generatedId=true
+# --field-end--
+# --field-start--
+#fieldName=string
+#indexName=simpledata_string_idx
+# --field-end--
+# --field-start--
+#fieldName=millis
+# --field-end--
+# --field-start--
+#fieldName=date
+# --field-end--
+# --field-start--
+#fieldName=even
+# --field-end--
+# --table-fields-end--
+# --table-end--
+
+# --table-start--
+dataClass=com.kerchin.yellownote.bean.Folder
+tableName=folder
+# --table-fields-start--
+# --field-start--
+fieldName=objectId
+id=true
+# --field-end--
+# --field-start--
+fieldName=name
+# --indexName=simpledata_string_idx--
+# --field-end--
+# --field-start--
+fieldName=contain
+# --field-end--
+# --table-fields-end--
+# --table-end--
+
+# --table-start--
+dataClass=com.kerchin.yellownote.bean.Note
+tableName=note
+# --table-fields-start--
+# --field-start--
+fieldName=objectId
+id=true
+# --field-end--
+# --field-start--
+fieldName=title
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=date
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=content
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=preview
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=folder
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=folderId
+canBeNull = false
+# --field-end--
+# --field-start--
+fieldName=type
+canBeNull = false
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

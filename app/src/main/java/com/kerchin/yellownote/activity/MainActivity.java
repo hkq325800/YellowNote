@@ -29,6 +29,7 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -342,8 +343,8 @@ public class MainActivity extends BaseActivity
             return false;
         } else if (id == R.id.nav_resetSecret) {
 //            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
-//            startActivity(new Intent(getApplicationContext(), Main.class));//for test ormLite
-            handler.sendEmptyMessage(gotoSecret);
+            startActivity(new Intent(getApplicationContext(), Main.class));//for test ormLite
+//            handler.sendEmptyMessage(gotoSecret);
             return false;
         }
         mMainDrawer.closeDrawers();

@@ -82,7 +82,7 @@ public class LaunchActivity extends BaseActivity {
                     Trace.d("PrimaryData" + Thread.currentThread().getId());
                     getDataStart = System.currentTimeMillis();
                     //一般而言登陆过的用户都有数据本地缓存
-                    PrimaryData.getInstance(new PrimaryData.DoAfterWithEx() {
+                    PrimaryData.getInstance(null, new PrimaryData.DoAfterWithEx() {
                         @Override
                         public void justNowWithEx(Exception e) {
                             isNeedToRefresh = true;

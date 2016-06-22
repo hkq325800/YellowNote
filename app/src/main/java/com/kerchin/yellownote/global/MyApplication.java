@@ -85,6 +85,7 @@ public class MyApplication extends Application {
     public static void logout() {
         isLogin = false;
         PrimaryData.getInstance().clearData();
+        //TODO 清除所有本地数据库内容
         PatternLockUtils.clearLocalPattern(context);
         //清除密码缓存
         SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();

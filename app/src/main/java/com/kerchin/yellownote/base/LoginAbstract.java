@@ -1,9 +1,12 @@
 package com.kerchin.yellownote.base;
 
+import com.j256.ormlite.android.apptools.OrmLiteBaseActivity;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
+
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
-public abstract class LoginAbstract extends BaseActivity {
+public abstract class LoginAbstract extends OrmLiteBaseActivity<OrmLiteHelper> {
     /**
      * 点击登录：表格检查-loginVerify
      */

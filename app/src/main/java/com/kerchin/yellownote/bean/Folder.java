@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Handler;
 
 import com.avos.avoscloud.AVException;
+import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -22,20 +23,33 @@ import java.util.List;
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
-@Table("folder")
+//@Table("folder")
 public class Folder implements Serializable {
-    //        @PrimaryKey
-    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
-    int id;
-    @Column("folder_objectId")
+//    public static final String COL_ID = "_id";
+    public static final String COL_OBJECTID = "_objectId";
+    public static final String COL_NAME = "_name";
+    public static final String COL_CONTAIN = "_contain";
+
+//    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
+//    @Column(COL_ID)
+//    long id;
+//    @PrimaryKey(AssignType.BY_MYSELF)//加了为null
+//    @Column(COL_OBJECTID)
+    @DatabaseField(id = true)
     String objectId;
     //    @Required
-    @NotNull
-    @Column("folder_name")
+//    @NotNull
+//    @Column(COL_NAME)
+    @DatabaseField
     String name;
-    @Default("0")
-    @Column("folder_contain")
+//    @Default("0")
+//    @Column(COL_CONTAIN)
+    @DatabaseField
     int contain;
+
+    Folder() {
+        // needed by ormlite
+    }
 
     public Folder(String objectId, String name, int contain) {
         this.name = name;
@@ -74,6 +88,14 @@ public class Folder implements Serializable {
     public String getObjectId() {
         return objectId;
     }
+
+//    public long getId() {
+//        return id;
+//    }
+//
+//    public void setId(long id) {
+//        this.id = id;
+//    }
 
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {
@@ -124,5 +146,9 @@ public class Folder implements Serializable {
                 }
             }).start();
         }
+    }
+
+    public String toString() {
+        return "objectId:" + objectId + " name:" + name + " contain" + contain;
     }
 }

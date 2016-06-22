@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
@@ -31,45 +32,66 @@ import java.util.Locale;
  */
 //@Table("note")
 public class Note implements Serializable {
-    @PrimaryKey(AssignType.BY_MYSELF)
-    @Column("note_objectId")
+    //    @PrimaryKey(AssignType.BY_MYSELF)
+//    @Column("note_objectId")
+    @DatabaseField(id = true)
     private String objectId;
-    @Column("note_title")
-    @NotNull
+    //    @Column("note_title")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private String title;
-    @Column("note_date")
-    @NotNull
+    //    @Column("note_date")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private Date date;
-    @Column("note_content")
+    //    @Column("note_content")
+    @DatabaseField(canBeNull = false)
     private String content;
-    @Column("note_preview")
-    @NotNull
+    //    @Column("note_preview")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private String preview;
-    @Column("note_folder")
-    @NotNull
+    //    @Column("note_folder")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private String folder;
-    @Column("folder_objectId")
-    @NotNull
+    //    @Column("folder_objectId")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private String folderId;
-    @Column("note_type")
-    @NotNull
+    //    @Column("note_type")
+//    @NotNull
+    @DatabaseField(canBeNull = false)
     private String type;
-    @Ignore
+    //    @Ignore
     private SimpleDateFormat myFmt;
 
-    public Note(String objectId, String title, Date date, String content, String preview
+    Note() {
+        // needed by ormlite
+    }
+
+    /**
+     * 从本地获取
+     */
+    public Note(String objectId, String title, Date date, String contentCode
             , String folder, String folderId, String type) {
         myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         this.objectId = objectId;
         this.title = title;
         this.date = date;
-        this.content = content;
         this.folder = folder;
         this.folderId = folderId;
-        this.preview = preview;
+        this.content = NormalUtils.sha1StringToString(contentCode);
+        if (content.length() > 70)
+            preview = content.substring(0, 70).replace("\n", " ");
+        else
+            preview = content.replace("\n", " ");
         this.type = type;
     }
 
+    /**
+     * 从网络获取
+     */
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
         myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
@@ -86,7 +108,13 @@ public class Note implements Serializable {
         this.type = type;
     }
 
-    public void setObjectId() {
+    public String toString() {
+        return "objectId" + objectId + "title" + title + "date" + date.toString()
+                + "content" + content.length() + "preview" + preview + "folder" + folder
+                + "folderId" + folderId + "type" + type;
+    }
+
+    public void setObjectId(String objectId) {
         this.objectId = objectId;
     }
 
@@ -121,7 +149,7 @@ public class Note implements Serializable {
         this.type = type;
     }
 
-    public void setMyFmt(SimpleDateFormat myFmt){
+    public void setMyFmt(SimpleDateFormat myFmt) {
         this.myFmt = myFmt;
     }
 
@@ -133,11 +161,11 @@ public class Note implements Serializable {
         return title;
     }
 
-    public SimpleDateFormat getMyFmt(){
+    public SimpleDateFormat getMyFmt() {
         return myFmt;
     }
 
-    public Date getDate(){
+    public Date getDate() {
         return date;
     }
 
