@@ -13,6 +13,7 @@ import com.j256.ormlite.table.TableUtils;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.global.MyApplication;
 //import com.kerchin.yellownote.samples.SimpleData;
 
 /**
@@ -22,7 +23,7 @@ import com.kerchin.yellownote.bean.Note;
 public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
 
     // name of the database file for your application -- change to something appropriate for your app
-    private static final String DATABASE_NAME = "helloAndroid.db";
+    private static final String DATABASE_NAME = "user_" + MyApplication.user + ".db";
     // any time you make changes to your database objects, you may have to increase the database version
     private static final int DATABASE_VERSION = 1;
 
@@ -72,7 +73,7 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
         RuntimeExceptionDao<Note, Integer> daoNote = getNoteDao();
         long millis = System.currentTimeMillis();
         // create some entries in the onCreate
-        Folder simple = new Folder(millis+"", "0", 0);
+        Folder simple = new Folder(millis + "", "0", 0);
         Note simpleNote = new Note("objectId", "title", 0L, "contentCode"
                 , "folder", "folderId", "type");
         dao.create(simple);
@@ -136,6 +137,7 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
         }
         return simpleRuntimeDaoForFolder;
     }
+
     public RuntimeExceptionDao<Note, Integer> getNoteDao() {
         if (simpleRuntimeDaoForNote == null) {
             simpleRuntimeDaoForNote = getRuntimeExceptionDao(Note.class);

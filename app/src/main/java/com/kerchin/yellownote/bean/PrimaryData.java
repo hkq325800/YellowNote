@@ -324,21 +324,26 @@ public class PrimaryData {
      *
      * @param doAfter 接口
      */
-    public static void waitForDataReady(DoAfter doAfter) {
-        while (true) {
-            Trace.d("waitForDataReady");
-            if (status.isNoteReady && status.isFolderReady) {
-                doAfter.justNow();
-                break;
-            } else {
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    break;
+    public static void waitForDataReady(final DoAfter doAfter) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    Trace.d("waitForDataReady");
+                    if (status.isNoteReady && status.isFolderReady) {
+                        doAfter.justNow();
+                        break;
+                    } else {
+                        try {
+                            Thread.sleep(250);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        }
+                    }
                 }
             }
-        }
+        }).start();
     }
 
     /**
@@ -347,11 +352,37 @@ public class PrimaryData {
      * @param doAfter 接口
      * @throws AVException
      */
-    public void refresh(DoAfter doAfter) throws AVException {
+    public void refresh(OrmLiteHelper helper, DoAfter doAfter) {
         Trace.d("refreshPrimaryData");
+        boolean canOffline = MyApplication.getDefaultShared()
+                .getBoolean(Config.KEY_CAN_OFFLINE, true);
         status.clear();
-        getNotesFromCloud();//refresh
-        getFolderFromCloud();//refresh
+        boolean isOffline = false;
+        try {
+//        if (getNoteFromData())
+            getNotesFromCloud();//refresh
+        } catch (AVException e) {
+            e.printStackTrace();
+            PrimaryData.status.restore();
+            isOffline = true;
+            if (canOffline) {
+                Trace.d("offline note");
+                getNoteFromData(helper);
+            }
+        }
+        try {
+//        if (getFolderFromData())
+            getFolderFromCloud();//refresh
+        } catch (AVException e) {
+            e.printStackTrace();
+            isOffline = true;
+            if (canOffline) {
+                Trace.d("offline folder");
+                getFolderFromData(helper);
+            }
+        }
+        if (!isOffline)
+            waitToSaveData(helper);
         waitForDataReady(doAfter);//refresh
     }
 

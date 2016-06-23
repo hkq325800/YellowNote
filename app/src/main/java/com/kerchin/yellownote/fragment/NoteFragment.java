@@ -152,7 +152,7 @@ public class NoteFragment extends BaseFragment
                 case GetDataHelper.handle4error:
                     AVException e = (AVException) msg.obj;
 //                    if (e.getMessage().contains("UnknownHostException"))
-                        Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
+                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
                     break;
                 default:
                     break;
@@ -247,7 +247,7 @@ public class NoteFragment extends BaseFragment
             @Override
             public void run() {
                 mProgress.startProgress(true);//first get
-                MainActivity a = (MainActivity)getActivity();
+                MainActivity a = (MainActivity) getActivity();
                 primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
                     @Override
                     public void justNow() {
@@ -583,25 +583,18 @@ public class NoteFragment extends BaseFragment
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            try {
-                                getDataHelper.refresh();//MainActivity dataGot
-                                //重新获取mHeaders listNote和mItems
-                                FolderFragment.isChanged4folder = true;//emptyClick
-                                primaryData.refresh(new PrimaryData.DoAfter() {//emptyClick
-                                    @Override
-                                    public void justNow() {
-                                        handler.sendEmptyMessage(primaryData.listNote.size() == 0
-                                                ? GetDataHelper.handle4firstGet
-                                                : GetDataHelper.handle4refresh);
-                                    }
-                                });
-//                                primaryData.refresh(handler, primaryData.listNote.size() == 0//emptyClick
-//                                        ? GetDataHelper.handle4firstGet
-//                                        : GetDataHelper.handle4refresh);
-                            } catch (AVException e) {
-                                e.printStackTrace();
-                                PrimaryData.status.restore();
-                            }
+                            getDataHelper.refresh();//MainActivity dataGot
+                            //重新获取mHeaders listNote和mItems
+                            FolderFragment.isChanged4folder = true;//emptyClick
+                            MainActivity a = (MainActivity) getActivity();
+                            primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
+                                @Override
+                                public void justNow() {
+                                    handler.sendEmptyMessage(primaryData.listNote.size() == 0
+                                            ? GetDataHelper.handle4firstGet
+                                            : GetDataHelper.handle4refresh);
+                                }
+                            });
                         }
                     }).start();
                 }
@@ -617,28 +610,27 @@ public class NoteFragment extends BaseFragment
         executorService.execute(new Runnable() {
             @Override
             public void run() {
-                try {
-                    getDataHelper.refresh();//MainActivity dataGot
-                    //重新获取mHeaders listNote和mItems
-                    primaryData.refresh(new PrimaryData.DoAfter() {//onRefresh
-                        @Override
-                        public void justNow() {
-                            handler.sendEmptyMessage(GetDataHelper.handle4refresh);
-                        }
-                    });
-//                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
-                } catch (AVException e) {
-                    e.printStackTrace();
-                    PrimaryData.status.restore();
-                    Message msg = Message.obtain();
-                    msg.obj = e;
-                    msg.what = GetDataHelper.handle4error;
-                    handler.sendMessage(msg);
-                } finally {
-                    isChanged4note = false;//onRefresh
-                    FolderFragment.hasRefresh = true;//onRefresh
-                    FolderFragment.isChanged4folder = true;//onRefresh
-                }
+//                try {
+                getDataHelper.refresh();//MainActivity dataGot
+                //重新获取mHeaders listNote和mItems
+                MainActivity a = (MainActivity) getActivity();
+                primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh
+                    @Override
+                    public void justNow() {
+                        handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                    }
+                });
+//                } catch (AVException e) {
+//                    e.printStackTrace();
+//                    Message msg = Message.obtain();
+//                    msg.obj = e;
+//                    msg.what = GetDataHelper.handle4error;
+//                    handler.sendMessage(msg);
+//                } finally {
+//                    isChanged4note = false;//onRefresh
+//                    FolderFragment.hasRefresh = true;//onRefresh
+//                    FolderFragment.isChanged4folder = true;//onRefresh
+//                }
             }
         });
     }

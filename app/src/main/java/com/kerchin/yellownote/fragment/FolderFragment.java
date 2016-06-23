@@ -301,18 +301,15 @@ public class FolderFragment extends BaseFragment {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        getDataHelper.refresh();//MainActivity dataGot
-                        primaryData.refresh(new PrimaryData.DoAfter() {
-                            @Override
-                            public void justNow() {
-                                handler.sendEmptyMessage(GetDataHelper.handle4refresh);
-                            }
-                        });
-//                        primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
-                    } catch (AVException e) {
-                        e.printStackTrace();
-                    }
+                    getDataHelper.refresh();//MainActivity dataGot
+                    MainActivity a = (MainActivity) getActivity();
+                    primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {
+                        @Override
+                        public void justNow() {
+                            handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                        }
+                    });
+//                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
                 }
             }).start();
         }
@@ -323,7 +320,7 @@ public class FolderFragment extends BaseFragment {
 //            getHeaderListFromFolder();//getData
             getDataHelper.firstGet();//首次加载数据 dataGot
             Trace.d("getData status " + getDataHelper.statusName);
-            MainActivity a = (MainActivity)getActivity();
+            MainActivity a = (MainActivity) getActivity();
             primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
                 @Override
                 public void justNow() {
