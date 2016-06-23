@@ -278,6 +278,7 @@ public class PrimaryData {
                                     simpleDaoForFolder.update(folder);
                             }
                         }
+                        Trace.d("waitToSaveData true");
                         break;
                     } else {
                         try {
@@ -350,9 +351,8 @@ public class PrimaryData {
      * 刷新
      *
      * @param doAfter 接口
-     * @throws AVException
      */
-    public void refresh(OrmLiteHelper helper, DoAfter doAfter) {
+    public void refresh(OrmLiteHelper helper, DoAfter doAfter, DoAfterWithEx doAfterWithEx) {
         Trace.d("refreshPrimaryData");
         boolean canOffline = MyApplication.getDefaultShared()
                 .getBoolean(Config.KEY_CAN_OFFLINE, true);
@@ -364,6 +364,8 @@ public class PrimaryData {
         } catch (AVException e) {
             e.printStackTrace();
             PrimaryData.status.restore();
+            if (doAfterWithEx != null)
+                doAfterWithEx.justNowWithEx(e);
             isOffline = true;
             if (canOffline) {
                 Trace.d("offline note");

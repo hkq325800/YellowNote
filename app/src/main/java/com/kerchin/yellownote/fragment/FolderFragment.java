@@ -24,7 +24,6 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
-import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
@@ -32,7 +31,6 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -308,7 +306,7 @@ public class FolderFragment extends BaseFragment {
                         public void justNow() {
                             handler.sendEmptyMessage(GetDataHelper.handle4refresh);
                         }
-                    });
+                    }, null);
 //                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
                 }
             }).start();

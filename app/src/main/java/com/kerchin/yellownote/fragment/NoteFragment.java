@@ -594,7 +594,7 @@ public class NoteFragment extends BaseFragment
                                             ? GetDataHelper.handle4firstGet
                                             : GetDataHelper.handle4refresh);
                                 }
-                            });
+                            }, null);
                         }
                     }).start();
                 }
@@ -618,14 +618,24 @@ public class NoteFragment extends BaseFragment
                     @Override
                     public void justNow() {
                         handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                        isChanged4note = false;//onRefresh
+                        FolderFragment.hasRefresh = true;//onRefresh
+                        FolderFragment.isChanged4folder = true;//onRefresh
+                    }
+                }, new PrimaryData.DoAfterWithEx() {
+                    @Override
+                    public void justNowWithEx(Exception e) {
+                        Message msg = Message.obtain();
+                        msg.obj = e;
+                        msg.what = GetDataHelper.handle4error;
+                        handler.sendMessage(msg);
+                        isChanged4note = false;//onRefresh
+                        FolderFragment.hasRefresh = true;//onRefresh
+                        FolderFragment.isChanged4folder = true;//onRefresh
                     }
                 });
 //                } catch (AVException e) {
 //                    e.printStackTrace();
-//                    Message msg = Message.obtain();
-//                    msg.obj = e;
-//                    msg.what = GetDataHelper.handle4error;
-//                    handler.sendMessage(msg);
 //                } finally {
 //                    isChanged4note = false;//onRefresh
 //                    FolderFragment.hasRefresh = true;//onRefresh

@@ -448,7 +448,7 @@ public class LoginActivity extends LoginAbstract {
                                             @Override
                                             public void run() {
                                                 dismissProgress();
-                                                mLoginPassEdt.setText("");
+//                                                mLoginPassEdt.setText("");
                                             }
                                         });
                                         Trace.show(LoginActivity.this, "密码错误,请重试");
@@ -612,7 +612,8 @@ public class LoginActivity extends LoginAbstract {
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
-            if (PrimaryData.status.isFolderReady
+            if (PrimaryData.status != null
+                    && PrimaryData.status.isFolderReady
                     && PrimaryData.status.isItemReady
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
@@ -632,8 +633,8 @@ public class LoginActivity extends LoginAbstract {
         }
     };
 
-    private void dismissProgress(){
-        if(mSVProgressHUD.isShowing())
+    private void dismissProgress() {
+        if (mSVProgressHUD.isShowing())
             mSVProgressHUD.dismiss();
     }
 
