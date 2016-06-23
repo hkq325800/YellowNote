@@ -35,10 +35,12 @@ import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.base.MyOrmLiteHasSwipeBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
@@ -58,7 +60,7 @@ import butterknife.OnClick;
 /**
  * Created by Kerchin on 2015/9/30 0030.
  */
-public class EditActivity extends BaseHasSwipeActivity {
+public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     @BindView(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
     @BindView(R.id.mEditNavLinear)
@@ -291,7 +293,7 @@ public class EditActivity extends BaseHasSwipeActivity {
         if (savedInstanceState != null) {
             Trace.d("EditActivity initDataFromBundle");
             //恢复primaryData
-            PrimaryData.getInstance(new PrimaryData.DoAfter() {
+            PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfter() {
                 @Override
                 public void justNow() {
                     handler.sendEmptyMessage(handle4reGet);

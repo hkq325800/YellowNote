@@ -24,11 +24,12 @@ import android.view.inputmethod.InputMethodManager;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
-import com.kerchin.yellownote.base.BaseActivity;
+import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -41,7 +42,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity
+public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         implements NavigationView.OnNavigationItemSelectedListener {
     @BindView(R.id.mMainPager)
     ViewPager mMainPager;
@@ -331,6 +332,7 @@ public class MainActivity extends BaseActivity
         } else if (id == R.id.nav_folder) {
             mMainPager.setCurrentItem(1);
         } else if (id == R.id.nav_logout) {
+            //切换本地数据库
             MyApplication.logout();
             Intent intent = new Intent();
             intent.setClass(this, LoginActivity.class);

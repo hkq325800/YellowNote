@@ -77,34 +77,23 @@ public class LoginActivity extends LoginAbstract {
     private Handler handler = new Handler();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(savedInstanceState);
-        //initTitleView();
-        //onTitleClick();
-        initializeView(savedInstanceState);
-        initializeData(savedInstanceState);
-        initializeEvent(savedInstanceState);
-    }
-
-//    @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
         NormalUtils.immerge(LoginActivity.this, R.color.lightSkyBlue);
     }
 
-//    @Override
+    @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mSVProgressHUD = new SVProgressHUD(this);
     }
 
-//    @Override
+    @Override
     protected void initializeData(Bundle savedInstanceState) {
 
     }
 
-//    @Override
+    @Override
     protected void initializeEvent(Bundle savedInstanceState) {
         if (!MyApplication.user.equals("")) {
             mLoginUserEdt.setText(MyApplication.user);

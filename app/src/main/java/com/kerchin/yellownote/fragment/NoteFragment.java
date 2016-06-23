@@ -151,9 +151,8 @@ public class NoteFragment extends BaseFragment
                     break;
                 case GetDataHelper.handle4error:
                     AVException e = (AVException) msg.obj;
-                    if (e.getMessage().contains("UnknownHostException")) {
-                        Trace.show(getActivity().getApplicationContext(), "网络不太通畅 请稍后再试");
-                    }
+//                    if (e.getMessage().contains("UnknownHostException"))
+                        Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
                     break;
                 default:
                     break;
@@ -248,7 +247,8 @@ public class NoteFragment extends BaseFragment
             @Override
             public void run() {
                 mProgress.startProgress(true);//first get
-                primaryData = PrimaryData.getInstance(new PrimaryData.DoAfter() {
+                MainActivity a = (MainActivity)getActivity();
+                primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
                     @Override
                     public void justNow() {
                         getDataHelper.firstGet();//first get
@@ -600,6 +600,7 @@ public class NoteFragment extends BaseFragment
 //                                        : GetDataHelper.handle4refresh);
                             } catch (AVException e) {
                                 e.printStackTrace();
+                                PrimaryData.status.restore();
                             }
                         }
                     }).start();
@@ -628,6 +629,7 @@ public class NoteFragment extends BaseFragment
 //                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//onRefresh
                 } catch (AVException e) {
                     e.printStackTrace();
+                    PrimaryData.status.restore();
                     Message msg = Message.obtain();
                     msg.obj = e;
                     msg.what = GetDataHelper.handle4error;

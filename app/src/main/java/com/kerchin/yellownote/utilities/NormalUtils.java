@@ -117,7 +117,6 @@ public class NormalUtils {
     }
     /**
      * 跳转activity
-     * @deprecated
      * @param context  上下文
      * @param activity 目标activity
      */

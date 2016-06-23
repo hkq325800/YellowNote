@@ -13,10 +13,11 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseActivity;
+import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
@@ -25,7 +26,7 @@ import com.kerchin.yellownote.utilities.Trace;
 /**
  * Created by Kerchin on 2016/4/3 0003.
  */
-public class LaunchActivity extends BaseActivity {
+public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private final static int delayTime = 1500;
     private final static int delayTimeToMain = 1200;
     private final static long runnableTimeout = 8000;
@@ -82,18 +83,20 @@ public class LaunchActivity extends BaseActivity {
                     Trace.d("PrimaryData" + Thread.currentThread().getId());
                     getDataStart = System.currentTimeMillis();
                     //一般而言登陆过的用户都有数据本地缓存
-                    PrimaryData.getInstance(null, new PrimaryData.DoAfterWithEx() {
+                    PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
                         @Override
                         public void justNowWithEx(Exception e) {
-                            isNeedToRefresh = true;
-                            //TODO 在完善了本地存储后可以取消 因为那时必定有数据
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mWelcomeTxt.setText("请检查网络后点击屏幕重试");
-                                }
-                            });
-                            Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                            if (!MyApplication.getDefaultShared().getBoolean(Config.KEY_CAN_OFFLINE, true)) {
+                                isNeedToRefresh = true;
+                                //TODO 在完善了本地存储后可以取消 因为那时必定有数据
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mWelcomeTxt.setText("请检查网络后点击屏幕重试");
+                                    }
+                                });
+                                Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                            }
                         }
                     });//isNeedToRefresh
                 }
@@ -224,8 +227,8 @@ public class LaunchActivity extends BaseActivity {
                                 message.what = reLogForFrozen;
                                 handler.sendMessageDelayed(message, delayTime);
                             } else {
-                                //保存默认笔记夹id
-                                MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
+                                //保存默认笔记夹id 弃用 应该统一在login获取
+//                                MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转
@@ -240,11 +243,11 @@ public class LaunchActivity extends BaseActivity {
                         e.printStackTrace();
                         //无网络时如果已经有缓存登录，还是允许进入查看离线消息
                         //TODO 在完善本地化后取消注释
-//                        if (MyApplication.isLogin()) {
-//                            cycleTarget = Message.obtain();//直接进入
-//                            cycleTarget.what = next;
-//                            handler.post(runnableForData);//无网络时
-//                        }
+                        if (MyApplication.isLogin()) {
+                            cycleTarget = Message.obtain();//直接进入
+                            cycleTarget.what = next;
+                            handler.post(runnableForData);//无网络时
+                        }
                     }
                 }
             }).start();

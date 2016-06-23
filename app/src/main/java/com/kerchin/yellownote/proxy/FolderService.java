@@ -50,35 +50,4 @@ public class FolderService {
         folder.save();
         return folder.getObjectId();
     }
-    /**
-     * @deprecated 1
-     * @param objectId id
-     * @param amount 数量
-     * @throws AVException
-     */
-    public static void add(String objectId, final int amount) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<>("Folder");
-        AVObject folder = query.get(objectId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num + amount);
-            folder.save();
-        }
-    }
-
-    /**
-     * @deprecated 2
-     * @param objectId id
-     * @param amount 数量
-     * @throws AVException
-     */
-    public static synchronized void dec(String objectId, final int amount) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<>("Folder");
-        AVObject folder = query.get(objectId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num - amount);
-            folder.save();
-        }
-    }
 }

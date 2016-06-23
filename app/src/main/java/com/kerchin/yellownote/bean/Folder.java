@@ -25,12 +25,12 @@ import java.util.List;
  */
 //@Table("folder")
 public class Folder implements Serializable {
-//    public static final String COL_ID = "_id";
+    //    public static final String COL_ID = "_id";
     public static final String COL_OBJECTID = "_objectId";
     public static final String COL_NAME = "_name";
     public static final String COL_CONTAIN = "_contain";
 
-//    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
+    //    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
 //    @Column(COL_ID)
 //    long id;
 //    @PrimaryKey(AssignType.BY_MYSELF)//加了为null
@@ -42,7 +42,7 @@ public class Folder implements Serializable {
 //    @Column(COL_NAME)
     @DatabaseField
     String name;
-//    @Default("0")
+    //    @Default("0")
 //    @Column(COL_CONTAIN)
     @DatabaseField
     int contain;
@@ -99,33 +99,30 @@ public class Folder implements Serializable {
 
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {
-        if (!PrimaryData.getInstance().hasTheSameName(newName)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        FolderService.reName(objectId, newName);
-                        Trace.d("reNameFolder 成功");
-                        //线下修改
-                        name = newName;
-                        Trace.show(context, "更名成功");
-                        //将所有folder下的note移至新folder下 线上修改
-                        if (contain != 0) {
-                            List<Note> list = PrimaryData.getInstance().getNoteListInFolder(objectId);
-                            for (Note note : list) {
-                                note.move2folder(context, newName, objectId);
-                            }
-                            NoteFragment.isChanged4note = true;//reName
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    FolderService.reName(objectId, newName);
+                    Trace.d("reNameFolder 成功");
+                    //线下修改
+                    name = newName;
+                    Trace.show(context, "更名成功");
+                    //将所有folder下的note移至新folder下 线上修改
+                    if (contain != 0) {
+                        List<Note> list = PrimaryData.getInstance().getNoteListInFolder(objectId);
+                        for (Note note : list) {
+                            note.move2folder(context, newName, objectId);
                         }
-                        handler.sendEmptyMessage(handle4respond);
-                    } catch (AVException e) {
-                        Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
-                        e.printStackTrace();
+                        NoteFragment.isChanged4note = true;//reName
                     }
+                    handler.sendEmptyMessage(handle4respond);
+                } catch (AVException e) {
+                    Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
+                    e.printStackTrace();
                 }
-            }).start();
-
-        }
+            }
+        }).start();
     }
 
     public void delete(final Activity context, final int position, final SystemHandler handler, final byte handle4respond) {

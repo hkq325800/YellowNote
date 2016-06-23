@@ -28,7 +28,7 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
 
     // the DAO object we use to access the SimpleData table
 //    private Dao<SimpleData, Integer> simpleDao = null;
-    private Dao<Folder, Integer> simpleDao = null;
+//    private Dao<Folder, Integer> simpleDao = null;
 //    private RuntimeExceptionDao<SimpleData, Integer> simpleRuntimeDao = null;
     private RuntimeExceptionDao<Folder, Integer> simpleRuntimeDaoForFolder = null;
     private RuntimeExceptionDao<Note, Integer> simpleRuntimeDaoForNote = null;
@@ -66,6 +66,7 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
 //        simple = new SimpleData(millis + 1);
 //        dao.create(simple);
 //        Log.i(OrmLiteHelper.class.getName(), "created new entries in onCreate: " + millis);
+
         // here we try inserting data in the on-create as a test
         RuntimeExceptionDao<Folder, Integer> dao = getFolderDao();
         RuntimeExceptionDao<Note, Integer> daoNote = getNoteDao();
@@ -76,6 +77,8 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
                 , "folder", "folderId", "type");
         dao.create(simple);
         daoNote.create(simpleNote);
+        dao.delete(simple);
+        daoNote.delete(simpleNote);
         Log.i(OrmLiteHelper.class.getName(), "created new entries in onCreate: " + millis);
     }
 
@@ -106,16 +109,16 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
      * Returns the Database Access Object (DAO) for our SimpleData class. It will create it or just give the cached
      * value.
      */
-    public Dao<Folder, Integer> getDao() throws SQLException {
-        if (simpleDao == null) {
-            try {
-                simpleDao = getDao(Folder.class);
-            } catch (java.sql.SQLException e) {
-                e.printStackTrace();
-            }
-        }
-        return simpleDao;
-    }
+//    public Dao<Folder, Integer> getDao() throws SQLException {
+//        if (simpleDao == null) {
+//            try {
+//                simpleDao = getDao(Folder.class);
+//            } catch (java.sql.SQLException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        return simpleDao;
+//    }
 
     /**
      * Returns the RuntimeExceptionDao (Database Access Object) version of a Dao for our SimpleData class. It will
@@ -146,7 +149,7 @@ public class OrmLiteHelper extends OrmLiteSqliteOpenHelper {
     @Override
     public void close() {
         super.close();
-        simpleDao = null;
+//        simpleDao = null;
 //        simpleRuntimeDao = null;
         simpleRuntimeDaoForFolder = null;
         simpleRuntimeDaoForNote = null;

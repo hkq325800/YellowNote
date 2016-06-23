@@ -77,34 +77,4 @@ public class NoteService {
             note.save();
         }
     }
-
-    /**
-     * @deprecated 1
-     * @param folderId 笔记夹id
-     * @throws AVException
-     */
-    public static void saveFolderNumDec(String folderId) throws AVException {
-        AVQuery<AVObject> query = new AVQuery<>("Folder");
-        AVObject folder = query.get(folderId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num - 1);
-            folder.save();
-        }
-    }
-
-    /**
-     * @deprecated 2
-     * @param folderId 笔记夹id
-     * @throws AVException
-     */
-    public static void saveFolderNumAdd(String folderId) throws AVException {
-        AVQuery<AVObject> query2 = new AVQuery<>("Folder");
-        AVObject folder = query2.get(folderId);
-        if (folder != null) {
-            int num = folder.getInt("folder_contain");
-            folder.put("folder_contain", num + 1);
-            folder.save();
-        }
-    }
 }

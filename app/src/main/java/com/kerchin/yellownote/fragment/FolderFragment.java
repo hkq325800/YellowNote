@@ -24,6 +24,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.BaseFragment;
+import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
@@ -31,6 +32,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -321,7 +323,8 @@ public class FolderFragment extends BaseFragment {
 //            getHeaderListFromFolder();//getData
             getDataHelper.firstGet();//首次加载数据 dataGot
             Trace.d("getData status " + getDataHelper.statusName);
-            primaryData = PrimaryData.getInstance(new PrimaryData.DoAfter() {
+            MainActivity a = (MainActivity)getActivity();
+            primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
                 @Override
                 public void justNow() {
                     handler.sendEmptyMessage(
@@ -449,13 +452,17 @@ public class FolderFragment extends BaseFragment {
                 } else if (mEditEdt.getText().toString().equals("默认")) {
                     Trace.show(getActivity(), "不要与默认笔记夹重名");
                 } else {
-                    getDataHelper.respond();//reTitleFolderDialogShow->folder.reName
-                    folder.reName(getActivity()
-                            , mEditEdt.getText().toString()
-                            , handler, GetDataHelper.handle4respond);
-                    alertDialog.dismiss();
-                    MainActivity mainActivity = (MainActivity) getActivity();
-                    mainActivity.showBtnAdd();
+                    if (primaryData.hasTheSameFolder(mEditEdt.getText().toString())) {
+                        Trace.show(getActivity(), "已存在相同名称的笔记夹");
+                    } else {
+                        getDataHelper.respond();//reTitleFolderDialogShow->folder.reName
+                        folder.reName(getActivity()
+                                , mEditEdt.getText().toString()
+                                , handler, GetDataHelper.handle4respond);
+                        alertDialog.dismiss();
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        mainActivity.showBtnAdd();
+                    }
                 }
             }
         });
