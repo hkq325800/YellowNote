@@ -565,7 +565,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     }
 
     @OnClick(R.id.mNavigationRightBtn)
-    public void saveChanges() {
+    public void saveChangesClick() {
         if (mEditContentEdt.getText().toString().trim().equals("")
                 || mNavigationTitleEdt.getText().toString().equals("")) {
             Trace.show(getApplicationContext(), "请输入标题和内容");
@@ -793,7 +793,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     }
 
     private void saveDifference(boolean isLast) {
-        mNote.saveChange(EditActivity.this
+        mNote.saveChange(EditActivity.this, getHelper()
                 , mNavigationTitleEdt.getText().toString()
                 , mEditContentEdt.getText().toString()
                 , handler, isLast ? handle4last : handle4saveChange);
@@ -816,7 +816,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 userConfirm = true;
-                saveChanges();
+                saveChangesClick();
             }
         });
         ad.show();

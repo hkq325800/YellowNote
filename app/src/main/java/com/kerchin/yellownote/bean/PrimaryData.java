@@ -105,7 +105,7 @@ public class PrimaryData {
      *
      * @param doAfter 接口
      */
-    public void initData(OrmLiteHelper helper, DoAfter doAfter) {
+    private void initData(OrmLiteHelper helper, DoAfter doAfter) {
         boolean canOffline = MyApplication.getDefaultShared()
                 .getBoolean(Config.KEY_CAN_OFFLINE, true);
         Trace.d("loadData");
@@ -200,7 +200,7 @@ public class PrimaryData {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                initData(helper, doAfterWithEx);//在首次手动调用 为了catch
+                initData(helper, null, doAfterWithEx);//在首次手动调用 为了catch
             }
         }).start();
     }
@@ -210,7 +210,7 @@ public class PrimaryData {
      *
      * @param helper ormLite帮助类
      */
-    private void initData(OrmLiteHelper helper, final DoAfterWithEx doAfterWithEx) {
+    public void initData(OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
         boolean canOffline = MyApplication.getDefaultShared()
                 .getBoolean(Config.KEY_CAN_OFFLINE, true);
         Trace.d("loadData");
@@ -222,12 +222,14 @@ public class PrimaryData {
             getNotesFromCloud();//initData
         } catch (AVException e) {
             e.printStackTrace();
+            PrimaryData.status.restore();
             isOffline = true;
             if (canOffline) {
                 Trace.d("offline note");
                 getNoteFromData(helper);
             }
-            doAfterWithEx.justNowWithEx(e);
+            if (doAfterWithEx != null)
+                doAfterWithEx.justNowWithEx(e);
         }
         try {
 //        if (getFolderFromData())
@@ -239,24 +241,25 @@ public class PrimaryData {
                 Trace.d("offline folder");
                 getFolderFromData(helper);
             }
-            doAfterWithEx.justNowWithEx(e);
+//            if (doAfterWithEx != null)
+//                doAfterWithEx.justNowWithEx(e);
         }
         if (!isOffline)
-            waitToSaveData(helper);
-        waitForFlag();
+            waitToSaveData(helper, doAfter);//initData login
+        //waitForFlag();
     }
 
     /**
-     * @param helper ormLite帮助类
+     * @param helper  ormLite帮助类
+     * @param doAfter
      */
-    private void waitToSaveData(final OrmLiteHelper helper) {
+    private void waitToSaveData(final OrmLiteHelper helper, final DoAfter doAfter) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while (true) {
-                    Trace.d("waitForFlag");
+                    Trace.d("waitToSaveData");
                     if (status.isNoteReady && status.isFolderReady) {
-                        //TODO
                         RuntimeExceptionDao<Note, Integer> simpleDaoForNote = null;
                         RuntimeExceptionDao<Folder, Integer> simpleDaoForFolder = null;
                         if (helper != null) {
@@ -265,11 +268,19 @@ public class PrimaryData {
                         }
                         if (simpleDaoForNote != null
                                 && simpleDaoForFolder != null) {
+                            int i = 0;
                             for (Note note : listNote) {
-                                if (simpleDaoForNote.queryForSameId(note) == null)
+                                //TODO 如果hasEdited为true则不覆盖数据库
+                                Note localNote = simpleDaoForNote.queryForSameId(note);
+                                if (localNote == null)
                                     simpleDaoForNote.create(note);
-                                else
+                                else if (!localNote.isHasEdited())
                                     simpleDaoForNote.update(note);
+                                else {
+                                    listNote.set(i, localNote);
+                                    Trace.d("note" + localNote.getTitle() + "hasEdited");
+                                }
+                                i++;
                             }
                             for (Folder folder : listFolder) {
                                 if (simpleDaoForFolder.queryForSameId(folder) == null)
@@ -279,6 +290,10 @@ public class PrimaryData {
                             }
                         }
                         Trace.d("waitToSaveData true");
+                        if (doAfter == null)
+                            getSimpleEntityFromList(MyApplication.userDefaultFolderId);
+                        else
+                            doAfter.justNow();
                         break;
                     } else {
                         try {
@@ -294,7 +309,7 @@ public class PrimaryData {
     }
 
     /**
-     * 等待数据加载完成
+     * 等待数据加载完成以配置mItems
      */
     private void waitForFlag() {
         new Thread(new Runnable() {
@@ -321,7 +336,7 @@ public class PrimaryData {
     /*launch login for data get*/
 
     /**
-     * 等待数据获取完成进行下步操作
+     * 等待数据获取完成进行下步doAfter操作
      *
      * @param doAfter 接口
      */
@@ -345,47 +360,6 @@ public class PrimaryData {
                 }
             }
         }).start();
-    }
-
-    /**
-     * 刷新
-     *
-     * @param doAfter 接口
-     */
-    public void refresh(OrmLiteHelper helper, DoAfter doAfter, DoAfterWithEx doAfterWithEx) {
-        Trace.d("refreshPrimaryData");
-        boolean canOffline = MyApplication.getDefaultShared()
-                .getBoolean(Config.KEY_CAN_OFFLINE, true);
-        status.clear();
-        boolean isOffline = false;
-        try {
-//        if (getNoteFromData())
-            getNotesFromCloud();//refresh
-        } catch (AVException e) {
-            e.printStackTrace();
-            PrimaryData.status.restore();
-            if (doAfterWithEx != null)
-                doAfterWithEx.justNowWithEx(e);
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline note");
-                getNoteFromData(helper);
-            }
-        }
-        try {
-//        if (getFolderFromData())
-            getFolderFromCloud();//refresh
-        } catch (AVException e) {
-            e.printStackTrace();
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline folder");
-                getFolderFromData(helper);
-            }
-        }
-        if (!isOffline)
-            waitToSaveData(helper);
-        waitForDataReady(doAfter);//refresh
     }
 
     /**
@@ -464,7 +438,7 @@ public class PrimaryData {
     /**
      * 将listNote中信息提炼到mItems中
      */
-    public void getItemsReady() {
+    private void getItemsReady() {
         for (int i = 0; i < listNote.size(); i++) {
             mItems.add(new SimpleEntity(listNote.get(i).getObjectId(), i, i
                     , listNote.get(i).getTitle()
@@ -477,7 +451,7 @@ public class PrimaryData {
     /**
      * 将listFolder中信息提炼到mItems中
      */
-    public void getHeadersReady() {
+    private void getHeadersReady() {
         int sum = 0;
         for (int i = 0; i < listFolder.size(); i++) {
             mItems.add(new SimpleEntity(i, i + sum

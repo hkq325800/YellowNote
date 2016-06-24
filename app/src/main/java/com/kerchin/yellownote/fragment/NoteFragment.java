@@ -587,7 +587,7 @@ public class NoteFragment extends BaseFragment
                             //重新获取mHeaders listNote和mItems
                             FolderFragment.isChanged4folder = true;//emptyClick
                             MainActivity a = (MainActivity) getActivity();
-                            primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
+                            primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
                                 @Override
                                 public void justNow() {
                                     handler.sendEmptyMessage(primaryData.listNote.size() == 0
@@ -614,7 +614,7 @@ public class NoteFragment extends BaseFragment
                 getDataHelper.refresh();//MainActivity dataGot
                 //重新获取mHeaders listNote和mItems
                 MainActivity a = (MainActivity) getActivity();
-                primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh
+                primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh
                     @Override
                     public void justNow() {
                         handler.sendEmptyMessage(GetDataHelper.handle4refresh);

@@ -301,7 +301,7 @@ public class FolderFragment extends BaseFragment {
                 public void run() {
                     getDataHelper.refresh();//MainActivity dataGot
                     MainActivity a = (MainActivity) getActivity();
-                    primaryData.refresh(a.getHelper(), new PrimaryData.DoAfter() {
+                    primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {
                         @Override
                         public void justNow() {
                             handler.sendEmptyMessage(GetDataHelper.handle4refresh);

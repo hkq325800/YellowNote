@@ -7,10 +7,12 @@ import android.support.v4.app.FragmentActivity;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -63,6 +65,9 @@ public class Note implements Serializable {
 //    @NotNull
     @DatabaseField(canBeNull = false)
     private String type;
+
+    @DatabaseField
+    private boolean hasEdited;
     //    @Ignore
     private SimpleDateFormat myFmt;
 
@@ -95,6 +100,7 @@ public class Note implements Serializable {
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
         myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
+        hasEdited = false;
         this.objectId = objectId;
         this.title = title;
         this.date = new Date(date);
@@ -114,6 +120,14 @@ public class Note implements Serializable {
                 + "folderId" + folderId + "type" + type;
     }
 
+    public boolean isHasEdited() {
+        return hasEdited;
+    }
+
+    public void setHasEdited(boolean hasEdited) {
+        this.hasEdited = hasEdited;
+    }
+
     public void setObjectId(String objectId) {
         this.objectId = objectId;
     }
@@ -130,11 +144,17 @@ public class Note implements Serializable {
         this.content = content;
     }
 
-    public void setPreview() {
+    public void setPreview(String preview) {
+        this.preview = preview;
+    }
+
+    public void setPreview(boolean isOffline) {
         if (content.length() > 70)
             preview = content.substring(0, 70).replace("\n", " ");
         else
             preview = content.replace("\n", " ");
+        if (isOffline)
+            preview = "[离线保存]" + preview;
     }
 
     public void setFolder(String folder) {
@@ -198,13 +218,16 @@ public class Note implements Serializable {
     }
 
     //保存更改
-    public void saveChange(final Activity context, final String newTitle, final String newContent
+    public void saveChange(final Activity context, final OrmLiteHelper helper
+            , final String newTitle, final String newContent
             , final Handler handler, final byte handle4saveChange) {
         //use PatternUtils.patternToSha1String(str) to save
+        final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")) {//新增
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    boolean isOffline = false;
                     try {
                         AVObject newNote = NoteService.addNewNote(
                                 MyApplication.user, newTitle
@@ -220,7 +243,7 @@ public class Note implements Serializable {
                         msg.obj = false;
                         msg.what = handle4saveChange;
                         handler.sendMessage(msg);
-                        Trace.show(context, "保存更改失败" + Trace.getErrorMsg(e));
+                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         e.printStackTrace();
                         return;//终止下一步
                     }
@@ -232,7 +255,10 @@ public class Note implements Serializable {
                     title = newTitle;
                     content = newContent;
                     date = new Date();
-                    setPreview();
+                    setPreview(isOffline);
+                    if (simpleDaoForNote != null) {
+                        simpleDaoForNote.create(Note.this);
+                    }
                     Trace.d("saveFolderNum+1 成功");
                     msg.obj = true;
                     handler.sendMessage(msg);
@@ -244,23 +270,38 @@ public class Note implements Serializable {
                 public void run() {
                     Message msg = Message.obtain();
                     msg.what = handle4saveChange;
+                    boolean isOffline = false;
                     try {
                         NoteService.saveEdit(objectId, newTitle
                                 , NormalUtils.stringToSha1String(newContent));
-                        title = newTitle;
-                        content = newContent;
-                        date = new Date();
-                        setPreview();
-                        NoteFragment.isChanged4note = true;//saveChange
                         Trace.d("saveModifyNote 成功");
-                        FolderFragment.isChanged4folder = true;//saveChange edit
                         msg.obj = true;
                         handler.sendMessage(msg);
                     } catch (AVException e) {
                         msg.obj = false;
                         handler.sendMessage(msg);
-                        Trace.show(context, "保存更改失败" + Trace.getErrorMsg(e));
+                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         e.printStackTrace();
+                        isOffline = true;
+                    }
+                    title = newTitle;
+                    content = newContent;
+                    date = new Date();
+                    setPreview(isOffline);
+                    NoteFragment.isChanged4note = true;//saveChange
+                    FolderFragment.isChanged4folder = true;//saveChange edit
+                    if (simpleDaoForNote != null) {
+                        Note localNote = simpleDaoForNote.queryForSameId(Note.this);
+                        if (localNote != null) {
+                            Trace.d("save in localNote");
+                            if (isOffline)
+                                localNote.setHasEdited(true);
+                            localNote.setTitle(newTitle);
+                            localNote.setContent(newContent);
+                            localNote.setDate(date);
+                            localNote.setPreview(preview);
+                            simpleDaoForNote.update(localNote);
+                        }
                     }
                 }
             }).start();
