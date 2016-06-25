@@ -8,7 +8,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
@@ -34,7 +33,6 @@ import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.base.MyOrmLiteHasSwipeBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
@@ -571,7 +569,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             Trace.show(getApplicationContext(), "请输入标题和内容");
         } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
-                || isFolderChanged) {
+                || isFolderChanged
+                || mNote.isHasEdited()) {
             mNavigationRightBtn.setText("保存中..");
             closeSliding();
             mNavigationRightBtn.setEnabled(false);
