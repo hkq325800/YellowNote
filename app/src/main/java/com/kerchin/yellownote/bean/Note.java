@@ -17,16 +17,9 @@ import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
-import com.litesuits.orm.db.annotation.Column;
-import com.litesuits.orm.db.annotation.Ignore;
-import com.litesuits.orm.db.annotation.NotNull;
-import com.litesuits.orm.db.annotation.PrimaryKey;
-import com.litesuits.orm.db.enums.AssignType;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 
 /**
@@ -68,8 +61,10 @@ public class Note implements Serializable {
 
     @DatabaseField
     private boolean hasEdited;
+
+    @DatabaseField
+    private boolean isOfflineAdd;
     //    @Ignore
-    private SimpleDateFormat myFmt;
 
     Note() {
         // needed by ormlite
@@ -80,7 +75,6 @@ public class Note implements Serializable {
      */
     public Note(String objectId, String title, Date date, String contentCode
             , String folder, String folderId, String type) {
-        myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         this.objectId = objectId;
         this.title = title;
         this.date = date;
@@ -99,7 +93,6 @@ public class Note implements Serializable {
      */
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
-        myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         hasEdited = false;
         this.objectId = objectId;
         this.title = title;
@@ -126,6 +119,14 @@ public class Note implements Serializable {
 
     public void setHasEdited(boolean hasEdited) {
         this.hasEdited = hasEdited;
+    }
+
+    public boolean isOfflineAdd() {
+        return isOfflineAdd;
+    }
+
+    public void setIsOfflineAdd(boolean isOfflineAdd) {
+        this.isOfflineAdd = isOfflineAdd;
     }
 
     public void setObjectId(String objectId) {
@@ -169,20 +170,12 @@ public class Note implements Serializable {
         this.type = type;
     }
 
-    public void setMyFmt(SimpleDateFormat myFmt) {
-        this.myFmt = myFmt;
-    }
-
     public String getType() {
         return type;
     }
 
     public String getTitle() {
         return title;
-    }
-
-    public SimpleDateFormat getMyFmt() {
-        return myFmt;
     }
 
     public Date getDate() {
@@ -194,7 +187,7 @@ public class Note implements Serializable {
     }
 
     public String getTrueDate() {
-        return myFmt.format(date);
+        return NormalUtils.getTrueDate(date);
     }
 
     public String getPreview() {
@@ -223,7 +216,8 @@ public class Note implements Serializable {
             , final Handler handler, final byte handle4saveChange) {
         //use PatternUtils.patternToSha1String(str) to save
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
-        if (objectId.equals("")) {//新增
+        if (objectId.equals("")
+                || objectId.contains(MyApplication.user)) {//新增
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -233,34 +227,43 @@ public class Note implements Serializable {
                                 MyApplication.user, newTitle
                                 , NormalUtils.stringToSha1String(newContent), folder, folderId);
                         //取回objectId
-                        if (newNote != null) {
-                            objectId = newNote.getObjectId();
-                            Trace.d("saveNewNote 成功");
-                            FolderFragment.isChanged4folder = true;//saveChange add
-                        }
+                        objectId = newNote.getObjectId();
                     } catch (AVException e) {
-                        Message msg = Message.obtain();
-                        msg.obj = false;
-                        msg.what = handle4saveChange;
-                        handler.sendMessage(msg);
-                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
+                        isOffline = true;
+//                        Message msg = Message.obtain();
+//                        msg.obj = false;
+//                        msg.what = handle4saveChange;
+//                        handler.sendMessage(msg);
+//                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         e.printStackTrace();
-                        return;//终止下一步
+//                        return;//终止下一步
                     }
-                    Message msg = Message.obtain();
-                    msg.what = handle4saveChange;
                     //folderNum+1
                     PrimaryData.getInstance().getFolder(folderId).addInList();
+                    FolderFragment.isChanged4folder = true;//saveChange add
                     NoteFragment.isChanged4note = true;//saveChange
                     title = newTitle;
                     content = newContent;
                     date = new Date();
                     setPreview(isOffline);
+                    if (isOffline) {
+                        objectId = MyApplication.user + "_" + date.getTime();
+                    }
+                    Trace.d(isOffline ? "saveNewNote 离线" + objectId : "saveNewNote 成功" + objectId);
                     if (simpleDaoForNote != null) {
-                        simpleDaoForNote.create(Note.this);
+                        if (isOfflineAdd) {
+                            isOfflineAdd = isOffline;
+                            simpleDaoForNote.create(Note.this);
+                        }
+                        else {
+                            isOfflineAdd = isOffline;
+                            simpleDaoForNote.update(Note.this);
+                        }
                     }
                     Trace.d("saveFolderNum+1 成功");
-                    msg.obj = true;
+                    Message msg = Message.obtain();
+                    msg.what = handle4saveChange;
+                    msg.obj = isOffline;
                     handler.sendMessage(msg);
                 }
             }).start();
@@ -294,8 +297,8 @@ public class Note implements Serializable {
                         Note localNote = simpleDaoForNote.queryForSameId(Note.this);
                         if (localNote != null) {
                             Trace.d("save in localNote");
-                            if (isOffline)
-                                localNote.setHasEdited(true);
+                            localNote.setHasEdited(isOffline);
+                            localNote.setIsOfflineAdd(isOffline);
                             localNote.setTitle(newTitle);
                             localNote.setContent(newContent);
                             localNote.setDate(date);
@@ -309,53 +312,81 @@ public class Note implements Serializable {
     }
 
     //主界面的删除
-    public void delete(final FragmentActivity context, final SystemHandler handler, final Message handle4explosion) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    NoteService.delete(objectId);
-                    Trace.d("deleteNote 成功");
-                    FolderFragment.isChanged4folder = true;//delete Main
-                    handler.sendMessage(handle4explosion);
-                } catch (AVException e) {
-                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
+    public void delete(final FragmentActivity context, final OrmLiteHelper helper
+            , final SystemHandler handler, final Message handle4explosion) {
+        if (isOfflineAdd) {
+            helper.getNoteDao().delete(Note.this);
+            Trace.d("deleteNote 成功");
+            FolderFragment.isChanged4folder = true;//delete Main
+            handler.sendMessage(handle4explosion);
+        } else
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        NoteService.delete(objectId);
+                        helper.getNoteDao().delete(Note.this);
+                        Trace.d("deleteNote 成功");
+                        FolderFragment.isChanged4folder = true;//delete Main
+                        handler.sendMessage(handle4explosion);
+                    } catch (AVException e) {
+                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                        e.printStackTrace();
+                    }
                 }
-            }
-        }).start();
+            }).start();
     }
 
     //编辑界面的删除
-    public void delete(final Activity context, final Handler handler, final byte handle4finish
+    public void delete(final Activity context, final OrmLiteHelper helper, final Handler handler, final byte handle4finish
             , final String folderId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    PrimaryData primaryData = PrimaryData.getInstance();
-                    NoteService.delete(objectId);//笔记网络删除
-                    Folder folder = primaryData.getFolder(folderId);
-                    if (folder != null) {
-                        FolderFragment.isChanged4folder = true;//edit delete
-                        folder.setContain(folder.getContain() - 1);
-                        Trace.d("saveFolderNum-" + 1 + "成功");
+        if (isOfflineAdd) {
+            PrimaryData primaryData = PrimaryData.getInstance();
+            helper.getNoteDao().delete(Note.this);
+            Folder folder = primaryData.getFolder(folderId);
+            if (folder != null) {
+                FolderFragment.isChanged4folder = true;//edit delete
+                folder.setContain(folder.getContain() - 1);
+                Trace.d("saveFolderNum-" + 1 + "成功");
 //                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
-                    }
-                    primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
-                    Trace.show(context, "删除成功");
-                    Trace.d("deleteNote 成功");
-                    NoteFragment.isChanged4note = true;//delete edit
-                    FolderFragment.isChanged4folder = true;//delete edit
-                    if (handler != null) {
-                        handler.sendEmptyMessage(handle4finish);
-                    }
-                } catch (AVException e) {
-                    Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
-                    e.printStackTrace();
-                }
             }
-        }).start();
+            primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
+            Trace.show(context, "删除成功");
+            Trace.d("deleteNote 成功");
+            NoteFragment.isChanged4note = true;//delete edit
+            FolderFragment.isChanged4folder = true;//delete edit
+            if (handler != null) {
+                handler.sendEmptyMessage(handle4finish);
+            }
+        } else
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        NoteService.delete(objectId);//笔记网络删除
+                        PrimaryData primaryData = PrimaryData.getInstance();
+                        helper.getNoteDao().delete(Note.this);
+                        Folder folder = primaryData.getFolder(folderId);
+                        if (folder != null) {
+                            FolderFragment.isChanged4folder = true;//edit delete
+                            folder.setContain(folder.getContain() - 1);
+                            Trace.d("saveFolderNum-" + 1 + "成功");
+//                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
+                        }
+                        primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
+                        Trace.show(context, "删除成功");
+                        Trace.d("deleteNote 成功");
+                        NoteFragment.isChanged4note = true;//delete edit
+                        FolderFragment.isChanged4folder = true;//delete edit
+                        if (handler != null) {
+                            handler.sendEmptyMessage(handle4finish);
+                        }
+                    } catch (AVException e) {
+                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
     }
 
     //已存在的笔记在笔记夹间移动

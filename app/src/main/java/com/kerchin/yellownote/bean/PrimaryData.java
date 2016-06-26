@@ -114,7 +114,10 @@ public class PrimaryData {
         boolean isOffline = false;
         try {
 //        if (getNoteFromData())
-            getNotesFromCloud();//initData
+            final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
+            //skip += avObjects.size();
+            Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
+            getNotes(avObjects, helper);//initData
         } catch (AVException e) {
             e.printStackTrace();
             isOffline = true;
@@ -219,7 +222,10 @@ public class PrimaryData {
         boolean isOffline = false;
         try {
 //        if (getNoteFromData())
-            getNotesFromCloud();//initData
+            final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
+            //skip += avObjects.size();
+            Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
+            getNotes(avObjects, helper);//initData
         } catch (AVException e) {
             e.printStackTrace();
             PrimaryData.status.restore();
@@ -244,8 +250,20 @@ public class PrimaryData {
 //            if (doAfterWithEx != null)
 //                doAfterWithEx.justNowWithEx(e);
         }
+        Collections.sort(listNote, new Comparator<Note>() {
+            @Override
+            public int compare(Note n1, Note n2) {
+                return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+            }
+        });
         if (!isOffline)
             waitToSaveData(helper, doAfter);//initData login
+        else {
+            if (doAfter == null)
+                getSimpleEntityFromList(MyApplication.userDefaultFolderId);
+            else
+                doAfter.justNow();
+        }
         //waitForFlag();
     }
 
@@ -309,7 +327,7 @@ public class PrimaryData {
     }
 
     /**
-     * 等待数据加载完成以配置mItems
+     * @deprecated 等待数据加载完成以配置mItems
      */
     private void waitForFlag() {
         new Thread(new Runnable() {
@@ -513,10 +531,7 @@ public class PrimaryData {
      *
      * @throws AVException
      */
-    private void getNotesFromCloud() throws AVException {
-        final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
-        //skip += avObjects.size();
-        Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
+    private void getNotes(final List<AVObject> avObjects, final OrmLiteHelper helper) throws AVException {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -538,6 +553,15 @@ public class PrimaryData {
                         i = map.get(folderId);
                     map.put(folderId, ++i);
                 }
+                List<Note> list = helper.getNoteDao().queryForEq("isOfflineAdd", true);
+                if (list.size() > 0)
+                    for (Note note : list) {
+                        listNote.add(note);
+                        int i = 0;
+                        if (map.get(note.getFolderId()) != null)
+                            i = map.get(note.getFolderId());
+                        map.put(note.getFolderId(), ++i);
+                    }
                 status.isNoteReady = true;
                 Trace.d("isNoteReady true");
             }
@@ -616,10 +640,11 @@ public class PrimaryData {
     /**
      * 编辑过的数据需要删去内存中原有数据并加一条在队首
      *
-     * @param note 新数据
+     * @param note               新数据
+     * @param offlineAddObjectId
      */
-    public void editNote(Note note) {
-        int pos = getNotePosition(note.getObjectId());
+    public void editNote(Note note, String offlineAddObjectId) {
+        int pos = getNotePosition(note.getObjectId(), offlineAddObjectId);
         if (pos != -1) {
             listNote.remove(pos);
             newNote(note);//editNote
@@ -631,14 +656,22 @@ public class PrimaryData {
     /**
      * 根据noteId取Note的position
      *
-     * @param noteId note唯一ID
+     * @param noteId             note唯一ID
+     * @param offlineAddObjectId
      * @return int
      */
-    public int getNotePosition(String noteId) {
-        for (int i = 0; i < listNote.size(); i++) {
-            if (listNote.get(i).getObjectId().equals(noteId))
-                return i;
-        }
+    public int getNotePosition(String noteId, String offlineAddObjectId) {
+        if (offlineAddObjectId != null
+                && !offlineAddObjectId.equals("")) {
+            for (int i = 0; i < listNote.size(); i++) {
+                if (listNote.get(i).getObjectId().equals(offlineAddObjectId))
+                    return i;
+            }
+        } else
+            for (int i = 0; i < listNote.size(); i++) {
+                if (listNote.get(i).getObjectId().equals(noteId))
+                    return i;
+            }
         return -1;
     }
 

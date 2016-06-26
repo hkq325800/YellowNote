@@ -26,16 +26,17 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-
-import me.zhanghai.android.patternlock.PatternView;
 
 /**
  * com.kerchin.yellownote.utilities
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    public static String getTrueDate(Date date) {
+        SimpleDateFormat myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
+        return myFmt.format(date);
+    }
 
     public static int getScreenWidth(Context context){
         WindowManager wm = (WindowManager) context

@@ -368,7 +368,8 @@ public class NoteFragment extends BaseFragment
                                             Message msg = new Message();
                                             msg.obj = note;
                                             msg.what = handle4explosion;//ui特效
-                                            note.delete(getActivity(), handler, msg);
+                                            MainActivity m = (MainActivity) getActivity();
+                                            note.delete(getActivity(), m.getHelper(), handler, msg);
                                         }
                                         //循环查询是否删除 从数据源中重新获取list并设置到adapter中
                                         handler.post(runnableForData);

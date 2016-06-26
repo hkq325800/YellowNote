@@ -106,6 +106,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     private List<Integer> searchResult;//记录关键字所在的index
     private int listFolderSize;
+    private String offlineAddObjectId;//专为解决离线新增没有objectId存在
 
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
     private boolean isLeftGray = true;//左侧的控制
@@ -140,25 +141,24 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                     if (isNew)
                         primaryData.newNote(mNote);//handle4saveChange
                     else
-                        primaryData.editNote(mNote);
+                        primaryData.editNote(mNote, offlineAddObjectId);
                     isNew = false;
                     mNavigationRightBtn.setEnabled(true);
                     mNavigationRightBtn.setText("保存");
                     openSliding();
-                    if ((boolean) msg.obj) {//操作是否成功便于回滚
-                        Trace.show(getApplicationContext(), "保存成功");
-                        mEditDeleteLinear.setEnabled(true);
-                        if (userConfirm) {
-                            finish();
-                        }
-                    } else if (userConfirm)
-                        userConfirm = false;
+                    Trace.show(getApplicationContext(), (boolean) msg.obj ? "离线保存成功" : "保存成功");
+                    mEditDeleteLinear.setEnabled(true);
+                    if (userConfirm) {
+                        finish();
+                    }
+//                    } else if (userConfirm)
+                    userConfirm = false;
                     break;
                 case handle4last:
                     if (isNew)
                         primaryData.newNote(mNote);//handle4last
                     else
-                        primaryData.editNote(mNote);
+                        primaryData.editNote(mNote, offlineAddObjectId);
                     finish();
                     break;
                 default:
@@ -181,7 +181,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
 //                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())) {
 //            //保存至草稿箱 数据库
 //        }
-        if(mSVProgressHUD.isShowing())
+        if (mSVProgressHUD.isShowing())
             mSVProgressHUD.dismiss();
         viewContainer.clear();
         NormalUtils.clearTextLineCache();
@@ -206,7 +206,9 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                 && !title.trim().equals("")) {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
-                    || isFolderChanged) {
+                    || isFolderChanged
+                    || mNote.isHasEdited()) {
+//                    || mNote.isOfflineAdd()//TODO
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -325,6 +327,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             primaryData = PrimaryData.getInstance();
             thisFolder = primaryData.getFolder(mNote.getFolderId());
         }
+        if (mNote.isOfflineAdd())
+            offlineAddObjectId = mNote.getObjectId();
         searchResult = new ArrayList<>();
 //        mNavigationPager.setVisibility(View.GONE);
         mEditContentEdt.setText(mNote.getContent());
@@ -571,6 +575,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                 || isFolderChanged
                 || mNote.isHasEdited()) {
+//                || mNote.isOfflineAdd()//TODO
             mNavigationRightBtn.setText("保存中..");
             closeSliding();
             mNavigationRightBtn.setEnabled(false);
@@ -777,7 +782,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 ad.dismiss();
-                mNote.delete(EditActivity.this, handler, handle4finish
+                mNote.delete(EditActivity.this, getHelper(), handler, handle4finish
                         , mNote.getFolderId());
             }
         });

@@ -208,7 +208,8 @@ public class FolderFragment extends BaseFragment {
                                                                 Message msg = new Message();
                                                                 msg.obj = note;
                                                                 msg.what = handle4explosion;//ui特效
-                                                                note.delete(getActivity(), handler, msg);
+                                                                MainActivity m = (MainActivity) getActivity();
+                                                                note.delete(getActivity(), m.getHelper(), handler, msg);
                                                             }
                                                         });
                                                 break;
