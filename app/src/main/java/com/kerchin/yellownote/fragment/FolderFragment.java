@@ -81,6 +81,9 @@ public class FolderFragment extends BaseFragment {
 //                    getHeaderListFromFolder();//handle4respond
                     setRecycleView();//respond
                     break;
+                case GetDataHelper.handle4error:
+                    String str = (String) msg.obj;
+                    Trace.show(getActivity().getApplicationContext(), str+"失败");
                 default:
                     break;
             }
@@ -209,7 +212,7 @@ public class FolderFragment extends BaseFragment {
                                                                 msg.obj = note;
                                                                 msg.what = handle4explosion;//ui特效
                                                                 MainActivity m = (MainActivity) getActivity();
-                                                                note.delete(getActivity(), m.getHelper(), handler, msg);
+                                                                note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
                                                             }
                                                         });
                                                 break;

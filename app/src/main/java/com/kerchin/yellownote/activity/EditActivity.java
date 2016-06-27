@@ -37,6 +37,8 @@ import com.kerchin.yellownote.base.MyOrmLiteHasSwipeBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
+import com.kerchin.yellownote.fragment.FolderFragment;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
@@ -84,6 +86,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     private static final byte handle4saveChange = 3;
     private static final byte handle4last = 4;
     private static final byte handle4reGet = 5;
+    private static final byte handle4error = 6;
     //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
 
@@ -128,6 +131,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                     primaryData = PrimaryData.getInstance();
                     break;
                 case handle4finish:
+                    Trace.show(getApplicationContext(), "删除成功");
                     finish();
                     break;
                 case handle4noTitle:
@@ -160,6 +164,10 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                     else
                         primaryData.editNote(mNote, offlineAddObjectId);
                     finish();
+                    break;
+                case handle4error:
+                    String str = (String) msg.obj;
+                    Trace.show(getApplicationContext(), str + "失败");
                     break;
                 default:
                     break;
@@ -207,8 +215,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged
-                    || mNote.isHasEdited()) {
-//                    || mNote.isOfflineAdd()//TODO
+                    || mNote.isHasEdited()
+                    || mNote.isOfflineAdd()) {//TODO
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -351,6 +359,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                 && isNew) {
             mEditDeleteLinear.setEnabled(false);
         }
+        if (Config.isDebugMode)
+            Trace.show(getApplicationContext(), mNote.getObjectId());
     }
 
     @Override
@@ -574,8 +584,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
         } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                 || isFolderChanged
-                || mNote.isHasEdited()) {
-//                || mNote.isOfflineAdd()//TODO
+                || mNote.isHasEdited()
+                || mNote.isOfflineAdd()) {//TODO
             mNavigationRightBtn.setText("保存中..");
             closeSliding();
             mNavigationRightBtn.setEnabled(false);
@@ -782,8 +792,16 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 ad.dismiss();
-                mNote.delete(EditActivity.this, getHelper(), handler, handle4finish
-                        , mNote.getFolderId());
+                mNote.delete(getHelper(), handler, handle4finish, handle4error);
+                Folder folder = primaryData.getFolder(mNote.getFolderId());
+                if (folder != null) {
+                    FolderFragment.isChanged4folder = true;//edit delete
+                    folder.setContain(folder.getContain() - 1);
+                    Trace.d("saveFolderNum-" + 1 + "成功");
+//                    folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
+                }
+//                PrimaryData primaryData = PrimaryData.getInstance();
+                primaryData.removeNoteById(mNote.getObjectId());//通过id删除因为从Main传进来的是list中的不是listNote中的
             }
         });
         builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {

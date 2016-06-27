@@ -3,14 +3,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/mRecyclerView"
-        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/textBackgroundColor"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:background="@color/textBackgroundColor"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:paddingBottom="8dp"
+        android:transcriptMode="disabled" />
     <!--<WaterDropListView
         android:id="@+id/waterdrop_folder"
         android:layout_width="match_parent"

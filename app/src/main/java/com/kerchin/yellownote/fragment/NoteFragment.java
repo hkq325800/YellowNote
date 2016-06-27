@@ -149,10 +149,14 @@ public class NoteFragment extends BaseFragment
                     primaryData.listNote.remove(note);//从数据源中删除
                     noteAdapter.getListDelete().remove(note);
                     break;
-                case GetDataHelper.handle4error:
+                case GetDataHelper.handle4empty:
                     AVException e = (AVException) msg.obj;
 //                    if (e.getMessage().contains("UnknownHostException"))
                     Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
+                    break;
+                case GetDataHelper.handle4error:
+                    String str = (String) msg.obj;
+                    Trace.show(getActivity().getApplicationContext(), str+"失败");
                     break;
                 default:
                     break;
@@ -302,6 +306,7 @@ public class NoteFragment extends BaseFragment
     public void respondForChange() {
         if (isChanged4note) {
             //被动刷新
+            Trace.d("respondForChange");
             getDataHelper.respond();//isChanged4note
             getData(350);//statusRespond onResume
             if (mainStatus.isSearchMode())
@@ -369,7 +374,7 @@ public class NoteFragment extends BaseFragment
                                             msg.obj = note;
                                             msg.what = handle4explosion;//ui特效
                                             MainActivity m = (MainActivity) getActivity();
-                                            note.delete(getActivity(), m.getHelper(), handler, msg);
+                                            note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
                                         }
                                         //循环查询是否删除 从数据源中重新获取list并设置到adapter中
                                         handler.post(runnableForData);
@@ -628,7 +633,7 @@ public class NoteFragment extends BaseFragment
                     public void justNowWithEx(Exception e) {
                         Message msg = Message.obtain();
                         msg.obj = e;
-                        msg.what = GetDataHelper.handle4error;
+                        msg.what = GetDataHelper.handle4empty;
                         handler.sendMessage(msg);
                         isChanged4note = false;//onRefresh
                         FolderFragment.hasRefresh = true;//onRefresh

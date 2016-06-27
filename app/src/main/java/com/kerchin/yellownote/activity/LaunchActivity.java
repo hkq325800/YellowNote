@@ -88,7 +88,6 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         public void justNowWithEx(Exception e) {
                             if (!MyApplication.getDefaultShared().getBoolean(Config.KEY_CAN_OFFLINE, true)) {
                                 isNeedToRefresh = true;
-                                //TODO 在完善了本地存储后可以取消 因为那时必定有数据
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
@@ -182,14 +181,15 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 } else
                     handler.sendMessage(cycleTarget);
             } else {
-                if (repeatCount * runnablePeriod <= runnableTimeout) {
+                //TODO
+//                if (repeatCount * runnablePeriod <= runnableTimeout) {
                     Trace.d("folder:" + PrimaryData.status.isFolderReady
                             + "note:" + PrimaryData.status.isNoteReady
                             + "items:" + PrimaryData.status.isItemReady);
                     handler.postDelayed(runnableForData, runnablePeriod);
                     repeatCount++;
-                } else
-                    repeatCount = 0;
+//                } else
+//                    repeatCount = 0;
             }
         }
     };
@@ -242,7 +242,6 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     } catch (AVException e) {
                         e.printStackTrace();
                         //无网络时如果已经有缓存登录，还是允许进入查看离线消息
-                        //TODO 在完善本地化后取消注释
                         if (MyApplication.isLogin()) {
                             cycleTarget = Message.obtain();//直接进入
                             cycleTarget.what = next;

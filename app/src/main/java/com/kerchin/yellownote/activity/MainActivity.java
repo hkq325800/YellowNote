@@ -34,7 +34,7 @@ import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.DepthPageTransformer;
+import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 
 import java.util.ArrayList;
 
@@ -84,7 +84,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
         outState.putString("user", MyApplication.user);
-        thisPosition = 0;
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -95,6 +94,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             noteFragment = NoteFragment.newInstance(null);
             folderFragment = FolderFragment.newInstance(null);
         } else {
+            thisPosition = 0;
             Trace.d("MainActivity initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
 //            PrimaryData.getInstance().giveBackData(savedInstanceState);
@@ -161,7 +161,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                     }
 //                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
-                    mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
+//                    mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
                     FolderFragment.hasRefresh = true;
                     folderFragment.respondForChange();
                     showBtnAdd();
@@ -170,7 +170,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                if (state == 0)
+                if (state == 0 && thisPosition == 1)
                     mSearchView.onActionViewCollapsed();
             }
         });

@@ -210,6 +210,7 @@ public class PrimaryData {
 
     /**
      * 网络获取初始化
+     * 并为refresh服务
      *
      * @param helper ormLite帮助类
      */
@@ -250,26 +251,28 @@ public class PrimaryData {
 //            if (doAfterWithEx != null)
 //                doAfterWithEx.justNowWithEx(e);
         }
-        Collections.sort(listNote, new Comparator<Note>() {
-            @Override
-            public int compare(Note n1, Note n2) {
-                return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
-            }
-        });
         if (!isOffline)
             waitToSaveData(helper, doAfter);//initData login
         else {
             if (doAfter == null)
                 getSimpleEntityFromList(MyApplication.userDefaultFolderId);
-            else
+            else {
+                Trace.d("has sort");
+                Collections.sort(listNote, new Comparator<Note>() {
+                    @Override
+                    public int compare(Note n1, Note n2) {
+                        return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+                    }
+                });
                 doAfter.justNow();
+            }
         }
         //waitForFlag();
     }
 
     /**
      * @param helper  ormLite帮助类
-     * @param doAfter
+     * @param doAfter 接口
      */
     private void waitToSaveData(final OrmLiteHelper helper, final DoAfter doAfter) {
         new Thread(new Runnable() {
@@ -292,7 +295,8 @@ public class PrimaryData {
                                 Note localNote = simpleDaoForNote.queryForSameId(note);
                                 if (localNote == null)
                                     simpleDaoForNote.create(note);
-                                else if (!localNote.isHasEdited())
+                                else if (!localNote.isHasEdited()//如果本地没有编辑过或者网上的日期比本地要新则update
+                                        || note.getDate().after(localNote.getDate()))
                                     simpleDaoForNote.update(note);
                                 else {
                                     listNote.set(i, localNote);
@@ -310,8 +314,16 @@ public class PrimaryData {
                         Trace.d("waitToSaveData true");
                         if (doAfter == null)
                             getSimpleEntityFromList(MyApplication.userDefaultFolderId);
-                        else
+                        else {
+                            Trace.d("has sort");
+                            Collections.sort(listNote, new Comparator<Note>() {
+                                @Override
+                                public int compare(Note n1, Note n2) {
+                                    return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+                                }
+                            });
                             doAfter.justNow();
+                        }
                         break;
                     } else {
                         try {
@@ -429,7 +441,13 @@ public class PrimaryData {
      * @param shownFolderId 需要设置为可见的folderId
      */
     public void getSimpleEntityFromList(String shownFolderId) {
-        Trace.d("getSimpleEntityFromList");
+        Trace.d("getSimpleEntityFromList has sort");
+        Collections.sort(listNote, new Comparator<Note>() {
+            @Override
+            public int compare(Note n1, Note n2) {
+                return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+            }
+        });
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
@@ -443,7 +461,13 @@ public class PrimaryData {
      * @param doAfter       接口
      */
     public void getSimpleEntityFromList(String shownFolderId, DoAfter doAfter) {
-        Trace.d("getSimpleEntityFromList");
+        Trace.d("getSimpleEntityFromList has sort");
+        Collections.sort(listNote, new Comparator<Note>() {
+            @Override
+            public int compare(Note n1, Note n2) {
+                return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+            }
+        });
         mItems.clear();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList

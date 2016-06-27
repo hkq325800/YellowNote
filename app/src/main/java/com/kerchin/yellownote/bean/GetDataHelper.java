@@ -16,7 +16,8 @@ public class GetDataHelper {
     public final static byte handle4refresh = 102;//由于isChangedFolder refresh
     public final static byte handle4loadMore = 103;//手动获取更多
 //    public final static byte handle4zero = 104;//从有到无
-    public final static byte handle4error = 105;//从有到无
+    public final static byte handle4empty = 105;//从有到无
+    public final static byte handle4error = 106;//从有到无
     public byte status = 0;//当前状态
     public String statusName = "";//当前状态名
     public byte handleCode = 0;

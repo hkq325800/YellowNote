@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.widget;
+package com.kerchin.yellownote.widget.ViewPagerTransform;
 
 import android.support.v4.view.ViewPager;
 import android.view.View;

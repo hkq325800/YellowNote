@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.bean;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
@@ -108,9 +109,13 @@ public class Note implements Serializable {
     }
 
     public String toString() {
-        return "objectId" + objectId + "title" + title + "date" + date.toString()
-                + "content" + content.length() + "preview" + preview + "folder" + folder
-                + "folderId" + folderId + "type" + type;
+        return "objectId " + objectId + "\n"
+                + " date " + date.toString() + "\n"
+                + "【title " + title + "】 content " + content.length() + " preview " + preview.length() + "\n"
+                + "【hasEdited " + hasEdited + "】"
+                + " 【isOfflineAdd " + isOfflineAdd + "】";
+        //+ " folder " + folder + " folderId " + folderId
+        //+ " type " + type;
     }
 
     public boolean isHasEdited() {
@@ -222,19 +227,17 @@ public class Note implements Serializable {
                 @Override
                 public void run() {
                     boolean isOffline = false;
+                    AVObject newNote = null;
                     try {
-                        AVObject newNote = NoteService.addNewNote(
+                        newNote = NoteService.addNewNote(
                                 MyApplication.user, newTitle
                                 , NormalUtils.stringToSha1String(newContent), folder, folderId);
-                        //取回objectId
-                        objectId = newNote.getObjectId();
                     } catch (AVException e) {
                         isOffline = true;
-//                        Message msg = Message.obtain();
-//                        msg.obj = false;
-//                        msg.what = handle4saveChange;
-//                        handler.sendMessage(msg);
+                        //离线新增给objectId 编辑离线新增不再赋值
 //                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
+                        if (objectId.equals(""))
+                            objectId = MyApplication.user + "_" + date.getTime();
                         e.printStackTrace();
 //                        return;//终止下一步
                     }
@@ -246,18 +249,20 @@ public class Note implements Serializable {
                     content = newContent;
                     date = new Date();
                     setPreview(isOffline);
-                    if (isOffline) {
-                        objectId = MyApplication.user + "_" + date.getTime();
-                    }
                     Trace.d(isOffline ? "saveNewNote 离线" + objectId : "saveNewNote 成功" + objectId);
                     if (simpleDaoForNote != null) {
-                        if (isOfflineAdd) {
+                        if (!isOfflineAdd) {//联网新增、离线新增
                             isOfflineAdd = isOffline;
                             simpleDaoForNote.create(Note.this);
-                        }
-                        else {
+                        } else {//离线编辑
                             isOfflineAdd = isOffline;
-                            simpleDaoForNote.update(Note.this);
+                            //取回objectId
+                            if (newNote != null) {
+                                simpleDaoForNote.delete(Note.this);
+                                objectId = newNote.getObjectId();//新增首次联网
+                                simpleDaoForNote.create(Note.this);
+                            }else
+                                simpleDaoForNote.update(Note.this);
                         }
                     }
                     Trace.d("saveFolderNum+1 成功");
@@ -278,15 +283,13 @@ public class Note implements Serializable {
                         NoteService.saveEdit(objectId, newTitle
                                 , NormalUtils.stringToSha1String(newContent));
                         Trace.d("saveModifyNote 成功");
-                        msg.obj = true;
-                        handler.sendMessage(msg);
                     } catch (AVException e) {
-                        msg.obj = false;
-                        handler.sendMessage(msg);
-                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
+//                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         e.printStackTrace();
                         isOffline = true;
                     }
+                    msg.obj = isOffline;
+                    handler.sendMessage(msg);
                     title = newTitle;
                     content = newContent;
                     date = new Date();
@@ -298,7 +301,6 @@ public class Note implements Serializable {
                         if (localNote != null) {
                             Trace.d("save in localNote");
                             localNote.setHasEdited(isOffline);
-                            localNote.setIsOfflineAdd(isOffline);
                             localNote.setTitle(newTitle);
                             localNote.setContent(newContent);
                             localNote.setDate(date);
@@ -312,77 +314,56 @@ public class Note implements Serializable {
     }
 
     //主界面的删除
-    public void delete(final FragmentActivity context, final OrmLiteHelper helper
-            , final SystemHandler handler, final Message handle4explosion) {
+    public void delete(final OrmLiteHelper helper
+            , final Handler handler, final Message handle4explosion, final byte codeErr) {
         if (isOfflineAdd) {
-            helper.getNoteDao().delete(Note.this);
-            Trace.d("deleteNote 成功");
-            FolderFragment.isChanged4folder = true;//delete Main
-            handler.sendMessage(handle4explosion);
+            deleteLocal(helper, handler, handle4explosion);
         } else
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         NoteService.delete(objectId);
-                        helper.getNoteDao().delete(Note.this);
-                        Trace.d("deleteNote 成功");
-                        FolderFragment.isChanged4folder = true;//delete Main
-                        handler.sendMessage(handle4explosion);
+                        deleteLocal(helper, handler, handle4explosion);
                     } catch (AVException e) {
-                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                        handler.sendEmptyMessage(codeErr);
                         e.printStackTrace();
                     }
                 }
             }).start();
     }
 
+    private void deleteLocal(OrmLiteHelper helper, Handler handler, Message msg) {
+        helper.getNoteDao().delete(Note.this);
+        Trace.d("deleteNote 成功");
+        FolderFragment.isChanged4folder = true;//delete Main
+        if (handler != null)
+            handler.sendMessage(msg);
+    }
+
     //编辑界面的删除
-    public void delete(final Activity context, final OrmLiteHelper helper, final Handler handler, final byte handle4finish
-            , final String folderId) {
+    public void delete(final OrmLiteHelper helper, final Handler handler, final byte handle4finish, final byte handle4error) {
         if (isOfflineAdd) {
-            PrimaryData primaryData = PrimaryData.getInstance();
-            helper.getNoteDao().delete(Note.this);
-            Folder folder = primaryData.getFolder(folderId);
-            if (folder != null) {
-                FolderFragment.isChanged4folder = true;//edit delete
-                folder.setContain(folder.getContain() - 1);
-                Trace.d("saveFolderNum-" + 1 + "成功");
-//                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
-            }
-            primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
-            Trace.show(context, "删除成功");
-            Trace.d("deleteNote 成功");
             NoteFragment.isChanged4note = true;//delete edit
-            FolderFragment.isChanged4folder = true;//delete edit
-            if (handler != null) {
-                handler.sendEmptyMessage(handle4finish);
-            }
+            Message msg = Message.obtain();
+            msg.what = handle4finish;
+            deleteLocal(helper, handler, msg);
         } else
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         NoteService.delete(objectId);//笔记网络删除
-                        PrimaryData primaryData = PrimaryData.getInstance();
-                        helper.getNoteDao().delete(Note.this);
-                        Folder folder = primaryData.getFolder(folderId);
-                        if (folder != null) {
-                            FolderFragment.isChanged4folder = true;//edit delete
-                            folder.setContain(folder.getContain() - 1);
-                            Trace.d("saveFolderNum-" + 1 + "成功");
-//                        folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
-                        }
-                        primaryData.removeNoteById(objectId);//通过id删除因为从Main传进来的是list中的不是listNote中的
-                        Trace.show(context, "删除成功");
-                        Trace.d("deleteNote 成功");
                         NoteFragment.isChanged4note = true;//delete edit
-                        FolderFragment.isChanged4folder = true;//delete edit
-                        if (handler != null) {
-                            handler.sendEmptyMessage(handle4finish);
-                        }
+                        Message msg = Message.obtain();
+                        msg.what = handle4finish;
+                        deleteLocal(helper, handler, msg);
                     } catch (AVException e) {
-                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
+                        Message msg = Message.obtain();
+                        msg.obj = "删除";
+                        msg.what = handle4error;
+                        handler.sendMessage(msg);
+//                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                         e.printStackTrace();
                     }
                 }

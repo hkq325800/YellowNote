@@ -622,9 +622,10 @@ public class LoginActivity extends LoginAbstract {
                 finish();
             } else {
                 if (repeatCount * runnablePeriod <= runnableTimeout) {
-                    Trace.d("folder:" + PrimaryData.status.isFolderReady
-                            + "note:" + PrimaryData.status.isNoteReady
-                            + "items:" + PrimaryData.status.isItemReady);
+                    if (PrimaryData.status != null)
+                        Trace.d("folder:" + PrimaryData.status.isFolderReady
+                                + "note:" + PrimaryData.status.isNoteReady
+                                + "items:" + PrimaryData.status.isItemReady);
                     handler.postDelayed(runnableForData, runnablePeriod);
                     repeatCount++;
                 } else
