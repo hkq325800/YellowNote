@@ -64,8 +64,6 @@ public class LoginActivity extends LoginAbstract {
     @BindView(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
     private SVProgressHUD mSVProgressHUD;
-    private final static long runnableTimeout = 8000;
-    private final static long runnablePeriod = 200;
     private final static byte statusInit = -1;//未查询或查询中
     private final static byte statusFalse = 0;//查询结果为假
     private final static byte statusTrue = 1;//查询结果为真
@@ -211,7 +209,7 @@ public class LoginActivity extends LoginAbstract {
         //表格检查
         if (tableCheck(txtUser, txtPass, txtRePass, txtProv)) {
             //验证验证码成功则注册成功以该帐号登录
-            if (Config.isDebugMode)
+            if (Config.isDebugMode)//比较危险
                 signUpVerify(txtUser, txtPass);
             else {
                 smsVerify(txtProv, txtUser);
@@ -381,9 +379,9 @@ public class LoginActivity extends LoginAbstract {
                 try {
                     LoginService.sendProv(txtUser, isSignUp, validPeriod);
                 } catch (AVException e) {
-                    Trace.e("发送验证码失败" + Trace.getErrorMsg(e));
+                    Trace.e("验证码发送失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
-                    Trace.show(LoginActivity.this, "发送验证码失败" + Trace.getErrorMsg(e));
+                    Trace.show(LoginActivity.this, "验证码发送失败" + Trace.getErrorMsg(e));
                 }
             }
         }).start();
@@ -553,7 +551,7 @@ public class LoginActivity extends LoginAbstract {
                             dismissProgress();
                         }
                     });
-                    Trace.show(LoginActivity.this, "验证是否注册失败" + Trace.getErrorMsg(e));
+                    Trace.show(LoginActivity.this, "是否注册验证失败" + Trace.getErrorMsg(e));
                 }
             }
         }).start();
@@ -562,8 +560,6 @@ public class LoginActivity extends LoginAbstract {
     //表格信息校验
     @Override
     protected boolean tableCheck(String txtUser, String txtPass, String txtRePass, String txtProv) {
-        if (Config.isDebugMode)
-            return true;
         if (txtUser.equals("") || txtUser.length() != 11) {
             Trace.show(getApplicationContext(), "请输入11位手机号并接收验证码");
             return false;
@@ -621,12 +617,12 @@ public class LoginActivity extends LoginAbstract {
 //                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
             } else {
-                if (repeatCount * runnablePeriod <= runnableTimeout) {
+                if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
                     if (PrimaryData.status != null)
                         Trace.d("folder:" + PrimaryData.status.isFolderReady
                                 + "note:" + PrimaryData.status.isNoteReady
                                 + "items:" + PrimaryData.status.isItemReady);
-                    handler.postDelayed(runnableForData, runnablePeriod);
+                    handler.postDelayed(runnableForData, Config.period_runnable);
                     repeatCount++;
                 } else
                     repeatCount = 0;

@@ -1,10 +1,8 @@
 package com.kerchin.yellownote.bean;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.FragmentActivity;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -16,7 +14,6 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;
@@ -28,44 +25,29 @@ import java.util.Date;
  */
 //@Table("note")
 public class Note implements Serializable {
-    //    @PrimaryKey(AssignType.BY_MYSELF)
-//    @Column("note_objectId")
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    @DatabaseField()
+    private String user_tel;
     @DatabaseField(id = true)
     private String objectId;
-    //    @Column("note_title")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private String title;
-    //    @Column("note_date")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private Date date;
-    //    @Column("note_content")
     @DatabaseField(canBeNull = false)
     private String content;
-    //    @Column("note_preview")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private String preview;
-    //    @Column("note_folder")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private String folder;
-    //    @Column("folder_objectId")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private String folderId;
-    //    @Column("note_type")
-//    @NotNull
     @DatabaseField(canBeNull = false)
     private String type;
-
     @DatabaseField
     private boolean hasEdited;
-
     @DatabaseField
     private boolean isOfflineAdd;
-    //    @Ignore
 
     Note() {
         // needed by ormlite
@@ -74,26 +56,28 @@ public class Note implements Serializable {
     /**
      * 从本地获取
      */
-    public Note(String objectId, String title, Date date, String contentCode
-            , String folder, String folderId, String type) {
-        this.objectId = objectId;
-        this.title = title;
-        this.date = date;
-        this.folder = folder;
-        this.folderId = folderId;
-        this.content = NormalUtils.sha1StringToString(contentCode);
-        if (content.length() > 70)
-            preview = content.substring(0, 70).replace("\n", " ");
-        else
-            preview = content.replace("\n", " ");
-        this.type = type;
-    }
+//    public Note(String objectId, String title, Date date, String contentCode
+//            , String folder, String folderId, String type) {
+//        user_tel = MyApplication.user;
+//        this.objectId = objectId;
+//        this.title = title;
+//        this.date = date;
+//        this.folder = folder;
+//        this.folderId = folderId;
+//        this.content = NormalUtils.sha1StringToString(contentCode);
+//        if (content.length() > 70)
+//            preview = content.substring(0, 70).replace("\n", " ");
+//        else
+//            preview = content.replace("\n", " ");
+//        this.type = type;
+//    }
 
     /**
      * 从网络获取
      */
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
+        user_tel = MyApplication.user;
         hasEdited = false;
         this.objectId = objectId;
         this.title = title;
@@ -216,7 +200,7 @@ public class Note implements Serializable {
     }
 
     //保存更改
-    public void saveChange(final Activity context, final OrmLiteHelper helper
+    public void saveChange(final OrmLiteHelper helper
             , final String newTitle, final String newContent
             , final Handler handler, final byte handle4saveChange) {
         //use PatternUtils.patternToSha1String(str) to save
@@ -253,6 +237,8 @@ public class Note implements Serializable {
                     if (simpleDaoForNote != null) {
                         if (!isOfflineAdd) {//联网新增、离线新增
                             isOfflineAdd = isOffline;
+                            if (newNote != null)
+                                objectId = newNote.getObjectId();
                             simpleDaoForNote.create(Note.this);
                         } else {//离线编辑
                             isOfflineAdd = isOffline;
@@ -261,7 +247,7 @@ public class Note implements Serializable {
                                 simpleDaoForNote.delete(Note.this);
                                 objectId = newNote.getObjectId();//新增首次联网
                                 simpleDaoForNote.create(Note.this);
-                            }else
+                            } else
                                 simpleDaoForNote.update(Note.this);
                         }
                     }
@@ -293,6 +279,7 @@ public class Note implements Serializable {
                     title = newTitle;
                     content = newContent;
                     date = new Date();
+                    hasEdited = isOffline;
                     setPreview(isOffline);
                     NoteFragment.isChanged4note = true;//saveChange
                     FolderFragment.isChanged4folder = true;//saveChange edit
@@ -315,18 +302,20 @@ public class Note implements Serializable {
 
     //主界面的删除
     public void delete(final OrmLiteHelper helper
-            , final Handler handler, final Message handle4explosion, final byte codeErr) {
+            , final Handler handler, final Message msgExplosion, final byte handle4error) {
         if (isOfflineAdd) {
-            deleteLocal(helper, handler, handle4explosion);
+            deleteLocal(helper, handler, msgExplosion);
         } else
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         NoteService.delete(objectId);
-                        deleteLocal(helper, handler, handle4explosion);
+                        deleteLocal(helper, handler, msgExplosion);
                     } catch (AVException e) {
-                        handler.sendEmptyMessage(codeErr);
+                        msgExplosion.what = handle4error;
+                        msgExplosion.obj = "目前暂不支持离线删除" + Trace.getErrorMsg(e);
+                        handler.sendMessage(msgExplosion);
                         e.printStackTrace();
                     }
                 }
@@ -342,7 +331,8 @@ public class Note implements Serializable {
     }
 
     //编辑界面的删除
-    public void delete(final OrmLiteHelper helper, final Handler handler, final byte handle4finish, final byte handle4error) {
+    public void delete(final OrmLiteHelper helper, final Handler handler
+            , final byte handle4finish, final byte handle4error) {
         if (isOfflineAdd) {
             NoteFragment.isChanged4note = true;//delete edit
             Message msg = Message.obtain();
@@ -360,10 +350,9 @@ public class Note implements Serializable {
                         deleteLocal(helper, handler, msg);
                     } catch (AVException e) {
                         Message msg = Message.obtain();
-                        msg.obj = "删除";
+                        msg.obj = "目前暂不支持离线删除" + Trace.getErrorMsg(e);
                         msg.what = handle4error;
                         handler.sendMessage(msg);
-//                        Trace.show(context, "删除失败" + Trace.getErrorMsg(e));
                         e.printStackTrace();
                     }
                 }
@@ -381,7 +370,7 @@ public class Note implements Serializable {
                     //Toast.makeText(context, "移动成功", Toast.LENGTH_SHORT).show();
                     Trace.d("move2folder 成功");
                 } catch (AVException e) {
-                    Trace.show(context, "笔记移动失败" + Trace.getErrorMsg(e));
+                    Trace.show(context, "目前暂不支持离线移动" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                     return;//终止下一步
                 }
@@ -411,7 +400,7 @@ public class Note implements Serializable {
                     folder = newOne;
                     folderId = newFolderId;
                 } catch (AVException e) {
-                    Trace.show(context, "更名移动失败" + Trace.getErrorMsg(e));
+                    Trace.show(context, "目前暂不支持离线更名" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                 }
             }
@@ -432,7 +421,7 @@ public class Note implements Serializable {
                     NoteFragment.isChanged4note = true;//reName
                     handler.sendEmptyMessage(handle4respond);
                 } catch (AVException e) {
-                    Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
+                    Trace.show(context, "目前暂不支持离线重命名" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                 }
             }

@@ -30,7 +30,7 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 //    @Override
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        switch (item.getItemId()) {
-//            case android.R.id.home://TODO ?
+//            case android.R.id.home:
 //                AppUtils.navigateUp(this);
 //                return true;
 //            default:
@@ -40,7 +40,7 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 
     /**
      * startActivityForResult失效
-     * @param pattern
+     * @param pattern 手势
      */
 //    public static void startMe(Activity activity, int requestCode) {
 //        Intent intent = new Intent(activity, SetPatternActivity.class);

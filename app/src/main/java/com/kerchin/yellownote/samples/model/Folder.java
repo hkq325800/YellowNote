@@ -1,12 +1,13 @@
-package com.kerchin.yellownote.bean;
+package com.kerchin.yellownote.samples.model;
 
 import android.app.Activity;
 import android.os.Handler;
 
 import com.avos.avoscloud.AVException;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.yellownote.bean.Note;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.fragment.NoteFragment;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -14,17 +15,31 @@ import com.kerchin.yellownote.utilities.Trace;
 import java.io.Serializable;
 import java.util.List;
 
+
 /**
  * Created by Kerchin on 2015/9/26 0026.
  */
+//@Table("folder")
 public class Folder implements Serializable {
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
-    @DatabaseField()
-    private String user_tel;
+    //    public static final String COL_ID = "_id";
+    public static final String COL_OBJECTID = "_objectId";
+    public static final String COL_NAME = "_name";
+    public static final String COL_CONTAIN = "_contain";
+
+    //    @PrimaryKey(AssignType.AUTO_INCREMENT)//加了为null
+//    @Column(COL_ID)
+//    long id;
+//    @PrimaryKey(AssignType.BY_MYSELF)//加了为null
+//    @Column(COL_OBJECTID)
     @DatabaseField(id = true)
     String objectId;
+    //    @Required
+//    @NotNull
+//    @Column(COL_NAME)
     @DatabaseField
     String name;
+    //    @Default("0")
+//    @Column(COL_CONTAIN)
     @DatabaseField
     int contain;
 
@@ -33,7 +48,6 @@ public class Folder implements Serializable {
     }
 
     public Folder(String objectId, String name, int contain) {
-        user_tel = MyApplication.user;
         this.name = name;
         this.contain = contain;
         this.objectId = objectId;
@@ -71,6 +85,14 @@ public class Folder implements Serializable {
         return objectId;
     }
 
+//    public long getId() {
+//        return id;
+//    }
+//
+//    public void setId(long id) {
+//        this.id = id;
+//    }
+
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {
         new Thread(new Runnable() {
@@ -92,7 +114,7 @@ public class Folder implements Serializable {
                     }
                     handler.sendEmptyMessage(handle4respond);
                 } catch (AVException e) {
-                    Trace.show(context, "目前暂不支持离线重命名" + Trace.getErrorMsg(e));
+                    Trace.show(context, "重命名失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                 }
             }
@@ -111,7 +133,7 @@ public class Folder implements Serializable {
                         handler.sendEmptyMessage(handle4respond);
                     } catch (AVException e) {
                         e.printStackTrace();
-                        Trace.show(context, "目前暂不支持离线删除" + Trace.getErrorMsg(e));
+                        Trace.show(context, "删除笔记夹失败" + Trace.getErrorMsg(e));
                     }
 
                 }

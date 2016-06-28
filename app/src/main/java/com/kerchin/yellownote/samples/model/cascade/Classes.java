@@ -1,9 +1,9 @@
-package com.kerchin.yellownote.model.cascade;
+package com.kerchin.yellownote.samples.model.cascade;
 
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.Table;
 import com.litesuits.orm.db.enums.Relation;
-import com.kerchin.yellownote.model.Model;
+import com.kerchin.yellownote.samples.model.Model;
 
 /**
  * 班级

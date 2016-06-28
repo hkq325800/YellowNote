@@ -4,12 +4,12 @@ import android.os.Bundle;
 import android.os.Environment;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.model.Person;
-import com.kerchin.yellownote.model.cascade.Book;
-import com.kerchin.yellownote.model.cascade.Classes;
-import com.kerchin.yellownote.model.cascade.School;
-import com.kerchin.yellownote.model.cascade.Student;
-import com.kerchin.yellownote.model.cascade.Teacher;
+import com.kerchin.yellownote.samples.model.Person;
+import com.kerchin.yellownote.samples.model.cascade.Book;
+import com.kerchin.yellownote.samples.model.cascade.Classes;
+import com.kerchin.yellownote.samples.model.cascade.School;
+import com.kerchin.yellownote.samples.model.cascade.Student;
+import com.kerchin.yellownote.samples.model.cascade.Teacher;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.assit.WhereBuilder;

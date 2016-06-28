@@ -9,12 +9,12 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,9 +28,9 @@ import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
-import com.kerchin.yellownote.samples.Main;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
@@ -108,7 +108,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //                Trace.d("folderFragment null");
             folderFragment = FolderFragment.newInstance(null);
 //            }
-            Trace.show(getApplicationContext(), MyApplication.user);
+//            Trace.show(getApplicationContext(), MyApplication.user);
 //            if (MyApplication.user.equals("")) {
 //                Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
 //                MyApplication.logout();
@@ -345,8 +345,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             return false;
         } else if (id == R.id.nav_resetSecret) {
 //            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
-            startActivity(new Intent(getApplicationContext(), Main.class));//for test ormLite
-//            handler.sendEmptyMessage(gotoSecret);
+            if (Config.isDebugMode)
+                startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
+            else
+                handler.sendEmptyMessage(gotoSecret);
             return false;
         }
         mMainDrawer.closeDrawers();
@@ -497,7 +499,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             if (isDrawerOpen)
                 mMainDrawer.closeDrawers();
             else
-                mMainDrawer.openDrawer(Gravity.LEFT);
+                mMainDrawer.openDrawer(GravityCompat.START);
             return true;
         }
         return super.dispatchKeyEvent(event);

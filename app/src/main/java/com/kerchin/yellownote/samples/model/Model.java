@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.model;
+package com.kerchin.yellownote.samples.model;
 
 /**
  * @author MaTianyu

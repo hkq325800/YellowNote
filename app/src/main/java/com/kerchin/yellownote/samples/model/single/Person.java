@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.model.single;
+package com.kerchin.yellownote.samples.model.single;
 
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Conflict;

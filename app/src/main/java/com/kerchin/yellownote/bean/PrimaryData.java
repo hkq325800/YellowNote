@@ -700,7 +700,7 @@ public class PrimaryData {
     }
 
     /**
-     * 根据noteId从内存中删去数据
+     * 根据noteId从内存中删去Note
      *
      * @param noteId note唯一ID
      */
@@ -711,6 +711,15 @@ public class PrimaryData {
                 return;
             }
         }
+    }
+
+    /**
+     * 根据folder位置从内存中删去Folder
+     *
+     * @param position folder位置
+     */
+    public void removeFolderByPosition(int position) {
+        listFolder.remove(position);
     }
 
     /**
@@ -790,7 +799,7 @@ public class PrimaryData {
     private void getFolderFromData(OrmLiteHelper helper) {
         listFolder.clear();
 //        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-        List<Folder> list = helper.getFolderDao().queryForAll();
+        List<Folder> list = helper.getFolderDao().queryForEq("user_tel",MyApplication.user);
         Trace.d("size" + list.size());
         listFolder.addAll(list);
         Trace.d("isFolderReady true");
@@ -806,11 +815,67 @@ public class PrimaryData {
         listNote.clear();
         map.clear();
 //        ArrayList<Note> list = liteOrmHelper.query(Note.class);
-        List<Note> list = helper.getNoteDao().queryForAll();
+        List<Note> list = helper.getNoteDao().queryForEq("user_tel", MyApplication.user);
         Trace.d("size" + list.size());
         listNote.addAll(list);
         status.isNoteReady = true;
         Trace.d("isNoteReady true");
+    }
+
+    /**
+     * 获取folder名称数组
+     *
+     * @param exceptFolderId 除去当前folder
+     * @return String[]
+     */
+    public String[] getFolderArr(String exceptFolderId) {
+        String[] arr = new String[listFolder.size() - 1];
+        int sum = 0;
+        if (exceptFolderId.equals(""))
+            for (Folder folder : listFolder) {
+                arr[sum] = folder.getName();
+                sum++;
+            }
+        else
+            for (Folder folder : listFolder) {
+                if (!folder.getObjectId().equals(exceptFolderId)) {
+                    arr[sum] = folder.getName();
+                    sum++;
+                }
+            }
+        return arr;
+    }
+
+    /**
+     * 获取folderId数组
+     *
+     * @param exceptFolderId 除去当前folder
+     * @return String[]
+     */
+    public String[] getFolderObjectIdArr(String exceptFolderId) {
+        String[] arr = new String[listFolder.size() - 1];
+        int sum = 0;
+        if (exceptFolderId.equals(""))
+            for (Folder folder : listFolder) {
+                arr[sum] = folder.getObjectId();
+                sum++;
+            }
+        else
+            for (Folder folder : listFolder) {
+                if (!folder.getObjectId().equals(exceptFolderId)) {
+                    arr[sum] = folder.getObjectId();
+                    sum++;
+                }
+            }
+        return arr;
+    }
+
+    public int getFolderSize(){
+        return listFolder.size();
+    }
+
+    public void addFolder(Folder newFolder) {
+        listFolder.add(newFolder);
     }
 
     public class PrimaryDataStatus {

@@ -108,7 +108,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     private PrimaryData primaryData;
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     private List<Integer> searchResult;//记录关键字所在的index
-    private int listFolderSize;
+//    private int listFolderSize;
     private String offlineAddObjectId;//专为解决离线新增没有objectId存在
 
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
@@ -175,11 +175,10 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
         }
     };
 
-    public static void startMe(Context context, Note note, int listFolderSize) {
+    public static void startMe(Context context, Note note) {
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("mNote", note);
-        intent.putExtra("listFolderSize", listFolderSize);
         context.startActivity(intent);
     }
 
@@ -216,7 +215,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged
                     || mNote.isHasEdited()
-                    || mNote.isOfflineAdd()) {//TODO
+                    || mNote.isOfflineAdd()) {
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
                 ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -290,7 +289,6 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
         outState.putSerializable("thisFolder", thisFolder);
         outState.putSerializable("mFolder", mFolder);
         outState.putSerializable("mFolderId", mFolderId);
-        outState.putInt("listFolderSize", listFolderSize);
         super.onSaveInstanceState(outState);
     }
 
@@ -316,7 +314,6 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                 isNew = false;
             }
             thisFolder = (Folder) savedInstanceState.getSerializable("thisFolder");
-            listFolderSize = savedInstanceState.getInt("listFolderSize");
             mFolder = savedInstanceState.getStringArray("mFolder");
             mFolderId = savedInstanceState.getStringArray("mFolderId");
             //从savedInstanceState中恢复数据
@@ -329,9 +326,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             } else {
                 isNew = false;
             }
-            listFolderSize = getIntent().getIntExtra("listFolderSize", 0);
-            mFolder = new String[listFolderSize - 1];
-            mFolderId = new String[listFolderSize - 1];
+//            mFolder = new String[listFolderSize - 1];
+//            mFolderId = new String[listFolderSize - 1];
             primaryData = PrimaryData.getInstance();
             thisFolder = primaryData.getFolder(mNote.getFolderId());
         }
@@ -585,7 +581,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                 || isFolderChanged
                 || mNote.isHasEdited()
-                || mNote.isOfflineAdd()) {//TODO
+                || mNote.isOfflineAdd()) {
             mNavigationRightBtn.setText("保存中..");
             closeSliding();
             mNavigationRightBtn.setEnabled(false);
@@ -665,7 +661,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
 
     public void noteMove() {
         AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
-        if (mFolder.length == 0) {
+        if (primaryData.getFolderSize() == 1) {
             builder.setTitle("没有别的笔记夹可以选择\n是否新建？")
                     .setPositiveButton("确认", new DialogInterface.OnClickListener() {
                         @Override
@@ -682,16 +678,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
             builder.create().show();
         } else {
             builder.setTitle("选择移至笔记夹");
-            int sum = 0;
-            mFolder = new String[listFolderSize - 1];
-            mFolderId = new String[listFolderSize - 1];
-            for (Folder folder : primaryData.listFolder) {
-                if (!folder.getObjectId().equals(mNote.getFolderId())) {
-                    mFolder[sum] = folder.getName();
-                    mFolderId[sum] = folder.getObjectId();
-                    sum++;
-                }
-            }
+            mFolder = primaryData.getFolderArr(mNote.getFolderId());
+            mFolderId = primaryData.getFolderObjectIdArr(mNote.getFolderId());
             // 设置一个下拉的列表选择项
             builder.setItems(mFolder, new DialogInterface.OnClickListener() {
                 @Override
@@ -748,10 +736,8 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.d("saveNewFolder 成功");
                                     Folder newFolder = new Folder(objectId, newFolderName, 0);
-                                    primaryData.listFolder.add(newFolder);
-                                    listFolderSize++;
-                                    //添加进
-                                    mFolder = new String[listFolderSize - 1];
+                                    primaryData.addFolder(newFolder);
+                                    //添加进内存数据
                                     thisFolder = newFolder;
                                     isFolderChanged = true;
                                     Trace.show(EditActivity.this, "选择的笔记夹为：" + newFolderName);
@@ -815,7 +801,7 @@ public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
     }
 
     private void saveDifference(boolean isLast) {
-        mNote.saveChange(EditActivity.this, getHelper()
+        mNote.saveChange(getHelper()
                 , mNavigationTitleEdt.getText().toString()
                 , mEditContentEdt.getText().toString()
                 , handler, isLast ? handle4last : handle4saveChange);

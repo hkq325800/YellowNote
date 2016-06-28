@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;

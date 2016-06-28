@@ -1,9 +1,9 @@
-package com.kerchin.yellownote.model;
+package com.kerchin.yellownote.samples.model;
 
 import com.litesuits.orm.db.annotation.*;
 import com.litesuits.orm.db.enums.AssignType;
 import com.litesuits.orm.db.enums.Relation;
-import com.kerchin.yellownote.model.cascade.Book;
+import com.kerchin.yellownote.samples.model.cascade.Book;
 
 import java.util.ArrayList;
 

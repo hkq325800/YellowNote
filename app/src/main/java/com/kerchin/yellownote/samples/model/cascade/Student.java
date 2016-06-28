@@ -1,6 +1,6 @@
-package com.kerchin.yellownote.model.cascade;
+package com.kerchin.yellownote.samples.model.cascade;
 
-import com.kerchin.yellownote.model.Person;
+import com.kerchin.yellownote.samples.model.Person;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.Table;
 import com.litesuits.orm.db.enums.Relation;

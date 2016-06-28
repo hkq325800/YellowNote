@@ -3,7 +3,7 @@ package com.kerchin.yellownote.samples;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.bean.Folder;
+import com.kerchin.yellownote.samples.model.Folder;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.model.ConflictAlgorithm;

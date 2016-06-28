@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.samples;
+package com.kerchin.yellownote.activity;
 
 import java.util.List;
 import java.util.Random;
@@ -17,7 +17,7 @@ import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 /**
  * Sample Android UI activity which displays a text window when it is run.
  */
-public class HelloAndroid extends OrmLiteBaseActivity<OrmLiteHelper> {
+public class OrmLiteConsoleActivity extends OrmLiteBaseActivity<OrmLiteHelper> {
 
     private final String LOG_TAG = getClass().getSimpleName();
     private final static int MAX_NUM_TO_CREATE = 8;

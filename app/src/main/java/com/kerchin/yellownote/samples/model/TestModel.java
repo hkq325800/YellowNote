@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.model;
+package com.kerchin.yellownote.samples.model;
 
 import com.litesuits.orm.db.annotation.*;
 import com.litesuits.orm.db.enums.AssignType;

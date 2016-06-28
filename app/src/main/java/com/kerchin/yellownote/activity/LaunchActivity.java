@@ -23,20 +23,23 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.Trace;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Created by Kerchin on 2016/4/3 0003.
  */
 public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private final static int delayTime = 1500;
     private final static int delayTimeToMain = 1200;
-    private final static long runnableTimeout = 8000;
-    private final static long runnablePeriod = 200;
     private static final byte wel = 0;
     private static final byte next = 1;
     private static final byte reLog = 2;
     private static final byte reLogForFrozen = 4;
-    private RelativeLayout mWelcomeRetryReL;
-    private TextView mWelcomeTxt;
+    @BindView(R.id.mWelcomeRetryReL)
+    RelativeLayout mWelcomeRetryReL;
+    @BindView(R.id.mWelcomeTxt)
+    TextView mWelcomeTxt;
     private boolean isNeedToRefresh = false;
     private int repeatCount = 0;
     private long getDataStart;//用于配置launch页时间
@@ -53,9 +56,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     protected void initializeView(Bundle savedInstanceState) {
-        mWelcomeRetryReL = (RelativeLayout) findViewById(R.id.mWelcomeRetryReL);
-        mWelcomeTxt = (TextView) findViewById(R.id.mWelcomeTxt);
-//        ButterKnife.bind(this);
+        ButterKnife.bind(this);
     }
 
     @Override
@@ -159,7 +160,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             Trace.d("runnableForData" + Thread.currentThread().getId());
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (PrimaryData.status == null) {
-                handler.postDelayed(runnableForData, runnablePeriod);
+                handler.postDelayed(runnableForData, Config.period_runnable);
                 repeatCount++;
             }
             if (Config.isDebugMode)
@@ -181,15 +182,16 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 } else
                     handler.sendMessage(cycleTarget);
             } else {
-                //TODO
-//                if (repeatCount * runnablePeriod <= runnableTimeout) {
+                if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
                     Trace.d("folder:" + PrimaryData.status.isFolderReady
                             + "note:" + PrimaryData.status.isNoteReady
                             + "items:" + PrimaryData.status.isItemReady);
-                    handler.postDelayed(runnableForData, runnablePeriod);
+                    handler.postDelayed(runnableForData, Config.period_runnable);
                     repeatCount++;
-//                } else
-//                    repeatCount = 0;
+                } else {
+                    repeatCount = 0;
+                    Trace.show(LaunchActivity.this, "网络状况不佳 稍后再试吧");
+                }
             }
         }
     };

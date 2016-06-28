@@ -19,7 +19,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.avos.avoscloud.AVException;
+import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
@@ -29,6 +29,7 @@ import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.OldProgress;
@@ -52,13 +53,10 @@ public class NoteFragment extends BaseFragment
         , View.OnCreateContextMenuListener, PopupMenu.OnMenuItemClickListener {
     @BindView(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
-    //    @BindView(R.id.mNoteEmptyTxt)
-//    TextView mNoteEmptyTxt;
-//    @BindView(R.id.mNoteProgress)
-//    ProgressBar mNoteProgress;
     @BindView(R.id.mProgress)
     OldProgress mProgress;
     public static boolean isChanged4note = false;
+    private SVProgressHUD mSVProgressHUD;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private NoteShrinkAdapter noteAdapter;
@@ -66,6 +64,7 @@ public class NoteFragment extends BaseFragment
     private ToolbarStatus mainStatus;
     private String mSearchText;//方便在搜索列表更改后重新搜索
     private PrimaryData primaryData;
+    private int repeatCount = 0;
     private int emptyClickCount = 0;//控制空白点击次数 三次则重新网络获取
     private int lastVisibleItemPosition;//用于显示隐藏浮动按钮
     //    private int skip = 0;
@@ -124,10 +123,8 @@ public class NoteFragment extends BaseFragment
                     getDataListFromNote(primaryData.listNote);//handle4respond
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mProgress.dismissNoData();
-//                    mNoteEmptyTxt.setVisibility(View.GONE);//TODO mNoteEmptyTxt
-//                    noteAdapter.initListDelete();
                     noteAdapter.setList(list);
-                    mNoteWDList.setAdapter(noteAdapter);
+                    mNoteWDList.setAdapter(noteAdapter);//TODO
                     break;
                 case GetDataHelper.handle4loadMore:
                     Trace.d("handlerInNote handle4loadMore");
@@ -150,13 +147,13 @@ public class NoteFragment extends BaseFragment
                     noteAdapter.getListDelete().remove(note);
                     break;
                 case GetDataHelper.handle4empty:
-                    AVException e = (AVException) msg.obj;
-//                    if (e.getMessage().contains("UnknownHostException"))
-                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
+//                    AVException e = (AVException) msg.obj;
+////                    if (e.getMessage().contains("UnknownHostException"))
+//                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
                     break;
                 case GetDataHelper.handle4error:
                     String str = (String) msg.obj;
-                    Trace.show(getActivity().getApplicationContext(), str+"失败");
+                    Trace.show(getActivity().getApplicationContext(), str);
                     break;
                 default:
                     break;
@@ -247,6 +244,7 @@ public class NoteFragment extends BaseFragment
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
+        mSVProgressHUD = new SVProgressHUD(getActivity());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -322,7 +320,7 @@ public class NoteFragment extends BaseFragment
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
             EditActivity.startMe(getActivity().getApplicationContext()//addClick
-                    , null, primaryData.listFolder.size());
+                    , null);
         } else
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
     }
@@ -361,6 +359,7 @@ public class NoteFragment extends BaseFragment
                                 deleteViewShow();
                             } else {
                                 deleteViewHide();
+//                                mSVProgressHUD.showWithStatus("删除中...");
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
@@ -389,15 +388,33 @@ public class NoteFragment extends BaseFragment
         return toolbarItemClickListener;
     }
 
+    private void dismissProgress() {
+        if (mSVProgressHUD.isShowing())
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSVProgressHUD.dismiss();
+                }
+            });
+    }
+
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (noteAdapter.getDeleteNum() == 0) {
+//                dismissProgress();//int android.view.View.mViewFlags NullPointerException
                 getDataHelper.respond();
                 getData(800);//statusRespond delete
-            } else {//若一直未能进入需要处理 TODO
-                handler.postDelayed(runnableForData, 250);
+            } else {
+                if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
+                    handler.postDelayed(runnableForData, Config.period_runnable);
+                    repeatCount++;
+                } else {
+                    repeatCount = 0;
+//                    dismissProgress();
+                    Trace.show(getActivity(), "网络状况不佳 稍后再试吧");
+                }
             }
         }
     };
@@ -554,8 +571,7 @@ public class NoteFragment extends BaseFragment
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
             EditActivity.startMe(getActivity().getApplicationContext()//OnItemClick
-                    , noteAdapter.getItem(position - 1)
-                    , primaryData.listFolder.size());
+                    , primaryData.getNote(noteAdapter.getItem(position - 1).getObjectId()));
         } else {
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
         }

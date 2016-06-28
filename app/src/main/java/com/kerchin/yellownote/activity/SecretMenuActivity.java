@@ -15,11 +15,9 @@ import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.global.PreferenceContract;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.PreferenceUtils;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;

@@ -1,6 +1,6 @@
-package com.kerchin.yellownote.model.cascade;
+package com.kerchin.yellownote.samples.model.cascade;
 
-import com.kerchin.yellownote.model.Model;
+import com.kerchin.yellownote.samples.model.Model;
 import com.litesuits.orm.db.annotation.Column;
 import com.litesuits.orm.db.annotation.Mapping;
 import com.litesuits.orm.db.annotation.Table;

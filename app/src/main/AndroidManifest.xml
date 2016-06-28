@@ -70,7 +70,7 @@
         <activity android:name=".samples.SingleTest"/>
         <activity android:name=".samples.SingleTestFolder"/>
         <activity android:name=".samples.CascadeTest"/>
-        <activity android:name=".samples.HelloAndroid"/>
+        <activity android:name=".activity.OrmLiteConsoleActivity"/>
         <activity android:name=".samples.Main"/>
         <!--<activity android:name=".activities.MaterialActivity" />-->
     </application>

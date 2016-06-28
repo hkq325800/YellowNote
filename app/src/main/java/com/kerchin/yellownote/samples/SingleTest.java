@@ -3,12 +3,11 @@ package com.kerchin.yellownote.samples;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.helper.sql.LiteOrmHelper;
-import com.kerchin.yellownote.model.single.Address;
-import com.kerchin.yellownote.model.single.Boss;
-import com.kerchin.yellownote.model.single.Company;
-import com.kerchin.yellownote.model.single.Man;
-import com.kerchin.yellownote.model.single.Wife;
+import com.kerchin.yellownote.samples.model.single.Address;
+import com.kerchin.yellownote.samples.model.single.Boss;
+import com.kerchin.yellownote.samples.model.single.Company;
+import com.kerchin.yellownote.samples.model.single.Man;
+import com.kerchin.yellownote.samples.model.single.Wife;
 import com.litesuits.orm.LiteOrm;
 import com.litesuits.orm.db.assit.QueryBuilder;
 import com.litesuits.orm.db.assit.WhereBuilder;

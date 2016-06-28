@@ -83,7 +83,7 @@ public class FolderFragment extends BaseFragment {
                     break;
                 case GetDataHelper.handle4error:
                     String str = (String) msg.obj;
-                    Trace.show(getActivity().getApplicationContext(), str+"失败");
+                    Trace.show(getActivity().getApplicationContext(), str);
                 default:
                     break;
             }
@@ -181,7 +181,7 @@ public class FolderFragment extends BaseFragment {
                                                     mainActivity.hideBtnAdd();
                                                     reTitleFolderDialogShow(position);
                                                 } else {
-                                                    Trace.show(getActivity(), "默认笔记夹不许更名");
+                                                    Trace.show(getActivity(), "不要更名这个哦");
                                                 }
                                                 break;
                                         }
@@ -240,12 +240,12 @@ public class FolderFragment extends BaseFragment {
         } else {
 //            PrimaryData.getInstance().initData(false, folderAdapter.shownFolderId);
             folderAdapter.setFolders(primaryData.mItems);
-            mRecyclerView.setAdapter(folderAdapter);//不set会少数据
-            //滑动到新添加的笔记夹 TODO 失效是由于getChildCount获取的数值错误
+            mRecyclerView.setAdapter(folderAdapter);//不set会少数据 TODO
+            //滑动到新添加的笔记夹
 //            folderAdapter.setIsFirstTrue();
 //            Trace.d("scroll" + mHeaders.get(mHeaders.size() - 1).getId() + "/" + mHeaders.get(mHeaders.size() - 1).getName());
 //            mRecyclerView.getLayoutManager().scrollToPosition(mHeaders.get(mHeaders.size() - 1).getId());
-//            mRecyclerView.smoothScrollToPosition();
+//            mRecyclerView.smoothScrollToPosition(folderAdapter.getCount()-1);
         }
     }
 
@@ -269,17 +269,8 @@ public class FolderFragment extends BaseFragment {
     }
 
     private void noteMove(final SimpleEntity item) {
-        int sum = 0;
-        int size = primaryData.listFolder.size();
-        final String[] mFolder = new String[size - 1];
-        final String[] mFolderId = new String[size - 1];
-        for (int i = 0; i < size; i++) {
-            if (!primaryData.getFolderAt(i).getObjectId().equals(item.getFolderId())) {
-                mFolder[sum] = primaryData.getFolderAt(i).getName();
-                mFolderId[sum] = primaryData.getFolderAt(i).getObjectId();
-                sum++;
-            }
-        }
+        final String[] mFolder = primaryData.getFolderArr(item.getFolderId());
+        final String[] mFolderId = primaryData.getFolderObjectIdArr(item.getFolderId());
         singleChooseDialogMaker(getActivity(), "选择移至笔记夹", mFolder, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -547,7 +538,7 @@ public class FolderFragment extends BaseFragment {
                         });
             }
         } else {
-            Trace.show(getActivity(), "默认笔记夹不许删除");
+            Trace.show(getActivity(), "不要删除这个哦");
         }
     }
 
@@ -601,14 +592,13 @@ public class FolderFragment extends BaseFragment {
                                     String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
                                     Trace.show(getActivity(), "保存成功");
                                     Trace.d("saveNewFolder 成功");
-                                    primaryData.listFolder.add(
-                                            new Folder(objectId, newFolderName, 0));
+                                    primaryData.addFolder(new Folder(objectId, newFolderName, 0));
                                     getDataHelper.respond();//addClick->getData
 //                                getData();//add folder respond
                                     handler.sendEmptyMessage(
                                             GetDataHelper.handle4respond);
                                 } catch (AVException e) {
-                                    Trace.show(getActivity(), "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                    Trace.show(getActivity(), "目前暂不支持离线新增" + Trace.getErrorMsg(e));
                                     e.printStackTrace();
                                 }
                             }
