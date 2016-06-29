@@ -69,9 +69,9 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
     public CrashExceptionHandler(Context context, String appMainFolderName, String crashInfoFolderName) {
         this.mApplicationContext = context.getApplicationContext();
         if (!TextUtils.isEmpty(appMainFolderName)) {
-            this.mAppMainFolder = new File(Environment.getExternalStorageDirectory(), appMainFolderName);
+            this.mAppMainFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), appMainFolderName);
         } else {
-            this.mAppMainFolder = new File(Environment.getExternalStorageDirectory(), DEFAULT_APP_FOLDER_NAME);
+            this.mAppMainFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), DEFAULT_APP_FOLDER_NAME);
         }
         if (!TextUtils.isEmpty(crashInfoFolderName)) {
             this.mCrashInfoFolder = new File(mAppMainFolder, crashInfoFolderName);

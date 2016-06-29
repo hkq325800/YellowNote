@@ -1,10 +1,14 @@
 package com.kerchin.yellownote.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -75,6 +79,9 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
+        //test crash
+//        String str = null;
+//        str.toCharArray();
         //只为有缓存登录的用户初始化数据
         if (MyApplication.isLogin()) {
             MyApplication.userDefaultFolderId = MyApplication.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");

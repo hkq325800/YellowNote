@@ -1,14 +1,19 @@
 package com.kerchin.yellownote.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -238,6 +243,20 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && Config.isDebugMode)
+            Trace.show(getApplicationContext(), "拥有写crash日志的权限");
+        else {
+            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (shouldShow) {
+                //申请权限
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_REQUEST_PERMISSION);
+            } else {
+                //被禁止显示弹窗
+                //TODO 显示对话框告知用户必须打开权限
+                Trace.show(getApplicationContext(), "请求打开");
+            }
+        }
     }
 
     private ToolbarStatus getFragmentStatus() {
@@ -422,6 +441,21 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //        Trace.d("hideBtnAdd");
         isHide = true;
         handler.sendEmptyMessage(hideBtnAdd);
+    }
+
+    int REQUEST_CODE_REQUEST_PERMISSION = 100;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_REQUEST_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //permission granted
+                //TODO 向SD卡写数据
+            } else {
+                //permission denied
+                //TODO 显示对话框告知用户必须打开权限
+            }
+        }
     }
 
     @Override
