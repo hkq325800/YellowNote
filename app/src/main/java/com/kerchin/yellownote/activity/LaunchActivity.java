@@ -1,14 +1,10 @@
 package com.kerchin.yellownote.activity;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -54,6 +50,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     protected void setContentView(Bundle savedInstanceState) {
 //        view = LayoutInflater.from(this).inflate(R.layout.fragment_welcome,
 //                null);
+        closeSliding();
         setContentView(R.layout.fragment_welcome);
         NormalUtils.immerge(LaunchActivity.this, R.color.minionYellow);
     }
@@ -181,6 +178,8 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 });
             if (PrimaryData.status.isFolderReady
                     && PrimaryData.status.isNoteReady
+                    && PrimaryData.status.isItemReady
+                    && PrimaryData.status.isHeaderReady
                     && cycleTarget != null) {
                 Trace.d("runnableForData done");
                 //保证标志图的最低显示时间为delayTimeToMain

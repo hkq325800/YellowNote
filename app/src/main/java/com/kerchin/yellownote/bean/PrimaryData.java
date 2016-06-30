@@ -800,7 +800,7 @@ public class PrimaryData {
         listFolder.clear();
 //        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
         List<Folder> list = helper.getFolderDao().queryForEq("user_tel",MyApplication.user);
-        Trace.d("size" + list.size());
+        Trace.d("getFolderFromData size" + list.size());
         listFolder.addAll(list);
         Trace.d("isFolderReady true");
         status.isFolderReady = true;
@@ -816,7 +816,7 @@ public class PrimaryData {
         map.clear();
 //        ArrayList<Note> list = liteOrmHelper.query(Note.class);
         List<Note> list = helper.getNoteDao().queryForEq("user_tel", MyApplication.user);
-        Trace.d("size" + list.size());
+        Trace.d("getNoteFromData size" + list.size());
         listNote.addAll(list);
         status.isNoteReady = true;
         Trace.d("isNoteReady true");

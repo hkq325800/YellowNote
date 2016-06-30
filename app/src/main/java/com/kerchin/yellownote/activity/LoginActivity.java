@@ -76,6 +76,7 @@ public class LoginActivity extends LoginAbstract {
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        closeSliding();
         setContentView(R.layout.activity_login);
         NormalUtils.immerge(LoginActivity.this, R.color.lightSkyBlue);
     }
@@ -538,12 +539,12 @@ public class LoginActivity extends LoginAbstract {
                 try {
                     boolean flag = LoginService.isRegistered(txtUser);
                     if (flag) {
-                        Trace.d("验证是否已经注册 查询到" + txtUser + "已注册");
+                        Trace.d("是否注册验证 查询到" + txtUser + "已注册");
                         registerStatus = statusTrue;
                     } else
                         registerStatus = statusFalse;
                 } catch (AVException e) {
-                    Trace.e("验证是否注册失败" + Trace.getErrorMsg(e));
+                    Trace.e("是否注册验证失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
                     runOnUiThread(new Runnable() {
                         @Override
@@ -611,6 +612,7 @@ public class LoginActivity extends LoginAbstract {
             if (PrimaryData.status != null
                     && PrimaryData.status.isFolderReady
                     && PrimaryData.status.isItemReady
+                    && PrimaryData.status.isHeaderReady
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
                 MainActivity.startMe(getApplicationContext());
@@ -632,7 +634,12 @@ public class LoginActivity extends LoginAbstract {
 
     private void dismissProgress() {
         if (mSVProgressHUD.isShowing())
-            mSVProgressHUD.dismiss();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSVProgressHUD.dismiss();
+                }
+            });
     }
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {

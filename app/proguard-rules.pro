@@ -15,24 +15,35 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+#指定代码的压缩级别
 -optimizationpasses 5
+#包名不混合大小写
 -dontusemixedcaseclassnames
+#指定不去忽略非公共库的类
 -dontskipnonpubliclibraryclasses
+#指定不去忽略非公共库的类
 -dontskipnonpubliclibraryclassmembers
+#预校验
 -dontpreverify
+#混淆时是否记录日志
 -verbose
+#混淆前后的映射
 -printmapping proguardMapping.txt
+#混淆时所采用的算法
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
--keepattributes *Annotation*
--keepattributes Signature
-
+#抛出异常时保留代码行号
+-keepattributes SourceFile,LineNumberTable
+#避免混淆泛型 如果混淆报错建议关掉
+#–keepattributes Signature
+#保持 native 方法不被混淆
 -keepclasseswithmembernames class * {
     native <methods>;
 }
--keepclassmembers enum * {
-    public static **[] values();
-    public static ** valueOf(java.lang.String);
-}
+#保持枚举 enum 类不被混淆 如果混淆报错，建议直接使用上面的 -keepclassmembers class * implements java.io.Serializable即可
+#-keepclassmembers enum * {
+#  public static **[] values();
+#  public static ** valueOf(java.lang.String);
+#}
 # OrmLite uses reflection
 -keep class com.j256.**
 -keepclassmembers class com.j256.** { *; }
@@ -40,8 +51,9 @@
 -keepclassmembers enum com.j256.** { *; }
 -keep interface com.j256.**
 -keepclassmembers interface com.j256.** { *; }
-
+#保护注解
 -keepattributes *Annotation*
+#保护DatabaseField
 -keepclassmembers class * {
     @com.j256.ormlite.field.DatabaseField *;
 }
@@ -55,13 +67,14 @@
 -keep public class * extends android.preference.Preference
 -keep public class * extends android.support.v4.app.Fragment
 -keep public class * extends android.app.Fragment
+
 -keep class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
--keep class com.kerchin.yellownote.base.MyOrmLiteHasSwipeBaseActivity { *; }
 -keep class com.kerchin.yellownote.helper.sql.* { *; }
 -keep class com.kerchin.yellownote.bean.Note { *; }
 -keep class com.kerchin.yellownote.bean.Folder { *; }
 -keep class com.kerchin.yellownote.bean.PrimaryData { *; }
 ##
+#保留R下面的资源
 -keep class **.R$*
 
 -dontwarn com.alibaba.fastjson.**

@@ -249,25 +249,6 @@ public class FolderFragment extends BaseFragment {
         }
     }
 
-    private void reConfirmDialogMaker(Context context, String title, String Message
-            , DialogInterface.OnClickListener negativeListener
-            , DialogInterface.OnClickListener positiveListener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-        builder.setMessage(Message);
-        builder.setNegativeButton("取消", negativeListener);
-        builder.setPositiveButton("确认", positiveListener);
-        builder.show();
-    }
-
-    private void singleChooseDialogMaker(Context context, String title, CharSequence[] items
-            , final DialogInterface.OnClickListener listener) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title);
-        builder.setItems(items, listener);
-        builder.show();
-    }
-
     private void noteMove(final SimpleEntity item) {
         final String[] mFolder = primaryData.getFolderArr(item.getFolderId());
         final String[] mFolderId = primaryData.getFolderObjectIdArr(item.getFolderId());
@@ -323,16 +304,6 @@ public class FolderFragment extends BaseFragment {
             });//初始化列表
 //            primaryData.getSimpleEntityFromList();//getData
         }
-    }
-
-    //
-    public void singleEditTextDialogMaker(Context context, String title
-            , View view, final DialogInterface.OnCancelListener listener) {
-        alertDialog = new AlertDialog.Builder(context)
-                .setTitle(title)
-                .setView(view)
-                .setOnCancelListener(listener).create();
-        alertDialog.show();
     }
 
     /**
@@ -672,5 +643,61 @@ public class FolderFragment extends BaseFragment {
             dataRefresh();
             FolderFragment.isChanged4folder = false;
         }
+    }
+
+    /**
+     * 重复确认对话框
+     * 确认删除笔记夹 确认删除笔记
+     *
+     * @param context
+     * @param title
+     * @param Message
+     * @param negativeListener
+     * @param positiveListener
+     */
+    private void reConfirmDialogMaker(Context context, String title, String Message
+            , DialogInterface.OnClickListener negativeListener
+            , DialogInterface.OnClickListener positiveListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setMessage(Message)
+                .setNegativeButton("取消", negativeListener)
+                .setPositiveButton("确认", positiveListener)
+                .show();
+    }
+
+    /**
+     * 单选对话框
+     * 笔记夹操作 笔记操作 移至笔记夹
+     *
+     * @param context
+     * @param title
+     * @param items
+     * @param listener
+     */
+    private void singleChooseDialogMaker(Context context, String title, CharSequence[] items
+            , final DialogInterface.OnClickListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle(title)
+                .setItems(items, listener)
+                .show();
+    }
+
+    /**
+     * 单编辑对话框
+     * 修改标题 修改笔记夹名称 显示笔记内容
+     *
+     * @param context
+     * @param title
+     * @param view
+     * @param listener
+     */
+    public void singleEditTextDialogMaker(Context context, String title
+            , View view, final DialogInterface.OnCancelListener listener) {
+        alertDialog = new AlertDialog.Builder(context)
+                .setTitle(title)
+                .setView(view)
+                .setOnCancelListener(listener).create();
+        alertDialog.show();
     }
 }

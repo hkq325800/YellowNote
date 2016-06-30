@@ -1,8 +1,10 @@
 package com.kerchin.yellownote.utilities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,10 +14,14 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.kerchin.yellownote.global.Config;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -345,6 +351,25 @@ public class NormalUtils {
             // Clear the array.
             for (int i = 0, size = Array.getLength(cached); i < size; i ++) {
                 Array.set(cached, i, null);
+            }
+        }
+    }
+
+    public static void checkWriteSDPermission(Activity context, int requestCode){
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            if (Config.isDebugMode)
+                Trace.show(context, "拥有写crash日志的权限");
+        } else {
+            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(context
+                    , Manifest.permission.WRITE_EXTERNAL_STORAGE);
+            if (shouldShow) {
+                //申请权限
+                ActivityCompat.requestPermissions(context
+                        , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+            } else {
+                //被禁止显示弹窗
+                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志");
             }
         }
     }

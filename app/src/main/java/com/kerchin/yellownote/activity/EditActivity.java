@@ -33,7 +33,7 @@ import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.MyOrmLiteHasSwipeBaseActivity;
+import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
@@ -60,7 +60,7 @@ import butterknife.OnClick;
 /**
  * Created by Kerchin on 2015/9/30 0030.
  */
-public class EditActivity extends MyOrmLiteHasSwipeBaseActivity<OrmLiteHelper> {
+public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @BindView(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
     @BindView(R.id.mEditNavLinear)

@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.activity;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
@@ -11,9 +10,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -33,7 +30,6 @@ import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
-import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -73,6 +69,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        closeSliding();
         setContentView(R.layout.activity_main);
         NormalUtils.immerge(MainActivity.this, R.color.lightSkyBlue);
     }
@@ -243,20 +240,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && Config.isDebugMode)
-            Trace.show(getApplicationContext(), "拥有写crash日志的权限");
-        else {
-            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (shouldShow) {
-                //申请权限
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE_REQUEST_PERMISSION);
-            } else {
-                //被禁止显示弹窗
-                //TODO 显示对话框告知用户必须打开权限
-                Trace.show(getApplicationContext(), "请求打开");
-            }
-        }
+        NormalUtils.checkWriteSDPermission(this, REQUEST_CODE_REQUEST_PERMISSION);
     }
 
     private ToolbarStatus getFragmentStatus() {
@@ -364,9 +348,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             return false;
         } else if (id == R.id.nav_resetSecret) {
 //            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
-            if (Config.isDebugMode)
-                startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
-            else
+//            if (Config.isDebugMode)
+//                startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
+//            else
                 handler.sendEmptyMessage(gotoSecret);
             return false;
         }
