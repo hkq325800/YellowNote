@@ -20,6 +20,7 @@ import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
 
@@ -369,7 +370,7 @@ public class NormalUtils {
                         , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
             } else {
                 //被禁止显示弹窗
-                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志");
+                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志", Toast.LENGTH_LONG);
             }
         }
     }

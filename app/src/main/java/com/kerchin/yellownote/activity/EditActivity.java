@@ -114,6 +114,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
     private boolean isLeftGray = true;//左侧的控制
     private boolean isRightGray = true;//右侧的控制
+    private SVProgressHUD mSVProgressHUD;
     //用于显示隐藏两栏
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
@@ -201,8 +202,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
-
-    private SVProgressHUD mSVProgressHUD;
 
     @Override
     public void onOpened() {

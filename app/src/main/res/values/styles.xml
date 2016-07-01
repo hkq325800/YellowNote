@@ -11,7 +11,7 @@
         <item name="colorControlHighlight">@color/colorPrimaryPressed</item>
     </style>
 
-    <style name="AppTheme.NoActionBar">
+    <style name="AppTheme.NoActionBar" parent="AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
@@ -46,10 +46,10 @@
         <item name="android:popupBackground">@color/lightSkyBlue</item>
     </style>-->
     <!--使得popMenu不遮挡-->
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" >
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
         <item name="actionOverflowMenuStyle">@style/LYJMenuStyle</item>
         <item name="android:popupBackground">@color/lightSkyBlue</item>
-        </style>
+    </style>
     <!--分割线-->
     <style name="horizontal_line_style">
         <item name="android:layout_width">match_parent</item>

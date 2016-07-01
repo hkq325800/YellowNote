@@ -8,11 +8,12 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.logger.LoggerFactory;
 import com.j256.ormlite.support.ConnectionSource;
+import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 
 /**
  * Created by Kerchin on 2016/6/23 0023.
  */
-public abstract class MyOrmLiteBaseActivity<H extends OrmLiteSqliteOpenHelper> extends BaseHasSwipeActivity {
+public abstract class MyOrmLiteBaseActivity<H extends OrmLiteHelper> extends BaseHasSwipeActivity {
     private volatile H helper;
     private volatile boolean created = false;
     private volatile boolean destroyed = false;

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -63,6 +64,8 @@ public class LoginActivity extends LoginAbstract {
     RelativeLayout mSignUpRelative;
     @BindView(R.id.mLoginFunLiL)
     LinearLayout mLoginFunLiL;
+    @BindView(R.id.mLoginIconImg)
+    ImageView mLoginIconImg;
     private SVProgressHUD mSVProgressHUD;
     private final static byte statusInit = -1;//未查询或查询中
     private final static byte statusFalse = 0;//查询结果为假

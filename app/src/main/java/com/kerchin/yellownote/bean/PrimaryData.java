@@ -291,7 +291,6 @@ public class PrimaryData {
                                 && simpleDaoForFolder != null) {
                             int i = 0;
                             for (Note note : listNote) {
-                                //TODO 如果hasEdited为true则不覆盖数据库
                                 Note localNote = simpleDaoForNote.queryForSameId(note);
                                 if (localNote == null)
                                     simpleDaoForNote.create(note);
@@ -309,6 +308,19 @@ public class PrimaryData {
                                     simpleDaoForFolder.create(folder);
                                 else
                                     simpleDaoForFolder.update(folder);
+                            }
+                            //检查查是否存在不在list中只在local中的数据
+                            for (Note n : simpleDaoForNote.queryForEq("user_tel", MyApplication.user)) {
+                                if (!noteListContain(listNote, n)) {
+                                    Trace.d("delete " + n.getTitle());
+                                    simpleDaoForNote.delete(n);
+                                }
+                            }
+                            for (Folder f : simpleDaoForFolder.queryForEq("user_tel", MyApplication.user)) {
+                                if (!folderListContain(listFolder, f)) {
+                                    Trace.d("delete " + f.getName());
+                                    simpleDaoForFolder.delete(f);
+                                }
                             }
                         }
                         Trace.d("waitToSaveData true");
@@ -336,6 +348,24 @@ public class PrimaryData {
                 }
             }
         }).start();
+    }
+
+    private boolean noteListContain(List<Note> list, Note out) {
+        for (Note n : list) {
+            if (n.equals(out)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean folderListContain(List<Folder> list, Folder out) {
+        for (Folder n : list) {
+            if (n.equals(out)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -665,7 +695,7 @@ public class PrimaryData {
      * 编辑过的数据需要删去内存中原有数据并加一条在队首
      *
      * @param note               新数据
-     * @param offlineAddObjectId
+     * @param offlineAddObjectId 离线添加的objectId
      */
     public void editNote(Note note, String offlineAddObjectId) {
         int pos = getNotePosition(note.getObjectId(), offlineAddObjectId);
@@ -681,7 +711,7 @@ public class PrimaryData {
      * 根据noteId取Note的position
      *
      * @param noteId             note唯一ID
-     * @param offlineAddObjectId
+     * @param offlineAddObjectId 离线添加的objectId
      * @return int
      */
     public int getNotePosition(String noteId, String offlineAddObjectId) {
@@ -799,7 +829,7 @@ public class PrimaryData {
     private void getFolderFromData(OrmLiteHelper helper) {
         listFolder.clear();
 //        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-        List<Folder> list = helper.getFolderDao().queryForEq("user_tel",MyApplication.user);
+        List<Folder> list = helper.getFolderDao().queryForEq("user_tel", MyApplication.user);
         Trace.d("getFolderFromData size" + list.size());
         listFolder.addAll(list);
         Trace.d("isFolderReady true");
@@ -870,7 +900,7 @@ public class PrimaryData {
         return arr;
     }
 
-    public int getFolderSize(){
+    public int getFolderSize() {
         return listFolder.size();
     }
 

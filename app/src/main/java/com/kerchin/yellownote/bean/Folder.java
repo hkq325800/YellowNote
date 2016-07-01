@@ -122,4 +122,8 @@ public class Folder implements Serializable {
     public String toString() {
         return "objectId:" + objectId + " name:" + name + " contain" + contain;
     }
+
+    public boolean equals(Folder f){
+        return objectId.equals(f.getObjectId());
+    }
 }

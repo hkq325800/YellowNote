@@ -9,6 +9,7 @@ import android.os.Process;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -62,7 +63,7 @@ public class NoteFragment extends BaseFragment
     private NoteShrinkAdapter noteAdapter;
     private List<Note> list;//维护list 因为有搜索需要
     private ToolbarStatus mainStatus;
-    private String mSearchText;//方便在搜索列表更改后重新搜索
+    private String mSearchText = "";//方便在搜索列表更改后重新搜索
     private PrimaryData primaryData;
     private int repeatCount = 0;
     private int emptyClickCount = 0;//控制空白点击次数 三次则重新网络获取
@@ -307,7 +308,8 @@ public class NoteFragment extends BaseFragment
             Trace.d("respondForChange");
             getDataHelper.respond();//isChanged4note
             getData(350);//statusRespond onResume
-            if (mainStatus.isSearchMode())
+            if (mainStatus.isSearchMode()
+                    && !TextUtils.isEmpty(mSearchText))
                 doSearch();
             isChanged4note = false;//respondForChange
         }

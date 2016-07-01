@@ -102,6 +102,10 @@ public class Note implements Serializable {
         //+ " type " + type;
     }
 
+    public boolean equals(Note n){
+        return objectId.equals(n.getObjectId());
+    }
+
     public boolean isHasEdited() {
         return hasEdited;
     }

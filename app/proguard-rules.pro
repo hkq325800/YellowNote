@@ -34,7 +34,7 @@
 #抛出异常时保留代码行号
 -keepattributes SourceFile,LineNumberTable
 #避免混淆泛型 如果混淆报错建议关掉
-#–keepattributes Signature
+-keepattributes Signature
 #保持 native 方法不被混淆
 -keepclasseswithmembernames class * {
     native <methods>;
@@ -55,24 +55,45 @@
 -keepattributes *Annotation*
 #保护DatabaseField
 -keepclassmembers class * {
+  public <init>(android.content.Context);
+}
+-keepclassmembers class * {
     @com.j256.ormlite.field.DatabaseField *;
 }
+
+## Keep all model classes that are used by OrmLite
+## Also keep their field names and the constructor
+#-keep @com.j256.ormlite.table.DatabaseTable class * {
+#    @com.j256.ormlite.field.DatabaseField <fields>;
+#    @com.j256.ormlite.field.ForeignCollectionField <fields>;
+#    # Add the ormlite field annotations that your model uses here
+#    <init>();
+#}
+#-keep class <com.kerchin.yellownote>.bean.Folder { *; }
+#-keep class <com.kerchin.yellownote>.bean.Note { *; }
+## Keep the helper class and its constructor
+#-keep class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper
+#-keepclassmembers class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper {
+#  public <init>(android.content.Context);
+#}
+
 ##
--keep public class * extends android.app.Activity
--keep public class * extends android.app.Application
--keep public class * extends android.app.Service
--keep public class * extends android.content.BroadcastReceiver
--keep public class * extends android.content.ContentProvider
--keep public class * extends android.app.backup.BackupAgent
--keep public class * extends android.preference.Preference
--keep public class * extends android.support.v4.app.Fragment
--keep public class * extends android.app.Fragment
+#-keep public class * extends android.app.Activity
+#-keep public class * extends android.app.Application
+#-keep public class * extends android.app.Service
+#-keep public class * extends android.content.BroadcastReceiver
+#-keep public class * extends android.content.ContentProvider
+#-keep public class * extends android.app.backup.BackupAgent
+#-keep public class * extends android.preference.Preference
+#-keep public class * extends android.support.v4.app.Fragment
+#-keep public class * extends android.app.Fragment
 
 -keep class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
--keep class com.kerchin.yellownote.helper.sql.* { *; }
--keep class com.kerchin.yellownote.bean.Note { *; }
--keep class com.kerchin.yellownote.bean.Folder { *; }
--keep class com.kerchin.yellownote.bean.PrimaryData { *; }
+-keepclassmembers class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
+#-keep class com.kerchin.yellownote.helper.sql.* { *; }
+#-keep class com.kerchin.yellownote.bean.Note { *; }
+#-keep class com.kerchin.yellownote.bean.Folder { *; }
+#-keep class com.kerchin.yellownote.bean.PrimaryData { *; }
 ##
 #保留R下面的资源
 -keep class **.R$*

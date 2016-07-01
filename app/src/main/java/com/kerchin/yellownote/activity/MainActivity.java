@@ -304,6 +304,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 noteFragment.disableLoad();
             }
         });
+        mSearchView.setQueryHint("可根据标题和内容进行搜索...");
         mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
         mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
         mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {

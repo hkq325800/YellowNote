@@ -45,7 +45,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     private final static int requestForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
     private final static int requestForConfirmPattern = 3;
     private final static int requestForEditPattern = 4;
-
+//    private SVProgressHUD mSVProgressHUD;
     private boolean hasPattern;
 
     @Override
@@ -57,7 +57,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-
     }
 
     @Override
@@ -74,6 +73,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         @Override
                         public void run() {
                             enablePattern(hasPattern);
+//                            mSVProgressHUD.dismissImmediately();
                         }
                     });
                 } catch (AVException e) {
@@ -93,6 +93,8 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
         mNavigationTitleEdt.setFocusable(false);
         mNavigationTitleEdt.clearFocus();
         mNavigationTitleEdt.setFocusableInTouchMode(false);
+//        mSVProgressHUD = new SVProgressHUD(this);
+//        mSVProgressHUD.showWithStatus("获取最新密码信息...", SVProgressHUD.SVProgressHUDMaskType.Clear);
     }
 
     public static void startMe(Context context) {
