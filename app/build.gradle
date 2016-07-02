@@ -50,15 +50,13 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     //共同使用
     compile 'me.zhanghai.android.patternlock:library:2.0.3'
-    //即将停止更新
+    //中国 有时修复bug
     compile 'tyrantgit:explosionfield:1.0.1'
     //已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
     //已经停止更新
     compile 'com.bigkoo:svprogresshud:1.0.2'
     //已经停止更新
-    compile 'me.zhanghai.android.patternlock:library:2.0.2'
-    //中国 有时修复bug
     compile project(':SlidingLibrary')
     //已经停止更新
     compile project(':JJSearchViewAnim')
@@ -66,7 +64,7 @@ dependencies {
     compile files('libs/superadapter-3.3.jar')
     //持续更新中
     //    compile project(path: ':android-lite-orm')
-    compile files('libs/lite-orm-1.9.1.jar')
+//    compile files('libs/lite-orm-1.9.1.jar')
     //持续更新中
     //    compile 'io.realm:realm-android:0.87.4'
     compile project(':snappingstepper')

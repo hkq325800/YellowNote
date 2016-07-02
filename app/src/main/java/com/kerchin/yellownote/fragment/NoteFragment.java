@@ -249,7 +249,7 @@ public class NoteFragment extends BaseFragment
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                mProgress.startProgress(true);//first get
+                mProgress.startProgress();//first get
                 MainActivity a = (MainActivity) getActivity();
                 primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
                     @Override
@@ -307,7 +307,7 @@ public class NoteFragment extends BaseFragment
             //被动刷新
             Trace.d("respondForChange");
             getDataHelper.respond();//isChanged4note
-            getData(350);//statusRespond onResume
+            getData(0);//statusRespond onResume
             if (mainStatus.isSearchMode()
                     && !TextUtils.isEmpty(mSearchText))
                 doSearch();
@@ -378,7 +378,7 @@ public class NoteFragment extends BaseFragment
                                             note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
                                         }
                                         //循环查询是否删除 从数据源中重新获取list并设置到adapter中
-                                        handler.post(runnableForData);
+                                        handler.post(runnableForDataAfterDelete);
                                     }
                                 }
                             }
@@ -400,7 +400,7 @@ public class NoteFragment extends BaseFragment
             });
     }
 
-    private Runnable runnableForData = new Runnable() {
+    private Runnable runnableForDataAfterDelete = new Runnable() {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
@@ -410,7 +410,7 @@ public class NoteFragment extends BaseFragment
                 getData(800);//statusRespond delete
             } else {
                 if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
-                    handler.postDelayed(runnableForData, Config.period_runnable);
+                    handler.postDelayed(runnableForDataAfterDelete, Config.period_runnable);
                     repeatCount++;
                 } else {
                     repeatCount = 0;
@@ -599,11 +599,11 @@ public class NoteFragment extends BaseFragment
                     Trace.d("emptyClickCount" + emptyClickCount);
                     emptyClickCount++;
                     getDataHelper.respond();
-                    mProgress.startProgress(false);//emptyClick
+                    mProgress.startProgress();//emptyClick
                     getData(0);//statusRespond empty
                     FolderFragment.isChanged4folder = true;//emptyClick
                 } else {
-                    mProgress.startProgress(false);//refresh
+                    mProgress.startProgress();//refresh
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

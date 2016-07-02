@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -82,11 +81,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mShareSuggestCodeImg)
     public void download() {
-        Uri uri = Uri.parse(getString(R.string.uri_download));//指定网址
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);//指定Action
-        intent.setData(uri);//设置Uri
-        startActivity(intent);//启动Activity
+        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
     }
 
     @OnClick(R.id.mNavigationRightBtn)

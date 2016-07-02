@@ -94,7 +94,7 @@ public class OldProgress extends RelativeLayout {
      * 开启过场
      * second
      */
-    public void startProgress(boolean isFirst) {
+    public void startProgress() {
 //        if (status >= statusStart)
 //            return;
         dismissNoData();

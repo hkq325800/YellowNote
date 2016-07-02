@@ -2,6 +2,7 @@ package com.kerchin.yellownote.utilities;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -40,6 +41,25 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    public static void downloadByUri(Context context, String uriStr){
+        Uri uri = Uri.parse(uriStr);//指定网址
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);//指定Action
+        intent.setData(uri);//设置Uri
+        context.startActivity(intent);//启动Activity
+    }
+
+    public static void downloadByDownloadManager(Context context, String uriStr){
+        //创建下载任务,downloadUrl就是下载链接
+        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(uriStr));
+        //指定下载路径和下载文件名
+        request.setDestinationInExternalPublicDir("/download/", "yellownote");
+        //获取下载管理器
+        DownloadManager downloadManager= (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        //将下载任务加入下载队列，否则不会进行下载
+        downloadManager.enqueue(request);
+    }
+
     public static String getTrueDate(Date date) {
         SimpleDateFormat myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
         return myFmt.format(date);
@@ -227,7 +247,9 @@ public class NormalUtils {
     public static Bitmap drawableToBitmap(Drawable drawable) {
         int width = drawable.getIntrinsicWidth();
         int height = drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(width, height, drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+        Bitmap bitmap = Bitmap.createBitmap(width, height
+                , drawable.getOpacity() != PixelFormat.OPAQUE
+                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, width, height);
         drawable.draw(canvas);
@@ -356,6 +378,11 @@ public class NormalUtils {
         }
     }
 
+    /**
+     * reference http://www.jianshu.com/p/3e16bda04852
+     * @param context
+     * @param requestCode
+     */
     public static void checkWriteSDPermission(Activity context, int requestCode){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
