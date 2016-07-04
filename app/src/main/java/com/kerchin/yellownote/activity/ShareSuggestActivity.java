@@ -21,6 +21,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
+import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
@@ -81,7 +82,12 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mShareSuggestCodeImg)
     public void download() {
-        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
+        Intent intent = new Intent(ShareSuggestActivity.this,
+                DownloadService.class);
+        intent.putExtra("uriStr",getString(R.string.uri_download));
+        intent.putExtra("versionCode",versionCode);
+        startService(intent);
+//        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -153,6 +159,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         });
     }
 
+    String versionCode;
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
@@ -178,15 +185,15 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            final String code = version.getString("version_name");
-                            if (code.compareTo(appVersionNow) > 0) {
-                                String str = "最新版本:" + code + "[查看内容]";
+                            versionCode = version.getString("version_name");
+                            if (versionCode.compareTo(appVersionNow) > 0) {
+                                String str = "最新版本:" + versionCode + "[查看内容]";
                                 mShareSuggestVersionTxt.setText(str);
                                 mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
                                         AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
-                                                .setTitle("版本:" + code)
+                                                .setTitle("版本:" + versionCode)
                                                 .setMessage(version.getString("version_content"))
 //                                        .setView(view)
 //                                        .setOnCancelListener(listener)

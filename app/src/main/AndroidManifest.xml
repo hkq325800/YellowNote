@@ -67,11 +67,12 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"
             android:theme="@style/JK.SwipeBack.Transparent.Theme" />
-        <activity android:name=".samples.SingleTest"/>
-        <activity android:name=".samples.SingleTestFolder"/>
-        <activity android:name=".samples.CascadeTest"/>
         <activity android:name=".activity.OrmLiteConsoleActivity"/>
-        <activity android:name=".samples.Main"/>
+        <service android:name="com.kerchin.yellownote.service.DownloadService" >
+            <intent-filter android:priority="1000" >
+                <action android:name="com.kerchin.yellownote.service.DownloadService" />
+            </intent-filter>
+        </service>
         <!--<activity android:name=".activities.MaterialActivity" />-->
     </application>
 

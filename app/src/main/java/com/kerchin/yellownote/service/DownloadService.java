@@ -8,10 +8,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
+import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.File;
@@ -22,18 +24,33 @@ import java.io.File;
  * reference http://www.jianshu.com/p/46fd1c253701
  */
 public class DownloadService extends Service {
+    String uriStr, versionCode, fileName;
+
+    @Override
+    public void onCreate() {
+
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
-
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        uriStr = intent.getStringExtra("uriStr");
+        versionCode = intent.getStringExtra("versionCode");
+        fileName = getResources().getString(R.string.app_name) + versionCode + ".apk";
+        downloadAPK(uriStr);
+        return START_NOT_STICKY;
+    }
 
     long mTaskId;
     DownloadManager downloadManager;
+
     //使用系统下载器下载
-    private void downloadAPK(String versionUrl, String versionName) {
+    private void downloadAPK(String versionUrl) {
         //创建下载任务
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(versionUrl));
         request.setAllowedOverRoaming(false);//漫游网络是否可以下载
@@ -48,7 +65,7 @@ public class DownloadService extends Service {
         request.setVisibleInDownloadsUi(true);
 
         //sdcard的目录下的download文件夹，必须设置
-        request.setDestinationInExternalPublicDir("/download/", versionName);
+        request.setDestinationInExternalPublicDir("/download/", fileName);
         //request.setDestinationInExternalFilesDir(),也可以自己制定下载路径
 
         //将下载请求加入下载队列
@@ -88,8 +105,8 @@ public class DownloadService extends Service {
                 case DownloadManager.STATUS_SUCCESSFUL:
                     Trace.i(">>>下载完成");
                     //下载完成安装APK
-                    //downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + versionName;
-                    installAPK(new File(""));//downloadPath
+                    String downloadPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath() + File.separator + fileName;
+                    installAPK(new File(downloadPath));//downloadPath
                     break;
                 case DownloadManager.STATUS_FAILED:
                     Trace.i(">>>下载失败");
