@@ -29,10 +29,10 @@
 [[Android优化进阶] 提高ListView性能的技巧](http://www.jianshu.com/p/3e22d53286ca)
 [Android 性能优化——布局优化](http://www.jianshu.com/p/d3a06b573ee5)
 [【干货】android真正的“万能”Adapter](http://www.jianshu.com/p/d6a76fd3ea5b)
+[Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
 
 ###TODO
 [Android主题换肤 无缝切换](http://www.jianshu.com/p/af7c0585dd5b)
-[Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
 [你可以这样复用 AlertDialog](http://www.jianshu.com/p/4d97a8538b98)
 [使用 DragHelper 控制拖动](http://www.jianshu.com/p/1712cdaf1f0e)
 [使用ItemTouchHelper完成仿Inbox的滑动删除](http://www.jianshu.com/p/9a5f81c887b8)

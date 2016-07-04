@@ -21,9 +21,6 @@ import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
-
-import com.kerchin.yellownote.global.Config;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
@@ -383,22 +380,37 @@ public class NormalUtils {
      * @param context
      * @param requestCode
      */
-    public static void checkWriteSDPermission(Activity context, int requestCode){
+//    public static void checkWriteSDPermission(Activity context, int requestCode){
+//        requestWritePermission(context, requestCode);
+//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            if (Config.isDebugMode)
+//                Trace.show(context, "拥有写crash日志的权限");
+//        } else {
+//            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(context
+//                    , Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//            if (shouldShow) {
+//                //申请权限
+//                ActivityCompat.requestPermissions(context
+//                        , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
+//            } else {
+//                //被禁止显示弹窗
+//                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志", Toast.LENGTH_LONG);
+//            }
+//        }
+//    }
+
+    /**
+     * reference http://www.jianshu.com/p/b4a8b3d4f587
+     * @param context
+     * @param requestCode
+     */
+    public static void requestWritePermission(Activity context,int requestCode){
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            if (Config.isDebugMode)
-                Trace.show(context, "拥有写crash日志的权限");
-        } else {
-            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(context
-                    , Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            if (shouldShow) {
-                //申请权限
-                ActivityCompat.requestPermissions(context
-                        , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
-            } else {
-                //被禁止显示弹窗
-                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志", Toast.LENGTH_LONG);
-            }
+                != PackageManager.PERMISSION_GRANTED) {
+            //申请WRITE_EXTERNAL_STORAGE权限
+            ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    requestCode);
         }
     }
 

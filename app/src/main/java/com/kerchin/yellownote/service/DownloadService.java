@@ -13,7 +13,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
-import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.File;
@@ -24,7 +23,7 @@ import java.io.File;
  * reference http://www.jianshu.com/p/46fd1c253701
  */
 public class DownloadService extends Service {
-    String uriStr, versionCode, fileName;
+    String uriStr, fileName;
 
     @Override
     public void onCreate() {
@@ -40,8 +39,7 @@ public class DownloadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         uriStr = intent.getStringExtra("uriStr");
-        versionCode = intent.getStringExtra("versionCode");
-        fileName = getResources().getString(R.string.app_name) + versionCode + ".apk";
+        fileName = intent.getStringExtra("fileName");
         downloadAPK(uriStr);
         return START_NOT_STICKY;
     }

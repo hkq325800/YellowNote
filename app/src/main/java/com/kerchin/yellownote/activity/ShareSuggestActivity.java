@@ -84,8 +84,8 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     public void download() {
         Intent intent = new Intent(ShareSuggestActivity.this,
                 DownloadService.class);
-        intent.putExtra("uriStr",getString(R.string.uri_download));
-        intent.putExtra("versionCode",versionCode);
+        intent.putExtra("uriStr", getString(R.string.uri_download));
+        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
         startService(intent);
 //        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
     }
@@ -160,6 +160,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     }
 
     String versionCode;
+
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         appVersionNow = SystemUtils.getAppVersion(getApplicationContext());

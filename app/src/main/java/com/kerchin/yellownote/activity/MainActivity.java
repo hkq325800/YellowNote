@@ -240,7 +240,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
-        NormalUtils.checkWriteSDPermission(this, REQUEST_CODE_REQUEST_PERMISSION);
+        NormalUtils.requestWritePermission(this, REQUEST_CODE_REQUEST_PERMISSION);
     }
 
     private ToolbarStatus getFragmentStatus() {
