@@ -60,6 +60,8 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     int quickSuggestTimes = MyApplication.getDefaultShared().getInt("quickSuggestTimes", 0);
     final static int deadLine = 30000;
     String appVersionNow;
+    String versionCode;
+    boolean hasConnect = false;
 
     private SystemHandler handler = new SystemHandler(this) {
 
@@ -82,13 +84,15 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mShareSuggestCodeImg)
     public void download() {
-        Intent intent = new Intent(ShareSuggestActivity.this,
-                DownloadService.class);
-        intent.putExtra("uriStr", getString(R.string.uri_download));
-        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
-        startService(intent);
-        mShareSuggestCodeImg.setOnClickListener(null);
-//        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
+        if (hasConnect) {
+            Intent intent = new Intent(ShareSuggestActivity.this,
+                    DownloadService.class);
+            intent.putExtra("uriStr", getString(R.string.uri_download));
+            intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
+            startService(intent);
+            mShareSuggestCodeImg.setOnClickListener(null);
+        } else
+            NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -160,8 +164,6 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         });
     }
 
-    String versionCode;
-
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
@@ -209,13 +211,14 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                                         alertDialog.show();
                                     }
                                 });
+                                hasConnect = true;
 //                                Trace.show(getApplicationContext(), version.getString("version_content"));
                             } else {
                                 String str = "当前版本：" + appVersionNow + " 已是最新";
                                 mShareSuggestVersionTxt.setText(str);
                                 mShareSuggestVersionTxt.setTextColor(getResources().getColor(R.color.black));
                                 mShareSuggestTipsTxt.setText("分享给你的朋友们吧！");
-                                mShareSuggestCodeImg.setOnClickListener(null);
+                                hasConnect = false;
                             }
                         }
                     });

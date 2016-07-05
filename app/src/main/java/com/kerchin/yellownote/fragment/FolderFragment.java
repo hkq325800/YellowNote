@@ -198,7 +198,7 @@ public class FolderFragment extends BaseFragment {
                                                 break;
                                             case 1://delete
                                                 final Note note = primaryData.getNote(item.getObjectId());
-                                                reConfirmDialogMaker(getActivity(), "确认删除笔记的内容", note.getPreview()
+                                                reConfirmDialogMaker(getActivity(), "确认删除笔记", note.getPreview()
                                                         , new DialogInterface.OnClickListener() {
                                                             @Override
                                                             public void onClick(DialogInterface dialog, int which) {
@@ -492,7 +492,7 @@ public class FolderFragment extends BaseFragment {
                 //笔记夹下如果还有笔记要么全部删除要么移至默认
                 Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
             else {
-                reConfirmDialogMaker(getActivity(), "确认删除笔记夹", primaryData.getFolderAt(position).getName()
+                reConfirmDialogMaker(getActivity(), "确认删除笔记夹:" + primaryData.getFolderAt(position).getName(), ""
                         , new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -659,11 +659,12 @@ public class FolderFragment extends BaseFragment {
             , DialogInterface.OnClickListener negativeListener
             , DialogInterface.OnClickListener positiveListener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(title)
-                .setMessage(Message)
+        builder = builder.setTitle(title)
                 .setNegativeButton("取消", negativeListener)
-                .setPositiveButton("确认", positiveListener)
-                .show();
+                .setPositiveButton("确认", positiveListener);
+        if (!Message.equals(""))
+            builder.setMessage(Message);
+        builder.show();
     }
 
     /**

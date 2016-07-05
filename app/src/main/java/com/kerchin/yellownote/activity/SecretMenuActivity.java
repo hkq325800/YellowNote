@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -41,11 +42,13 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     TextView mSecretMenuPatternEditTxt;
     @BindView(R.id.mSecretMenuPatternToggleLiL)
     LinearLayout mSecretMenuPatternToggleLiL;
+    @BindView(R.id.mSecretMenuPatternToggleTxt)
+    TextView mSecretMenuPatternToggleTxt;
     private final static int requestForPattern = 1;//手势开关
     private final static int requestForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
     private final static int requestForConfirmPattern = 3;
     private final static int requestForEditPattern = 4;
-//    private SVProgressHUD mSVProgressHUD;
+    //    private SVProgressHUD mSVProgressHUD;
     private boolean hasPattern;
 
     @Override
@@ -78,6 +81,15 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     });
                 } catch (AVException e) {
                     e.printStackTrace();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mSecretMenuPatternToggleLiL.setClickable(false);
+                            mSecretMenuPatternToggleTxt.setTextColor(getResources()
+                                    .getColor(R.color.light_gray));
+                            Trace.show(getApplicationContext(), "网络离线无法设置手势密码");
+                        }
+                    });
                 }
             }
         }).start();
@@ -228,7 +240,8 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         if (!hasPattern) {//开启手势
                             SecretService.setPatternStr(MyApplication.user, patternFromOthers);
                             PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
-                            Trace.show(SecretMenuActivity.this, patternFromOthers);
+                            if (Config.isDebugMode)
+                                Trace.show(SecretMenuActivity.this, patternFromOthers);
                             hasPattern = true;
                         } else {//关闭手势
                             PatternLockUtils.clearPattern(getApplicationContext());

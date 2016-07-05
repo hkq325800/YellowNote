@@ -100,7 +100,7 @@ public class LoginActivity extends LoginAbstract {
         if (!MyApplication.user.equals("")) {
             mLoginUserEdt.setText(MyApplication.user);
             mLoginUserEdt.setSelection(MyApplication.user.length());
-            mLoginPassEdt.requestFocus();
+            //TODO mLoginPassEdt获取焦点
         } else
             mLoginUserEdt.requestFocus();
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
@@ -154,8 +154,8 @@ public class LoginActivity extends LoginAbstract {
                 return false;
             }
         });
-        mLoginPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
-        mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+//        mLoginPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
+//        mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
 
@@ -163,6 +163,7 @@ public class LoginActivity extends LoginAbstract {
 
     @OnClick(R.id.mLoginBtn)
     public void loginClick() {
+        mLoginPassEdt.setHint("请输入密码(长度需大于6)");
         //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
             mSignUpRelative.setVisibility(View.GONE);
@@ -192,6 +193,7 @@ public class LoginActivity extends LoginAbstract {
 
     @OnClick(R.id.mLoginSignUpBtn)
     public void signUpClick() {
+        mLoginPassEdt.setHint("请输入密码(长度需大于6)");
         if (mLoginSignUpBtn.getText().toString().equals("注册")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("忘记密码");
@@ -213,26 +215,22 @@ public class LoginActivity extends LoginAbstract {
         //表格检查
         if (tableCheck(txtUser, txtPass, txtRePass, txtProv)) {
             //验证验证码成功则注册成功以该帐号登录
-            if (Config.isDebugMode)//比较危险
-                signUpVerify(txtUser, txtPass);
-            else {
-                smsVerify(txtProv, txtUser);
-                new CountDownTimer(Config.timeout_avod, 250) {
-                    @Override
-                    public void onTick(long millisUntilFinished) {
-                        if (smsStatus) {
-                            cancel();
-                            smsStatus = false;
-                            Trace.d("CDTimer signUp server echo " + millisUntilFinished);
-                            signUpVerify(txtUser, txtPass);
-                        }
+            smsVerify(txtProv, txtUser);
+            new CountDownTimer(Config.timeout_avod, 250) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    if (smsStatus) {
+                        cancel();
+                        smsStatus = false;
+                        Trace.d("CDTimer signUp server echo " + millisUntilFinished);
+                        signUpVerify(txtUser, txtPass);
                     }
+                }
 
-                    @Override
-                    public void onFinish() {
-                    }
-                }.start();
-            }
+                @Override
+                public void onFinish() {
+                }
+            }.start();
         } else
             isEnter = false;//signUp tableCheck false
     }
@@ -242,6 +240,7 @@ public class LoginActivity extends LoginAbstract {
         if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("找回密码");
+            mLoginPassEdt.setHint("请输入新密码(长度需大于6)");
             mSignUpRelative.setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(), "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
         } else {
@@ -269,27 +268,23 @@ public class LoginActivity extends LoginAbstract {
                         if (registerStatus == statusFalse) {
                             Trace.show(getApplicationContext(), "该帐号尚未注册");
                         } else {
-                            if (Config.isDebugMode)
-                                forgetVerify(txtUser, txtPass);
-                            else {
-                                //验证验证码成功则找回成功以该帐号登录
-                                smsVerify(txtProv, txtUser);
-                                new CountDownTimer(Config.timeout_avod, 250) {
-                                    @Override
-                                    public void onTick(long millisUntilFinished) {
-                                        if (smsStatus) {
-                                            cancel();
-                                            smsStatus = false;
-                                            Trace.d("CDTimer SMSVerify server echo " + millisUntilFinished);
-                                            forgetVerify(txtUser, txtPass);
-                                        }
+                            //验证验证码成功则找回成功以该帐号登录
+                            smsVerify(txtProv, txtUser);
+                            new CountDownTimer(Config.timeout_avod, 250) {
+                                @Override
+                                public void onTick(long millisUntilFinished) {
+                                    if (smsStatus) {
+                                        cancel();
+                                        smsStatus = false;
+                                        Trace.d("CDTimer SMSVerify server echo " + millisUntilFinished);
+                                        forgetVerify(txtUser, txtPass);
                                     }
+                                }
 
-                                    @Override
-                                    public void onFinish() {
-                                    }
-                                }.start();
-                            }
+                                @Override
+                                public void onFinish() {
+                                }
+                            }.start();
                         }
                         registerStatus = statusInit;
                     }
@@ -573,8 +568,8 @@ public class LoginActivity extends LoginAbstract {
         } else if (!txtRePass.equals(txtPass)) {
             Trace.show(getApplicationContext(), "两次输入的密码不同");
             return false;
-        } else if (txtPass.length() < 6 || txtPass.length() > 13) {
-            Trace.show(getApplicationContext(), "密码长度控制在6-13位");
+        } else if (txtPass.length() < 6) {
+            Trace.show(getApplicationContext(), "密码长度需大于6位");
             return false;
         } else if (txtProv.length() != 6) {
             Trace.show(getApplicationContext(), "请输入6位验证码");

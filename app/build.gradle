@@ -11,6 +11,12 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+    productFlavors {
+//        YingYongBao {
+//            manifestPlaceholders = [UMENG_CHANNEL: "YingYongBao"]
+//            buildConfigField "String", "CHANNEL", "\"YingYongBao\""
+//        }
+    }
     lintOptions {
         abortOnError false
     }
@@ -18,13 +24,19 @@ android {
         applicationId "com.kerchin.yellownote"
         minSdkVersion 14
         targetSdkVersion 23
-        versionCode 5
-        versionName "1.05"
+        versionCode 6
+        versionName "1.06"
     }
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            zipAlignEnabled true
+            shrinkResources true
+//            buildConfigField "String", "CHANNEL", "\"dev\""
         }
     }
 }

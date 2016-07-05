@@ -26,6 +26,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
@@ -58,6 +59,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     DrawerLayout mMainDrawer;
     @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
+    TextView mNavHeaderMainTipTxt;
     TextView msgNote, msgFolder;
 
     public static int thisPosition = 0;
@@ -81,11 +83,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
         msgNote = (TextView) galleryNote.findViewById(R.id.msg);
         LinearLayout galleryFolder = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_folder).getActionView();
         msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
         setSupportActionBar(mMainToolbar);
+        if (BuildConfig.BUILD_TYPE.equals("debug")) {
+            String str = mNavHeaderMainTipTxt.getText() + " Dev.";
+            mNavHeaderMainTipTxt.setText(str);
+        }
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
     }
@@ -219,8 +226,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onDrawerOpened(View drawerView) {
                 //menu数字
-                String note = PrimaryData.getInstance().getFolderSize() + "";
-                String folder = PrimaryData.getInstance().getNoteSize() + "";
+                String note = PrimaryData.getInstance().getNoteSize() + "";
+                String folder = PrimaryData.getInstance().getFolderSize() + "";
                 msgNote.setText(note);
                 msgFolder.setText(folder);
                 isDrawerOpen = true;

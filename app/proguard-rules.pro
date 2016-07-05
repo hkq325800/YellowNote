@@ -61,22 +61,6 @@
     @com.j256.ormlite.field.DatabaseField *;
 }
 
-## Keep all model classes that are used by OrmLite
-## Also keep their field names and the constructor
-#-keep @com.j256.ormlite.table.DatabaseTable class * {
-#    @com.j256.ormlite.field.DatabaseField <fields>;
-#    @com.j256.ormlite.field.ForeignCollectionField <fields>;
-#    # Add the ormlite field annotations that your model uses here
-#    <init>();
-#}
-#-keep class <com.kerchin.yellownote>.bean.Folder { *; }
-#-keep class <com.kerchin.yellownote>.bean.Note { *; }
-## Keep the helper class and its constructor
-#-keep class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper
-#-keepclassmembers class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper {
-#  public <init>(android.content.Context);
-#}
-
 ##
 #-keep public class * extends android.app.Activity
 #-keep public class * extends android.app.Application
@@ -88,6 +72,8 @@
 #-keep public class * extends android.support.v4.app.Fragment
 #-keep public class * extends android.app.Fragment
 
+-keep class com.kerchin.yellownote.helper.sql.OrmLiteHelper { *; }
+-keepclassmembers class com.kerchin.yellownote.helper.sql.OrmLiteHelper { *; }
 -keep class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
 -keepclassmembers class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
 #-keep class com.kerchin.yellownote.helper.sql.* { *; }
@@ -104,3 +90,5 @@
 -keep class com.avos.avoscloud.okio.** { *; }
 -dontwarn com.j256.ormlite.**
 -keep class com.j256.ormlite.** { *;}
+-keep class com.avos.avoscloud.** {*;}
+-keepclassmembers class com.avos.avoscloud.** {*;}

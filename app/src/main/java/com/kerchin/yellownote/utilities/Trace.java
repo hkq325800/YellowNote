@@ -96,6 +96,5 @@ public class Trace {
             return e.getMessage();
         else
             return "";
-
     }
 }

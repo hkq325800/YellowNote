@@ -101,13 +101,22 @@ public class NoteFragment extends BaseFragment
                         mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                emptyClick();
+                                if (!hasClick) {
+                                    hasClick = true;
+                                    emptyClick();
+                                }
                             }
                         });
                         Trace.d("handlerInNote handle4zero");
                         mNoteWDList.setVisibility(View.GONE);
                     } else
                         mProgress.showListView();//handle4firstGet
+                    //借emptyClickCount做一个标志
+                    if (emptyClickCount >= 3) {
+                        emptyClickCount = 0;
+                        if (noteAdapter == null || noteAdapter.getItemCount() == 0)
+                            Trace.show(getActivity().getApplicationContext(), "这个真没有");
+                    }
                     break;
                 case GetDataHelper.handle4refresh:
                     Trace.d("handlerInNote handle4refresh");
@@ -117,6 +126,12 @@ public class NoteFragment extends BaseFragment
 //                    }
                     if (noteAdapter != null) {
                         noteAdapter.setList(list);
+                    }
+                    //借emptyClickCount做一个标志
+                    if (emptyClickCount >= 3) {
+                        emptyClickCount = 0;
+                        if (noteAdapter == null || noteAdapter.getItemCount() == 0)
+                            Trace.show(getActivity().getApplicationContext(), "这个真没有");
                     }
                     break;
                 case GetDataHelper.handle4respond:
@@ -590,12 +605,14 @@ public class NoteFragment extends BaseFragment
         return true;
     }
 
+    boolean hasClick = false;
+
     public void emptyClick() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 //刷新界面
-                if (emptyClickCount < 2) {
+                if (emptyClickCount < 3) {
                     Trace.d("emptyClickCount" + emptyClickCount);
                     emptyClickCount++;
                     getDataHelper.respond();
@@ -607,13 +624,16 @@ public class NoteFragment extends BaseFragment
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            getDataHelper.refresh();//MainActivity dataGot
                             //重新获取mHeaders listNote和mItems
                             FolderFragment.isChanged4folder = true;//emptyClick
                             MainActivity a = (MainActivity) getActivity();
                             primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
                                 @Override
                                 public void justNow() {
+                                    if (primaryData.getNoteSize() == 0)
+                                        getDataHelper.firstGet();
+                                    else
+                                        getDataHelper.refresh();//MainActivity dataGot
                                     handler.sendEmptyMessage(primaryData.listNote.size() == 0
                                             ? GetDataHelper.handle4firstGet
                                             : GetDataHelper.handle4refresh);
@@ -687,16 +707,11 @@ public class NoteFragment extends BaseFragment
     }
 
     public void stopRefresh() {
+        hasClick = false;
         if (getDataHelper.status == GetDataHelper.statusRefresh) {
             getDataHelper.none();
             Trace.d("emptyClickCount" + emptyClickCount);
-            //借emptyClickCount做一个标志
-            if (emptyClickCount >= 2) {
-                emptyClickCount = 0;
-                if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                    Trace.show(getActivity().getApplicationContext(), "这个真没有");
-            } else
-                mNoteWDList.stopRefresh();
+            mNoteWDList.stopRefresh();
         }
     }
 }

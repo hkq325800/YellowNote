@@ -2,7 +2,6 @@ package com.kerchin.yellownote.utilities;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -44,17 +43,6 @@ public class NormalUtils {
         intent.setAction(Intent.ACTION_VIEW);//指定Action
         intent.setData(uri);//设置Uri
         context.startActivity(intent);//启动Activity
-    }
-
-    public static void downloadByDownloadManager(Context context, String uriStr){
-        //创建下载任务,downloadUrl就是下载链接
-        DownloadManager.Request request = new DownloadManager.Request(Uri.parse(uriStr));
-        //指定下载路径和下载文件名
-        request.setDestinationInExternalPublicDir("/download/", "yellownote");
-        //获取下载管理器
-        DownloadManager downloadManager= (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        //将下载任务加入下载队列，否则不会进行下载
-        downloadManager.enqueue(request);
     }
 
     public static String getTrueDate(Date date) {
@@ -374,31 +362,6 @@ public class NormalUtils {
             }
         }
     }
-
-    /**
-     * reference http://www.jianshu.com/p/3e16bda04852
-     * @param context
-     * @param requestCode
-     */
-//    public static void checkWriteSDPermission(Activity context, int requestCode){
-//        requestWritePermission(context, requestCode);
-//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-//                == PackageManager.PERMISSION_GRANTED) {
-//            if (Config.isDebugMode)
-//                Trace.show(context, "拥有写crash日志的权限");
-//        } else {
-//            boolean shouldShow = ActivityCompat.shouldShowRequestPermissionRationale(context
-//                    , Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//            if (shouldShow) {
-//                //申请权限
-//                ActivityCompat.requestPermissions(context
-//                        , new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, requestCode);
-//            } else {
-//                //被禁止显示弹窗
-//                Trace.show(context, "请在应用权限中打开存储功能以在crash时上传日志", Toast.LENGTH_LONG);
-//            }
-//        }
-//    }
 
     /**
      * reference http://www.jianshu.com/p/b4a8b3d4f587

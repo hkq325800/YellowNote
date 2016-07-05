@@ -167,15 +167,14 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 handler.postDelayed(runnableForData, Config.period_runnable);
                 repeatCount++;
             }
-            if (Config.isDebugMode)
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        String str = PrimaryData.status.toString();
-                        if (!str.equals(""))
-                            mWelcomeTxt.setText(str);
-                    }
-                });
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    String str = PrimaryData.status.toString();
+                    if (!str.equals(""))
+                        mWelcomeTxt.setText(str);
+                }
+            });
             if (PrimaryData.status.isFolderReady
                     && PrimaryData.status.isNoteReady
                     && PrimaryData.status.isItemReady
