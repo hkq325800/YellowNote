@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -60,6 +58,9 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
      * 向远程服务器发送错误信息
      */
     private CrashExceptionRemoteReport mCrashExceptionRemoteReport;
+    private static final int killAfterMills = 2000;
+    String timeStampString;
+    Date date;
 
     /**
      * @param context
@@ -82,10 +83,12 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
+        date = new Date();
+        timeStampString = DATE_FORMAT.format(date);//当先的时间格式化
         ex.printStackTrace();
         handleException(ex);
         try {
-            Thread.sleep(3000);
+            Thread.sleep(killAfterMills);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -122,7 +125,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 public void run() {
                     Looper.prepare();
                     try {
-                        Toast.makeText(mApplicationContext, "程序出现异常 , 即将退出....", Toast.LENGTH_LONG).show();
+                        Toast.makeText(mApplicationContext, "程序出现异常,即将退出....", Toast.LENGTH_LONG).show();
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
@@ -140,13 +143,13 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
     private File saveCrashInfoToFile(Throwable ex) {
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             try {
+                long start = System.currentTimeMillis();
                 if (!mAppMainFolder.exists()) {//app目录不存在则先创建目录
                     mAppMainFolder.mkdirs();
                 }
                 if (!mCrashInfoFolder.exists()) {//闪退日志目录不存在则先创建闪退日志目录
                     mCrashInfoFolder.mkdirs();
                 }
-                String timeStampString = DATE_FORMAT.format(new Date());//当先的时间格式化
                 String crashLogFileName = MyApplication.user + "_" + timeStampString + ".log";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
@@ -180,12 +183,16 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                         "------------Crash Environment Info------------" + "\n\n";
                 randomAccessFile.write(str.getBytes(Charset.forName("UTF-8")));
                 randomAccessFile.close();
-                
+
 
                 PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(crashLogFile.getAbsolutePath(), true)), true);
-                String time = "[" + NormalUtils.getNowDate("yyyy-MM-dd-HH-mm-ss") + "]";
-                pw.append(time);
+//                String time = "[" + NormalUtils.getNowDate("yyyy-MM-dd-HH-mm-ss") + "]";
                 ex.printStackTrace(pw);//写入崩溃的日志信息
+                long end = System.currentTimeMillis();
+                String strS = "logStartAt:" + date + "\n";
+                pw.append(strS);
+                String strD = "logCreateFor:" + (end - start) + "ms";
+                pw.append(strD);
                 pw.close();
                 return crashLogFile;
             } catch (IOException e) {

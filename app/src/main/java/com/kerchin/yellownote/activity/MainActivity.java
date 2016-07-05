@@ -23,10 +23,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
+import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
@@ -55,6 +58,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     DrawerLayout mMainDrawer;
     @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
+    TextView msgNote, msgFolder;
 
     public static int thisPosition = 0;
     public boolean isHide = false;
@@ -77,6 +81,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
+        msgNote = (TextView) galleryNote.findViewById(R.id.msg);
+        LinearLayout galleryFolder = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_folder).getActionView();
+        msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
         setSupportActionBar(mMainToolbar);
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -210,6 +218,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
+                //menu数字
+                String note = PrimaryData.getInstance().getFolderSize() + "";
+                String folder = PrimaryData.getInstance().getNoteSize() + "";
+                msgNote.setText(note);
+                msgFolder.setText(folder);
                 isDrawerOpen = true;
                 btnSearch.setVisible(false);
                 btnSort.setVisible(false);
@@ -349,10 +362,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             return false;
         } else if (id == R.id.nav_resetSecret) {
 //            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
-//            if (Config.isDebugMode)
-//                startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
-//            else
-                handler.sendEmptyMessage(gotoSecret);
+//            startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
+            handler.sendEmptyMessage(gotoSecret);
             return false;
         }
         mMainDrawer.closeDrawers();

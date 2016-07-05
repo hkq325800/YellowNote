@@ -900,6 +900,10 @@ public class PrimaryData {
         return arr;
     }
 
+    public int getNoteSize() {
+        return listNote.size();
+    }
+
     public int getFolderSize() {
         return listFolder.size();
     }

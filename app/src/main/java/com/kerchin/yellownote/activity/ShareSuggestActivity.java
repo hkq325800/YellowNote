@@ -87,6 +87,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
         intent.putExtra("uriStr", getString(R.string.uri_download));
         intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
         startService(intent);
+        mShareSuggestCodeImg.setOnClickListener(null);
 //        NormalUtils.downloadByUri(getApplicationContext(), getString(R.string.uri_download));
     }
 

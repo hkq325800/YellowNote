@@ -30,6 +30,7 @@
 [Android 性能优化——布局优化](http://www.jianshu.com/p/d3a06b573ee5)
 [【干货】android真正的“万能”Adapter](http://www.jianshu.com/p/d6a76fd3ea5b)
 [Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
+[原生NavigationView菜单中添加消息提醒（小红点）](http://www.jianshu.com/p/90eb9d06480d)
 
 ###TODO
 [Android主题换肤 无缝切换](http://www.jianshu.com/p/af7c0585dd5b)
