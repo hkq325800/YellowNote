@@ -7,6 +7,9 @@ package com.kerchin.yellownote.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -14,12 +17,20 @@ import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.zhanghai.android.patternlock.PatternView;
 
 /**
  * 设置密码界面
  */
 public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatternActivity {
+    @BindView(R.id.mNavigationLeftBtn)
+    Button mNavigationLeftBtn;
+    @BindView(R.id.mNavigationRightBtn)
+    Button mNavigationRightBtn;
+    @BindView(R.id.mNavigationTitleEdt)
+    EditText mNavigationTitleEdt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +38,12 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
                 R.anim.push_left_out);
         NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
         super.onCreate(savedInstanceState);
+        ButterKnife.bind(this);
+        mNavigationTitleEdt.setText(getResources().getString(R.string.app_name));
+        mNavigationLeftBtn.setVisibility(View.INVISIBLE);
+        mNavigationTitleEdt.setEnabled(false);
+        mNavigationTitleEdt.setFocusable(false);
+        mNavigationTitleEdt.setFocusableInTouchMode(false);
 //        mMessageText.setTextColor(getResources().getColor(R.color.colorPrimary));
 //        AppUtils.setActionBarDisplayUp(this);
     }

@@ -11,10 +11,9 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
-        android:id="@+id/iv_navheader"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
+    <com.kerchin.yellownote.widget.CircleImageView
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:src="@mipmap/ic_face" />
 
     <TextView
@@ -22,16 +21,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textColor="@color/lightSkyBlue"
-        android:textSize="20sp"
         android:text="Yellow Note"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@color/lightSkyBlue"
+        android:textSize="20sp" />
+
+    <!--<TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="hkq325800@163.com" />
+        android:text="hkq325800@163.com"
+        android:textColor="@color/lightSkyBlue" />-->
 
 </LinearLayout>

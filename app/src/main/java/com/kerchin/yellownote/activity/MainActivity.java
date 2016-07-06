@@ -364,13 +364,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             startActivity(intent);
             finish();
             return false;
-        } else if (id == R.id.nav_setting) {
+        } else if (id == R.id.nav_share) {
             handler.sendEmptyMessage(gotoSetting);
             return false;
         } else if (id == R.id.nav_resetSecret) {
 //            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
 //            startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
             handler.sendEmptyMessage(gotoSecret);
+            return false;
+        } else if(id == R.id.nav_thank){
+            handler.sendEmptyMessage(gotoThank);
             return false;
         }
         mMainDrawer.closeDrawers();
@@ -381,11 +384,17 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public static final int showBtnAdd = 1;
     public static final int hideBtnAdd = 2;
     public static final int gotoSecret = 3;
+    public static final int gotoThank = 4;
     private SystemHandler handler = new SystemHandler(this) {
 
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case gotoThank:
+                    ThankActivity.startMe(getApplicationContext());
+                    overridePendingTransition(R.anim.push_left_in,
+                            R.anim.push_left_out);
+                    break;
                 case gotoSecret:
                     hideBtnAdd();//使进入
                     SecretMenuActivity.startMe(getApplicationContext());

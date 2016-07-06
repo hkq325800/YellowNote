@@ -6,12 +6,12 @@
         <item
             android:id="@+id/nav_note"
             app:actionLayout="@layout/menu_badge"
-            android:icon="@android:drawable/ic_menu_camera"
+            android:icon="@android:drawable/ic_menu_edit"
             android:title="笔记" />
         <item
             android:id="@+id/nav_folder"
             app:actionLayout="@layout/menu_badge"
-            android:icon="@android:drawable/ic_menu_gallery"
+            android:icon="@android:drawable/ic_menu_today"
             android:title="笔记本" />
         <!--<item android:id="@+id/nav_slideshow" android:icon="@android:drawable/ic_menu_slideshow"
             android:title="Slideshow" />
@@ -22,8 +22,8 @@
     <item android:title="用户操作">
         <menu>
             <item
-                android:id="@+id/nav_setting"
-                android:icon="@android:drawable/ic_menu_send"
+                android:id="@+id/nav_share"
+                android:icon="@android:drawable/ic_menu_share"
                 android:title="分享与反馈" />
             <item
                 android:id="@+id/nav_resetSecret"
@@ -31,8 +31,12 @@
                 android:title="密码相关" />
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@android:drawable/ic_menu_share"
+                android:icon="@android:drawable/ic_menu_send"
                 android:title="注销" />
+            <item
+                android:id="@+id/nav_thank"
+                android:icon="@android:drawable/ic_menu_compass"
+                android:title="致谢" />
         </menu>
     </item>
 

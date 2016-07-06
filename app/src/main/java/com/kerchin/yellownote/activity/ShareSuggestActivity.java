@@ -113,7 +113,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                             long lastSuggestTime = MyApplication.getDefaultShared().getLong("lastSuggestTime", thisSuggestTime);
                             SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
                             editor.putLong("lastSuggestTime", thisSuggestTime);
-                            //距离上一次提交意见30秒内再次提交记一次违规 5次违规禁止提交 重装恢复
+                            //距离上一次提交意见30秒内再次提交记一次违规 3次违规禁止提交 重装恢复
                             editor.putInt("quickSuggestTimes",
                                     thisSuggestTime - lastSuggestTime < deadLine ? quickSuggestTimes + 1 : 1);
                             Trace.d("quickSuggestTimes " + quickSuggestTimes + " boolean " + (thisSuggestTime - lastSuggestTime < 30000));

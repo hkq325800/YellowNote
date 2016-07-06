@@ -11,6 +11,7 @@
 - [superadapter](https://github.com/byteam/SuperAdapter)
 - [snappingstepper](https://github.com/saiwu-bigkoo/Android-SnappingStepper)
 - [ormlite](https://github.com/j256/ormlite-android)
+
 ###have done
 - [那些Android上的性能优化](http://www.jianshu.com/p/762f7cca7539)
 - [Android快速实现文件下载（只有4行代码）](http://www.jianshu.com/p/46fd1c253701)
@@ -23,10 +24,10 @@
 - [听说每个人都会写单例,你会了吗?](http://www.jianshu.com/p/eebcb81b1394)
 - [Android 性能典范：拯救计划](http://www.jianshu.com/p/efcb36b7ce48)
 - [JJSearchViewAnim源码分析](http://www.jianshu.com/p/a48f4e6cf036)
-- [- [Android] 获取View的宽度和高度](http://www.jianshu.com/p/d18f0c96acb8)
+- [[Android] 获取View的宽度和高度](http://www.jianshu.com/p/d18f0c96acb8)
 - [超完整！Android获取图片的三种方法](http://www.jianshu.com/p/d4793d32a5fb)
 - [如何查看Android App的方法总数](http://www.jianshu.com/p/b3677647d90e)
-- [- [Android优化进阶] 提高ListView性能的技巧](http://www.jianshu.com/p/3e22d53286ca)
+- [[Android优化进阶] 提高ListView性能的技巧](http://www.jianshu.com/p/3e22d53286ca)
 - [Android 性能优化——布局优化](http://www.jianshu.com/p/d3a06b573ee5)
 - [【干货】android真正的“万能”Adapter](http://www.jianshu.com/p/d6a76fd3ea5b)
 - [Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
@@ -39,3 +40,6 @@
 - [使用ItemTouchHelper完成仿Inbox的滑动删除](http://www.jianshu.com/p/9a5f81c887b8)
 - [Fragment之我的解决方案：Fragmentation](http://www.jianshu.com/p/38f7994faa6b)
 - [使用ItemTouchHelper高效地实现 今日头条 、网易新闻 的频道排序、移动](http://www.jianshu.com/p/d30fd8da4eac)
+
++-keep class com.avos.avoscloud.** {*;}
++-keepclassmembers class com.avos.avoscloud.** {*;}
