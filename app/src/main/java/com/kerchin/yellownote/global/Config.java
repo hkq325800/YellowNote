@@ -29,6 +29,6 @@ public class Config {
      */
     public static final int timeout_prov = 5;//min 发送验证码的过期时间
     public static final int timeout_avod = 15000;//mill 轮询间隔
-    public static final int timeout_runnable = 15000;
-    public static final int period_runnable = 200;
+    public static final int timeout_runnable = 20000;
+    public static final int period_runnable = 100;
 }

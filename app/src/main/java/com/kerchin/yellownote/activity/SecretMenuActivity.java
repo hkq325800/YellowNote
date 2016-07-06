@@ -163,8 +163,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         Intent intent = new Intent(SecretMenuActivity.this
                                 , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
                         startActivityForResult(intent, requestForPattern);
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                     } else {//与网络不同
                         hasPattern = !TextUtils.isEmpty(str);
                         runOnUiThread(new Runnable() {
@@ -211,8 +209,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         mSecretMenuPatternEditLiL.setClickable(true);
                         Intent intent = new Intent(SecretMenuActivity.this, ConfirmPatternActivity.class);
                         startActivityForResult(intent, requestForConfirmPattern);
-                        overridePendingTransition(R.anim.push_left_in,
-                                R.anim.push_left_out);
                     }
                 } catch (AVException e) {
                     e.printStackTrace();
@@ -270,8 +266,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
             Intent intent = new Intent(SecretMenuActivity.this, SecretActivity.class);
             intent.putExtra("isForget", true);
             startActivityForResult(intent, requestForForget);
-            overridePendingTransition(R.anim.push_left_in,
-                    R.anim.push_left_out);
         } else if (requestCode == requestForForget && resultCode == RESULT_OK) {
             //忘记密码验证成功清除密码
 //            mSecretMenuPatternToggle.setChecked(false);
@@ -296,8 +290,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
             //修改手势密码验证成功跳转设置
             Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
             startActivityForResult(intent, requestForEditPattern);
-            overridePendingTransition(R.anim.push_left_in,
-                    R.anim.push_left_out);
         } else if (requestCode == requestForEditPattern && resultCode == RESULT_OK) {
             //修改手势密码成功
             new Thread(new Runnable() {
@@ -306,7 +298,8 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     try {
                         SecretService.setPatternStr(MyApplication.user, patternFromOthers);
                         PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
-                        Trace.show(SecretMenuActivity.this, patternFromOthers);
+                        if (Config.isDebugMode)
+                            Trace.show(SecretMenuActivity.this, patternFromOthers);
                         hasPattern = true;
                         runOnUiThread(new Runnable() {
                             @Override

@@ -167,7 +167,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case secretError:
-                    Trace.show(getApplicationContext(), "你输入的旧密码出错啦");
+                    Trace.show(getApplicationContext(), "你输入的密码不对哦");
                     break;
                 case reLogForFrozen:
                     Trace.show(getApplicationContext(), "您操作的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);

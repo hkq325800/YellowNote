@@ -7,12 +7,18 @@ package com.kerchin.yellownote.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import me.zhanghai.android.patternlock.PatternView;
 
 /**
@@ -23,28 +29,56 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
     Runnable r = new Runnable() {
         @Override
         public void run() {
-            mMessageText.setText("");
+            mMessageText.setText("请输入手势密码");
         }
     };
     boolean isFromLaunch;
 
+    @BindView(R.id.mNavigationLeftBtn)
+    Button mNavigationLeftBtn;
+    @BindView(R.id.mNavigationRightBtn)
+    Button mNavigationRightBtn;
+    @BindView(R.id.mNavigationTitleEdt)
+    EditText mNavigationTitleEdt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
+        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
+        if (isFromLaunch)
+            overridePendingTransition(android.R.anim.fade_in,
+                    android.R.anim.fade_out);
+        else
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.not_move);
         super.onCreate(savedInstanceState);
+        mMessageText.setText("请输入手势密码");
+        ButterKnife.bind(this);
+        mNavigationTitleEdt.setText(getResources().getString(R.string.app_name));
+        mNavigationLeftBtn.setVisibility(View.INVISIBLE);
+        mNavigationTitleEdt.setEnabled(false);
+        mNavigationTitleEdt.setFocusable(false);
+        mNavigationTitleEdt.setFocusableInTouchMode(false);
 //        ActivityInfo ActivityManager
 //        Trace.show(this, "" + getApplicationInfo().loadLabel(ConfirmPatternActivity.this.getPackageManager()));
     }
 
     @Override
     protected void onConfirmed() {
-        if (isFromLaunch) {
-            MainActivity.startMe(getApplicationContext());
-        } else {
-            setResult(RESULT_OK);
-        }
-        finish();
+        mMessageText.setText("手势正确");
+        mMessageText.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isFromLaunch) {
+                    MainActivity.startMe(getApplicationContext());
+                } else {
+                    setResult(RESULT_OK);
+                }
+                finish();
+                overridePendingTransition(android.R.anim.fade_in,
+                        android.R.anim.fade_out);
+            }
+        }, 500);
     }
 
     /**

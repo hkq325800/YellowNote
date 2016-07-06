@@ -100,12 +100,13 @@
     </style>-->
     <!--SlideActivity-->
 
-    <style name="AppTheme.Pattern" parent="AppTheme">
+    <style name="AppTheme.Pattern" parent="JK.SwipeBack.Transparent.Theme">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <!--<item name="colorPrimary">#ff263238</item>-->
-        <item name="colorPrimaryDark">#ff21272b</item>
-        <item name="colorControlNormal">@color/material_blue_grey_800</item>
-        <!--<item name="android:windowBackground">@android:color/white</item>-->
+        <!--<item name="colorPrimaryDark">#ff66ccff</item>-->
+        <item name="background">@android:color/transparent</item>
+        <item name="colorControlNormal">@color/textContentColor</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>

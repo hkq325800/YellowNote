@@ -5,9 +5,11 @@
 
 package com.kerchin.yellownote.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;
@@ -21,9 +23,11 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
+        overridePendingTransition(R.anim.push_left_in,
+                R.anim.push_left_out);
+        NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
         super.onCreate(savedInstanceState);
-        mMessageText.setTextColor(getResources().getColor(R.color.colorPrimary));
+//        mMessageText.setTextColor(getResources().getColor(R.color.colorPrimary));
 //        AppUtils.setActionBarDisplayUp(this);
     }
 
@@ -54,5 +58,11 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 //        PatternLockUtils.setPattern(pattern, this);
         //TODO 数据传输有问题
         SecretMenuActivity.patternFromOthers = PatternLockUtils.getStrFromPattern(pattern);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

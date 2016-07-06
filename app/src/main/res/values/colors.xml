@@ -10,7 +10,7 @@
     <color name="backgroundLight">#FAFAD2</color><!--亮金黄色 -->
     <color name="textColor">#FFFFF0</color><!--象牙色-->
     <color name="textHintColor">#D2E2F5</color><!--light_gray-->
-    <color name="textContentColor">#000000</color>
+    <color name="textContentColor">#666666</color>
     <color name="textBackgroundColor">#FFFFFF</color>
     <color name="backgroundFunctionBar">#D2E2F5</color><!--light_gray-->
     <color name="whiteFocus">#DDDDDD</color><!--bg_focus-->
