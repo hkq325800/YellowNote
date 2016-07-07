@@ -6,6 +6,8 @@
 - 密码相关、删除progress 因为层叠顺序
 
 准备完成的功能
+- 升级提示 3天一次
+- 更换头像 图片选择
 - EditActivity中显示图片(可实现就不需要note type)有一个开源项目
 - 录音 cache(helper) RxAndroidAudio
 - 自己实现snapper

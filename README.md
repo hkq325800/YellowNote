@@ -1,4 +1,7 @@
 # YellowNote 
+###how to clone the latest
+git clone https://github.com/hkq325800/YellowNote.git --depth=1
+
 ###thanks to
 - [leakcanary](https://github.com/square/leakcanary)
 - [secure-preferences](https://github.com/scottyab/secure-preferences)

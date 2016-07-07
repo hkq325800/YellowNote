@@ -206,7 +206,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     public void onOpened() {
-
         final String content = mEditContentEdt.getText().toString();
         final String title = mNavigationTitleEdt.getText().toString();
         if (!content.trim().equals("")
@@ -218,9 +217,14 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     || mNote.isOfflineAdd()) {
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
-
                 AlertDialog.Builder ad = new AlertDialog.Builder(EditActivity.this);
                 ad.setTitle("是否保存更改");
+                ad.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                    @Override
+                    public void onCancel(DialogInterface dialog) {
+                        handler.sendEmptyMessageDelayed(handle4quit, 300);
+                    }
+                });
                 ad.setNegativeButton("放弃保存", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -820,7 +824,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         ad.setNegativeButton("放弃保存", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                finish();
+                handler.sendEmptyMessageDelayed(handle4quit, 300);
             }
         });
         ad.setPositiveButton("保存并退出", new DialogInterface.OnClickListener() {
