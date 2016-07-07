@@ -2,7 +2,6 @@ package com.kerchin.yellownote.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -54,8 +53,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_secret_menu);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            NormalUtils.immerge(this, R.color.lightSkyBlue);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override

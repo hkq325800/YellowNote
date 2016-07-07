@@ -2,7 +2,6 @@ package com.kerchin.yellownote.activity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +10,7 @@ import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -59,8 +59,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_secret);
         isForget = getIntent().getBooleanExtra("isForget", false);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            NormalUtils.immerge(this, R.color.lightSkyBlue);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
@@ -107,7 +106,21 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mNavigationLeftBtn)
     public void back() {
+        KeyBoardCancel();
         finish();
+    }
+
+    @Override
+    public void onOpened(){
+        back();
+    }
+
+    public void KeyBoardCancel() {
+        View view = getWindow().peekDecorView();
+        if (view != null) {
+            InputMethodManager inputManger = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputManger.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -203,8 +216,8 @@ public class SecretActivity extends BaseHasSwipeActivity {
             } else if (!mSecretNewPassEdt.getText().toString().equals(mSecretNewPassAgainEdt.getText().toString())) {
                 Trace.show(getApplicationContext(), "两次填写的新密码不一致");
                 return false;
-            } else if (mSecretNewPassEdt.getText().toString().length() < 6 || mSecretNewPassEdt.getText().toString().length() > 13) {
-                Trace.show(getApplicationContext(), "密码长度控制在6-13位");
+            } else if (mSecretNewPassEdt.getText().toString().length() < 6) {
+                Trace.show(getApplicationContext(), "密码长度需大于6位");
                 return false;
             }
             return true;

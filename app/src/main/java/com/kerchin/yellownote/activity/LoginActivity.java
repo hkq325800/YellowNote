@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -46,6 +47,8 @@ public class LoginActivity extends LoginAbstract {
     ScrollView mLoginScV;
     @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
+    @BindView(R.id.mLoginPassTextInput)
+    TextInputLayout mLoginPassTextInput;
     @BindView(R.id.mLoginPassEdt)
     EditText mLoginPassEdt;
     @BindView(R.id.mLoginProveEdt)
@@ -100,6 +103,8 @@ public class LoginActivity extends LoginAbstract {
         if (!MyApplication.user.equals("")) {
             mLoginUserEdt.setText(MyApplication.user);
             mLoginUserEdt.setSelection(MyApplication.user.length());
+//            mLoginPassTextInput.bringToFront();
+//            mLoginPassTextInput.requestFocusFromTouch();
             //TODO mLoginPassEdt获取焦点
         } else
             mLoginUserEdt.requestFocus();
@@ -163,7 +168,7 @@ public class LoginActivity extends LoginAbstract {
 
     @OnClick(R.id.mLoginBtn)
     public void loginClick() {
-        mLoginPassEdt.setHint("请输入密码(长度需大于6)");
+        mLoginPassTextInput.setHint("请输入密码");
         //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
             mSignUpRelative.setVisibility(View.GONE);
@@ -193,7 +198,7 @@ public class LoginActivity extends LoginAbstract {
 
     @OnClick(R.id.mLoginSignUpBtn)
     public void signUpClick() {
-        mLoginPassEdt.setHint("请输入密码(长度需大于6)");
+        mLoginPassTextInput.setHint("请输入密码(长度需大于6位)");
         if (mLoginSignUpBtn.getText().toString().equals("注册")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("忘记密码");
@@ -240,7 +245,7 @@ public class LoginActivity extends LoginAbstract {
         if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("找回密码");
-            mLoginPassEdt.setHint("请输入新密码(长度需大于6)");
+            mLoginPassTextInput.setHint("请输入新密码(长度需大于6位)");
             mSignUpRelative.setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(), "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
         } else {
@@ -616,6 +621,8 @@ public class LoginActivity extends LoginAbstract {
                 MainActivity.startMe(getApplicationContext());
 //                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
             } else {
                 if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
                     if (PrimaryData.status != null)

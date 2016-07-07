@@ -26,12 +26,6 @@ import me.zhanghai.android.patternlock.PatternView;
  * 需要重写方法isStealthModeEnabled isPatternCorrect onForgotPassword
  */
 public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.ConfirmPatternActivity {
-    Runnable r = new Runnable() {
-        @Override
-        public void run() {
-            mMessageText.setText("请输入手势密码");
-        }
-    };
     boolean isFromLaunch;
 
     @BindView(R.id.mNavigationLeftBtn)
@@ -46,7 +40,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
         NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
         if (isFromLaunch)
-            overridePendingTransition(android.R.anim.fade_in,
+            overridePendingTransition(R.anim.push_left_in,
                     android.R.anim.fade_out);
         else
             overridePendingTransition(R.anim.push_left_in,
@@ -54,7 +48,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
         super.onCreate(savedInstanceState);
         mMessageText.setText("请输入手势密码");
         ButterKnife.bind(this);
-        mNavigationTitleEdt.setText(getResources().getString(R.string.app_name));
+        mNavigationTitleEdt.setText(/*"确认手势"*/getResources().getString(R.string.app_name));
         mNavigationLeftBtn.setVisibility(View.INVISIBLE);
         mNavigationTitleEdt.setEnabled(false);
         mNavigationTitleEdt.setFocusable(false);
@@ -75,10 +69,10 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
                     setResult(RESULT_OK);
                 }
                 finish();
-                overridePendingTransition(android.R.anim.fade_in,
+                overridePendingTransition(R.anim.push_left_in,
                         android.R.anim.fade_out);
             }
-        }, 500);
+        }, isFromLaunch ? 0 : 500);
     }
 
     /**
@@ -91,11 +85,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected boolean isPatternCorrect(List<PatternView.Cell> pattern) {
-        mMessageText.removeCallbacks(r);
-        boolean flag = PatternLockUtils.isPatternCorrect(pattern, this);
-        if (!flag)
-            mMessageText.postDelayed(r, 2000);
-        return flag;
+        return PatternLockUtils.isPatternCorrect(pattern, this);
     }
 
     private final static int requestForForget = 1;//校验用户名密码 然后清除密码并关闭手势密码
@@ -108,7 +98,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             intent.putExtra("isForget", true);
             startActivityForResult(intent, requestForForget);
             overridePendingTransition(R.anim.push_left_in,
-                    R.anim.push_left_out);
+                    R.anim.not_move);
         } else
 //        startActivity(new Intent(this, ResetPatternActivity.class));
             //PatternLockUtils.clearPattern(ResetPatternActivity.this);
@@ -121,9 +111,9 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
      */
     @Override
     public void onPatternStart() {
-        if (!mMessageText.getText().toString().equals(getResources()
-                .getString(me.zhanghai.android.patternlock.R.string.pl_draw_pattern_to_unlock)))
-            mMessageText.setText("");
+//        if (!mMessageText.getText().toString().equals(getResources()
+//                .getString(me.zhanghai.android.patternlock.R.string.pl_draw_pattern_to_unlock)))
+//            mMessageText.setText("");
         super.onPatternStart();
     }
 
@@ -133,6 +123,8 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
         if (requestCode == requestForForget && resultCode == RESULT_OK) {
             MainActivity.startMe(getApplicationContext());
             finish();
+            overridePendingTransition(R.anim.push_left_in,
+                    android.R.anim.fade_out);
         }
     }
 }

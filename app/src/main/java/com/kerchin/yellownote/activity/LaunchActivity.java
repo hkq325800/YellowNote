@@ -121,22 +121,16 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 case wel://首次登陆
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
                     break;
                 case reLog://由于密码错误重新登陆
                     Trace.show(LaunchActivity.this, "你的密码已被修改,请重新登录", Toast.LENGTH_LONG);
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
                     break;
                 case reLogForFrozen://账户冻结
                     Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
                     NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
                     finish();
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
                     break;
                 case next://缓存正确 直接进入
                     if (PatternLockUtils.hasPattern(getApplicationContext())) {
@@ -147,14 +141,19 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         MainActivity.startMe(getApplicationContext());
 //                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
                     finish();
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
                     break;
                 default:
                     break;
             }
         }
     };
+
+    @Override
+    public void finish(){
+        super.finish();
+        overridePendingTransition(R.anim.push_left_in,
+                R.anim.push_left_out);
+    }
 
     private Runnable runnableForData = new Runnable() {
         @Override

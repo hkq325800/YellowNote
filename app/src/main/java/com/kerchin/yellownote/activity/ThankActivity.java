@@ -30,12 +30,16 @@ public class ThankActivity extends BaseHasSwipeActivity {
     EditText mNavigationTitleEdt;
     @BindView(R.id.mNavigationRightBtn)
     Button mNavigationRightBtn;
-    @BindView(R.id.mThankTxt)
-    TextView mThankTxt;
-    String thankStr;
+    @BindView(R.id.mThankLeftTxt)
+    TextView mThankLeftTxt;
+    @BindView(R.id.mThankTopTxt)
+    TextView mThankTopTxt;
+    @BindView(R.id.mThankRightTxt)
+    TextView mThankRightTxt;
+    String thankStrLeft, thankStrRight;
     ArrayList<String> thankList;
     ArrayList<String> linkList;
-    SpannableString target;
+    SpannableString targetLeft, targetRight, targetTop;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
@@ -48,37 +52,70 @@ public class ThankActivity extends BaseHasSwipeActivity {
 
     }
 
+    String todo;
+
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         thankList = new ArrayList<>();
         linkList = new ArrayList<>();
+        todo = getResources().getString(R.string.todo);
+        final String todoUrl = getResources().getString(R.string.todoUrl);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                thankStr = getResources().getString(R.string.thank);
+                //top
+                String strTop = "尚待解决的问题 " + todo + "\n特此感谢以下开源库";
+                targetTop = new SpannableString(strTop);
+                targetTop.setSpan(new URLSpan(todoUrl), strTop.indexOf(" ") + 1, strTop.indexOf(" ") + 1 + todo.length()
+                        , Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                //left right
+                String thankStr;
+                thankStr = getResources().getString(R.string.thank) + " ";
                 thankStr = thankStr.replace("- ", "\n");
-                while (thankStr.contains("[")) {
-                    String str = thankStr.substring(thankStr.indexOf("["), thankStr.indexOf(")") + 1);
-                    String thank = str.substring(str.indexOf("[") + 1, str.indexOf("]"));
-                    thankList.add(thank);
-                    linkList.add(str.substring(str.indexOf("(") + 1, str.indexOf(")")));
-                    thankStr = thankStr.replace(str, thank);
-                }
-                target = new SpannableString(thankStr);
+                collectThankAndLink(thankStr);
+                targetLeft = new SpannableString(thankStrLeft);
+                targetRight = new SpannableString(thankStrRight);
+
+//                targetLeft.setSpan(new URLSpan(todoUrl), thankStr.indexOf(todo)
+//                        , thankStr.indexOf(todo) + todo.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 int i = 0;
                 for (String thank : thankList) {
 //                    SpannableString ss = new SpannableString(thank);
-                    target.setSpan(new URLSpan(linkList.get(i)), thankStr.indexOf(thank)
-                            , thankStr.indexOf(thank) + thank.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    if (i % 2 == 0)
+                        targetLeft.setSpan(new URLSpan(linkList.get(i)), thankStrLeft.indexOf(thank)
+                                , thankStrLeft.indexOf(thank) + thank.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    else
+                        targetRight.setSpan(new URLSpan(linkList.get(i)), thankStrRight.indexOf(thank)
+                                , thankStrRight.indexOf(thank) + thank.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     i++;
                 }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        mThankTxt.setText(target);
-                        mThankTxt.setMovementMethod(LinkMovementMethod.getInstance());
+                        mThankTopTxt.setText(targetTop);
+                        mThankTopTxt.setMovementMethod(LinkMovementMethod.getInstance());
+                        mThankLeftTxt.setText(targetLeft);
+                        mThankLeftTxt.setMovementMethod(LinkMovementMethod.getInstance());
+                        mThankRightTxt.setText(targetRight);
+                        mThankRightTxt.setMovementMethod(LinkMovementMethod.getInstance());
                     }
                 });
+            }
+
+            private void collectThankAndLink(String thankStr) {
+                thankStrLeft = "";
+                thankStrRight = "";
+                while (thankStr.contains("[")) {
+                    String str = thankStr.substring(thankStr.indexOf("["), thankStr.indexOf(")") + 1);
+                    String thank = str.substring(str.indexOf("[") + 1, str.indexOf("]"));
+                    thankList.add(thank);
+                    linkList.add(str.substring(str.indexOf("(") + 1, str.indexOf(")")));
+                    if (thankList.size() % 2 == 1)
+                        thankStrLeft += thank + "\n";
+                    else
+                        thankStrRight += thank + "\n";
+                    thankStr = thankStr.replace(str, thank);
+                }
             }
         }).start();
     }

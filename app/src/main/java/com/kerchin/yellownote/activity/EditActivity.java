@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -87,6 +86,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private static final byte handle4last = 4;
     private static final byte handle4reGet = 5;
     private static final byte handle4error = 6;
+    private static final byte handle4quit = 7;
     //    private static final int RESULT_LOAD_IMAGE = 100;
     private static final int animDuration = 160;//动画的长度
 
@@ -108,7 +108,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private PrimaryData primaryData;
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     private List<Integer> searchResult;//记录关键字所在的index
-//    private int listFolderSize;
+    //    private int listFolderSize;
     private String offlineAddObjectId;//专为解决离线新增没有objectId存在
 
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
@@ -122,12 +122,14 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private AlertDialog ad;
     private ArrayList<View> viewContainer = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
-//    private Spannable spanText;//带span的字符
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
     private SystemHandler handler = new SystemHandler(EditActivity.this) {
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case handle4quit:
+                    finish();
+                    break;
                 case handle4reGet:
                     primaryData = PrimaryData.getInstance();
                     break;
@@ -199,13 +201,12 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_edit);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            NormalUtils.immerge(this, R.color.lightSkyBlue);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
     public void onOpened() {
-        mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
+
         final String content = mEditContentEdt.getText().toString();
         final String title = mNavigationTitleEdt.getText().toString();
         if (!content.trim().equals("")
@@ -217,13 +218,31 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     || mNote.isOfflineAdd()) {
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
-                ExecutorService executorService = Executors.newSingleThreadExecutor();
-                executorService.execute(new Runnable() {
+
+                AlertDialog.Builder ad = new AlertDialog.Builder(EditActivity.this);
+                ad.setTitle("是否保存更改");
+                ad.setNegativeButton("放弃保存", new DialogInterface.OnClickListener() {
                     @Override
-                    public void run() {
-                        saveDifference(true);
+                    public void onClick(DialogInterface dialog, int which) {
+                        handler.sendEmptyMessageDelayed(handle4quit, 300);
                     }
                 });
+                ad.setPositiveButton("保存并退出", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        userConfirm = true;
+                        mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
+
+                        ExecutorService executorService = Executors.newSingleThreadExecutor();
+                        executorService.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                saveDifference(true);
+                            }
+                        });
+                    }
+                });
+                ad.show();
             } else
                 finish();
         } else
@@ -382,7 +401,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //                Trace.d(TAG, "------selected:" + position);
                 if (position == 1) {
                     mEditCircleSearch.focusEditText();
-//                    mEditCircleSearch.startSearch();
+                    mEditCircleSearch.startSearch();
                 } else {
                     mEditCircleSearch.clearFocusEditText();
                     mEditContentEdt.requestFocusFromTouch();
@@ -666,12 +685,10 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             addClick();
-//                            Trace.show(getApplicationContext(), "确认");
                         }
                     }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-//                    Trace.show(getApplicationContext(), "算了吧");
                 }
             });
             builder.create().show();
@@ -685,21 +702,8 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 public void onClick(DialogInterface dialog, final int which) {
                     isFolderChanged = true;
                     Trace.show(getApplicationContext(), "选择的笔记夹为：" + mFolder[which]);
-                    //Folder newOne = null;
-//                    final String oldName = thisFolder.getName();
-//                    final String oldId = thisFolder.getObjectId();
-//                    final String newName = mFolder[which];
-//                    final String newId = mFolderId[which];
                     //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
                     thisFolder = primaryData.getFolder(mFolderId[which]);
-                    //将现在的夹名添加到列表中供用户选择
-//                    for (int i = 0; i < mFolderId.length; i++) {
-//                        if (mFolderId[i].equals(newId)) {
-//                            mFolder[i] = oldName;
-//                            mFolderId[i] = oldId;
-//                            break;
-//                        }
-//                    }
                     if (isNew) {//新的笔记先设置已有的笔记在保存时设置
                         mNote.setFolder(mFolder[which]);
                         mNote.setFolderId(thisFolder.getObjectId());

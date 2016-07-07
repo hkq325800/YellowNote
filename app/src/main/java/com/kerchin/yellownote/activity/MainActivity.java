@@ -2,7 +2,9 @@ package com.kerchin.yellownote.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -356,13 +358,27 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else if (id == R.id.nav_folder) {
             mMainPager.setCurrentItem(1);
         } else if (id == R.id.nav_logout) {
-            //切换本地数据库
-            MyApplication.logout();
-            Intent intent = new Intent();
-            intent.setClass(this, LoginActivity.class);
-            intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-            startActivity(intent);
-            finish();
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("退出当前账号");
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //切换本地数据库
+                    MyApplication.logout();
+                    Intent intent = new Intent();
+                    intent.setClass(MainActivity.this, LoginActivity.class);
+                    intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+                    startActivity(intent);
+                    finish();
+                }
+            });
+            builder.show();
             return false;
         } else if (id == R.id.nav_share) {
             handler.sendEmptyMessage(gotoSetting);

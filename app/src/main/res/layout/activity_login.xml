@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
                     android:background="@null"
-                    android:hint="请输入密码(长度需大于6)"
+                    android:hint="请输入密码"
                     android:inputType="textPassword"
                     android:paddingBottom="10dp"
                     android:paddingTop="10dp"

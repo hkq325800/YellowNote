@@ -105,8 +105,8 @@
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <!--<item name="colorPrimary">#ff263238</item>-->
         <!--<item name="colorPrimaryDark">#ff66ccff</item>-->
-        <item name="background">@android:color/transparent</item>
+        <!--<item name="background">@android:color/transparent</item>-->
         <item name="colorControlNormal">@color/textContentColor</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--<item name="android:windowBackground">@android:color/transparent</item>-->
     </style>
 </resources>

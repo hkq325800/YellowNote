@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -78,8 +77,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_share_suggest);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            NormalUtils.immerge(this, R.color.lightSkyBlue);
+        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @OnClick(R.id.mShareSuggestCodeImg)
@@ -218,6 +216,16 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                                 mShareSuggestVersionTxt.setText(str);
                                 mShareSuggestVersionTxt.setTextColor(getResources().getColor(R.color.black));
                                 mShareSuggestTipsTxt.setText("分享给你的朋友们吧！");
+                                mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
+                                                .setTitle("版本:" + versionCode)
+                                                .setMessage(version.getString("version_content"))
+                                                .create();
+                                        alertDialog.show();
+                                    }
+                                });
                                 hasConnect = false;
                             }
                         }

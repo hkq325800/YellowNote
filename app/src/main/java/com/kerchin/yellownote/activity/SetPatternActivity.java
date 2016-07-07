@@ -5,7 +5,6 @@
 
 package com.kerchin.yellownote.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -75,11 +74,5 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 //        PatternLockUtils.setPattern(pattern, this);
         //TODO 数据传输有问题
         SecretMenuActivity.patternFromOthers = PatternLockUtils.getStrFromPattern(pattern);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }

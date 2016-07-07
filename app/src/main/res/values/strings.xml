@@ -10,8 +10,12 @@
     <!--waterdroplistview-->
     <string name="listfooterview_normal">查看更多</string>
     <string name="listfooterview_ready">松开载入更多</string>
+
+    <string name="describeOfMe">github:hkq325800\nhkq325800@163.com</string>
+    <string name="todo">todoList</string>
+    <string name="todoUrl">https://github.com/hkq325800/YellowNote/blob/master/doc/todo.md</string>
     <string name="uri_download">https://github.com/hkq325800/AppRelease/blob/master/YellowNote.apk?raw=true</string>
-    <string name="thank">共使用以下第三方组件 特此感谢！\n[leakcanary](https://github.com/square/leakcanary)
+    <string name="thank">[leakcanary](https://github.com/square/leakcanary)
 - [secure-preferences](https://github.com/scottyab/secure-preferences)
 - [butterknife](https://github.com/JakeWharton/butterknife)
 - [patternlock](https://github.com/DreaminginCodeZH/PatternLock)

@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
-            android:text="github:hkq325800\nhkq325800@163.com"
+            android:text="@string/describeOfMe"
             android:textColor="@color/textColor" />
     </LinearLayout>
 
@@ -37,16 +37,52 @@
         android:layout_weight="1"
         android:background="@color/white">
 
-        <TextView
-            android:id="@+id/mThankTxt"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lineSpacingExtra="3dp"
-            android:lineSpacingMultiplier="1.5"
-            android:paddingBottom="16dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="10dp"
-            android:textSize="16sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mThankTopTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:lineSpacingExtra="3dp"
+                android:lineSpacingMultiplier="1.5"
+                android:paddingBottom="16dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="10dp"
+                android:textSize="16sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/mThankLeftTxt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lineSpacingExtra="3dp"
+                    android:lineSpacingMultiplier="1.5"
+                    android:paddingBottom="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/mThankRightTxt"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:lineSpacingExtra="3dp"
+                    android:lineSpacingMultiplier="1.5"
+                    android:paddingBottom="16dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>
