@@ -12,6 +12,7 @@
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <com.kerchin.yellownote.widget.CircleImageView
+        android:id="@+id/mNavHeaderMainImg"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:src="@mipmap/ic_face" />

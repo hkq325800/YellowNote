@@ -19,8 +19,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -37,7 +37,7 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
-    public static void downloadByUri(Context context, String uriStr){
+    public static void downloadByUri(Context context, String uriStr) {
         Uri uri = Uri.parse(uriStr);//指定网址
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);//指定Action
@@ -50,13 +50,15 @@ public class NormalUtils {
         return myFmt.format(date);
     }
 
-    public static int getScreenWidth(Context context){
+    public static int getScreenWidth(Context context) {
         WindowManager wm = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
         return wm.getDefaultDisplay().getWidth();
     }
+
     /**
      * 沉浸式
+     *
      * @param activity
      * @param color
      */
@@ -126,10 +128,12 @@ public class NormalUtils {
      */
     public static int dip2px(Context context, float dipValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) ((dipValue - 0.5f ) * scale);
+        return (int) ((dipValue - 0.5f) * scale);
     }
+
     /**
      * 跳转activity
+     *
      * @param context  上下文
      * @param activity 目标activity
      */
@@ -248,9 +252,8 @@ public class NormalUtils {
      *
      * @param context       上下文
      * @param selectedImage 选择的图片的uri
-     * @param widget        控件
      */
-    public static void setDrawableToWidget(Context context, Uri selectedImage, ImageView widget) {
+    public static Bitmap getZoomBitmapFromUri(Context context, Uri selectedImage) {
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
         Cursor cursor = context.getContentResolver().query(selectedImage,
@@ -260,18 +263,37 @@ public class NormalUtils {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
-            widget.setImageBitmap(zoomImage(picturePath));
+            return zoomImage(picturePath);
         }
+        return null;
     }
 
     private static Bitmap zoomImage(String picturePath) {
+        File f = new File(picturePath);
+        long size = f.length();//29832 bytes
         BitmapFactory.Options option = new BitmapFactory.Options();
-        option.inSampleSize = 8;
+        double result = size / 1024;
+        int multi = 0;
+        if (f.getName().contains(".gif"))
+            multi = 2;
+        else {
+            if (result / 100 < 1)//几十kb
+                multi = 1;
+            else if (result / 100 < 10)//几百kb
+                multi = 2;
+            else if (result / 100 < 100)//几mb
+                multi = 8;
+            else
+                multi = 16;
+        }
+        Trace.d("multi " + multi);
+        option.inSampleSize = multi;
         return BitmapFactory.decodeFile(picturePath, option);
     }
 
     /**
      * 获取匹配字符串格式的日期字符串
+     *
      * @param matchStr 匹配字符串
      * @return String
      */
@@ -320,7 +342,7 @@ public class NormalUtils {
 
     public static String sha1StringToString(String string) {
         try {
-            return new String(stringToBytes(string),"UTF-8");
+            return new String(stringToBytes(string), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -357,7 +379,7 @@ public class NormalUtils {
         }
         if (cached != null) {
             // Clear the array.
-            for (int i = 0, size = Array.getLength(cached); i < size; i ++) {
+            for (int i = 0, size = Array.getLength(cached); i < size; i++) {
                 Array.set(cached, i, null);
             }
         }
@@ -365,10 +387,11 @@ public class NormalUtils {
 
     /**
      * reference http://www.jianshu.com/p/b4a8b3d4f587
+     *
      * @param context
      * @param requestCode
      */
-    public static void requestWritePermission(Activity context,int requestCode){
+    public static void requestWritePermission(Activity context, int requestCode) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             //申请WRITE_EXTERNAL_STORAGE权限
@@ -377,5 +400,6 @@ public class NormalUtils {
         }
     }
 
-    private NormalUtils() {}
+    private NormalUtils() {
+    }
 }

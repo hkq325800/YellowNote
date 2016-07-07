@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -25,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -62,6 +64,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
     TextView mNavHeaderMainTipTxt;
+    ImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
 
     public static int thisPosition = 0;
@@ -86,6 +89,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
+        mNavHeaderMainImg = (ImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
         msgNote = (TextView) galleryNote.findViewById(R.id.msg);
         LinearLayout galleryFolder = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_folder).getActionView();
@@ -195,9 +199,19 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         });
     }
 
+    int RESULT_LOAD_IMAGE = 1;
+
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
         mMainNav.setNavigationItemSelectedListener(this);
+        mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(
+                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, RESULT_LOAD_IMAGE);
+            }
+        });
         //若新增按钮位置下移 说明软键盘收起
         mMainFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
@@ -263,6 +277,15 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         });
         toggle.syncState();
         NormalUtils.requestWritePermission(this, REQUEST_CODE_REQUEST_PERMISSION);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            mNavHeaderMainImg.setImageBitmap(NormalUtils.getZoomBitmapFromUri(this, selectedImage));
+        }
+//        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private ToolbarStatus getFragmentStatus() {
@@ -388,7 +411,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //            startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
             handler.sendEmptyMessage(gotoSecret);
             return false;
-        } else if(id == R.id.nav_thank){
+        } else if (id == R.id.nav_thank) {
             handler.sendEmptyMessage(gotoThank);
             return false;
         }
@@ -477,11 +500,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_REQUEST_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //permission granted
-                //TODO 向SD卡写数据
+                Trace.d("permission granted");
             } else {
-                //permission denied
                 //TODO 显示对话框告知用户必须打开权限
+                Trace.d("permission denied");
             }
         }
     }
