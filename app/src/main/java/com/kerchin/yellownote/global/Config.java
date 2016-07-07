@@ -8,11 +8,6 @@ public class Config {
     public static boolean isLeakCanary = false;
     public static boolean isDebugMode = false;
     /**
-     * LeanCloud所需配置
-     */
-    public static String APP_ID = "yourLeanCloud APP_ID";
-    public static String APP_KEY = "yourLeanCloud APP_KEY";
-    /**
      * Settings
      */
     public static final String KEY_USER = "xiaohuangjUser";

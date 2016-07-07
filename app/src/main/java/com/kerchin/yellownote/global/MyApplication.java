@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVOSCloud;
+import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -42,8 +43,9 @@ public class MyApplication extends Application {
     public void onCreate() {
         context = getApplicationContext();
 //        Realm realm = Realm.getInstance(context);
-        AVOSCloud.initialize(context,
-                Config.APP_ID, Config.APP_KEY);
+        AVOSCloud.initialize(context
+                , getResources().getString(R.string.APP_ID)
+                , getResources().getString(R.string.APP_KEY));
         if (Config.isLeakCanary)
             LeakCanary.install(this);
 //        CrashHandler crashHandler = CrashHandler.getInstance();

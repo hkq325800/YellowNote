@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">YellowNote</string>
     <string name="declare">code by hkq325800</string>
+    <string name="APP_ID">yourAPPID</string>
+    <string name="APP_KEY">yourAPPKey</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

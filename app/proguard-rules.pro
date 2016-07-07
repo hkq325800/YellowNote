@@ -51,6 +51,8 @@
 -keepclassmembers enum com.j256.** { *; }
 -keep interface com.j256.**
 -keepclassmembers interface com.j256.** { *; }
+-dontwarn com.j256.ormlite.**
+-keep class com.j256.ormlite.** { *;}
 #保护注解
 -keepattributes *Annotation*
 #保护DatabaseField
@@ -82,13 +84,59 @@
 #-keep class com.kerchin.yellownote.bean.PrimaryData { *; }
 ##
 #保留R下面的资源
--keep class **.R$*
+#-keep class **.R$*
 
+#avoscloud
 -dontwarn com.alibaba.fastjson.**
 -keep class com.alibaba.fastjson.** { *; }
 -dontwarn com.avos.avoscloud.okio.**
 -keep class com.avos.avoscloud.okio.** { *; }
--dontwarn com.j256.ormlite.**
--keep class com.j256.ormlite.** { *;}
 -keep class com.avos.avoscloud.** {*;}
 -keepclassmembers class com.avos.avoscloud.** {*;}
+
+-dontwarn com.jcraft.jzlib.**
+-keep class com.jcraft.jzlib.**  { *;}
+
+-dontwarn sun.misc.**
+-keep class sun.misc.** { *;}
+
+-dontwarn com.alibaba.fastjson.**
+-keep class com.alibaba.fastjson.** { *;}
+
+-dontwarn sun.security.**
+-keep class sun.security.** { *; }
+
+-dontwarn com.google.**
+-keep class com.google.** { *;}
+
+-dontwarn com.avos.**
+-keep class com.avos.** { *;}
+
+-keep public class android.net.http.SslError
+-keep public class android.webkit.WebViewClient
+
+-dontwarn android.webkit.WebView
+-dontwarn android.net.http.SslError
+-dontwarn android.webkit.WebViewClient
+
+-dontwarn android.support.**
+
+-dontwarn org.apache.**
+-keep class org.apache.** { *;}
+
+-dontwarn org.jivesoftware.smack.**
+-keep class org.jivesoftware.smack.** { *;}
+
+-dontwarn com.loopj.**
+-keep class com.loopj.** { *;}
+
+-dontwarn com.squareup.okhttp.**
+-keep class com.squareup.okhttp.** { *;}
+-keep interface com.squareup.okhttp.** { *; }
+
+-dontwarn okio.**
+
+-dontwarn org.xbill.**
+-keep class org.xbill.** { *;}
+#avoscloud
+

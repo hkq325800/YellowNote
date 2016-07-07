@@ -40,6 +40,7 @@ public class ThankActivity extends BaseHasSwipeActivity {
     ArrayList<String> thankList;
     ArrayList<String> linkList;
     SpannableString targetLeft, targetRight, targetTop;
+    String todo;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
@@ -51,8 +52,6 @@ public class ThankActivity extends BaseHasSwipeActivity {
     protected void initializeEvent(Bundle savedInstanceState) {
 
     }
-
-    String todo;
 
     @Override
     protected void initializeData(Bundle savedInstanceState) {
@@ -75,12 +74,8 @@ public class ThankActivity extends BaseHasSwipeActivity {
                 collectThankAndLink(thankStr);
                 targetLeft = new SpannableString(thankStrLeft);
                 targetRight = new SpannableString(thankStrRight);
-
-//                targetLeft.setSpan(new URLSpan(todoUrl), thankStr.indexOf(todo)
-//                        , thankStr.indexOf(todo) + todo.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 int i = 0;
                 for (String thank : thankList) {
-//                    SpannableString ss = new SpannableString(thank);
                     if (i % 2 == 0)
                         targetLeft.setSpan(new URLSpan(linkList.get(i)), thankStrLeft.indexOf(thank)
                                 , thankStrLeft.indexOf(thank) + thank.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
