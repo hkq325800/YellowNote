@@ -20,7 +20,7 @@ public class MyApplication extends Application {
     /**
      * app在sd卡的主目录
      */
-    private final static String APP_MAIN_FOLDER_NAME = "YellowNote";
+    public final static String APP_MAIN_FOLDER_NAME = "YellowNote";
     /**
      * 本地存放闪退日志的目录
      */
@@ -31,6 +31,7 @@ public class MyApplication extends Application {
     private static boolean isLogin = false;
     public static String user;
     public static String userDefaultFolderId = "";
+    public static String userIcon;
 //    public static String view = "note";//TODO
     //public static final int pageLimit = 5;
 //    public static boolean isItemsReadyToGo = false;//TODO

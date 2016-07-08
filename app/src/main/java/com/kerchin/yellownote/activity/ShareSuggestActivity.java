@@ -197,8 +197,6 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                                         AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
                                                 .setTitle("版本:" + versionCode)
                                                 .setMessage(version.getString("version_content"))
-//                                        .setView(view)
-//                                        .setOnCancelListener(listener)
                                                 .setPositiveButton("下载", new DialogInterface.OnClickListener() {
                                                     @Override
                                                     public void onClick(DialogInterface dialog, int which) {

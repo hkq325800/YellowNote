@@ -25,6 +25,7 @@
 
     <style name="AppTheme.NoActionBarDrawer" parent="AppTheme.NoActionBar">
         <item name="colorPrimary">@color/white</item><!--字-->
+        <item name="android:backgroundDimEnabled">false</item><!-- dim:模糊的 阴影效果 遮罩 -->
         <item name="colorControlHighlight">@color/colorPrimary</item><!--背景-->
     </style>
 

@@ -167,26 +167,30 @@ public class FolderFragment extends BaseFragment {
                 @Override
                 public void onItemLongClick(View v, final int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
-                        singleChooseDialogMaker(getActivity(), "笔记夹操作", new String[]{"删除", "重命名"}
-                                , new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        switch (which) {
-                                            case 0://delete
-                                                deleteFolder(position);
-                                                break;
-                                            case 1://rename
-                                                if (!primaryData.getFolderAt(position).getName().equals("默认")) {
-                                                    MainActivity mainActivity = (MainActivity) getActivity();
-                                                    mainActivity.hideBtnAdd();
-                                                    reTitleFolderDialogShow(position);
-                                                } else {
-                                                    Trace.show(getActivity(), "不要更名这个哦");
-                                                }
-                                                break;
+                        if (item.getFolderId().equals(MyApplication.userDefaultFolderId))
+                            Trace.show(getActivity().getApplicationContext(), "好孩子不要动这个哦");
+                        else
+                            singleChooseDialogMaker(getActivity(), "笔记夹操作"
+                                    , new String[]{"删除", "重命名"}
+                                    , new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which) {
+                                                case 0://delete
+                                                    deleteFolder(position);
+                                                    break;
+                                                case 1://rename
+                                                    if (!primaryData.getFolderAt(position).getName().equals("默认")) {
+                                                        MainActivity mainActivity = (MainActivity) getActivity();
+                                                        mainActivity.hideBtnAdd();
+                                                        reTitleFolderDialogShow(position);
+                                                    } else {
+                                                        Trace.show(getActivity(), "不要更名这个哦");
+                                                    }
+                                                    break;
+                                            }
                                         }
-                                    }
-                                });
+                                    });
                     } else if (viewType == SimpleEntity.typeNote) {
                         singleChooseDialogMaker(getActivity(), "笔记操作", new String[]{"移动", "删除", "重命名"}
                                 , new DialogInterface.OnClickListener() {
@@ -486,30 +490,26 @@ public class FolderFragment extends BaseFragment {
      * @param position 点击的position
      */
     private void deleteFolder(final int position) {
-        if (!primaryData.getFolderAt(position).getName().equals("默认")) {
-            //del
-            if (primaryData.getFolderAt(position).getContain() != 0)
-                //笔记夹下如果还有笔记要么全部删除要么移至默认
-                Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
-            else {
-                reConfirmDialogMaker(getActivity(), "确认删除笔记夹:" + primaryData.getFolderAt(position).getName(), ""
-                        , new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        }, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                getDataHelper.respond();//deleteFolder->folder.delete
-                                primaryData.getFolderAt(position)
-                                        .delete(getActivity(), position, handler, GetDataHelper.handle4respond);
-                            }
-                        });
-            }
-        } else {
-            Trace.show(getActivity(), "不要删除这个哦");
+        //del
+        if (primaryData.getFolderAt(position).getContain() != 0)
+            //笔记夹下如果还有笔记要么全部删除要么移至默认
+            Trace.show(getActivity(), "请先移除笔记夹下的所有笔记");
+        else {
+            reConfirmDialogMaker(getActivity(), "确认删除笔记夹:" + primaryData.getFolderAt(position).getName(), ""
+                    , new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    }, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            getDataHelper.respond();//deleteFolder->folder.delete
+                            primaryData.getFolderAt(position)
+                                    .delete(getActivity(), position, handler, GetDataHelper.handle4respond);
+                        }
+                    });
         }
     }
 
@@ -545,6 +545,13 @@ public class FolderFragment extends BaseFragment {
                 return false;
             }
         });
+        alertDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.showBtnAdd();
+            }
+        });
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -575,6 +582,8 @@ public class FolderFragment extends BaseFragment {
                             }
                         }).start();
                         alertDialog.dismiss();
+                        MainActivity mainActivity = (MainActivity) getActivity();
+                        mainActivity.showBtnAdd();
 //                        mEditEdt.setEnabled(true);
                     }
                 } else {
@@ -592,6 +601,8 @@ public class FolderFragment extends BaseFragment {
             }
         });
         alertDialog.show();
+        //设置主窗体透明度
+//        alertDialog.getWindow().getDecorView().setAlpha(0.7f);
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {

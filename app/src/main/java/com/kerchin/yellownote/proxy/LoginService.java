@@ -1,10 +1,13 @@
 package com.kerchin.yellownote.proxy;
 
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.kerchin.yellownote.global.MyApplication;
+
+import java.io.FileNotFoundException;
 
 /**
  * Created by Kerchin on 2016/4/5 0005.
@@ -109,29 +112,27 @@ public class LoginService {
     }
 
     //获取文件
-//        AVFile.withObjectIdInBackground("560ba05f60b2ce30b2d4727e", new GetFileCallback<AVFile>() {
-//            @Override
-//            public void done(AVFile avFile, AVException e) {
-//                if (e == null) {
-//                    AVObject Folder = new AVObject("Folder");
-//                    Folder.put("user_tel", txtUser);
-//                    Folder.put("folder_cover", avFile);
-//                    Folder.saveInBackground(new SaveCallback() {
-//                        @Override
-//                        public void done(AVException e) {
-//                            if (e == null) {
-//                                Log.d("signupVerify", "默认文件夹创建完成");
-//                                goToMain();
-//                                Toast.makeText(LoginActivity.this, txtUser + "注册成功", Toast.LENGTH_SHORT).show();
-//                                isEnter = false;
-//                            } else {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                    });
-//                } else {
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
+    public static AVFile getUserIcon(final String userIcon) throws AVException, FileNotFoundException {
+        return AVFile.withObjectId(userIcon);
+    }
+
+    //保存文件
+    public static void saveUserIcon(String path) throws AVException, FileNotFoundException {
+        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user, path);
+        file.save();
+        AVQuery<AVObject> query = new AVQuery<>("mUser");
+        query.whereEqualTo("user_tel", MyApplication.user);
+        AVObject user = query.getFirst();
+        user.put("user_icon", file.getObjectId());
+        user.save();
+    }
+
+    //保存文件
+    public static void saveUserIconById(String path) throws AVException, FileNotFoundException {
+        AVFile file = AVFile.withObjectId(MyApplication.userIcon);
+        file.delete();
+        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user, path);
+        newFile.setObjectId(MyApplication.userIcon);
+        newFile.save();
+    }
 }

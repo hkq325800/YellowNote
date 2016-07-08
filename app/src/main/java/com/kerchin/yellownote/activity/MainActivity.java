@@ -7,8 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -20,16 +22,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
+import com.bumptech.glide.Glide;
 import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
@@ -40,16 +45,21 @@ import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
+import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -64,7 +74,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
     TextView mNavHeaderMainTipTxt;
-    ImageView mNavHeaderMainImg;
+    CircleImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
 
     public static int thisPosition = 0;
@@ -89,7 +99,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
-        mNavHeaderMainImg = (ImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
+        mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
         msgNote = (TextView) galleryNote.findViewById(R.id.msg);
         LinearLayout galleryFolder = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_folder).getActionView();
@@ -101,6 +111,26 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    }
+
+    private void setUserIconByNet() {
+        Trace.d("setUserIconByNet");
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVFile file = LoginService.getUserIcon(MyApplication.userIcon);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
+                        }
+                    });
+                } catch (AVException | FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -120,7 +150,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             thisPosition = 0;
             Trace.d("MainActivity initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
-//            PrimaryData.getInstance().giveBackData(savedInstanceState);
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
 //            if (noteFragment == null) {
 //                Trace.d("noteFragment null");
@@ -131,17 +160,20 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //                Trace.d("folderFragment null");
             folderFragment = FolderFragment.newInstance(null);
 //            }
-//            Trace.show(getApplicationContext(), MyApplication.user);
-//            if (MyApplication.user.equals("")) {
-//                Trace.show(getApplicationContext(), "用户信息过期 请重新登录");
-//                MyApplication.logout();
-//                Intent intent = new Intent();
-//                intent.setClass(this, LoginActivity.class);
-//                intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-//                startActivity(intent);
-//                finish();
-//            }
         }
+        savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                , MyApplication.APP_MAIN_FOLDER_NAME);
+        userIconPath = savePath.getAbsolutePath() + File.separator
+                + MyApplication.user + ".png";
+        userIconFile = new File(userIconPath);
+        if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
+            Trace.d("getLocalBitmap");
+            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+        } else if (userIconFile.exists()) {
+            Trace.d("getLocalBitmap");
+            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLoacalBitmap(userIconPath));
+        } else
+            setUserIconByNet();
         fragments.add(noteFragment);
         fragments.add(folderFragment);
         MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(
@@ -279,11 +311,40 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         NormalUtils.requestWritePermission(this, REQUEST_CODE_REQUEST_PERMISSION);
     }
 
+    File savePath;
+    File userIconFile;
+    String userIconPath;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            mNavHeaderMainImg.setImageBitmap(NormalUtils.getZoomBitmapFromUri(this, selectedImage));
+            final Uri selectedImage = data.getData();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (!savePath.exists())
+                            savePath.createNewFile();
+                        final Bitmap bitmap = NormalUtils
+                                .getZoomBitmapFromUri(MainActivity.this, selectedImage);
+                        //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
+                        NormalUtils.saveBitmap(bitmap, userIconFile);
+                        //没则新增有则创建
+                        if (TextUtils.isEmpty(MyApplication.userIcon))
+                            LoginService.saveUserIcon(userIconPath);
+                        else
+                            LoginService.saveUserIconById(userIconPath);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNavHeaderMainImg.setImageBitmap(bitmap);
+                            }
+                        });
+                    } catch (AVException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
         }
 //        super.onActivityResult(requestCode, resultCode, data);
     }
@@ -369,8 +430,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public void createNew() {
         if (thisPosition == 0)
             noteFragment.addClick();
-        else if (thisPosition == 1)
+        else if (thisPosition == 1) {
+            hideBtnAdd();
             folderFragment.addClick();
+        }
     }
 
     @Override

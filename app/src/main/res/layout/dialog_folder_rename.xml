@@ -8,14 +8,17 @@
         android:id="@+id/mEditEdt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:drawableRight="@mipmap/clear_edit"
-        android:hint="请输入名称"
         android:layout_marginLeft="25dp"
         android:layout_marginRight="25dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="10dp"
+        android:drawableRight="@mipmap/clear_edit"
+        android:hint="请输入名称"
         android:inputType="text"
+        android:background="@null"
         android:textColor="@color/black"
         android:textColorHint="@color/backgroundFunctionBar"
+        android:textCursorDrawable="@null"
         android:textSize="16sp" />
 
     <Button
@@ -29,6 +32,6 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/selector_navigation_button"
         android:text="确认"
-        android:textSize="18sp"
-        android:textColor="@color/textColor" />
+        android:textColor="@color/textColor"
+        android:textSize="16sp" />
 </RelativeLayout>

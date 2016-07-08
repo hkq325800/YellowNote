@@ -21,6 +21,10 @@ import android.view.View;
 import android.view.WindowManager;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -238,7 +242,7 @@ public class NormalUtils {
         int height = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap(width, height
                 , drawable.getOpacity() != PixelFormat.OPAQUE
-                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+                        ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, width, height);
         drawable.draw(canvas);
@@ -273,20 +277,22 @@ public class NormalUtils {
         long size = f.length();//29832 bytes
         BitmapFactory.Options option = new BitmapFactory.Options();
         double result = size / 1024;
-        int multi = 0;
+        int multi;
         if (f.getName().contains(".gif"))
             multi = 2;
         else {
-            if (result / 100 < 1)//几十kb
+            if (result / 100 < 1)//小于100kb
                 multi = 1;
-            else if (result / 100 < 10)//几百kb
+            else if (result / 100 < 10)//100kb-1mb
                 multi = 2;
-            else if (result / 100 < 100)//几mb
+            else if (result / 100 < 30)//1-3mb
+                multi = 4;
+            else if (result / 100 < 50)//3-5mb
                 multi = 8;
             else
                 multi = 16;
         }
-        Trace.d("multi " + multi);
+        Trace.d("multi " + multi + "/" + result + "kb");
         option.inSampleSize = multi;
         return BitmapFactory.decodeFile(picturePath, option);
     }
@@ -401,5 +407,38 @@ public class NormalUtils {
     }
 
     private NormalUtils() {
+    }
+
+    /**
+     * 加载本地图片
+     * http://bbs.3gstdy.com
+     * @param url 路径
+     * @return Bitmap
+     */
+    public static Bitmap getLoacalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void saveBitmap(Bitmap bm, File f) throws IOException {
+        if (f.exists()) {
+            f.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            bm.compress(Bitmap.CompressFormat.PNG, 70, out);
+            out.flush();
+            out.close();
+            Trace.i("yes", "已经保存" + f.getPath());
+        } catch (FileNotFoundException e) {
+            Trace.e("saveBitmap", "FileNotFoundException: " + e.getMessage());
+        } catch (IOException e) {
+            Trace.e("saveBitmap", "IOException: " + e.getMessage());
+        }
     }
 }

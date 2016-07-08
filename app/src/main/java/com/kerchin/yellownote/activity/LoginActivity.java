@@ -430,14 +430,15 @@ public class LoginActivity extends LoginAbstract {
                             @Override
                             public void run() {
                                 try {
-                                    AVObject avObjects = LoginService.loginVerify(txtUser, txtPass);
-                                    if (avObjects != null) {
-                                        boolean isFrozen = avObjects.getBoolean("isFrozen");
+                                    AVObject user = LoginService.loginVerify(txtUser, txtPass);
+                                    if (user != null) {
+                                        boolean isFrozen = user.getBoolean("isFrozen");
                                         if (isFrozen) {
                                             dismissProgress();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
-                                            MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
+                                            MyApplication.userDefaultFolderId = user.getString("user_default_folderId");
+                                            MyApplication.userIcon = user.getString("user_icon");
                                             String pattern = SecretService.getPatternStr(txtUser);
                                             PatternLockUtils.setPattern(pattern, getApplicationContext());
                                             if (Config.isDebugMode)

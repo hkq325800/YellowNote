@@ -210,19 +210,19 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     Trace.d("loginVerify" + Thread.currentThread().getId());
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
-                        AVObject avObjects = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
+                        AVObject user = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
 //                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
 //                        }
-                        if (avObjects != null) {
-                            Trace.d("查询缓存 用户" + avObjects.get("user_tel") + "登陆成功");
+                        if (user != null) {
+                            Trace.d("查询缓存 用户" + user.get("user_tel") + "登陆成功");
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     mWelcomeTxt.setText("登录成功 正在获取数据...");
                                 }
                             });
-                            boolean isFrozen = avObjects.getBoolean("isFrozen");
-                            PatternLockUtils.setPattern(avObjects.getString("user_read_pass"), getApplicationContext());
+                            boolean isFrozen = user.getBoolean("isFrozen");
+                            PatternLockUtils.setPattern(user.getString("user_read_pass"), getApplicationContext());
 //                            if (Config.isDebugMode)
 //                                Trace.show(LaunchActivity.this, SecretService.getPatternStr(txtUser));
                             if (isFrozen) {
@@ -231,8 +231,9 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                 message.what = reLogForFrozen;
                                 handler.sendMessageDelayed(message, delayTime);
                             } else {
-                                //保存默认笔记夹id 弃用 应该统一在login获取
-//                                MyApplication.userDefaultFolderId = avObjects.getString("user_default_folderId");
+                                //默认笔记夹id统一在login获取 因为不轻易改变 保存在本地
+                                //userIcon每次获取
+                                MyApplication.userIcon = user.getString("user_icon");
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转
