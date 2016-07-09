@@ -180,7 +180,7 @@ public class Note implements Serializable {
     }
 
     public String getTrueDate() {
-        return NormalUtils.getTrueDate(date);
+        return NormalUtils.getDateStr(date, "yyyy年MM月dd日 HH时mm分ss秒");
     }
 
     public String getPreview() {

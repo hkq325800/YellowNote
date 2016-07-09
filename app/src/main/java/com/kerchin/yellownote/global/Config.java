@@ -6,7 +6,7 @@ package com.kerchin.yellownote.global;
 public class Config {
 
     public static boolean isLeakCanary = false;
-    public static boolean isDebugMode = false;
+    public static boolean isDebugMode = true;
     /**
      * Settings
      */
@@ -15,6 +15,7 @@ public class Config {
     public static final String KEY_ISLOGIN = "xiaohuangjIsLogin";
     public static final String KEY_DEFAULT_FOLDER = "xiaohuangjDefaultFolder";
     public static final String KEY_CAN_OFFLINE = "xiaohuangjCanOffline";
+    public static final String KEY_WHEN_CHECK_UPDATE = "xiaohuangjWhenCheckUpdate";
 //    public static final String KEY_CACHE_User = "cacheUser";
 //    public static final String KEY_CACHE_Pass = "cachePass";
 //    public static final String KEY_CACHE_RePass = "cacheRePass";

@@ -1,11 +1,12 @@
 package com.kerchin.yellownote.utilities;
 
+import android.content.Context;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.Thread.UncaughtExceptionHandler;
-
-import android.content.Context;
+import java.util.Date;
 
 public class CrashHandler implements UncaughtExceptionHandler {
 	public static final String TAG = "CrashHandler";
@@ -88,7 +89,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
 		printWriter.close();
 		String result = writer.toString();
 		sb.append(result);
-		String time = NormalUtils.getNowDate("yyyy-MM-dd-HH-mm-ss");
+		String time = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd-HH-mm-ss");
 		if (FileStore.hasSDCard()) {
 			FileStore
 					.writeSDCardAdd("[" + time + "]" + sb.toString());

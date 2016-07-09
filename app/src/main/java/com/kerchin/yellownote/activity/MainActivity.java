@@ -34,7 +34,8 @@ import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
-import com.bumptech.glide.Glide;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.GetDataCallback;
 import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
@@ -43,18 +44,24 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
+import com.kerchin.yellownote.proxy.ShareSuggestService;
+import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.SystemUtils;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
+import com.securepreferences.SecurePreferences;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -88,6 +95,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private ActionBarDrawerToggle toggle;
     private ArrayList<Fragment> fragments = new ArrayList<>();
 
+    File savePath;
+    File userIconFile;
+    String userIconPath;
+
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         closeSliding();
@@ -120,10 +131,37 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void run() {
                 try {
                     final AVFile file = LoginService.getUserIcon(MyApplication.userIcon);
-                    runOnUiThread(new Runnable() {
+                    file.getDataInBackground(new GetDataCallback() {
                         @Override
-                        public void run() {
-                            Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
+                        public void done(final byte[] bytes, AVException e) {
+                            if (e != null) {
+                                mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+                                e.printStackTrace();
+                                return;
+                            }
+                            final Bitmap b = NormalUtils.bytes2Bitmap(bytes);
+                            try {
+                                NormalUtils.saveBitmap(b, userIconFile);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mNavHeaderMainImg.setImageBitmap(b);
+//                                    GlideBuilder gb = new GlideBuilder(MainActivity.this);
+//                                    DiskCache.Factory factory = new DiskCache.Factory() {
+//                                        @Override
+//                                        public DiskCache build() {
+//                                            File cacheLocation = new File(getExternalCacheDir(), "cache_dir_name");
+//                                            cacheLocation.mkdirs();
+//                                            return DiskLruCacheWrapper.get(cacheLocation, bytes.length);
+//                                        }
+//                                    };
+//                                    gb.setDiskCache(factory);
+//                                    Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
+                                }
+                            });
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -137,6 +175,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
         outState.putString("user", MyApplication.user);
+        outState.putString("userIcon", MyApplication.userIcon);
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -150,6 +189,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             thisPosition = 0;
             Trace.d("MainActivity initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
+            MyApplication.setUserIcon(savedInstanceState.getString("userIcon"));
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
 //            if (noteFragment == null) {
 //                Trace.d("noteFragment null");
@@ -161,6 +201,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             folderFragment = FolderFragment.newInstance(null);
 //            }
         }
+        //userIcon
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 , MyApplication.APP_MAIN_FOLDER_NAME);
         userIconPath = savePath.getAbsolutePath() + File.separator
@@ -169,11 +210,13 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-        } else if (userIconFile.exists()) {
+        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
-            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLoacalBitmap(userIconPath));
-        } else
+            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
+        } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
+        //checkForUpdate
+        checkForUpdate();
         fragments.add(noteFragment);
         fragments.add(folderFragment);
         MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(
@@ -229,6 +272,45 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     mSearchView.onActionViewCollapsed();
             }
         });
+    }
+    String versionContent,versionCode;
+    private void checkForUpdate() {
+        String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
+        String lastCheck = MyApplication.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
+                , "");
+        SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
+        if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
+            editor.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr);
+            editor.apply();
+            return;
+        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVObject version = ShareSuggestService.getVersionInfo();
+                    String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
+                    versionCode = version.getString("version_name");
+                    versionContent = version.getString("version_content");
+                    if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
+                        //需要更新
+                        handler.sendEmptyMessageDelayed(checkUpdate, 2000);
+                    }
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        editor.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr);
+        editor.apply();
+    }
+
+    private void download(String versionCode) {
+        Intent intent = new Intent(MainActivity.this,
+                DownloadService.class);
+        intent.putExtra("uriStr", getString(R.string.uri_download));
+        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
+        startService(intent);
     }
 
     int RESULT_LOAD_IMAGE = 1;
@@ -310,10 +392,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         toggle.syncState();
         NormalUtils.requestWritePermission(this, REQUEST_CODE_REQUEST_PERMISSION);
     }
-
-    File savePath;
-    File userIconFile;
-    String userIconPath;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -487,11 +565,25 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public static final int hideBtnAdd = 2;
     public static final int gotoSecret = 3;
     public static final int gotoThank = 4;
+    public static final int checkUpdate = 5;
     private SystemHandler handler = new SystemHandler(this) {
 
         @Override
         public void handlerMessage(Message msg) {
             switch (msg.what) {
+                case checkUpdate:
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("版本:" + versionCode)
+                            .setMessage(versionContent)
+                            .setPositiveButton("下载", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    download(versionCode);
+                                }
+                            })
+                            .create();
+                    alertDialog.show();
+                    break;
                 case gotoThank:
                     ThankActivity.startMe(getApplicationContext());
                     overridePendingTransition(R.anim.push_left_in,

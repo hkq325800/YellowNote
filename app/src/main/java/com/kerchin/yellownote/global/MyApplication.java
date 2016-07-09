@@ -85,6 +85,10 @@ public class MyApplication extends Application {
         isLogin = true;
     }
 
+    public static void setUserIcon(String icon){
+        userIcon = icon;
+    }
+
     public static void logout() {
         isLogin = false;
         PrimaryData.getInstance().clearData();
@@ -93,6 +97,9 @@ public class MyApplication extends Application {
         SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();
         editor.putBoolean(Config.KEY_ISLOGIN, false);
         editor.putString(Config.KEY_PASS, "");
+        editor.putString(Config.KEY_DEFAULT_FOLDER, "");
+        editor.putBoolean(Config.KEY_CAN_OFFLINE, true);
+        editor.putString(Config.KEY_WHEN_CHECK_UPDATE, "");
         editor.apply();
     }
 }

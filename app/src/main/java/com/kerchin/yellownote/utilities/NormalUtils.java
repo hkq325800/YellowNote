@@ -49,11 +49,6 @@ public class NormalUtils {
         context.startActivity(intent);//启动Activity
     }
 
-    public static String getTrueDate(Date date) {
-        SimpleDateFormat myFmt = new SimpleDateFormat("yyyy年MM月dd日 HH时mm分ss秒", Locale.CHINA);
-        return myFmt.format(date);
-    }
-
     public static int getScreenWidth(Context context) {
         WindowManager wm = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
@@ -181,33 +176,6 @@ public class NormalUtils {
     }
 
     /**
-     * 返回Note中的日期字符串
-     *
-     * @param date Date类型
-     * @return String
-     */
-    public static String getDateString(Date date) {
-        Calendar now = Calendar.getInstance();
-        Calendar c = Calendar.getInstance();
-        c.setTime(date);
-        SimpleDateFormat formatter = new SimpleDateFormat(" HH:mm:ss", Locale.CHINA);
-        if (c.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
-            int d1 = c.get(Calendar.DAY_OF_YEAR);
-            int d2 = now.get(Calendar.DAY_OF_YEAR);
-            if (d1 == d2) {
-                return "今天" + formatter.format(date);
-            } else if (d2 - d1 == 1) {
-                return "昨天" + formatter.format(date);
-            } else if (d2 - d1 == 2) {
-                return "前天" + formatter.format(date);
-            }
-        }
-        formatter = new SimpleDateFormat("yyyy年MM月dd日", Locale.CHINA);/* HH:mm:ss*/
-        return formatter.format(date);
-
-    }
-
-    /**
      * WaterDropListViewHeader——
      * Map a value within a given range to another range.
      *
@@ -242,7 +210,7 @@ public class NormalUtils {
         int height = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap(width, height
                 , drawable.getOpacity() != PixelFormat.OPAQUE
-                        ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, width, height);
         drawable.draw(canvas);
@@ -298,15 +266,16 @@ public class NormalUtils {
     }
 
     /**
-     * 获取匹配字符串格式的日期字符串
-     *
-     * @param matchStr 匹配字符串
-     * @return String
+     * http://www.cnblogs.com/fighter/archive/2012/02/20/android-bitmap-drawable.html
+     * @param b
+     * @return
      */
-    public static String getNowDate(String matchStr) {
-        SimpleDateFormat formatter = new SimpleDateFormat(matchStr, Locale.CHINA);
-        Date curDate = new Date(System.currentTimeMillis());// 获取当前时间
-        return formatter.format(curDate);
+    public static Bitmap bytes2Bitmap(byte[] b) {
+        if (b.length != 0) {
+            return BitmapFactory.decodeByteArray(b, 0, b.length);
+        } else {
+            return null;
+        }
     }
 
     public static int getStatusBarHeight(Context context) {
@@ -412,10 +381,11 @@ public class NormalUtils {
     /**
      * 加载本地图片
      * http://bbs.3gstdy.com
+     *
      * @param url 路径
      * @return Bitmap
      */
-    public static Bitmap getLoacalBitmap(String url) {
+    public static Bitmap getLocalBitmap(String url) {
         try {
             FileInputStream fis = new FileInputStream(url);
             return BitmapFactory.decodeStream(fis);
@@ -440,5 +410,45 @@ public class NormalUtils {
         } catch (IOException e) {
             Trace.e("saveBitmap", "IOException: " + e.getMessage());
         }
+    }
+
+    //to DateUtil
+
+    /**
+     * 获取匹配字符串格式的日期字符串
+     *
+     * @param matchStr 匹配字符串
+     * @return String
+     */
+    public static String getDateStr(Date date, String matchStr){
+        SimpleDateFormat myFmt = new SimpleDateFormat(matchStr, Locale.CHINA);
+        return myFmt.format(date);
+    }
+
+    /**
+     * 返回Note中的日期字符串
+     *
+     * @param date Date类型
+     * @return String
+     */
+    public static String getDateString(Date date) {
+        Calendar now = Calendar.getInstance();
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        SimpleDateFormat formatter = new SimpleDateFormat(" HH:mm:ss", Locale.CHINA);
+        if (c.get(Calendar.YEAR) == now.get(Calendar.YEAR)) {
+            int d1 = c.get(Calendar.DAY_OF_YEAR);
+            int d2 = now.get(Calendar.DAY_OF_YEAR);
+            if (d1 == d2) {
+                return "今天" + formatter.format(date);
+            } else if (d2 - d1 == 1) {
+                return "昨天" + formatter.format(date);
+            } else if (d2 - d1 == 2) {
+                return "前天" + formatter.format(date);
+            }
+        }
+        formatter = new SimpleDateFormat("yyyy年MM月dd日", Locale.CHINA);/* HH:mm:ss*/
+        return formatter.format(date);
+
     }
 }
