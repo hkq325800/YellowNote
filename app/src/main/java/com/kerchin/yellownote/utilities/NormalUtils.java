@@ -198,86 +198,6 @@ public class NormalUtils {
         return toLow + (valueScale * toRangeSize);
     }
 
-    /**
-     * WaterDropListView——
-     * convert drawable to bitmap
-     *
-     * @param drawable source
-     * @return bitmap
-     */
-    public static Bitmap drawableToBitmap(Drawable drawable) {
-        int width = drawable.getIntrinsicWidth();
-        int height = drawable.getIntrinsicHeight();
-        Bitmap bitmap = Bitmap.createBitmap(width, height
-                , drawable.getOpacity() != PixelFormat.OPAQUE
-                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
-        Canvas canvas = new Canvas(bitmap);
-        drawable.setBounds(0, 0, width, height);
-        drawable.draw(canvas);
-        return bitmap;
-    }
-
-    /**
-     * Intent i = new Intent(
-     * Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-     * startActivityForResult(i, RESULT_LOAD_IMAGE);
-     *
-     * @param context       上下文
-     * @param selectedImage 选择的图片的uri
-     */
-    public static Bitmap getZoomBitmapFromUri(Context context, Uri selectedImage) {
-        String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-        Cursor cursor = context.getContentResolver().query(selectedImage,
-                filePathColumn, null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            cursor.close();
-            return zoomImage(picturePath);
-        }
-        return null;
-    }
-
-    private static Bitmap zoomImage(String picturePath) {
-        File f = new File(picturePath);
-        long size = f.length();//29832 bytes
-        BitmapFactory.Options option = new BitmapFactory.Options();
-        double result = size / 1024;
-        int multi;
-        if (f.getName().contains(".gif"))
-            multi = 2;
-        else {
-            if (result / 100 < 1)//小于100kb
-                multi = 1;
-            else if (result / 100 < 10)//100kb-1mb
-                multi = 2;
-            else if (result / 100 < 30)//1-3mb
-                multi = 4;
-            else if (result / 100 < 50)//3-5mb
-                multi = 8;
-            else
-                multi = 16;
-        }
-        Trace.d("multi " + multi + "/" + result + "kb");
-        option.inSampleSize = multi;
-        return BitmapFactory.decodeFile(picturePath, option);
-    }
-
-    /**
-     * http://www.cnblogs.com/fighter/archive/2012/02/20/android-bitmap-drawable.html
-     * @param b
-     * @return
-     */
-    public static Bitmap bytes2Bitmap(byte[] b) {
-        if (b.length != 0) {
-            return BitmapFactory.decodeByteArray(b, 0, b.length);
-        } else {
-            return null;
-        }
-    }
-
     public static int getStatusBarHeight(Context context) {
         int result = 0;
         int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -378,40 +298,6 @@ public class NormalUtils {
     private NormalUtils() {
     }
 
-    /**
-     * 加载本地图片
-     * http://bbs.3gstdy.com
-     *
-     * @param url 路径
-     * @return Bitmap
-     */
-    public static Bitmap getLocalBitmap(String url) {
-        try {
-            FileInputStream fis = new FileInputStream(url);
-            return BitmapFactory.decodeStream(fis);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public static void saveBitmap(Bitmap bm, File f) throws IOException {
-        if (f.exists()) {
-            f.delete();
-        }
-        try {
-            FileOutputStream out = new FileOutputStream(f);
-            bm.compress(Bitmap.CompressFormat.PNG, 70, out);
-            out.flush();
-            out.close();
-            Trace.i("yes", "已经保存" + f.getPath());
-        } catch (FileNotFoundException e) {
-            Trace.e("saveBitmap", "FileNotFoundException: " + e.getMessage());
-        } catch (IOException e) {
-            Trace.e("saveBitmap", "IOException: " + e.getMessage());
-        }
-    }
-
     //to DateUtil
 
     /**
@@ -420,7 +306,7 @@ public class NormalUtils {
      * @param matchStr 匹配字符串
      * @return String
      */
-    public static String getDateStr(Date date, String matchStr){
+    public static String getDateStr(Date date, String matchStr) {
         SimpleDateFormat myFmt = new SimpleDateFormat(matchStr, Locale.CHINA);
         return myFmt.format(date);
     }
@@ -449,6 +335,124 @@ public class NormalUtils {
         }
         formatter = new SimpleDateFormat("yyyy年MM月dd日", Locale.CHINA);/* HH:mm:ss*/
         return formatter.format(date);
+    }
 
+    //to BitmapUtil
+
+    /**
+     * 加载本地图片
+     * http://bbs.3gstdy.com
+     *
+     * @param url 路径
+     * @return Bitmap
+     */
+    public static Bitmap getLocalBitmap(String url) {
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static void saveBitmap(Bitmap bm, File f, String type) throws IOException {
+        if (f.exists()) {
+            f.delete();
+        }
+        try {
+            FileOutputStream out = new FileOutputStream(f);
+            if (type.contains("jpg") || type.contains("jpeg"))
+                bm.compress(Bitmap.CompressFormat.JPEG, 70, out);
+            else
+                bm.compress(Bitmap.CompressFormat.PNG, 70, out);
+            out.flush();
+            out.close();
+            Trace.i("yes", "已经保存" + f.getPath() + "/" + (f.length() / 1024) + "kb");
+        } catch (FileNotFoundException e) {
+            Trace.e("saveBitmap", "FileNotFoundException: " + e.getMessage());
+        } catch (IOException e) {
+            Trace.e("saveBitmap", "IOException: " + e.getMessage());
+        }
+    }
+
+    /**
+     * WaterDropListView——
+     * convert drawable to bitmap
+     *
+     * @param drawable source
+     * @return bitmap
+     */
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        int width = drawable.getIntrinsicWidth();
+        int height = drawable.getIntrinsicHeight();
+        Bitmap bitmap = Bitmap.createBitmap(width, height
+                , drawable.getOpacity() != PixelFormat.OPAQUE
+                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, width, height);
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
+    public static String getPathFromUri(Context context, Uri selectedImage) {
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+        Cursor cursor = context.getContentResolver().query(selectedImage,
+                filePathColumn, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            cursor.close();
+            return picturePath;
+        }
+        return "";
+    }
+
+    /**
+     * Intent i = new Intent(
+     * Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+     * startActivityForResult(i, RESULT_LOAD_IMAGE);
+     */
+    public static Bitmap zoomImage(String picturePath) {
+        File f = new File(picturePath);
+        double size = f.length() / 1024.0;//TODO jpg的size和得出的multi都有问题
+        BitmapFactory.Options option = new BitmapFactory.Options();
+        double result = size / 100.0;
+        int multi;
+        if (f.getName().contains(".gif"))//TODO 尚待优化
+            multi = 2;
+        else {
+            if (result < 1)//小于100kb
+                multi = 1;
+            else if (result < 5)//100-500kb
+                multi = 2;
+            else if (result < 15)//500kb-1.5mb
+                multi = 4;
+            else if (result < 30)//1.5-3mb
+                multi = 8;
+            else if (result < 50)//3-5mb
+                multi = 16;
+            else//5mb以上
+                multi = 32;
+        }
+        Trace.d("multi " + multi + "/" + size + "kb");
+        option.inSampleSize = multi;
+        return BitmapFactory.decodeFile(picturePath, option);
+    }
+
+    /**
+     * http://www.cnblogs.com/fighter/archive/2012/02/20/android-bitmap-drawable.html
+     *
+     * @param b
+     * @return
+     */
+    public static Bitmap bytes2Bitmap(byte[] b) {
+        if (b.length != 0) {
+            return BitmapFactory.decodeByteArray(b, 0, b.length);
+        } else {
+            return null;
+        }
     }
 }

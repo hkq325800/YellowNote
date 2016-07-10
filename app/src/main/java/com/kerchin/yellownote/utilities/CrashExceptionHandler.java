@@ -150,7 +150,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 if (!mCrashInfoFolder.exists()) {//闪退日志目录不存在则先创建闪退日志目录
                     mCrashInfoFolder.mkdirs();
                 }
-                String crashLogFileName = MyApplication.user + "_" + timeStampString + ".log";
+                String crashLogFileName = MyApplication.user + "_" + timeStampString + ".txt";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
 

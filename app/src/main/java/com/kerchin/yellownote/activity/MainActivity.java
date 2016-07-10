@@ -139,9 +139,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                 e.printStackTrace();
                                 return;
                             }
+                            String type = (String) file.getMetaData("type");
                             final Bitmap b = NormalUtils.bytes2Bitmap(bytes);
                             try {
-                                NormalUtils.saveBitmap(b, userIconFile);
+                                NormalUtils.saveBitmap(b, userIconFile, type);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                             }
@@ -208,7 +209,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 + MyApplication.user + ".png";
         userIconFile = new File(userIconPath);
         if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
-            Trace.d("getLocalBitmap");
+            Trace.d("getLocalMipmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
@@ -273,7 +274,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
     }
-    String versionContent,versionCode;
+
+    String versionContent, versionCode;
+
     private void checkForUpdate() {
         String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
         String lastCheck = MyApplication.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
@@ -403,15 +406,17 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     try {
                         if (!savePath.exists())
                             savePath.createNewFile();
-                        final Bitmap bitmap = NormalUtils
-                                .getZoomBitmapFromUri(MainActivity.this, selectedImage);
+                        String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
+                        String type = picturePath.substring(picturePath.lastIndexOf("."));
+                        final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
                         //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
-                        NormalUtils.saveBitmap(bitmap, userIconFile);
+                        NormalUtils.saveBitmap(bitmap, userIconFile, type);
                         //没则新增有则创建
-                        if (TextUtils.isEmpty(MyApplication.userIcon))
-                            LoginService.saveUserIcon(userIconPath);
-                        else
-                            LoginService.saveUserIconById(userIconPath);
+                        if (TextUtils.isEmpty(MyApplication.userIcon)) {
+                            MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath, type));
+                        } else {
+                            MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath, type));
+                        }
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {

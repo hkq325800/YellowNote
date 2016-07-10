@@ -117,22 +117,30 @@ public class LoginService {
     }
 
     //保存文件
-    public static void saveUserIcon(String path) throws AVException, FileNotFoundException {
-        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user, path);
+    public static String saveUserIcon(String path, String type) throws AVException, FileNotFoundException {
+        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user + type, path);
+        file.addMetaData("type", type);
         file.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", MyApplication.user);
         AVObject user = query.getFirst();
         user.put("user_icon", file.getObjectId());
         user.save();
+        return file.getObjectId();
     }
 
     //保存文件
-    public static void saveUserIconById(String path) throws AVException, FileNotFoundException {
+    public static String saveUserIconById(String path, String type) throws AVException, FileNotFoundException {
         AVFile file = AVFile.withObjectId(MyApplication.userIcon);
         file.delete();
-        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user, path);
-        newFile.setObjectId(MyApplication.userIcon);
+        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user + type, path);
+        newFile.addMetaData("type", type);
         newFile.save();
+        AVQuery<AVObject> query = new AVQuery<>("mUser");
+        query.whereEqualTo("user_tel", MyApplication.user);
+        AVObject user = query.getFirst();
+        user.put("user_icon", newFile.getObjectId());
+        user.save();
+        return newFile.getObjectId();
     }
 }
