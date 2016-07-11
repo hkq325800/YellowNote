@@ -53,6 +53,7 @@ import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 import com.securepreferences.SecurePreferences;
@@ -98,6 +99,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     File savePath;
     File userIconFile;
     String userIconPath;
+    String versionContent, versionCode;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
@@ -126,7 +128,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private void setUserIconByNet() {
         Trace.d("setUserIconByNet");
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -139,10 +141,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                 e.printStackTrace();
                                 return;
                             }
-                            String type = (String) file.getMetaData("type");
                             final Bitmap b = NormalUtils.bytes2Bitmap(bytes);
                             try {
-                                NormalUtils.saveBitmap(b, userIconFile, type);
+                                NormalUtils.saveBitmap(b, userIconFile);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                             }
@@ -163,13 +164,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //                                    Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
                                 }
                             });
+                            MyApplication.saveUserIcon();
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     @Override
@@ -177,6 +179,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
         outState.putString("user", MyApplication.user);
         outState.putString("userIcon", MyApplication.userIcon);
+        outState.putString("userDefaultFolderId", MyApplication.userDefaultFolderId);
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -191,6 +194,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             Trace.d("MainActivity initializeData else");
             MyApplication.setUser(savedInstanceState.getString("user"));
             MyApplication.setUserIcon(savedInstanceState.getString("userIcon"));
+            MyApplication.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
 //            if (noteFragment == null) {
 //                Trace.d("noteFragment null");
@@ -206,7 +210,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 , MyApplication.APP_MAIN_FOLDER_NAME);
         userIconPath = savePath.getAbsolutePath() + File.separator
-                + MyApplication.user + ".png";
+                + MyApplication.user + ".jpg";
         userIconFile = new File(userIconPath);
         if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
             Trace.d("getLocalMipmap");
@@ -214,6 +218,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
+            if (!MyApplication.userIcon.equals(
+                    MyApplication.getDefaultShared().getString(Config.KEY_USERICON, "")))
+                setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
         //checkForUpdate
@@ -246,9 +253,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
 //                    if (getFragmentStatus().isDeleteMode())
 //                        noteFragment.deleteViewHide();
-                    if (noteFragment.getMainStatus().isSearchMode())
-                        noteFragment.restore();
-                    showBtnAdd();
+//                    if (noteFragment.getMainStatus().isSearchMode())
+//                        noteFragment.restore();
+//                    if (!getFragmentStatus().isSearchMode())
+                        showBtnAdd();
+//                    else
+//                        hideBtnAdd();
                 } else if (position == 1) {
                     btnDelete.setVisible(false);
                     btnSort.setVisible(false);
@@ -269,13 +279,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                if (state == 0 && thisPosition == 1)
-                    mSearchView.onActionViewCollapsed();
+//                if (state == 0 && thisPosition == 1)
+//                    mSearchView.onActionViewCollapsed();
             }
         });
     }
-
-    String versionContent, versionCode;
 
     private void checkForUpdate() {
         String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
@@ -287,7 +295,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             editor.apply();
             return;
         }
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -303,7 +311,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
         editor.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr);
         editor.apply();
     }
@@ -400,22 +408,24 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             final Uri selectedImage = data.getData();
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         if (!savePath.exists())
                             savePath.createNewFile();
                         String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
-                        String type = picturePath.substring(picturePath.lastIndexOf("."));
+//                        String type = picturePath.substring(picturePath.lastIndexOf("."));
+//                        if(type.contains("gif"))
+//                            type = ".jpg";
                         final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
                         //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
-                        NormalUtils.saveBitmap(bitmap, userIconFile, type);
+                        NormalUtils.saveBitmap(bitmap, userIconFile);
                         //没则新增有则创建
                         if (TextUtils.isEmpty(MyApplication.userIcon)) {
-                            MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath, type));
+                            MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath));
                         } else {
-                            MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath, type));
+                            MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath));
                         }
                         runOnUiThread(new Runnable() {
                             @Override
@@ -423,11 +433,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                 mNavHeaderMainImg.setImageBitmap(bitmap);
                             }
                         });
+                        MyApplication.saveUserIcon();
                     } catch (AVException | IOException e) {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
         }
 //        super.onActivityResult(requestCode, resultCode, data);
     }
@@ -487,9 +498,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mSearchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getFragmentStatus().setIsSearchMode(true);
+                noteFragment.getMainStatus().setIsSearchMode(true);
+                noteFragment.deleteViewHide();
                 //开启搜索模式
-                hideBtnAdd();
+//                hideBtnAdd();
                 noteFragment.disableLoad();
             }
         });

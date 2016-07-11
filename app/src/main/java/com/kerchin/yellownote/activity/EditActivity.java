@@ -44,6 +44,7 @@ import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.CircleSearchView;
 
@@ -736,7 +737,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         Trace.show(getApplicationContext(), "该笔记夹名称已存在");
                         mEditEdt.setEnabled(true);
                     } else {
-                        new Thread(new Runnable() {
+                        ThreadPool.getInstance().execute(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -757,7 +758,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                     e.printStackTrace();
                                 }
                             }
-                        }).start();
+                        });
                         alertDialog.dismiss();
                         mEditEdt.setEnabled(true);
                     }

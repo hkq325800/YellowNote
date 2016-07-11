@@ -32,6 +32,7 @@ import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -334,26 +335,38 @@ public class LoginActivity extends LoginAbstract {
                 }.start();
             } else {//注册
                 //是否注册查询
-                isRegistered(txtUser);
-                new CountDownTimer(Config.timeout_avod, 250) {
+                ThreadPool.getInstance().execute(new Runnable() {
                     @Override
-                    public void onTick(long millisUntilFinished) {
-                        if (registerStatus > statusInit) {
-                            cancel();
-                            Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
-                            if (registerStatus == statusFalse) {
-                                sendProv(true, txtUser, Config.timeout_prov);
-                            } else {
-                                Trace.show(getApplicationContext(), "该帐号已注册,请直接登录");
-                            }
-                            registerStatus = statusInit;
+                    public void run() {
+                        boolean isAbleToSignIn = false;
+                        try {
+                            isAbleToSignIn = LoginService.isAbleToSignIn();
+                        } catch (AVException e) {
+                            e.printStackTrace();
                         }
+                        if (!isAbleToSignIn) {
+                            Trace.show(LoginActivity.this, "非常抱歉,目前不开放注册");
+                            return;
+                        }
+                        boolean flag = false;
+                        try {
+                            flag = LoginService.isRegistered(txtUser);
+                        } catch (AVException e) {
+                            e.printStackTrace();
+                        }
+                        if (flag) {
+                            Trace.d("是否注册验证 查询到" + txtUser + "已注册");
+                            registerStatus = statusTrue;
+                        } else
+                            registerStatus = statusFalse;
+                        if (registerStatus == statusFalse) {
+                            sendProv(true, txtUser, Config.timeout_prov);
+                        } else {
+                            Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
+                        }
+                        registerStatus = statusInit;
                     }
-
-                    @Override
-                    public void onFinish() {
-                    }
-                }.start();
+                });
             }
         }
     }
@@ -377,7 +390,7 @@ public class LoginActivity extends LoginAbstract {
                 mLoginSendProvBtn.setText("发送验证码");
             }
         }.start();
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -388,13 +401,13 @@ public class LoginActivity extends LoginAbstract {
                     Trace.show(LoginActivity.this, "验证码发送失败" + Trace.getErrorMsg(e));
                 }
             }
-        }).start();
+        });
     }
 
     //短信验证
     @Override
     protected void smsVerify(final String txtProv, final String txtUser) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -406,7 +419,7 @@ public class LoginActivity extends LoginAbstract {
                     Trace.show(LoginActivity.this, "验证码错误" + Trace.getErrorMsg(e));
                 }
             }
-        }).start();
+        });
     }
 
     //登录操作确认
@@ -426,7 +439,7 @@ public class LoginActivity extends LoginAbstract {
                         dismissProgress();
                     } else {
                         //密码查询
-                        new Thread(new Runnable() {
+                        ThreadPool.getInstance().execute(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -438,7 +451,7 @@ public class LoginActivity extends LoginAbstract {
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = user.getString("user_default_folderId");
-                                            MyApplication.userIcon = user.getString("user_icon");
+                                            MyApplication.setUserIcon(user.getString("user_icon"));
                                             String pattern = SecretService.getPatternStr(txtUser);
                                             PatternLockUtils.setPattern(pattern, getApplicationContext());
                                             if (Config.isDebugMode)
@@ -468,7 +481,7 @@ public class LoginActivity extends LoginAbstract {
                                     Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
                                 }
                             }
-                        }).start();
+                        });
                     }
                     registerStatus = statusInit;
                     cancel();
@@ -484,7 +497,7 @@ public class LoginActivity extends LoginAbstract {
     //注册操作确认
     @Override
     protected void signUpVerify(final String txtUser, final String txtPass) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -510,13 +523,13 @@ public class LoginActivity extends LoginAbstract {
                     isEnter = false;//signUpVerify saveInBackground true
                 }
             }
-        }).start();
+        });
     }
 
     //忘记密码操作确认
     @Override
     protected void forgetVerify(final String txtUser, final String txtPass) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -531,13 +544,13 @@ public class LoginActivity extends LoginAbstract {
                     isEnter = false;//forgetVerify saveInBackground true
                 }
             }
-        }).start();
+        });
     }
 
     //是否注册验证
     @Override
     protected void isRegistered(final String txtUser) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -559,7 +572,7 @@ public class LoginActivity extends LoginAbstract {
                     Trace.show(LoginActivity.this, "是否注册验证失败" + Trace.getErrorMsg(e));
                 }
             }
-        }).start();
+        });
     }
 
     //表格信息校验
@@ -588,7 +601,7 @@ public class LoginActivity extends LoginAbstract {
     //通过正常登陆、注册、找回密码登录 缓存状态并跳转主页面
     @Override
     protected void goToMain() {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
@@ -598,7 +611,7 @@ public class LoginActivity extends LoginAbstract {
                     }
                 });
             }
-        }).start();
+        });
         //存入shared
         MyApplication.setUser(mLoginUserEdt.getText().toString());
         SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();

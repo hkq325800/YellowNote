@@ -24,6 +24,7 @@ import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -102,7 +103,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
             if (!isPosting) {
                 isPosting = true;
                 mNavigationRightBtn.setEnabled(false);
-                new Thread(new Runnable() {
+                ThreadPool.getInstance().execute(new Runnable() {
                     @Override
                     public void run() {
                         try {
@@ -126,7 +127,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                             mNavigationRightBtn.setEnabled(false);
                         }
                     }
-                }).start();
+                });
             } else {
                 Trace.show(getApplicationContext(), "您宝贵的意见正在提交中···");
             }
@@ -165,7 +166,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -178,8 +179,8 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     e.printStackTrace();
                 }
             }
-        }).start();
-        new Thread(new Runnable() {
+        });
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -232,7 +233,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     @Override

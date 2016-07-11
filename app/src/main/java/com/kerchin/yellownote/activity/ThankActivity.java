@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 
 import java.util.ArrayList;
 
@@ -59,7 +60,7 @@ public class ThankActivity extends BaseHasSwipeActivity {
         linkList = new ArrayList<>();
         todo = getResources().getString(R.string.todo);
         final String todoUrl = getResources().getString(R.string.todoUrl);
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 //top
@@ -112,7 +113,7 @@ public class ThankActivity extends BaseHasSwipeActivity {
                     thankStr = thankStr.replace(str, thank);
                 }
             }
-        }).start();
+        });
     }
 
     @Override

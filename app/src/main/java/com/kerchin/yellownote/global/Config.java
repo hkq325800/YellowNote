@@ -11,6 +11,7 @@ public class Config {
      * Settings
      */
     public static final String KEY_USER = "xiaohuangjUser";
+    public static final String KEY_USERICON = "xiaohuangjUserIcon";
     public static final String KEY_PASS = "xiaohuangjPass";
     public static final String KEY_ISLOGIN = "xiaohuangjIsLogin";
     public static final String KEY_DEFAULT_FOLDER = "xiaohuangjDefaultFolder";

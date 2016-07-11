@@ -21,6 +21,7 @@ import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;
@@ -82,7 +83,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         //只为有缓存登录的用户初始化数据
         if (MyApplication.isLogin()) {
             MyApplication.userDefaultFolderId = MyApplication.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     Trace.d("PrimaryData" + Thread.currentThread().getId());
@@ -104,7 +105,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         }
                     });//isNeedToRefresh
                 }
-            }).start();
+            });
         }
         loginVerify(MyApplication.user);
     }
@@ -204,7 +205,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         if (!txtUser.equals("") && !MyApplication.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
             //密码查询
             mWelcomeTxt.setText("查询到缓存 正在进行验证...");
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     Trace.d("loginVerify" + Thread.currentThread().getId());
@@ -233,7 +234,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             } else {
                                 //默认笔记夹id统一在login获取 因为不轻易改变 保存在本地
                                 //userIcon每次获取
-                                MyApplication.userIcon = user.getString("user_icon");
+                                MyApplication.setUserIcon(user.getString("user_icon"));
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转
@@ -254,7 +255,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         }
                     }
                 }
-            }).start();
+            });
         } else {//无缓存显示界面
             Message message = Message.obtain();//首次登陆
             message.what = wel;

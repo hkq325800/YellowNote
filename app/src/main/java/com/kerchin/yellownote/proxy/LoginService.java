@@ -117,9 +117,8 @@ public class LoginService {
     }
 
     //保存文件
-    public static String saveUserIcon(String path, String type) throws AVException, FileNotFoundException {
-        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user + type, path);
-        file.addMetaData("type", type);
+    public static String saveUserIcon(String path) throws AVException, FileNotFoundException {
+        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user + ".jpg", path);
         file.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", MyApplication.user);
@@ -130,11 +129,10 @@ public class LoginService {
     }
 
     //保存文件
-    public static String saveUserIconById(String path, String type) throws AVException, FileNotFoundException {
+    public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
         AVFile file = AVFile.withObjectId(MyApplication.userIcon);
         file.delete();
-        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user + type, path);
-        newFile.addMetaData("type", type);
+        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user + ".jpg", path);
         newFile.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", MyApplication.user);
@@ -142,5 +140,10 @@ public class LoginService {
         user.put("user_icon", newFile.getObjectId());
         user.save();
         return newFile.getObjectId();
+    }
+
+    public static boolean isAbleToSignIn() throws AVException {
+        AVQuery<AVObject> query = new AVQuery<>("App");
+        return query.getFirst().getBoolean("app_ableToSignIn");
     }
 }

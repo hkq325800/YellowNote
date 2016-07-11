@@ -32,6 +32,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.OldProgress;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
@@ -139,8 +140,13 @@ public class NoteFragment extends BaseFragment
                     getDataListFromNote(primaryData.listNote);//handle4respond
                     mNoteWDList.setVisibility(View.VISIBLE);
                     mProgress.dismissNoData();
-                    noteAdapter.setList(list);
-                    mNoteWDList.setAdapter(noteAdapter);//TODO
+                    if (mainStatus.isSearchMode()
+                            && !TextUtils.isEmpty(mSearchText))
+                        doSearch();//respondForChange()
+                    else {
+                        noteAdapter.setList(list);
+                        mNoteWDList.setAdapter(noteAdapter);//TODO
+                    }
                     break;
                 case GetDataHelper.handle4loadMore:
                     Trace.d("handlerInNote handle4loadMore");
@@ -323,9 +329,6 @@ public class NoteFragment extends BaseFragment
             Trace.d("respondForChange");
             getDataHelper.respond();//isChanged4note
             getData(0);//statusRespond onResume
-            if (mainStatus.isSearchMode()
-                    && !TextUtils.isEmpty(mSearchText))
-                doSearch();
             isChanged4note = false;//respondForChange
         }
     }
@@ -565,8 +568,8 @@ public class NoteFragment extends BaseFragment
         list.clear();//doSearch
         list = primaryData.getSearchList(mSearchText);
         if (noteAdapter != null)
-            if (!isChanged4note)//doSearch
-                noteAdapter.setList(list);
+//            if (!isChanged4note)//doSearch
+            noteAdapter.setList(list);
     }
 
     //从搜索状态中恢复
@@ -596,6 +599,8 @@ public class NoteFragment extends BaseFragment
 
     @OnItemLongClick(R.id.mNoteWDList)
     public boolean listItemLongClick(int position) {
+        if (mainStatus.isSearchMode())
+            return false;
         //批量删除操作
         if (!mainStatus.isDeleteMode()) {
             deleteViewShow();//显示叉号 设置条目点击
@@ -621,7 +626,7 @@ public class NoteFragment extends BaseFragment
                     FolderFragment.isChanged4folder = true;//emptyClick
                 } else {
                     mProgress.startProgress();//refresh
-                    new Thread(new Runnable() {
+                    ThreadPool.getInstance().execute(new Runnable() {
                         @Override
                         public void run() {
                             //重新获取mHeaders listNote和mItems
@@ -640,7 +645,7 @@ public class NoteFragment extends BaseFragment
                                 }
                             }, null);
                         }
-                    }).start();
+                    });
                 }
             }
         }, 600);

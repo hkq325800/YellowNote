@@ -18,6 +18,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;
@@ -63,7 +64,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         //从本地数据判断手势密码状态
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -90,7 +91,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     });
                 }
             }
-        }).start();
+        });
 //        mSecretMenuPatternToggle.setChecked(hasPattern);
     }
 
@@ -151,7 +152,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     public void gotoSecretSet() {
         mSecretMenuPatternToggleLiL.setClickable(false);
 //        mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -178,7 +179,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     mSecretMenuPatternToggleLiL.setClickable(true);
                 }
             }
-        }).start();
+        });
     }
 
     /**
@@ -187,7 +188,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     @OnClick(R.id.mSecretMenuPatternEditLiL)
     public void gotoSecretModify() {
         mSecretMenuPatternEditLiL.setClickable(false);
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -212,7 +213,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     private void enablePattern(boolean enable) {
@@ -227,7 +228,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == requestForPattern && resultCode == RESULT_OK) {//创建成功
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -255,7 +256,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         patternFromOthers = "";
                     }
                 }
-            }).start();
+            });
         } else if (requestCode == requestForPattern && resultCode == RESULT_CANCELED) {
             //手势开关失败
 //            mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
@@ -267,7 +268,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
         } else if (requestCode == requestForForget && resultCode == RESULT_OK) {
             //忘记密码验证成功清除密码
 //            mSecretMenuPatternToggle.setChecked(false);
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -283,14 +284,14 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
         } else if (requestCode == requestForConfirmPattern && resultCode == RESULT_OK) {
             //修改手势密码验证成功跳转设置
             Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
             startActivityForResult(intent, requestForEditPattern);
         } else if (requestCode == requestForEditPattern && resultCode == RESULT_OK) {
             //修改手势密码成功
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -312,7 +313,7 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
                         patternFromOthers = "";
                     }
                 }
-            }).start();
+            });
         }
     }
 }

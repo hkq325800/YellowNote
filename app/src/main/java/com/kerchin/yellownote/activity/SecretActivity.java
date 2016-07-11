@@ -25,6 +25,7 @@ import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -126,7 +127,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
     @OnClick(R.id.mNavigationRightBtn)
     public void submit() {
         if (tableCheck(isForget)) {
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -169,7 +170,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
                         Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
                 }
-            }).start();
+            });
         }
     }
 

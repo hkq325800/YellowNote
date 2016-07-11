@@ -31,10 +31,8 @@ public class MyApplication extends Application {
     private static boolean isLogin = false;
     public static String user;
     public static String userDefaultFolderId = "";
-    public static String userIcon;
-//    public static String view = "note";//TODO
+    public static String userIcon;//永远是最新的
     //public static final int pageLimit = 5;
-//    public static boolean isItemsReadyToGo = false;//TODO
 
     public static Context getContext() {
         return context;
@@ -85,8 +83,14 @@ public class MyApplication extends Application {
         isLogin = true;
     }
 
-    public static void setUserIcon(String icon){
+    public static void setUserIcon(String icon) {
         userIcon = icon;
+    }
+
+    public static void saveUserIcon() {
+        SecurePreferences.Editor editor = (SecurePreferences.Editor) shared.edit();
+        editor.putString(Config.KEY_USERICON, userIcon);
+        editor.apply();
     }
 
     public static void logout() {

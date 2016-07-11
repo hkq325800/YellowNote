@@ -356,16 +356,16 @@ public class NormalUtils {
         }
     }
 
-    public static void saveBitmap(Bitmap bm, File f, String type) throws IOException {
+    public static void saveBitmap(Bitmap bm, File f) throws IOException {
         if (f.exists()) {
             f.delete();
         }
         try {
             FileOutputStream out = new FileOutputStream(f);
-            if (type.contains("jpg") || type.contains("jpeg"))
-                bm.compress(Bitmap.CompressFormat.JPEG, 70, out);
-            else
-                bm.compress(Bitmap.CompressFormat.PNG, 70, out);
+//            if (type.contains("jpg") || type.contains("jpeg"))
+                bm.compress(Bitmap.CompressFormat.JPEG, 90, out);
+//            else
+//                bm.compress(Bitmap.CompressFormat.PNG, 70, out);
             out.flush();
             out.close();
             Trace.i("yes", "已经保存" + f.getPath() + "/" + (f.length() / 1024) + "kb");
@@ -388,7 +388,7 @@ public class NormalUtils {
         int height = drawable.getIntrinsicHeight();
         Bitmap bitmap = Bitmap.createBitmap(width, height
                 , drawable.getOpacity() != PixelFormat.OPAQUE
-                ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+                        ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, width, height);
         drawable.draw(canvas);
@@ -415,14 +415,18 @@ public class NormalUtils {
      * Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
      * startActivityForResult(i, RESULT_LOAD_IMAGE);
      */
+    //TODO 最终以图像的宽高为准比较好
     public static Bitmap zoomImage(String picturePath) {
         File f = new File(picturePath);
-        double size = f.length() / 1024.0;//TODO jpg的size和得出的multi都有问题
+        double size = f.length() / 1024.0;
         BitmapFactory.Options option = new BitmapFactory.Options();
         double result = size / 100.0;
         int multi;
-        if (f.getName().contains(".gif"))//TODO 尚待优化
-            multi = 2;
+        if (f.getName().contains(".gif"))
+            if (result < 3)
+                multi = 1;
+            else
+                multi = 2;
         else {
             if (result < 1)//小于100kb
                 multi = 1;
@@ -430,12 +434,10 @@ public class NormalUtils {
                 multi = 2;
             else if (result < 15)//500kb-1.5mb
                 multi = 4;
-            else if (result < 30)//1.5-3mb
+            else if (result < 60)//1.5-6mb
                 multi = 8;
-            else if (result < 50)//3-5mb
+            else//6mb以上
                 multi = 16;
-            else//5mb以上
-                multi = 32;
         }
         Trace.d("multi " + multi + "/" + size + "kb");
         option.inSampleSize = multi;

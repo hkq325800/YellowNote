@@ -74,7 +74,8 @@ public class DownloadService extends Service {
 
         //注册广播接收者，监听下载状态
         getApplicationContext().registerReceiver(receiver,
-                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
+                , null, null);
     }
 
     //广播接受者，接收下载状态

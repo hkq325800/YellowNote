@@ -33,6 +33,7 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;
@@ -276,7 +277,7 @@ public class FolderFragment extends BaseFragment {
             handler.sendEmptyMessageDelayed(
                     GetDataHelper.handle4respond, 650);
         } else {
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     getDataHelper.refresh();//MainActivity dataGot
@@ -289,7 +290,7 @@ public class FolderFragment extends BaseFragment {
                     }, null);
 //                    primaryData.refresh(handler, GetDataHelper.handle4refresh);//isChanged4folder
                 }
-            }).start();
+            });
         }
     }
 
@@ -563,7 +564,7 @@ public class FolderFragment extends BaseFragment {
 //                        mEditEdt.setEnabled(true);
                         mEditEdt.setError("该笔记夹名称已存在");
                     } else {
-                        new Thread(new Runnable() {
+                        ThreadPool.getInstance().execute(new Runnable() {
                             @Override
                             public void run() {
                                 try {
@@ -580,7 +581,7 @@ public class FolderFragment extends BaseFragment {
                                     e.printStackTrace();
                                 }
                             }
-                        }).start();
+                        });
                         alertDialog.dismiss();
                         MainActivity mainActivity = (MainActivity) getActivity();
                         mainActivity.showBtnAdd();
