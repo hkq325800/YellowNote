@@ -18,7 +18,7 @@ public class SimpleCrashReporter implements CrashExceptionHandler.CrashException
         if (file != null && !Config.isDebugMode) {
             //接下来要在此处加入将闪退日志回传到服务器的功能
             try {
-                AVFile avFile = AVFile.withAbsoluteLocalPath(file.getName() + ".txt", file.getAbsolutePath());
+                AVFile avFile = AVFile.withAbsoluteLocalPath(file.getName(), file.getAbsolutePath());
                 avFile.saveInBackground();
                 // AVObject crash = new AVObject("Crash");
                 // crash.put("user_tel", MyApplication.user);

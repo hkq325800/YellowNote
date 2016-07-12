@@ -1,9 +1,10 @@
-package com.kerchin.yellownote.widget;
+package com.kerchin.widget.progresslayout;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -11,14 +12,13 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.Trace;
-
 /**
  * Created by Administrator on 2016/5/4 0004.
  * More Code on hkq325800@163.com
  */
-public class OldProgress extends RelativeLayout {
+public class ProgressLayout extends RelativeLayout {
+    private boolean debugMode = false;
+    private static final String LOGTAG = "progressLayout";
     private static final long listViewShowDuration = 1000;//listView显示的延迟
     private ImageView mNoDataImg;
     private TextView mNoDataTxt;
@@ -46,18 +46,18 @@ public class OldProgress extends RelativeLayout {
     private static final long avoidBlockDelay = 450;//界面需要准备时间否则动画在一开始会卡顿
     private View[] mViews;//init
 
-    public OldProgress(Context context, AttributeSet attrs,
-                       int defStyle) {
+    public ProgressLayout(Context context, AttributeSet attrs,
+                          int defStyle) {
         super(context, attrs, defStyle);
         initializeView(context);
     }
 
-    public OldProgress(Context context, AttributeSet attrs) {
+    public ProgressLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeView(context);
     }
 
-    public OldProgress(Context context) {
+    public ProgressLayout(Context context) {
         super(context);
         initializeView(context);
     }
@@ -100,7 +100,8 @@ public class OldProgress extends RelativeLayout {
         dismissNoData();
         status = statusStart;
         timeStart = System.currentTimeMillis();
-        Trace.d("ProgressRelativeLayout startProgress" + timeStart);
+        if (debugMode)
+            Log.d(LOGTAG, "ProgressRelativeLayout startProgress" + timeStart);
         showSpecificView(mLoadingAnim, showDuration);
         mLoadingAnim.startRotateAnimation();
 
@@ -110,7 +111,8 @@ public class OldProgress extends RelativeLayout {
      * 隐藏过场
      */
     public void dismissAnim() {
-        Trace.d("dismiss" + timeDismiss);
+        if (debugMode)
+            Log.d(LOGTAG, "dismiss" + timeDismiss);
         hideAlphaView(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
@@ -133,7 +135,8 @@ public class OldProgress extends RelativeLayout {
      */
     public void showListView(final View... views) {
         timeDismiss = System.currentTimeMillis();
-        Trace.d("showListView");
+        if (debugMode)
+            Log.d(LOGTAG, "showListView");
         status = statusShowList;
         long delay;
         if (timeStart != 0)
@@ -161,7 +164,8 @@ public class OldProgress extends RelativeLayout {
      */
     public void showNoData(final String text, final OnClickListener noDataInterface) {
         timeDismiss = System.currentTimeMillis();
-        Trace.d("showNoData");
+        if (debugMode)
+            Log.d(LOGTAG, "showNoData");
         long delay;
         if (timeStart != 0)
             delay = timeDismiss - timeStart > 1000 ? timeDismiss - timeStart : 1000;
@@ -197,12 +201,14 @@ public class OldProgress extends RelativeLayout {
      */
     public void showRefresh(String text, String err,
                             OnClickListener noDataInterface) {
-        Trace.d("showRefresh");
+        if (debugMode)
+            Log.d(LOGTAG, "showRefresh");
         status = statusShowRefresh;
         timeDismiss = System.currentTimeMillis();
         dismissAnim();//showRefresh
-        Trace.d(err);
-        mNoDataImg.setImageResource(R.mipmap.ic_no_network);
+        if (debugMode)
+            Log.d(LOGTAG, err);
+        mNoDataImg.setImageResource(R.drawable.ic_no_network);
         mNoDataTxt.setText(text);
         showAlphaView(mNoDataTxt, mNoDataImg, mNoDataBtn);
         mNoDataBtn.setOnClickListener(noDataInterface);

@@ -35,10 +35,10 @@
         android:headerDividersEnabled="false"
         android:footerDividersEnabled="false" />
 
-    <com.kerchin.yellownote.widget.OldProgress
+    <com.kerchin.widget.progresslayout.ProgressLayout
         android:id="@+id/mProgress"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
-    </com.kerchin.yellownote.widget.OldProgress>
+    </com.kerchin.widget.progresslayout.ProgressLayout>
 </RelativeLayout>

@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.kerchin.widget.progresslayout.ProgressLayout;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
@@ -34,7 +35,6 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.OldProgress;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class NoteFragment extends BaseFragment
     @BindView(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
     @BindView(R.id.mProgress)
-    OldProgress mProgress;
+    ProgressLayout mProgress;
     public static boolean isChanged4note = false;
     private SVProgressHUD mSVProgressHUD;
     private SearchView.OnQueryTextListener queryTextListener;

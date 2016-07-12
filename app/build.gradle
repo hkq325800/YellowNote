@@ -89,4 +89,5 @@ dependencies {
     //已经停止更新 有时间改造一波
     compile files('libs/ormlite-android-4.49-SNAPSHOT.jar')
     compile files('libs/ormlite-core-4.49-SNAPSHOT.jar')
+    compile project(path: ':progresslayout')
 }

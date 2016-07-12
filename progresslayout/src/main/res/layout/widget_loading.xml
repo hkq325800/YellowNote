@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true">
 
-        <com.kerchin.yellownote.widget.LoadingAnimView
+        <com.kerchin.widget.progresslayout.LoadingAnimView
             android:id="@+id/mLoadingAnim"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -53,7 +53,7 @@
             android:layout_above="@id/mNoDataTxt"
             android:layout_centerInParent="true"
             android:paddingBottom="15dp"
-            android:src="@mipmap/ic_no_network"
+            android:src="@drawable/ic_no_network"
             android:visibility="gone" />
     </RelativeLayout>
 

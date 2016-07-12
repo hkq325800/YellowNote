@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.widget;
+package com.kerchin.widget.progresslayout;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -7,9 +7,6 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-
-import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.NormalUtils;
 
 /**
  * Created by Administrator on 2016/4/25 0025.
@@ -62,12 +59,12 @@ public class LoadingAnimView extends View {
         valueAnimator = new ValueAnimator[size];
         // 未聚焦画笔初始化
         paintUnFocus = new Paint();
-        paintUnFocus.setColor(getResources().getColor(R.color.white)); // 设置画笔的颜色
+        paintUnFocus.setColor(getResources().getColor(R.color.color_unfocus)); // 设置画笔的颜色
         paintUnFocus.setStyle(Paint.Style.FILL); // 设置空心
         paintUnFocus.setAntiAlias(true); // 消除锯齿
         // 聚焦画笔初始化
         paint = new Paint();
-        paint.setColor(context.getResources().getColor(R.color.colorPrimary)); // 设置画笔的颜色
+        paint.setColor(context.getResources().getColor(R.color.color_focus)); // 设置画笔的颜色
         paint.setStyle(Paint.Style.FILL); // 设置空心
         paint.setAntiAlias(true); // 消除锯齿
     }
@@ -232,7 +229,7 @@ public class LoadingAnimView extends View {
      * @param distance xxdp
      */
     public void setDistance(int distance) {
-        this.distance = NormalUtils.dip2px(context, distance);
+        this.distance = dip2px(context, distance);
     }
 
     /**
@@ -241,7 +238,7 @@ public class LoadingAnimView extends View {
      * @param radius xxdp
      */
     public void setRadius(int radius) {
-        this.radius = NormalUtils.dip2px(context, radius);
+        this.radius = dip2px(context, radius);
         // for (int i = 0; i < size; i++) {
         // point[i].r = radius;
         // }
@@ -265,5 +262,14 @@ public class LoadingAnimView extends View {
          */
         double offset;
 
+    }
+
+
+    /**
+     * 根据手机的分辨率从 dp(像素) 的单位 转成为 px
+     */
+    public static int dip2px(Context context, float dipValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) ((dipValue - 0.5f) * scale);
     }
 }

@@ -4,7 +4,7 @@
     android:layout_height="@dimen/edit_function_height"
     android:orientation="vertical">
 
-    <com.kerchin.yellownote.widget.CircleSearchView
+    <com.cjj.sva.widget.CircleSearchView
         android:id="@+id/mEditCircleSearch"
         android:layout_width="match_parent"
         android:layout_height="@dimen/edit_function_height"

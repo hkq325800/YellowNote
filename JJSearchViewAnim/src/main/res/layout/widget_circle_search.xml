@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/backgroundFunctionBar">
+    android:background="@color/circle_search_background">
 
     <com.cjj.sva.JJSearchView
         android:id="@+id/mSearchView"
@@ -42,7 +42,7 @@
             android:layout_height="36dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:background="@mipmap/ic_arrow_down" />
+            android:background="@drawable/ic_arrow_down" />
 
         <TextView
             android:id="@+id/mSearchViewWeGotTxt"
@@ -61,6 +61,6 @@
             android:layout_height="36dp"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/mSearchViewWeGotTxt"
-            android:background="@mipmap/ic_arrow_up" />
+            android:background="@drawable/ic_arrow_up" />
     </RelativeLayout>
 </RelativeLayout>

@@ -31,6 +31,7 @@ import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.bigkoo.svprogresshud.SVProgressHUD;
+import com.cjj.sva.widget.CircleSearchView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.bean.Folder;
@@ -46,7 +47,6 @@ import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
-import com.kerchin.yellownote.widget.CircleSearchView;
 
 import java.util.ArrayList;
 import java.util.List;
