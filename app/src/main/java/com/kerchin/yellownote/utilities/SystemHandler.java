@@ -1,11 +1,12 @@
 package com.kerchin.yellownote.utilities;
 
-import java.lang.ref.WeakReference;
 import android.os.Handler;
 import android.os.Message;
 
+import java.lang.ref.WeakReference;
+
 /**
- * 销毁hander引起的持有对象activity
+ * 销毁handler引起的持有对象activity
  * 
  * @author syc
  */

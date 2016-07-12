@@ -1,6 +1,12 @@
 # YellowNote 
+- [update](https://github.com/hkq325800/YellowNote/blob/master/doc/update.md)
+- [todo](https://github.com/hkq325800/YellowNote/blob/master/doc/todo.md)
+- you can download this app from [here](http://android.app.qq.com/myapp/detail.htm?apkName=com.kerchin.yellownote)
+
 ###how to clone the latest
+```
 git clone https://github.com/hkq325800/YellowNote.git --depth=1
+```
 
 ###thanks to
 - [leakcanary](https://github.com/square/leakcanary)
@@ -15,7 +21,7 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [snappingstepper](https://github.com/saiwu-bigkoo/Android-SnappingStepper)
 - [ormlite](https://github.com/j256/ormlite-android)
 
-###have done
+###have learned from
 - [那些Android上的性能优化](http://www.jianshu.com/p/762f7cca7539)
 - [Android快速实现文件下载（只有4行代码）](http://www.jianshu.com/p/46fd1c253701)
 - [Android权限最佳实践](http://www.jianshu.com/p/3e16bda04852)
@@ -36,13 +42,3 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
 - [原生NavigationView菜单中添加消息提醒（小红点）](http://www.jianshu.com/p/90eb9d06480d)
 
-###TODO
-- [Android主题换肤 无缝切换](http://www.jianshu.com/p/af7c0585dd5b)
-- [你可以这样复用 AlertDialog](http://www.jianshu.com/p/4d97a8538b98)
-- [使用 DragHelper 控制拖动](http://www.jianshu.com/p/1712cdaf1f0e)
-- [使用ItemTouchHelper完成仿Inbox的滑动删除](http://www.jianshu.com/p/9a5f81c887b8)
-- [Fragment之我的解决方案：Fragmentation](http://www.jianshu.com/p/38f7994faa6b)
-- [使用ItemTouchHelper高效地实现 今日头条 、网易新闻 的频道排序、移动](http://www.jianshu.com/p/d30fd8da4eac)
-
-+-keep class com.avos.avoscloud.** {*;}
-+-keepclassmembers class com.avos.avoscloud.** {*;}

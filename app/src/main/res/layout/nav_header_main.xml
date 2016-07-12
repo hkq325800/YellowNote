@@ -11,18 +11,18 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/mNavHeaderMainImg"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        app:civ_border_width="1dp"
-        app:civ_border_color="@color/white"/>
+        android:src="@mipmap/ic_face"
+        app:civ_border_color="@color/white"
+        app:civ_border_width="1dp" />
 
     <!--<com.kerchin.yellownote.widget.CircleImageView-->
-        <!--android:layout_width="75dp"-->
-        <!--android:layout_height="75dp"-->
-        <!--android:src="@mipmap/ic_face" />-->
+    <!--android:layout_width="75dp"-->
+    <!--android:layout_height="75dp"-->
+    <!--android:src="@mipmap/ic_face" />-->
 
     <TextView
         android:id="@+id/mNavHeaderMainTipTxt"

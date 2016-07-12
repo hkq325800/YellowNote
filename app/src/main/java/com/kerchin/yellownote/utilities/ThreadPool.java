@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 /**
+ * http://www.jianshu.com/p/842e81abb9b7
  * Created by Joker on 2015/3/7.
  */
 public class ThreadPool {
