@@ -341,30 +341,34 @@ public class LoginActivity extends LoginAbstract {
                         boolean isAbleToSignIn = false;
                         try {
                             isAbleToSignIn = LoginService.isAbleToSignIn();
+                            if (!isAbleToSignIn) {
+                                Trace.show(LoginActivity.this, "非常抱歉,目前不开放注册");
+                                return;
+                            }
                         } catch (AVException e) {
                             e.printStackTrace();
                         }
-                        if (!isAbleToSignIn) {
-                            Trace.show(LoginActivity.this, "非常抱歉,目前不开放注册");
-                            return;
-                        }
-                        boolean flag = false;
                         try {
-                            flag = LoginService.isRegistered(txtUser);
+                            boolean flag = LoginService.isRegistered(txtUser);
+                            if (flag) {
+                                Trace.d("是否注册验证 查询到" + txtUser + "已注册");
+                                registerStatus = statusTrue;
+                            } else
+                                registerStatus = statusFalse;
+                            if (registerStatus == statusFalse) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        sendProv(true, txtUser, Config.timeout_prov);
+                                    }
+                                });
+                            } else {
+                                Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
+                            }
+                            registerStatus = statusInit;
                         } catch (AVException e) {
                             e.printStackTrace();
                         }
-                        if (flag) {
-                            Trace.d("是否注册验证 查询到" + txtUser + "已注册");
-                            registerStatus = statusTrue;
-                        } else
-                            registerStatus = statusFalse;
-                        if (registerStatus == statusFalse) {
-                            sendProv(true, txtUser, Config.timeout_prov);
-                        } else {
-                            Trace.show(LoginActivity.this, "该帐号已注册,请直接登录");
-                        }
-                        registerStatus = statusInit;
                     }
                 });
             }
@@ -376,7 +380,7 @@ public class LoginActivity extends LoginAbstract {
     protected void sendProv(final boolean isSignUp, final String txtUser, final int validPeriod) {
         mLoginSendProvBtn.setEnabled(false);
         mLoginUserEdt.setEnabled(false);
-        new CountDownTimer(validPeriod * 60 * 1000, 1000) {
+        final CountDownTimer cdt = new CountDownTimer(validPeriod * 60 * 1000, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 String str = "发送成功" + (millisUntilFinished / 1000);
@@ -398,7 +402,16 @@ public class LoginActivity extends LoginAbstract {
                 } catch (AVException e) {
                     Trace.e("验证码发送失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();
-                    Trace.show(LoginActivity.this, "验证码发送失败" + Trace.getErrorMsg(e));
+                    cdt.cancel();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mLoginSendProvBtn.setEnabled(true);
+                            mLoginUserEdt.setEnabled(true);
+                            mLoginSendProvBtn.setText("发送验证码");
+                        }
+                    });
+                    Trace.show(LoginActivity.this, "验证码发送失败" + e.getMessage());
                 }
             }
         });
