@@ -22,6 +22,7 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [ormlite](https://github.com/j256/ormlite-android)
 
 ###have learned from
+- [带你重新认识：Android Splash页秒开 Activity白屏 Activity黑屏](http://blog.csdn.net/yanzhenjie1003/article/details/52201896)
 - [那些Android上的性能优化](http://www.jianshu.com/p/762f7cca7539)
 - [Android快速实现文件下载（只有4行代码）](http://www.jianshu.com/p/46fd1c253701)
 - [Android权限最佳实践](http://www.jianshu.com/p/3e16bda04852)

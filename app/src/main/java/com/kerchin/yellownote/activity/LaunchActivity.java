@@ -52,7 +52,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        view = LayoutInflater.from(this).inflate(R.layout.fragment_welcome,
 //                null);
         closeSliding();
-        setContentView(R.layout.fragment_welcome);
+        setContentView(R.layout.activity_launch);
         NormalUtils.immerge(LaunchActivity.this, R.color.minionYellow);
     }
 

@@ -37,15 +37,15 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
-        if (isFromLaunch)
-            overridePendingTransition(R.anim.push_left_in,
-                    android.R.anim.fade_out);
-        else
+        if (!isFromLaunch)
+//            overridePendingTransition(R.anim.push_left_in,
+//                    android.R.anim.fade_out);
+//        else
             overridePendingTransition(R.anim.push_left_in,
                     R.anim.not_move);
-        super.onCreate(savedInstanceState);
         mMessageText.setText("请输入手势密码");
         ButterKnife.bind(this);
         mNavigationTitleEdt.setText(/*"确认手势"*/getResources().getString(R.string.app_name));
@@ -70,7 +70,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
                 }
                 finish();
                 overridePendingTransition(R.anim.push_left_in,
-                        android.R.anim.fade_out);
+                        R.anim.push_left_out);
             }
         }, isFromLaunch ? 0 : 500);
     }
@@ -124,7 +124,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             MainActivity.startMe(getApplicationContext());
             finish();
             overridePendingTransition(R.anim.push_left_in,
-                    android.R.anim.fade_out);
+                    R.anim.push_left_out);
         }
     }
 }
