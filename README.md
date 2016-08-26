@@ -21,7 +21,17 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [snappingstepper](https://github.com/saiwu-bigkoo/Android-SnappingStepper)
 - [ormlite](https://github.com/j256/ormlite-android)
 
+- [DataBindingSample](https://github.com/hkq325800/DataBindingSample)
+- [ScaleSketchPenPad](https://github.com/hkq325800/ScaleSketchPenPad)
+- [InfiniteCycleViewPager](https://github.com/DevLight-Mobile-Agency/InfiniteCycleViewPager)
+- [BGARefreshLayout-Android](https://github.com/bingoogolapple/BGARefreshLayout-Android)
+- [BlurView](https://github.com/robinxdroid/BlurView)
+- [Android-FilePicker](https://github.com/DroidNinja/Android-FilePicker)
+- [QQBubbleView](https://github.com/Yasic/QQBubbleView)
+
 ###have learned from
+- [几行代码快速集成二维码扫描库](http://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650820785&idx=1&sn=a5880c110f79bae07f85d2f7e5c13d7e&scene=0)
+- [夜间模式实践](http://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650820727&idx=1&sn=6254bf8971d3a576a424afda2671beed&scene=0)
 - [带你重新认识：Android Splash页秒开 Activity白屏 Activity黑屏](http://blog.csdn.net/yanzhenjie1003/article/details/52201896)
 - [那些Android上的性能优化](http://www.jianshu.com/p/762f7cca7539)
 - [Android快速实现文件下载（只有4行代码）](http://www.jianshu.com/p/46fd1c253701)
