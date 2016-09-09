@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:id="@+id/mFolderItemRelative"
+    android:background="?attr/clockBackground"
     android:layout_height="@dimen/folder_item_height">
 
     <TextView
@@ -12,8 +13,8 @@
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:minHeight="46dp"
-        android:textColor="@color/lightSkyBlue"
-        android:background="@drawable/bg_channel"
+        android:textColor="@color/colorPrimary"
+        android:background="?attr/clockBackground"
         android:foreground="?attr/selectableItemBackground"
         android:layout_centerInParent="true"
         android:paddingLeft="8dp"

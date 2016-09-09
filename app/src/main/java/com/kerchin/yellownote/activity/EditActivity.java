@@ -34,12 +34,14 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.cjj.sva.widget.CircleSearchView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
+import com.kerchin.yellownote.bean.DayNight;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -201,6 +203,12 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.TransparentThemeDay);
+        } else {
+            setTheme(R.style.TransparentThemeNight);
+        }
         setContentView(R.layout.activity_edit);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }

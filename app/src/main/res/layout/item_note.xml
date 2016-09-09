@@ -2,13 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/textBackgroundColor">
+    android:background="?attr/clockBackground">
 
     <View
         android:id="@+id/mNoteItemView"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/white" />
+        android:background="?attr/clockBackground" />
 
     <!--android:layout_marginRight="7dp"-->
     <RelativeLayout
@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/mNoteItemView"
-        android:background="@color/lightSkyBlue">
+        android:background="?attr/colorPrimary">
 
         <TextView
             android:id="@+id/mNoteItemDateTxt"
@@ -28,7 +28,7 @@
             android:paddingRight="10dp"
             android:paddingTop="5dp"
             android:text=""
-            android:textColor="@color/textColor"
+            android:textColor="?attr/clockTextColor"
             android:textSize="18sp" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:text=""
-            android:textColor="@color/textColor"
+            android:textColor="?attr/clockTextColor"
             android:textSize="18sp" />
 
         <ImageView
@@ -60,6 +60,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/mNoteBlankReL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/relative_title">
@@ -72,14 +73,14 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="7dp"
-            android:background="@color/lightSkyBlue"
+            android:background="@color/colorPrimary"
             android:ellipsize="end"
             android:maxLines="3"
             android:maxWidth="80dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text=""
-            android:textColor="@color/textColor"
+            android:textColor="?attr/clockTextColor"
             android:textSize="14sp" />
 
         <TextView
@@ -94,7 +95,7 @@
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:text=""
-            android:textColor="@color/skyblue"
+            android:textColor="@color/colorPrimary"
             android:textSize="18sp" />
         <!--android:textStyle="italic"-->
     </RelativeLayout>

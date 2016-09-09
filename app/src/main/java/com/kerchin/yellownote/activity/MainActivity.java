@@ -2,13 +2,17 @@ package com.kerchin.yellownote.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
@@ -20,16 +24,21 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
@@ -40,12 +49,14 @@ import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
+import com.kerchin.yellownote.bean.DayNight;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
@@ -57,10 +68,15 @@ import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 import com.securepreferences.SecurePreferences;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -104,8 +120,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void setContentView(Bundle savedInstanceState) {
         closeSliding();
-        setContentView(R.layout.activity_main);
+        mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.DayTheme);
+        } else {
+            setTheme(R.style.NightTheme);
+        }
         NormalUtils.immerge(MainActivity.this, R.color.lightSkyBlue);
+        setContentView(R.layout.activity_main);
     }
 
     @Override
@@ -119,7 +141,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
         setSupportActionBar(mMainToolbar);
         if (BuildConfig.BUILD_TYPE.equals("debug")) {
-            String str = mNavHeaderMainTipTxt.getText() + " Dev.";
+            String str = mNavHeaderMainTipTxt.getText() + " Dev" + (Config.isDebugMode ? "Mode" : "");
             mNavHeaderMainTipTxt.setText(str);
         }
         toggle = new ActionBarDrawerToggle(
@@ -256,7 +278,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //                    if (noteFragment.getMainStatus().isSearchMode())
 //                        noteFragment.restore();
 //                    if (!getFragmentStatus().isSearchMode())
-                        showBtnAdd();
+                    showBtnAdd();
 //                    else
 //                        hideBtnAdd();
                 } else if (position == 1) {
@@ -439,6 +461,15 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     }
                 }
             });
+        } else if (requestCode == REQUEST_CODE && data != null) {
+            Bundle bundle = data.getExtras();
+            if (bundle == null)
+                return;
+            if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                String result = bundle.getString(CodeUtils.RESULT_STRING);
+                Trace.show(this, result);
+            } else
+                Trace.show(this, "解析二维码失败");
         }
 //        super.onActivityResult(requestCode, resultCode, data);
     }
@@ -572,10 +603,117 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else if (id == R.id.nav_thank) {
             handler.sendEmptyMessage(gotoThank);
             return false;
+        } else if (id == R.id.nav_night) {
+            changeThemeByZhiHu();
+        } else if (id == R.id.nav_qcode) {
+            gotoQCode();
         }
         mMainDrawer.closeDrawers();
         return true;
     }
+
+    private final static int REQUEST_CODE = 500;
+
+    private void gotoQCode() {
+        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+        startActivityForResult(intent, REQUEST_CODE);
+    }
+
+    /*夜间模式*/
+
+    /**
+     * 使用知乎的实现套路来切换夜间主题
+     */
+    private void changeThemeByZhiHu() {
+        showAnimation();
+        toggleThemeSetting();
+        noteFragment.refreshUI();
+        folderFragment.refreshUI();
+        refreshStatusBar();
+    }
+
+    /**
+     * 刷新 StatusBar
+     */
+    private void refreshStatusBar() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            TypedValue typedValue = new TypedValue();
+            Resources.Theme theme = getTheme();
+            theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            getWindow().setStatusBarColor(getResources().getColor(typedValue.resourceId));
+        }
+    }
+
+    private DayNightHelper mDayNightHelper;
+
+    /**
+     * 切换主题设置
+     */
+    private void toggleThemeSetting() {
+        if (mDayNightHelper.isDay()) {
+            mDayNightHelper.setMode(DayNight.NIGHT);
+            setTheme(R.style.NightTheme);
+        } else {
+            mDayNightHelper.setMode(DayNight.DAY);
+            setTheme(R.style.DayTheme);
+        }
+        Resources.Theme theme = getTheme();
+        TypedValue background = new TypedValue();
+        theme.resolveAttribute(R.attr.clockBackground, background, true);
+        mMainPager.setBackgroundResource(background.resourceId);
+//        mMainNav.setBackgroundResource(background.resourceId);
+        mNavHeaderMainTipTxt.setTextColor(getResources().getColor(background.resourceId));
+        msgNote.setTextColor(getResources().getColor(background.resourceId));
+        msgFolder.setTextColor(getResources().getColor(background.resourceId));
+    }
+
+    /**
+     * 展示一个切换动画
+     */
+    private void showAnimation() {
+        final View decorView = getWindow().getDecorView();
+        Bitmap cacheBitmap = getCacheBitmapFromView(decorView);
+        if (decorView instanceof ViewGroup && cacheBitmap != null) {
+            final View view = new View(this);
+            view.setBackgroundDrawable(new BitmapDrawable(getResources(), cacheBitmap));
+            ViewGroup.LayoutParams layoutParam = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+            ((ViewGroup) decorView).addView(view, layoutParam);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+            objectAnimator.setDuration(300);
+            objectAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ((ViewGroup) decorView).removeView(view);
+                }
+            });
+            objectAnimator.start();
+        }
+    }
+
+    /**
+     * 获取一个 View 的缓存视图
+     *
+     * @param view
+     * @return
+     */
+    private Bitmap getCacheBitmapFromView(View view) {
+        final boolean drawingCacheEnabled = true;
+        view.setDrawingCacheEnabled(drawingCacheEnabled);
+        view.buildDrawingCache(drawingCacheEnabled);
+        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap bitmap;
+        if (drawingCache != null) {
+            bitmap = Bitmap.createBitmap(drawingCache);
+            view.setDrawingCacheEnabled(false);
+        } else {
+            bitmap = null;
+        }
+        return bitmap;
+    }
+
+    /*夜间模式*/
 
     public static final int gotoSetting = 0;
     public static final int showBtnAdd = 1;

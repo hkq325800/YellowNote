@@ -7,8 +7,8 @@
     <!--添加menu上item右侧的文字-->
     <TextView
         android:id="@+id/msg"
-        android:background="@color/colorPrimary"
-        android:textColor="@android:color/white"
+        android:background="?attr/colorPrimary"
+        android:textColor="?attr/clockTextColor"
         android:gravity="center"
         android:layout_width="20dp"
         android:layout_height="20dp"/>

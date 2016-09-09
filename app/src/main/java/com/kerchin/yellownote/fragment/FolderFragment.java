@@ -5,19 +5,27 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
@@ -37,6 +45,10 @@ import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class FolderFragment extends BaseFragment {
     public static boolean isChanged4folder = false;
@@ -145,7 +157,7 @@ public class FolderFragment extends BaseFragment {
                     else return 0;
                 }
             });
-            folderAdapter.setOnHeaderClickListener(new FolderShrinkAdapter.OnHeaderClickListener() {
+            folderAdapter.setOnItemClickListener(new FolderShrinkAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(View v, int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {//点击Folder打开
@@ -155,7 +167,13 @@ public class FolderFragment extends BaseFragment {
                         if (note.getType().equals("text")) {//文本
                             @SuppressLint("InflateParams") View view = getInflater().inflate(R.layout.dialog_folder_show_note, null);
                             final EditText mDialogContentEdt = (EditText) view.findViewById(R.id.mDialogContentEdt);
+                            final TextView mDialogTitleTxt = (TextView) view.findViewById(R.id.mDialogTitleTxt);
                             mDialogContentEdt.setText(note.getContent());
+                            mDialogTitleTxt.setText(note.getTitle());
+                            Resources.Theme theme = getActivity().getTheme();
+                            TypedValue background = new TypedValue();
+                            theme.resolveAttribute(R.attr.clockBackground, background, true);
+                            view.setBackgroundResource(background.resourceId);
 //                            mDialogContentEdt.setKeyListener(null);//禁止输入法
 //                            et.setTextIsSelectable(true);//可以选择
                             singleEditTextDialogMaker(getActivity(), note.getTitle(), view, null);
@@ -708,9 +726,59 @@ public class FolderFragment extends BaseFragment {
     public void singleEditTextDialogMaker(Context context, String title
             , View view, final DialogInterface.OnCancelListener listener) {
         alertDialog = new AlertDialog.Builder(context)
-                .setTitle(title)
                 .setView(view)
                 .setOnCancelListener(listener).create();
         alertDialog.show();
+    }
+
+    /**
+     * 刷新UI界面
+     */
+    public void refreshUI() {
+        TypedValue background = new TypedValue();//背景色
+        TypedValue textColor = new TypedValue();//字体颜色
+        Resources.Theme theme = getActivity().getTheme();
+        theme.resolveAttribute(R.attr.clockBackground, background, true);
+        theme.resolveAttribute(R.attr.clockTextColor, textColor, true);
+        Resources resources = getResources();
+
+        int childCount = mRecyclerView.getChildCount();//mFolderHeaderContainTxt mFolderHeaderNameTxt
+        for (int childIndex = 0; childIndex < childCount; childIndex++) {
+            ViewGroup childView = (ViewGroup) mRecyclerView.getChildAt(childIndex);
+            if (folderAdapter.getItem(childIndex).entityType == SimpleEntity.typeNote) {//item
+                childView.setBackgroundResource(background.resourceId);//itemView
+                TextView mFolderItemTxt = (TextView) childView.findViewById(R.id.mFolderItemTxt);
+                mFolderItemTxt.setBackgroundResource(background.resourceId);
+            } else {//header
+                TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);
+                mFolderHeaderContainTxt.setBackgroundResource(background.resourceId);
+                TextView mFolderHeaderNameTxt = (TextView) childView.findViewById(R.id.mFolderHeaderNameTxt);
+                mFolderHeaderNameTxt.setTextColor(resources.getColor(background.resourceId));
+            }
+        }
+
+        //让 RecyclerView 缓存在 Pool 中的 Item 失效
+        //那么，如果是ListView，要怎么做呢？这里的思路是通过反射拿到 AbsListView 类中的 RecycleBin 对象，然后同样再用反射去调用 clear 方法
+        Class<RecyclerView> recyclerViewClass = RecyclerView.class;
+        try {
+            Field declaredField = recyclerViewClass.getDeclaredField("mRecycler");
+            declaredField.setAccessible(true);
+            Method declaredMethod = Class.forName(RecyclerView.Recycler.class.getName()).getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
+            declaredMethod.setAccessible(true);
+            declaredMethod.invoke(declaredField.get(mRecyclerView), new Object[0]);
+            RecyclerView.RecycledViewPool recycledViewPool = mRecyclerView.getRecycledViewPool();
+            recycledViewPool.clear();
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
     }
 }

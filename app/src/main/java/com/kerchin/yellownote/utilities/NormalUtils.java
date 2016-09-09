@@ -73,7 +73,7 @@ public class NormalUtils {
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             setStatusBarColor(activity, color);//阴影绘制
             //设置状态栏颜色
-//            getWindow().setStatusBarColor(getResources().getColor(color));
+//            activity.getWindow().setStatusBarColor(activity.getResources().getColor(color));
             //设置导航栏颜色
             activity.getWindow().setNavigationBarColor(activity.getResources().getColor(color));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

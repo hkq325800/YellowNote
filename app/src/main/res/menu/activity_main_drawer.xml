@@ -30,6 +30,14 @@
                 android:icon="@android:drawable/ic_menu_manage"
                 android:title="密码相关" />
             <item
+                android:id="@+id/nav_night"
+                android:icon="@android:drawable/ic_menu_view"
+                android:title="夜间模式"/>
+            <item
+                android:id="@+id/nav_qcode"
+                android:icon="@android:drawable/ic_menu_view"
+                android:title="二维码"/>
+            <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_menu_send"
                 android:title="注销" />

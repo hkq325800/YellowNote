@@ -30,6 +30,7 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [QQBubbleView](https://github.com/Yasic/QQBubbleView)
 
 ###have learned from
+- [知乎和简书的夜间模式实现套路](http://www.jianshu.com/p/3b55e84742e5)
 - [几行代码快速集成二维码扫描库](http://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650820785&idx=1&sn=a5880c110f79bae07f85d2f7e5c13d7e&scene=0)
 - [夜间模式实践](http://mp.weixin.qq.com/s?__biz=MzAxMTI4MTkwNQ==&mid=2650820727&idx=1&sn=6254bf8971d3a576a424afda2671beed&scene=0)
 - [带你重新认识：Android Splash页秒开 Activity白屏 Activity黑屏](http://blog.csdn.net/yanzhenjie1003/article/details/52201896)

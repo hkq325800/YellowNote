@@ -35,7 +35,7 @@ public class Folder implements Serializable {
     public Folder(String objectId, String name, int contain) {
         user_tel = MyApplication.user;
         this.name = name;
-        this.contain = contain;
+//        this.contain = contain;//useless
         this.objectId = objectId;
     }
 

@@ -81,6 +81,7 @@ dependencies {
     //add getState() and HKQController
     compile files('libs/superadapter-3.3.jar')
     //持续更新中
+    compile 'cn.yipianfengye.android:zxing-library:1.9'
     //    compile project(path: ':android-lite-orm')
 //    compile files('libs/lite-orm-1.9.1.jar')
     //持续更新中

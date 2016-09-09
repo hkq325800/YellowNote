@@ -479,6 +479,7 @@ public class PrimaryData {
             }
         });
         mItems.clear();
+        setContain();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
         configData(shownFolderId);
@@ -499,11 +500,18 @@ public class PrimaryData {
             }
         });
         mItems.clear();
+        setContain();
         getHeadersReady();//getSimpleEntityFromList
         getItemsReady();//getSimpleEntityFromList
         configData(shownFolderId);
         if (doAfter != null) {
             doAfter.justNow();
+        }
+    }
+
+    private void setContain() {
+        for (Folder f : listFolder) {
+            f.setContain(map.get(f.getObjectId()));
         }
     }
 
@@ -559,7 +567,7 @@ public class PrimaryData {
                     final Folder folder = new Folder(avObject.getObjectId()
                             , avObject.getString("folder_name")
                             //, avObject.getInt("folder_contain"));
-                            , map.get(avObject.getObjectId()) == null ? 0 : map.get(avObject.getObjectId()));
+                            , 0);
 //                    Trace.d(avObject.getString("folder_name") + map.get(avObject.getObjectId()));
                     listFolder.add(folder);
 //                    long l = liteOrmHelper.save(folder);

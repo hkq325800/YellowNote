@@ -6,16 +6,12 @@ import android.os.CountDownTimer;
 import android.view.View;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 
 import org.byteam.superadapter.IMulItemViewType;
 import org.byteam.superadapter.SuperAdapter;
 import org.byteam.superadapter.internal.SuperViewHolder;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -28,7 +24,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     private final float childHeight;
     private List<SimpleEntity> mItems;
     // header点击事件
-    private OnHeaderClickListener mFolderItemClickListener;
+    private OnItemClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
 //    private int shownFolderPosition = 0;
     public String shownFolderId;//当前显示着的folder位置
@@ -56,13 +52,13 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
         addAll(items);
     }
 
-    public interface OnHeaderClickListener {
+    public interface OnItemClickListener {
         void onItemClick(View v, int position, int viewType, SimpleEntity item);
 
         void onItemLongClick(View v, int position, int viewType, SimpleEntity item);
     }
 
-    public void setOnHeaderClickListener(OnHeaderClickListener listener) {
+    public void setOnItemClickListener(OnItemClickListener listener) {
         this.mFolderItemClickListener = listener;
     }
 

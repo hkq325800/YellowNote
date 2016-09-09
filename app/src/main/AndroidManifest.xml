@@ -30,7 +30,7 @@
         <activity
             android:name=".activity.LaunchActivity"
             android:label="@string/app_name"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme" />
+            android:theme="@style/TransparentThemeDay" />
         <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"
@@ -55,27 +55,27 @@
             android:name=".activity.EditActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.ShareSuggestActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name=".activity.SecretActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name=".activity.SecretMenuActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name=".activity.ThankActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/JK.SwipeBack.Transparent.Theme"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity android:name=".activity.OrmLiteConsoleActivity" />
 

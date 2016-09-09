@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.global;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -13,10 +12,11 @@ import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
 import com.squareup.leakcanary.LeakCanary;
+import com.uuzuche.lib_zxing.ZApplication;
 
 //import io.realm.Realm;
 
-public class MyApplication extends Application {
+public class MyApplication extends ZApplication {
     /**
      * app在sd卡的主目录
      */

@@ -39,7 +39,7 @@ public class SimpleEntity implements Serializable {
         this.objectId = objectId;
         entityType = typeNote;
         this.globalId = globalId;
-        this.id = id;
+//        this.id = id;//useless
         now = -1;
         contain = -1;
         this.name = name;
@@ -121,8 +121,8 @@ public class SimpleEntity implements Serializable {
                 "name" + name +
                 "folderPosition" + folderPosition +
                 "isShown" + isShown +
-                "folderId" + folderId +
-                "objectId" + objectId +
+//                "folderId" + folderId +
+//                "objectId" + objectId +
                 "isShown" + isShown +
                 "hasShownAnim" + hasShownAnim +
                 "contain" + contain +

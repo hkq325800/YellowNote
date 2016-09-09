@@ -36,11 +36,11 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
         holder.setText(R.id.mNoteItemTitleTxt, note.getTitle());
         holder.setText(R.id.mNoteItemDateTxt, note.getShowDate());
         holder.setText(R.id.mNoteItemPreviewTxt, note.getPreview());
-        if (note.getType().equals("audio")) {
-            holder.setTextColor(R.id.mNoteItemFolderTxt, colorA);
-        } else {
-            holder.setTextColor(R.id.mNoteItemFolderTxt, colorB);
-        }
+//        if (note.getType().equals("audio")) {
+//            holder.setTextColor(R.id.mNoteItemFolderTxt, colorA);
+//        } else {
+//            holder.setTextColor(R.id.mNoteItemFolderTxt, colorB);
+//        }
         holder.setText(R.id.mNoteItemFolderTxt, note.getFolder());
         if (isDelete) {
             if (listDelete.contains(note)) {

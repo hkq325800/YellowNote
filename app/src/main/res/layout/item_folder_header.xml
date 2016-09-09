@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/folder_item_height"
-    android:background="@color/lightSkyBlue"
+    android:background="@color/colorPrimary"
     android:layout_marginTop="1dp"
     android:orientation="horizontal">
 
@@ -25,11 +25,11 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="15dp"
-        android:background="@color/textBackgroundColor"
+        android:background="?attr/clockBackground"
         android:includeFontPadding="false"
         android:gravity="center"
         android:text=""
-        android:textColor="@color/lightSkyBlue"
+        android:textColor="@color/colorPrimary"
         android:textSize="16sp" />
 
     <TextView
@@ -45,7 +45,7 @@
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:text=""
-        android:textColor="@color/textColor"
+        android:textColor="?attr/clockTextColor"
         android:textSize="18sp" />
 
 </RelativeLayout>
