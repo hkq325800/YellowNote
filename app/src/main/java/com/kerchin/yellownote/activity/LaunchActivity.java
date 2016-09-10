@@ -134,6 +134,8 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     finish();
                     break;
                 case next://缓存正确 直接进入
+                    if(PrimaryData.getInstance().isOffline)
+                        Trace.show(LaunchActivity.this, "当前数据处于离线状态");
                     if (PatternLockUtils.hasPattern(getApplicationContext())) {
                         Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class);
                         intent.putExtra("isFromLaunch", true);

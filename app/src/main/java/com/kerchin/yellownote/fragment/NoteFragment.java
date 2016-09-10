@@ -39,6 +39,7 @@ import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
@@ -730,57 +731,61 @@ public class NoteFragment extends BaseFragment
         }
     }
 
-    /**
-     * 刷新UI界面
-     */
-    public void refreshUI() {
-        TypedValue background = new TypedValue();//背景色
-        TypedValue textColor = new TypedValue();//字体颜色
-        Resources.Theme theme = getActivity().getTheme();
-        theme.resolveAttribute(R.attr.clockBackground, background, true);
-        theme.resolveAttribute(R.attr.clockTextColor, textColor, true);
+//    /**
+//     * 刷新UI界面
+//     * @param mDayNightHelper
+//     */
+//    public void refreshUI(DayNightHelper mDayNightHelper) {
+//        int childCount = mNoteWDList.getChildCount();
+//        for (int childIndex = 1; childIndex < childCount; childIndex++) {
+//            ViewGroup childView = (ViewGroup) mNoteWDList.getChildAt(childIndex);
+////            childView.setBackgroundResource(background.resourceId);
+////            View mNoteItemView = childView.findViewById(R.id.mNoteItemView);
+////            mNoteItemView.setBackgroundResource(background.resourceId);
+////            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
+////            mNoteBlankReL.setBackgroundResource(background.resourceId);
+//            TextView mNoteItemTitleTxt = (TextView) childView.findViewById(R.id.mNoteItemTitleTxt);
+//            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            TextView mNoteItemDateTxt = (TextView) childView.findViewById(R.id.mNoteItemDateTxt);
+//            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
+//            mNoteItemFolderTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//        }
 //
-        Resources resources = getResources();
-
-        int childCount = mNoteWDList.getChildCount();
-        for (int childIndex = 1; childIndex < childCount; childIndex++) {
-            ViewGroup childView = (ViewGroup) mNoteWDList.getChildAt(childIndex);
-            childView.setBackgroundResource(background.resourceId);
-            TextView mNoteItemTitleTxt = (TextView) childView.findViewById(R.id.mNoteItemTitleTxt);
-            mNoteItemTitleTxt.setTextColor(resources.getColor(background.resourceId));
-            View mNoteItemView = childView.findViewById(R.id.mNoteItemView);
-            mNoteItemView.setBackgroundResource(background.resourceId);
-            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
-            mNoteBlankReL.setBackgroundResource(background.resourceId);
-            TextView mNoteItemDateTxt = (TextView) childView.findViewById(R.id.mNoteItemDateTxt);
-            mNoteItemDateTxt.setTextColor(resources.getColor(background.resourceId));
-            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
-            mNoteItemFolderTxt.setTextColor(resources.getColor(background.resourceId));
-        }
-
-        //让 RecyclerView 缓存在 Pool 中的 Item 失效
-        //那么，如果是ListView，要怎么做呢？这里的思路是通过反射拿到 AbsListView 类中的 RecycleBin 对象，然后同样再用反射去调用 clear 方法
-        Class<AbsListView> absListViewClass = AbsListView.class;
-        try {
-            Field declaredField = absListViewClass.getDeclaredField("mRecycler");
-            declaredField.setAccessible(true);
-            Method declaredMethod = Class.forName("android.widget.AbsListView$RecycleBin"/*AbsListView.RecycleBin.class.getName()*/).getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
-            declaredMethod.setAccessible(true);
-            declaredMethod.invoke(declaredField.get(mNoteWDList), new Object[0]);
-//            RecyclerView.RecycledViewPool recycledViewPool = mNoteWDList.getRecycledViewPool();
-//            recycledViewPool.clear();
-
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-    }
+//        //让 RecyclerView 缓存在 Pool 中的 Item 失效
+//        //那么，如果是ListView，要怎么做呢？这里的思路是通过反射拿到 AbsListView 类中的 RecycleBin 对象，然后同样再用反射去调用 clear 方法
+////        Class<AbsListView> absListViewClass = AbsListView.class;
+//        try {
+////            Field declaredField = absListViewClass.getDeclaredField("mRecycler");
+////            declaredField.setAccessible(true);
+////            Method declaredMethod = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
+////            declaredMethod.setAccessible(true);
+////            declaredMethod.invoke(declaredField.get(mNoteWDList), new Object[0]);
+////            Method declaredMethod1 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("clearTransientStateViews", (Class<?>[]) new Class[0]);
+////            declaredMethod1.setAccessible(true);
+////            declaredMethod1.invoke(declaredField.get(mNoteWDList), new Object[0]);//scrapActiveViews pruneScrapViews
+////            Method declaredMethod2 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("scrapActiveViews", (Class<?>[]) new Class[0]);
+////            declaredMethod2.setAccessible(true);
+////            declaredMethod2.invoke(declaredField.get(mNoteWDList), new Object[0]);
+////            Method declaredMethod3 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("pruneScrapViews", (Class<?>[]) new Class[0]);
+////            declaredMethod3.setAccessible(true);
+////            declaredMethod3.invoke(declaredField.get(mNoteWDList), new Object[0]);
+////            mNoteWDList.destroyDrawingCache();
+//
+////            RecyclerView.RecycledViewPool recycledViewPool = mNoteWDList.getRecycledViewPool();
+////            recycledViewPool.clear();
+//
+//        } catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchMethodException e) {
+//            e.printStackTrace();
+//        } catch (InvocationTargetException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 }

@@ -31,7 +31,7 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Yellow Note"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="?attr/clockTextColor"
+        android:textColor="@color/gray"
         android:textSize="20sp" />
 
     <!--<TextView

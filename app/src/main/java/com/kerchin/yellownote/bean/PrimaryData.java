@@ -8,6 +8,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class PrimaryData {
     public volatile ArrayList<Folder> listFolder;
     public volatile ArrayList<Note> listNote;
     public volatile ArrayList<SimpleEntity> mItems;//note&folder
+    public boolean isOffline = false;
     //    private LiteOrmHelper liteOrmHelper;//随用随停 单例
     //记录每个folder_id下的note数量 代替数据库中存储 在从本地读取时没必要使用
     Map<String, Integer> map = new HashMap<>();
@@ -42,7 +44,7 @@ public class PrimaryData {
             synchronized (PrimaryData.class) {
                 if (data == null) {
                     throw new NullPointerException();
-//                    new Thread(new Runnable() {
+//                    ThreadPool.getInstance().execute(new Runnable() {
 //                        @Override
 //                        public void run() {
 //                            try {
@@ -51,7 +53,7 @@ public class PrimaryData {
 //                                e.printStackTrace();
 //                            }
 //                        }
-//                    }).start();
+//                    });
                 }
             }
         return data;
@@ -91,13 +93,13 @@ public class PrimaryData {
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 Trace.d("PrimaryData initDataWithDoAfter");
                 initData(helper, doAfter);//在首次手动调用 为了catch
             }
-        }).start();
+        });
     }
 
     /**
@@ -111,7 +113,6 @@ public class PrimaryData {
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
-        boolean isOffline = false;
         try {
 //        if (getNoteFromData())
             final List<AVObject> avObjects = NoteService.getUserNote(MyApplication.user);
@@ -146,7 +147,7 @@ public class PrimaryData {
      * @param doAfter 接口
      */
     private void waitForFlag(final DoAfter doAfter) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -164,7 +165,7 @@ public class PrimaryData {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     /*edit folder note for data recover*/
@@ -200,12 +201,12 @@ public class PrimaryData {
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 initData(helper, null, doAfterWithEx);//在首次手动调用 为了catch
             }
-        }).start();
+        });
     }
 
     /**
@@ -275,7 +276,7 @@ public class PrimaryData {
      * @param doAfter 接口
      */
     private void waitToSaveData(final OrmLiteHelper helper, final DoAfter doAfter) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -347,7 +348,7 @@ public class PrimaryData {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     private boolean noteListContain(List<Note> list, Note out) {
@@ -372,7 +373,7 @@ public class PrimaryData {
      * @deprecated 等待数据加载完成以配置mItems
      */
     private void waitForFlag() {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -390,7 +391,7 @@ public class PrimaryData {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     /*launch login for data get*/
@@ -401,7 +402,7 @@ public class PrimaryData {
      * @param doAfter 接口
      */
     public static void waitForDataReady(final DoAfter doAfter) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 while (true) {
@@ -419,7 +420,7 @@ public class PrimaryData {
                     }
                 }
             }
-        }).start();
+        });
     }
 
     /**
@@ -552,7 +553,7 @@ public class PrimaryData {
     private void getFolderFromCloud() throws AVException {
         final List<AVObject> avObjects = FolderService.getUserFolders(MyApplication.user);
         Trace.d("getData4Folder成功 查询到" + avObjects.size() + " 条符合条件的数据");
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 listFolder.clear();
@@ -585,7 +586,7 @@ public class PrimaryData {
                 Trace.d("isFolderReady true");
                 status.isFolderReady = true;
             }
-        }).start();
+        });
     }
 
     /**
@@ -594,7 +595,7 @@ public class PrimaryData {
      * @throws AVException
      */
     private void getNotes(final List<AVObject> avObjects, final OrmLiteHelper helper) throws AVException {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 listNote.clear();
@@ -627,7 +628,7 @@ public class PrimaryData {
                 status.isNoteReady = true;
                 Trace.d("isNoteReady true");
             }
-        }).start();
+        });
     }
 
     /**

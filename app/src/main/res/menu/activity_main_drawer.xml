@@ -17,35 +17,35 @@
             android:title="Slideshow" />
         <item android:id="@+id/nav_manage" android:icon="@android:drawable/ic_menu_manage"
             android:title="Tools" />-->
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@android:drawable/ic_menu_share"
+            android:title="分享与反馈" />
+        <item
+            android:id="@+id/nav_resetSecret"
+            android:icon="@android:drawable/ic_menu_manage"
+            android:title="密码相关" />
+        <item
+            android:id="@+id/nav_night"
+            android:icon="@android:drawable/ic_menu_view"
+            android:title="夜间模式"/>
+        <item
+            android:id="@+id/nav_qrcode"
+            android:icon="@android:drawable/ic_menu_gallery"
+            android:title="二维码"/>
+        <item
+            android:id="@+id/nav_logout"
+            android:icon="@android:drawable/ic_menu_send"
+            android:title="注销" />
+        <item
+            android:id="@+id/nav_thank"
+            android:icon="@android:drawable/ic_menu_compass"
+            android:title="致谢" />
     </group>
 
-    <item android:title="用户操作">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@android:drawable/ic_menu_share"
-                android:title="分享与反馈" />
-            <item
-                android:id="@+id/nav_resetSecret"
-                android:icon="@android:drawable/ic_menu_manage"
-                android:title="密码相关" />
-            <item
-                android:id="@+id/nav_night"
-                android:icon="@android:drawable/ic_menu_view"
-                android:title="夜间模式"/>
-            <item
-                android:id="@+id/nav_qcode"
-                android:icon="@android:drawable/ic_menu_view"
-                android:title="二维码"/>
-            <item
-                android:id="@+id/nav_logout"
-                android:icon="@android:drawable/ic_menu_send"
-                android:title="注销" />
-            <item
-                android:id="@+id/nav_thank"
-                android:icon="@android:drawable/ic_menu_compass"
-                android:title="致谢" />
-        </menu>
-    </item>
+    <!--<item android:title="用户操作">-->
+        <!--<menu>-->
+        <!--</menu>-->
+    <!--</item>-->
 
 </menu>

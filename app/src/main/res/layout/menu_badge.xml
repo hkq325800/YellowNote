@@ -8,7 +8,7 @@
     <TextView
         android:id="@+id/msg"
         android:background="?attr/colorPrimary"
-        android:textColor="?attr/clockTextColor"
+        android:textColor="@color/gray"
         android:gravity="center"
         android:layout_width="20dp"
         android:layout_height="20dp"/>

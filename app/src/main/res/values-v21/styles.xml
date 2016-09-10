@@ -14,7 +14,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@android:color/white</item>
-        <item name="clockTextColor">@android:color/white</item>
+        <item name="clockSoftBackground">@color/gray</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
         <!--<item name="android:windowAnimationStyle">@style/JK.Animation.SlidingBack</item>-->
         <item name="android:actionBarStyle">@style/JKActionBar.Custom</item>
@@ -32,7 +32,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@color/color3F3F3F</item>
-        <item name="clockTextColor">@color/color3F3F3F</item>
+        <item name="clockSoftBackground">@color/gray</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
         <!--<item name="android:windowAnimationStyle">@style/JK.Animation.SlidingBack</item>-->
         <item name="android:actionBarStyle">@style/JKActionBar.Custom</item>

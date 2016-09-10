@@ -74,9 +74,6 @@ import com.uuzuche.lib_zxing.activity.CodeUtils;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -105,12 +102,17 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public boolean isHide = false;
     //    private static Long mExitTime = (long) 0;//退出时间
     private boolean isDrawerOpen = false;
-    public SearchView mSearchView;
-    public MenuItem btnSearch, btnSort, btnDelete;
+    private SearchView mSearchView;
+    private MenuItem btnSearch, btnSort, btnDelete;
     private NoteFragment noteFragment;
     private FolderFragment folderFragment;
     private ActionBarDrawerToggle toggle;
     private ArrayList<Fragment> fragments = new ArrayList<>();
+    private DayNightHelper mDayNightHelper;
+
+    private int REQUEST_LOAD_IMAGE = 100;
+    private final static int REQUEST_QRCODE = 101;
+    private int REQUEST_PERMISSION = 102;
 
     File savePath;
     File userIconFile;
@@ -245,7 +247,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
-        //checkForUpdate
         checkForUpdate();
         fragments.add(noteFragment);
         fragments.add(folderFragment);
@@ -346,8 +347,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         startService(intent);
     }
 
-    int RESULT_LOAD_IMAGE = 1;
-
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
         mMainNav.setNavigationItemSelectedListener(this);
@@ -356,7 +355,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void onClick(View v) {
                 Intent i = new Intent(
                         Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, RESULT_LOAD_IMAGE);
+                startActivityForResult(i, REQUEST_LOAD_IMAGE);
             }
         });
         //若新增按钮位置下移 说明软键盘收起
@@ -423,12 +422,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
-        NormalUtils.requestWritePermission(this, REQUEST_CODE_REQUEST_PERMISSION);
+        NormalUtils.requestWritePermission(this, REQUEST_PERMISSION);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == REQUEST_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
             final Uri selectedImage = data.getData();
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
@@ -461,7 +460,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     }
                 }
             });
-        } else if (requestCode == REQUEST_CODE && data != null) {
+        } else if (requestCode == REQUEST_QRCODE && data != null) {
             Bundle bundle = data.getExtras();
             if (bundle == null)
                 return;
@@ -605,18 +604,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             return false;
         } else if (id == R.id.nav_night) {
             changeThemeByZhiHu();
-        } else if (id == R.id.nav_qcode) {
-            gotoQCode();
+        } else if (id == R.id.nav_qrcode) {
+            gotoQRCode();
         }
         mMainDrawer.closeDrawers();
         return true;
     }
 
-    private final static int REQUEST_CODE = 500;
-
-    private void gotoQCode() {
+    private void gotoQRCode() {
         Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-        startActivityForResult(intent, REQUEST_CODE);
+        startActivityForResult(intent, REQUEST_QRCODE);
     }
 
     /*夜间模式*/
@@ -627,9 +624,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private void changeThemeByZhiHu() {
         showAnimation();
         toggleThemeSetting();
-        noteFragment.refreshUI();
-        folderFragment.refreshUI();
-        refreshStatusBar();
+//        noteFragment.refreshUI(mDayNightHelper);
+        folderFragment.refreshUI(mDayNightHelper);
+//        refreshStatusBar();//TODO 目前没用到
     }
 
     /**
@@ -644,27 +641,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
     }
 
-    private DayNightHelper mDayNightHelper;
-
     /**
      * 切换主题设置
      */
     private void toggleThemeSetting() {
-        if (mDayNightHelper.isDay()) {
-            mDayNightHelper.setMode(DayNight.NIGHT);
-            setTheme(R.style.NightTheme);
-        } else {
-            mDayNightHelper.setMode(DayNight.DAY);
-            setTheme(R.style.DayTheme);
-        }
-        Resources.Theme theme = getTheme();
-        TypedValue background = new TypedValue();
-        theme.resolveAttribute(R.attr.clockBackground, background, true);
-        mMainPager.setBackgroundResource(background.resourceId);
+        mDayNightHelper.toggleThemeSetting(MainActivity.this);
+        mMainPager.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND));
 //        mMainNav.setBackgroundResource(background.resourceId);
-        mNavHeaderMainTipTxt.setTextColor(getResources().getColor(background.resourceId));
-        msgNote.setTextColor(getResources().getColor(background.resourceId));
-        msgFolder.setTextColor(getResources().getColor(background.resourceId));
+//        mNavHeaderMainTipTxt.setTextColor(getResources().getColor(background.resourceId));
+//        msgNote.setTextColor(getResources().getColor(background.resourceId));
+//        msgFolder.setTextColor(getResources().getColor(background.resourceId));
     }
 
     /**
@@ -804,11 +790,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         handler.sendEmptyMessage(hideBtnAdd);
     }
 
-    int REQUEST_CODE_REQUEST_PERMISSION = 100;
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_REQUEST_PERMISSION) {
+        if (requestCode == REQUEST_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Trace.d("permission granted");
             } else {

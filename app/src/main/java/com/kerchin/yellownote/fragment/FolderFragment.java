@@ -39,6 +39,7 @@ import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.SimpleEntity;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.ThreadPool;
@@ -733,27 +734,22 @@ public class FolderFragment extends BaseFragment {
 
     /**
      * 刷新UI界面
+     *
+     * @param mDayNightHelper
      */
-    public void refreshUI() {
-        TypedValue background = new TypedValue();//背景色
-        TypedValue textColor = new TypedValue();//字体颜色
-        Resources.Theme theme = getActivity().getTheme();
-        theme.resolveAttribute(R.attr.clockBackground, background, true);
-        theme.resolveAttribute(R.attr.clockTextColor, textColor, true);
-        Resources resources = getResources();
-
+    public void refreshUI(DayNightHelper mDayNightHelper) {
         int childCount = mRecyclerView.getChildCount();//mFolderHeaderContainTxt mFolderHeaderNameTxt
         for (int childIndex = 0; childIndex < childCount; childIndex++) {
             ViewGroup childView = (ViewGroup) mRecyclerView.getChildAt(childIndex);
-            if (folderAdapter.getItem(childIndex).entityType == SimpleEntity.typeNote) {//item
-                childView.setBackgroundResource(background.resourceId);//itemView
+            if (childView.findViewById(R.id.mFolderItemTxt) != null) {//item
+                childView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));//itemView
                 TextView mFolderItemTxt = (TextView) childView.findViewById(R.id.mFolderItemTxt);
-                mFolderItemTxt.setBackgroundResource(background.resourceId);
-            } else {//header
+                mFolderItemTxt.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+            } else if (childView.findViewById(R.id.mFolderHeaderContainTxt) != null) {//header
                 TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);
-                mFolderHeaderContainTxt.setBackgroundResource(background.resourceId);
+                mFolderHeaderContainTxt.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
                 TextView mFolderHeaderNameTxt = (TextView) childView.findViewById(R.id.mFolderHeaderNameTxt);
-                mFolderHeaderNameTxt.setTextColor(resources.getColor(background.resourceId));
+                mFolderHeaderNameTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
             }
         }
 

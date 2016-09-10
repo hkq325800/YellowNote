@@ -2,13 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/clockBackground">
+    android:background="@color/transparent">
 
     <View
         android:id="@+id/mNoteItemView"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="?attr/clockBackground" />
+        android:background="@color/transparent" />
 
     <!--android:layout_marginRight="7dp"-->
     <RelativeLayout
@@ -28,7 +28,7 @@
             android:paddingRight="10dp"
             android:paddingTop="5dp"
             android:text=""
-            android:textColor="?attr/clockTextColor"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:text=""
-            android:textColor="?attr/clockTextColor"
+            android:textColor="@color/white"
             android:textSize="18sp" />
 
         <ImageView
@@ -63,6 +63,7 @@
         android:id="@+id/mNoteBlankReL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/transparent"
         android:layout_below="@id/relative_title">
 
         <TextView
@@ -80,7 +81,7 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text=""
-            android:textColor="?attr/clockTextColor"
+            android:textColor="@color/white"
             android:textSize="14sp" />
 
         <TextView

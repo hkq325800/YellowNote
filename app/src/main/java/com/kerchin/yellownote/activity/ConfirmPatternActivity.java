@@ -69,8 +69,12 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
                     setResult(RESULT_OK);
                 }
                 finish();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
+                if (isFromLaunch)
+                    overridePendingTransition(R.anim.push_left_in,
+                            R.anim.push_left_out);
+                else
+                    overridePendingTransition(R.anim.push_right_in,
+                            R.anim.push_right_out);
             }
         }, isFromLaunch ? 0 : 500);
     }

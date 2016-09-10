@@ -14,6 +14,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;
@@ -211,7 +212,7 @@ public class Note implements Serializable {
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")
                 || objectId.contains(MyApplication.user)) {//新增
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     boolean isOffline = false;
@@ -261,9 +262,9 @@ public class Note implements Serializable {
                     msg.obj = isOffline;
                     handler.sendMessage(msg);
                 }
-            }).start();
+            });
         } else {//编辑
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     Message msg = Message.obtain();
@@ -300,7 +301,7 @@ public class Note implements Serializable {
                         }
                     }
                 }
-            }).start();
+            });
         }
     }
 
@@ -310,7 +311,7 @@ public class Note implements Serializable {
         if (isOfflineAdd) {
             deleteLocal(helper, handler, msgExplosion);
         } else
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -323,7 +324,7 @@ public class Note implements Serializable {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
     }
 
     private void deleteLocal(OrmLiteHelper helper, Handler handler, Message msg) {
@@ -343,7 +344,7 @@ public class Note implements Serializable {
             msg.what = handle4finish;
             deleteLocal(helper, handler, msg);
         } else
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -360,12 +361,12 @@ public class Note implements Serializable {
                         e.printStackTrace();
                     }
                 }
-            }).start();
+            });
     }
 
     //已存在的笔记在笔记夹间移动
     public void move2folder(final Activity context, final Folder newOne, final Handler handler, final byte handleCode) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -389,12 +390,12 @@ public class Note implements Serializable {
                 else
                     handler.sendEmptyMessage(handleCode);
             }
-        }).start();
+        });
     }
 
     //更名的批量移动
     public void move2folder(final Activity context, final String newOne, final String newFolderId) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -408,12 +409,12 @@ public class Note implements Serializable {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     public void reName(final Activity context, final String newTitle, final Handler handler
             , final byte handle4respond) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -429,6 +430,6 @@ public class Note implements Serializable {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 }

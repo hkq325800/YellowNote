@@ -10,7 +10,7 @@
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorControlHighlight">@color/colorPrimaryPressed</item>
         <item name="clockBackground">@color/color3F3F3F</item>
-        <item name="clockTextColor">@android:color/white</item>
+        <item name="clockSoftBackground">@android:color/white</item>
     </style>
 
     <!--白天主题，此处直接和AppTheme一样-->
@@ -21,7 +21,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@android:color/white</item>
-        <item name="clockTextColor">@android:color/white</item>
+        <item name="clockSoftBackground">@color/gray</item>
     </style>
 
     <!--夜间主题-->
@@ -32,7 +32,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@color/color3F3F3F</item>
-        <item name="clockTextColor">@color/color3F3F3F</item>
+        <item name="clockSoftBackground">@color/gray</item>
     </style>
 
     <style name="AppTheme.Splash" parent="AppTheme">
@@ -104,7 +104,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@android:color/white</item>
-        <item name="clockTextColor">@android:color/white</item>
+        <item name="clockSoftBackground">@android:color/white</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
@@ -120,7 +120,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@color/color3F3F3F</item>
-        <item name="clockTextColor">@color/color3F3F3F</item>
+        <item name="clockSoftBackground">@color/color3F3F3F</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->

@@ -43,6 +43,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="start"
             android:fitsSystemWindows="true"
+            android:background="?attr/clockSoftBackground"
             app:itemTextColor="?attr/colorPrimary"
             app:headerLayout="@layout/nav_header_main"
             app:menu="@menu/activity_main_drawer" />

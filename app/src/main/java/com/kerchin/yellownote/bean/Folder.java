@@ -9,6 +9,7 @@ import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
+import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;
@@ -73,7 +74,7 @@ public class Folder implements Serializable {
 
     public void reName(final Activity context, final String newName, final Handler handler
             , final byte handle4respond) {
-        new Thread(new Runnable() {
+        ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -96,12 +97,12 @@ public class Folder implements Serializable {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
     }
 
     public void delete(final Activity context, final int position, final SystemHandler handler, final byte handle4respond) {
         if (contain == 0) {
-            new Thread(new Runnable() {
+            ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -115,7 +116,7 @@ public class Folder implements Serializable {
                     }
 
                 }
-            }).start();
+            });
         }
     }
 
