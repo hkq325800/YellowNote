@@ -512,7 +512,10 @@ public class PrimaryData {
 
     private void setContain() {
         for (Folder f : listFolder) {
-            f.setContain(map.get(f.getObjectId()));
+            if (map.get(f.getObjectId()) == null)
+                f.setContain(0);
+            else
+                f.setContain(map.get(f.getObjectId()));
         }
     }
 

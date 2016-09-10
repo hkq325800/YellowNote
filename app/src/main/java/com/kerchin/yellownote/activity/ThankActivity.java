@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.ThreadPool;
 
@@ -45,6 +46,12 @@ public class ThankActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.TransparentThemeDay);
+        } else {
+            setTheme(R.style.TransparentThemeNight);
+        }
         setContentView(R.layout.activity_thank);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }

@@ -19,6 +19,7 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
 import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -77,6 +78,12 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.TransparentThemeDay);
+        } else {
+            setTheme(R.style.TransparentThemeNight);
+        }
         setContentView(R.layout.activity_share_suggest);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
@@ -192,6 +199,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                             if (versionCode.compareTo(appVersionNow) > 0) {
                                 String str = "最新版本:" + versionCode + "[查看内容]";
                                 mShareSuggestVersionTxt.setText(str);
+                                mShareSuggestVersionTxt.setTextColor(getResources().getColor(R.color.crimson));
                                 mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
@@ -213,7 +221,6 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                             } else {
                                 String str = "当前版本：" + appVersionNow + " 已是最新";
                                 mShareSuggestVersionTxt.setText(str);
-                                mShareSuggestVersionTxt.setTextColor(getResources().getColor(R.color.black));
                                 mShareSuggestTipsTxt.setText("分享给你的朋友们吧！");
                                 mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
                                     @Override

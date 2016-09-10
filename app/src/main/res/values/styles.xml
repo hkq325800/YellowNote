@@ -9,8 +9,9 @@
         <!--@color/colorPrimaryDark-->
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="colorControlHighlight">@color/colorPrimaryPressed</item>
-        <item name="clockBackground">@color/color3F3F3F</item>
+        <item name="clockBackground">@android:color/white</item>
         <item name="clockSoftBackground">@android:color/white</item>
+        <item name="clockTextColor">@color/gray</item>
     </style>
 
     <!--白天主题，此处直接和AppTheme一样-->
@@ -21,7 +22,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@android:color/white</item>
-        <item name="clockSoftBackground">@color/gray</item>
+        <item name="clockSoftBackground">@color/white</item>
+        <item name="clockTextColor">@color/gray</item>
     </style>
 
     <!--夜间主题-->
@@ -31,8 +33,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="clockBackground">@color/color3F3F3F</item>
+        <item name="clockBackground">@color/gray</item>
         <item name="clockSoftBackground">@color/gray</item>
+        <item name="clockTextColor">@color/colorPrimary</item>
     </style>
 
     <style name="AppTheme.Splash" parent="AppTheme">
@@ -52,11 +55,11 @@
         <item name="android:textColorHint">@color/textHintColor</item>
     </style>
 
-    <style name="AppTheme.NoActionBarDrawer" parent="AppTheme.NoActionBar">
-        <item name="colorPrimary">@color/white</item><!--字-->
-        <item name="android:backgroundDimEnabled">false</item><!-- dim:模糊的 阴影效果 遮罩 -->
-        <item name="colorControlHighlight">@color/colorPrimary</item><!--背景-->
-    </style>
+    <!--<style name="AppTheme.NoActionBarDrawer" parent="AppTheme.NoActionBar">
+        <item name="colorPrimary">@color/white</item>&lt;!&ndash;字&ndash;&gt;
+        <item name="android:backgroundDimEnabled">false</item>&lt;!&ndash; dim:模糊的 阴影效果 遮罩 &ndash;&gt;
+        <item name="colorControlHighlight">@color/colorPrimary</item>&lt;!&ndash;背景&ndash;&gt;
+    </style>-->
 
     <!--<style name="FloatingStyle" parent="@android:style/TextAppearance">
         &lt;!&ndash; 字体颜色 &ndash;&gt;
@@ -104,7 +107,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="clockBackground">@android:color/white</item>
-        <item name="clockSoftBackground">@android:color/white</item>
+        <item name="clockSoftBackground">@color/white</item>
+        <item name="clockTextColor">@color/gray</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
@@ -119,8 +123,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="clockBackground">@color/color3F3F3F</item>
-        <item name="clockSoftBackground">@color/color3F3F3F</item>
+        <item name="clockBackground">@color/gray</item>
+        <item name="clockSoftBackground">@color/gray</item>
+        <item name="clockTextColor">@color/colorPrimary</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
@@ -152,7 +157,17 @@
     </style>-->
     <!--SlideActivity-->
 
-    <style name="AppTheme.Pattern" parent="TransparentThemeDay">
+    <style name="AppThemePatternDay" parent="TransparentThemeDay">
+        <item name="android:windowDisablePreview">true</item>
+        <item name="patternViewStyle">@style/PatternView.Light</item>
+        <!--<item name="colorPrimary">#ff263238</item>-->
+        <!--<item name="colorPrimaryDark">#ff66ccff</item>-->
+        <!--<item name="background">@android:color/transparent</item>-->
+        <item name="colorControlNormal">@color/textContentColor</item>
+        <!--<item name="android:windowBackground">@android:color/transparent</item>-->
+    </style>
+
+    <style name="AppThemePatternNight" parent="TransparentThemeNight">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <!--<item name="colorPrimary">#ff263238</item>-->

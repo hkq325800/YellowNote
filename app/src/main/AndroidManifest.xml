@@ -39,18 +39,18 @@
         <activity
             android:name=".activity.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBarDrawer"
+            android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".activity.SetPatternActivity"
             android:label="设置密码"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Pattern" />
+            android:theme="@style/AppThemePatternDay" />
         <activity
             android:name=".activity.ConfirmPatternActivity"
             android:label="确认密码"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.Pattern" />
+            android:theme="@style/AppThemePatternDay" />
         <activity
             android:name=".activity.EditActivity"
             android:launchMode="singleTask"

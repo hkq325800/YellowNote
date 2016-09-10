@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
@@ -37,6 +38,12 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.AppThemePatternDay);
+        } else {
+            setTheme(R.style.AppThemePatternNight);
+        }
         super.onCreate(savedInstanceState);
         NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);

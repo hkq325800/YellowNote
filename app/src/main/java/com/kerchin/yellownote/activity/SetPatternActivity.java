@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
@@ -36,6 +37,12 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);
         NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.AppThemePatternDay);
+        } else {
+            setTheme(R.style.AppThemePatternNight);
+        }
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
         mNavigationTitleEdt.setText(getResources().getString(R.string.app_name));

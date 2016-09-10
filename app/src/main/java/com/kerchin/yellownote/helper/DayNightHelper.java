@@ -22,7 +22,9 @@ public class DayNightHelper {
     private final static int COLOR_BACKGROUND_RES = 1;
     public final static int COLOR_SOFT_BACKGROUND = 2;
     private final static int COLOR_SOFT_BACKGROUND_RES = 3;
-    private boolean isToogle = false;
+    public final static int COLOR_TEXT = 4;
+    private final static int COLOR_TEXT_RES = 5;
+    private boolean isToggle = false;
 
     private SharedPreferences mSharedPreferences;
     private Map<Integer, Integer> map = new HashMap();
@@ -44,7 +46,13 @@ public class DayNightHelper {
     }
 
     public void toggleThemeSetting(Context context) {
-        isToogle = true;
+        isToggle = true;
+        map.put(COLOR_BACKGROUND, null);
+        map.put(COLOR_BACKGROUND_RES, null);
+        map.put(COLOR_SOFT_BACKGROUND, null);
+        map.put(COLOR_SOFT_BACKGROUND_RES, null);
+        map.put(COLOR_TEXT, null);
+        map.put(COLOR_TEXT_RES, null);
         if (isDay()) {
             setMode(DayNight.NIGHT);
             context.setTheme(R.style.NightTheme);
@@ -83,7 +91,7 @@ public class DayNightHelper {
     }
 
     public int getColorRes(Context context, int colorCode) {
-        if (map.get(colorCode + 1) != null && !isToogle)
+        if (map.get(colorCode + 1) != null && !isToggle)
             return map.get(colorCode + 1);
         Resources.Theme theme = context.getTheme();
         TypedValue typedValue = new TypedValue();
@@ -95,6 +103,9 @@ public class DayNightHelper {
             case COLOR_SOFT_BACKGROUND:
                 attr = R.attr.clockSoftBackground;
                 break;
+            case COLOR_TEXT:
+                attr = R.attr.clockTextColor;
+                break;
         }
         theme.resolveAttribute(attr, typedValue, true);
         map.put(colorCode + 1, context.getResources().getColor(typedValue.resourceId));
@@ -102,7 +113,7 @@ public class DayNightHelper {
     }
 
     public int getColorResId(Context context, int colorCode) {
-        if (map.get(colorCode) != null && !isToogle)
+        if (map.get(colorCode) != null && !isToggle)
             return map.get(colorCode);
         Resources.Theme theme = context.getTheme();
         TypedValue typedValue = new TypedValue();
@@ -113,6 +124,9 @@ public class DayNightHelper {
                 break;
             case COLOR_SOFT_BACKGROUND:
                 attr = R.attr.clockSoftBackground;
+                break;
+            case COLOR_TEXT:
+                attr = R.attr.clockTextColor;
                 break;
         }
         theme.resolveAttribute(attr, typedValue, true);

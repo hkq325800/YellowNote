@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/textBackgroundColor">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="?attr/clockBackground">
 
     <include
         layout="@layout/include_navigation"
@@ -18,15 +19,16 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/mShareSuggestVersionTxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:textSize="20sp"
                 android:layout_marginTop="25dp"
-                android:textColor="@color/crimson"
-                android:text=""/>
+                android:text=""
+                android:textColor="?attr/clockTextColor"
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/mShareSuggestTipsTxt"
@@ -34,7 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="60dp"
-                android:text="点击二维码下载或者分享给你的朋友" />
+                android:text="分享给你的朋友们吧！"
+                android:textColor="?attr/clockTextColor" />
 
             <ImageView
                 android:id="@+id/mShareSuggestCodeImg"
@@ -58,7 +61,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/mShareSuggestCodeImg"
-                android:padding="20dp">
+                android:padding="20dp"
+                android:textColorHint="?attr/clockTextColor">
 
                 <EditText
                     android:id="@+id/mShareSuggestTouchEdt"
@@ -66,6 +70,7 @@
                     android:layout_height="wrap_content"
                     android:hint="留下您的QQ或邮箱(选填)"
                     android:maxLength="500"
+                    android:textColor="?attr/clockTextColor"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
 
@@ -74,7 +79,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/mShareSuggestTouchTextInput"
-                android:padding="20dp">
+                android:padding="20dp"
+                android:textColorHint="?attr/clockTextColor">
 
                 <EditText
                     android:id="@+id/mShareSuggestContentEdt"
@@ -82,6 +88,7 @@
                     android:layout_height="wrap_content"
                     android:hint="您的建议就是我的最大动力"
                     android:maxLength="500"
+                    android:textColor="?attr/clockTextColor"
                     android:textSize="16sp" />
             </android.support.design.widget.TextInputLayout>
         </RelativeLayout>

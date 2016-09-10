@@ -16,6 +16,7 @@
     </declare-styleable>
     <attr name="clockBackground" format="color" />
     <attr name="clockSoftBackground" format="color" />
+    <attr name="clockTextColor" format="color" />
     <!--<declare-styleable name="SnappingStepper">
         <attr name="min" format="integer"/>
         <attr name="max" format="integer"/>

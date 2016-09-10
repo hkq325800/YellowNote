@@ -15,6 +15,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
@@ -50,9 +51,16 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     private final static int requestForEditPattern = 4;
     //    private SVProgressHUD mSVProgressHUD;
     private boolean hasPattern;
+    DayNightHelper mDayNightHelper;
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.TransparentThemeDay);
+        } else {
+            setTheme(R.style.TransparentThemeNight);
+        }
         setContentView(R.layout.activity_secret_menu);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
@@ -218,8 +226,12 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
 
     private void enablePattern(boolean enable) {
         mSecretMenuPatternEditLiL.setClickable(enable);
-        mSecretMenuPatternEditTxt.setTextColor(getResources()
-                .getColor(enable ? R.color.textContentColor : R.color.light_gray));
+        if (enable)
+            mSecretMenuPatternEditTxt.setTextColor(getResources()
+                    .getColor(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_TEXT)));
+        else
+            mSecretMenuPatternEditTxt.setTextColor(getResources()
+                    .getColor(R.color.light_gray));
     }
 
     public static String patternFromOthers;

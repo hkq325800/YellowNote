@@ -21,10 +21,12 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
@@ -58,6 +60,12 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @Override
     protected void setContentView(Bundle savedInstanceState) {
+        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.TransparentThemeDay);
+        } else {
+            setTheme(R.style.TransparentThemeNight);
+        }
         setContentView(R.layout.activity_secret);
         isForget = getIntent().getBooleanExtra("isForget", false);
         NormalUtils.immerge(this, R.color.lightSkyBlue);
@@ -107,7 +115,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mNavigationLeftBtn)
     public void back() {
-        KeyBoardCancel();
+        SoftKeyboardUtils.KeyBoardCancel(this);
         finish();
     }
 
@@ -116,17 +124,10 @@ public class SecretActivity extends BaseHasSwipeActivity {
         back();
     }
 
-    public void KeyBoardCancel() {
-        View view = getWindow().peekDecorView();
-        if (view != null) {
-            InputMethodManager inputManger = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            inputManger.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
     @OnClick(R.id.mNavigationRightBtn)
     public void submit() {
         if (tableCheck(isForget)) {
+            mNavigationRightBtn.setEnabled(false);
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -145,6 +146,7 @@ public class SecretActivity extends BaseHasSwipeActivity {
                                 if (isForget) {
                                     setResult(RESULT_OK);
                                     PatternLockUtils.clearPattern(getApplicationContext());
+                                    SoftKeyboardUtils.KeyBoardCancel(SecretActivity.this);
                                     finish();
                                 } else {
                                     SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
@@ -167,6 +169,12 @@ public class SecretActivity extends BaseHasSwipeActivity {
                         }
                     } catch (AVException e) {
                         e.printStackTrace();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNavigationRightBtn.setEnabled(true);
+                            }
+                        });
                         Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
                     }
                 }
@@ -182,12 +190,15 @@ public class SecretActivity extends BaseHasSwipeActivity {
             switch (msg.what) {
                 case secretError:
                     Trace.show(getApplicationContext(), "你输入的密码不对哦");
+                    mNavigationRightBtn.setEnabled(true);
                     break;
                 case reLogForFrozen:
                     Trace.show(getApplicationContext(), "您操作的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
+                    mNavigationRightBtn.setEnabled(true);
                     break;
                 case trueForSecret:
                     Trace.show(getApplicationContext(), "密码修改成功");
+                    mNavigationRightBtn.setEnabled(true);
                     mSecretNewPassEdt.setText("");
                     mSecretPassEdt.setText("");
                     mSecretNewPassAgainEdt.setText("");

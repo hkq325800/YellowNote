@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -647,7 +649,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private void toggleThemeSetting() {
         mDayNightHelper.toggleThemeSetting(MainActivity.this);
         mMainPager.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND));
-//        mMainNav.setBackgroundResource(background.resourceId);
+        mMainNav.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
+        mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
 //        mNavHeaderMainTipTxt.setTextColor(getResources().getColor(background.resourceId));
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));
 //        msgFolder.setTextColor(getResources().getColor(background.resourceId));
