@@ -1,2 +1,1 @@
 include ':app', ':SlidingLibrary', ':JJSearchViewAnim', ':snappingstepper', ':progresslayout'
-//, ':superadapter'

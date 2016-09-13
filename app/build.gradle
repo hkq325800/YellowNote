@@ -5,7 +5,7 @@ apply plugin: 'com.getkeepsafe.dexcount'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '23.0.3'
+    buildToolsVersion '24.0.2'
 
     packagingOptions {
         exclude 'META-INF/LICENSE.txt'
@@ -45,9 +45,9 @@ dependencies {
     //    compile fileTree(include: ['*.jar'], dir: 'libs')
     debugCompile 'junit:junit:4.12'
     //android
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:recyclerview-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:appcompat-v7:24.+'
+    compile 'com.android.support:recyclerview-v7:24.+'
+    compile 'com.android.support:design:24.+'
     //leancloud服务器上jar包
     compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
@@ -70,7 +70,7 @@ dependencies {
     //共同使用
     apt 'com.jakewharton:butterknife-compiler:8.0.1'
     //可靠的作者 No service of type Factory<LoggingManagerInternal> available in ProjectScopeServices.
-    compile 'com.kaopiz:kprogresshud:1.0.5'
+//    compile 'com.kaopiz:kprogresshud:1.0.5'
     //手势密码 有时修复bug
     compile 'me.zhanghai.android.patternlock:library:2.0.3'
     //爆炸效果库 已经停止更新
@@ -78,13 +78,14 @@ dependencies {
     //！已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
     //progressDialog已经停止更新
-    compile 'com.bigkoo:svprogresshud:1.0.2'
+    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新
     compile project(':SlidingLibrary')
     //add getState() and HKQController
     compile project(':JJSearchViewAnim')
     //通用adapter持续更新中
-    compile files('libs/superadapter-3.3.jar')
+//    compile files('libs/superadapter-3.3.jar')
+    compile 'org.byteam.superadapter:superadapter:3.+'
     //弹出菜单库 可靠的作者
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码

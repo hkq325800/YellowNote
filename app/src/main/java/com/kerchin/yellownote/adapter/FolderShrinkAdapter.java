@@ -47,7 +47,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 
     public void setFolders(List<SimpleEntity> items) {
         //shownFolderPosition会跟着改变切不确定会变成什么样故无法判断
-        mList.clear();
+        mData.clear();
         this.mItems = items;
         addAll(items);
     }

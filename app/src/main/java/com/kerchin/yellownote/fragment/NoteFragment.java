@@ -77,6 +77,7 @@ public class NoteFragment extends BaseFragment
     private final static int sortByDateAsc = 3;
 
     private GetDataHelper getDataHelper;
+    private final byte handle4dismiss = 5;
     private final byte handle4explosion = 6;
     //    private final byte handle4AVException = 40;
     @SuppressLint("HandlerLeak")
@@ -168,6 +169,9 @@ public class NoteFragment extends BaseFragment
                     primaryData.getFolder(note.getFolderId()).decInList();
                     primaryData.listNote.remove(note);//从数据源中删除
                     noteAdapter.getListDelete().remove(note);
+                    break;
+                case handle4dismiss:
+                    mSVProgressHUD.dismissImmediately();
                     break;
                 case GetDataHelper.handle4empty:
 //                    AVException e = (AVException) msg.obj;
@@ -380,7 +384,7 @@ public class NoteFragment extends BaseFragment
                                 deleteViewShow();
                             } else {
                                 deleteViewHide();
-//                                mSVProgressHUD.showWithStatus("删除中...");//TODO
+                                mSVProgressHUD.showWithStatus("删除中...");//TODO
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
@@ -409,22 +413,12 @@ public class NoteFragment extends BaseFragment
         return toolbarItemClickListener;
     }
 
-    private void dismissProgress() {
-        if (mSVProgressHUD.isShowing())
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSVProgressHUD.dismiss();
-                }
-            });
-    }
-
     private Runnable runnableForDataAfterDelete = new Runnable() {
         @Override
         public void run() {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (noteAdapter.getDeleteNum() == 0) {
-//                dismissProgress();//int android.view.View.mViewFlags NullPointerException
+                handler.sendEmptyMessage(handle4dismiss);//int android.view.View.mViewFlags NullPointerException
                 getDataHelper.respond();
                 getData(800);//statusRespond delete
             } else {
@@ -433,7 +427,7 @@ public class NoteFragment extends BaseFragment
                     repeatCount++;
                 } else {
                     repeatCount = 0;
-//                    dismissProgress();
+                    handler.sendEmptyMessage(handle4dismiss);
                     Trace.show(getActivity(), "网络状况不佳 稍后再试吧");
                 }
             }
