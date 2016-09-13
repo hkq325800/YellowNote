@@ -11,7 +11,6 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -19,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenuView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -26,7 +26,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -38,9 +37,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
@@ -51,7 +48,6 @@ import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
-import com.kerchin.yellownote.bean.DayNight;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.fragment.FolderFragment;
@@ -66,7 +62,7 @@ import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 import com.securepreferences.SecurePreferences;
@@ -150,6 +146,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        NavigationMenuView navigationMenuView = (NavigationMenuView) mMainNav.getChildAt(0);
+        if (navigationMenuView != null) {
+            navigationMenuView.setVerticalScrollBarEnabled(false);
+        }
     }
 
     private void setUserIconByNet() {
@@ -532,6 +532,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void onClick(View v) {
                 noteFragment.getMainStatus().setIsSearchMode(true);
                 noteFragment.deleteViewHide();
+                btnSort.setVisible(false);
+                btnDelete.setVisible(false);
                 //开启搜索模式
 //                hideBtnAdd();
                 noteFragment.disableLoad();
@@ -544,6 +546,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public boolean onClose() {
                 noteFragment.closeClick();
+                btnSort.setVisible(true);
+                btnDelete.setVisible(true);
                 return false;
             }
         });
@@ -589,6 +593,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
                     startActivity(intent);
                     finish();
+                    overridePendingTransition(R.anim.push_left_in,
+                            R.anim.push_left_out);
                 }
             });
             builder.show();
@@ -651,7 +657,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainPager.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND));
         mMainNav.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
         mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
-//        mNavHeaderMainTipTxt.setTextColor(getResources().getColor(background.resourceId));
+        mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));
 //        msgFolder.setTextColor(getResources().getColor(background.resourceId));
     }

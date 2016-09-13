@@ -157,7 +157,7 @@
     </style>-->
     <!--SlideActivity-->
 
-    <style name="AppThemePatternDay" parent="TransparentThemeDay">
+    <style name="AppThemePatternDay" parent="DayTheme">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <!--<item name="colorPrimary">#ff263238</item>-->
@@ -167,7 +167,7 @@
         <!--<item name="android:windowBackground">@android:color/transparent</item>-->
     </style>
 
-    <style name="AppThemePatternNight" parent="TransparentThemeNight">
+    <style name="AppThemePatternNight" parent="NightTheme">
         <item name="android:windowDisablePreview">true</item>
         <item name="patternViewStyle">@style/PatternView.Light</item>
         <!--<item name="colorPrimary">#ff263238</item>-->

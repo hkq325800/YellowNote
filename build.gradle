@@ -8,6 +8,9 @@ buildscript {
         maven {
             url "http://mvn.leancloud.cn/nexus/content/repositories/releases"
         }
+        maven {
+            url 'https://dl.bintray.com/wangyuwei/maven'
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
@@ -30,6 +33,9 @@ allprojects {
             url "http://mvn.leancloud.cn/nexus/content/repositories/releases"
         }
         maven { url "https://jitpack.io" }
+        maven {
+            url 'https://dl.bintray.com/wangyuwei/maven'
+        }
     }
 }
 

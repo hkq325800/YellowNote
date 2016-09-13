@@ -25,7 +25,7 @@ import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 

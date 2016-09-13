@@ -14,6 +14,8 @@ import static com.kerchin.yellownote.R.drawable.slide_shadow;
 
 /**
  * Created by hailonghan on 15/6/11.
+ *
+ *
  */
 public abstract class BaseSwipeBackActivity extends AppCompatActivity
         implements SlidingMenu.OnOpenedListener {

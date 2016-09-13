@@ -2,30 +2,22 @@ package com.kerchin.yellownote.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.IntentFilter;
-import android.content.res.Resources;
-import android.os.Build;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Process;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.widget.progresslayout.ProgressLayout;
@@ -39,15 +31,11 @@ import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -59,11 +47,13 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemClick;
 import butterknife.OnItemLongClick;
+import me.wangyuwei.flipshare.FlipShareView;
+import me.wangyuwei.flipshare.ShareItem;
 import tyrantgit.explosionfield.ExplosionField;
 
 public class NoteFragment extends BaseFragment
         implements WaterDropListView.IWaterDropListViewListener
-        , View.OnCreateContextMenuListener, PopupMenu.OnMenuItemClickListener {
+        , View.OnCreateContextMenuListener/*, PopupMenu.OnMenuItemClickListener*/ {
     @BindView(R.id.mNoteWDList)
     WaterDropListView mNoteWDList;
     @BindView(R.id.mProgress)
@@ -390,7 +380,7 @@ public class NoteFragment extends BaseFragment
                                 deleteViewShow();
                             } else {
                                 deleteViewHide();
-//                                mSVProgressHUD.showWithStatus("删除中...");
+//                                mSVProgressHUD.showWithStatus("删除中...");//TODO
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
@@ -517,34 +507,50 @@ public class NoteFragment extends BaseFragment
 
     /*sort part*/
 
-    public void showPop(View v) {
-        PopupMenu popup = new PopupMenu(getActivity(), v, Gravity.END);
-        MenuInflater inflater = popup.getMenuInflater();
-        inflater.inflate(R.menu.note_sort, popup.getMenu());
-        popup.setOnMenuItemClickListener(this);
-        popup.show();
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-        switch (item.getItemId()) {
-            //TODO sortByName
+    public void showPop(Toolbar v) {
+        ActionMenuView actionMenuView = (ActionMenuView) v.getChildAt(2);
+        if(actionMenuView==null)
+            return;
+        FlipShareView share = new FlipShareView.Builder(getActivity(), actionMenuView)
+                .addItem(new ShareItem("按日期降序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
+                .addItem(new ShareItem("按日期升序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
+                .addItem(new ShareItem("按目录排序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
+//                .setBackgroundColor(0x60000000)
+                .setItemDuration(150)
+                .setSeparateLineColor(0x30000000)
+                .setAnimType(FlipShareView.TYPE_HORIZONTAL)
+                .create();
+        share.setOnFlipClickListener(new FlipShareView.OnFlipClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                switch (position) {
+                    //TODO sortByName
 //            case R.id.name:
 //                doSort(sortByName);
 //                break;
-            case R.id.dateDesc:
-                doSort(sortByDateDesc);
-                break;
-            case R.id.dateAsc:
-                doSort(sortByDateAsc);
-                break;
-            case R.id.catalog:
-                doSort(sortByFolder);
-                break;
-            default:
-                break;
-        }
-        return false;
+                    case 0:
+                        doSort(sortByDateDesc);
+                        break;
+                    case 1:
+                        doSort(sortByDateAsc);
+                        break;
+                    case 2:
+                        doSort(sortByFolder);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void dismiss() {
+            }
+        });
+//        PopupMenu popup = new PopupMenu(getActivity(), v, Gravity.END);
+//        MenuInflater inflater = popup.getMenuInflater();
+//        inflater.inflate(R.menu.note_sort, popup.getMenu());
+//        popup.setOnMenuItemClickListener(this);
+//        popup.show();
     }
 
     private void doSort(final int sortType) {

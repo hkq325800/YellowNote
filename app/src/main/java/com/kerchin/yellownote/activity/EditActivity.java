@@ -34,7 +34,6 @@ import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.cjj.sva.widget.CircleSearchView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
-import com.kerchin.yellownote.bean.DayNight;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
@@ -47,7 +46,7 @@ import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;

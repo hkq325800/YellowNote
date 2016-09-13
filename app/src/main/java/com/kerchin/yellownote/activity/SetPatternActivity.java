@@ -13,7 +13,7 @@ import android.widget.EditText;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
 
 import java.util.List;
 

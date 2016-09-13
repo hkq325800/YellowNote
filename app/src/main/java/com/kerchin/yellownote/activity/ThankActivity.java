@@ -16,7 +16,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 
 import java.util.ArrayList;
 

@@ -9,6 +9,8 @@ import com.kerchin.yellownote.global.Config;
 
 /**
  * Created by Kerchin on 2016/3/1 0005.
+ *
+ * 包含log toast dialog的工具类
  */
 public class Trace {
     public static final String TAG = "hkq_trace";

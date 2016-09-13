@@ -9,7 +9,7 @@ import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool;
+import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;

@@ -7,6 +7,8 @@ import com.kerchin.yellownote.utilities.Trace;
 
 /**
  * Created by hailonghan on 15/6/9.
+ *
+ * MyOrmLiteBaseActivity的父类 也可以作为Activity直接父类
  */
 public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 

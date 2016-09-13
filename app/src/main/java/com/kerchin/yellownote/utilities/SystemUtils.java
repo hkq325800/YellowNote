@@ -11,7 +11,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
 /**
- * 系统实用工具类
+ * 获取系统信息工具类
  * <p/>
  * Created by Clock on 2016/1/24.
  */
