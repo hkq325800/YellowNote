@@ -22,7 +22,7 @@ android {
     }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 24
         versionCode 7
         versionName "1.07"
@@ -56,7 +56,7 @@ dependencies {
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //material样式库
-    //    compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
+    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
     //较好的圆形图像控件 持续修改中
     compile 'de.hdodenhof:circleimageview:2.1.0'
     //磁盘先进先出缓存 基本停止commit
@@ -84,7 +84,6 @@ dependencies {
     //add getState() and HKQController
     compile project(':JJSearchViewAnim')
     //通用adapter持续更新中
-//    compile files('libs/superadapter-3.3.jar')
     compile 'org.byteam.superadapter:superadapter:3.+'
     //弹出菜单库 可靠的作者
     compile 'me.wangyuwei:FlipShare:1.0.1'
