@@ -1,5 +1,6 @@
 package com.kerchin.yellownote.activity;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -238,17 +239,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         userIconPath = savePath.getAbsolutePath() + File.separator
                 + MyApplication.user + ".jpg";
         userIconFile = new File(userIconPath);
-        if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
-            Trace.d("getLocalMipmap");
-            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
-            Trace.d("getLocalBitmap");
-            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
-            if (!MyApplication.userIcon.equals(
-                    MyApplication.getDefaultShared().getString(Config.KEY_USERICON, "")))
-                setUserIconByNet();
-        } else//userIcon存在但是本地文件不存在 下载并保存、设置
-            setUserIconByNet();
+
+        if (NormalUtils.requestPermission(this, REQUEST_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            setUserIcon();
+        }
+
         checkForUpdate();
         fragments.add(noteFragment);
         fragments.add(folderFragment);
@@ -308,6 +303,20 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //                    mSearchView.onActionViewCollapsed();
             }
         });
+    }
+
+    private void setUserIcon() {
+        if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
+            Trace.d("getLocalMipmap");
+            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
+            Trace.d("getLocalBitmap");
+            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
+            if (!MyApplication.userIcon.equals(
+                    MyApplication.getDefaultShared().getString(Config.KEY_USERICON, "")))
+                setUserIconByNet();
+        } else//userIcon存在但是本地文件不存在 下载并保存、设置
+            setUserIconByNet();
     }
 
     private void checkForUpdate() {
@@ -424,7 +433,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
-        NormalUtils.requestWritePermission(this, REQUEST_PERMISSION);
     }
 
     @Override
@@ -468,6 +476,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 return;
             if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
                 String result = bundle.getString(CodeUtils.RESULT_STRING);
+                if (result != null && result.startsWith("www."))
+                    result = "http://" + result;
+                //用浏览器打开
+                try {
+                    NormalUtils.downloadByUri(MainActivity.this, result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 Trace.show(this, result);
             } else
                 Trace.show(this, "解析二维码失败");
@@ -804,9 +820,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         if (requestCode == REQUEST_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Trace.d("permission granted");
+                setUserIcon();
             } else {
                 //TODO 显示对话框告知用户必须打开权限
                 Trace.d("permission denied");
+                setUserIconByNet();
             }
         }
     }

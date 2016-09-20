@@ -221,7 +221,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (!content.equals(mNote.getContent())
                     || !title.equals(mNote.getTitle())
                     || isFolderChanged
-                    || mNote.isHasEdited()
+                    || (mNote.isHasEdited() && NormalUtils.isNetworkAvailable(EditActivity.this))
                     || mNote.isOfflineAdd()) {
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
@@ -610,7 +610,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         } else if (!mEditContentEdt.getText().toString().equals(mNote.getContent())
                 || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())
                 || isFolderChanged
-                || mNote.isHasEdited()
+                || (mNote.isHasEdited() && NormalUtils.isNetworkAvailable(EditActivity.this))
                 || mNote.isOfflineAdd()) {
             mNavigationRightBtn.setText("保存中..");
             closeSliding();

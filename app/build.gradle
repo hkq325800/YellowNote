@@ -8,8 +8,8 @@ android {
     buildToolsVersion '24.0.2'
 
     packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
+//        exclude 'META-INF/LICENSE.txt'
+//        exclude 'META-INF/NOTICE.txt'
     }
     productFlavors {
 //        YingYongBao {
@@ -48,6 +48,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile 'com.android.support:design:24.+'
+//    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
     compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'

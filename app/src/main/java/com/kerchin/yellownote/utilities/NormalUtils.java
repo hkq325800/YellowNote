@@ -11,9 +11,12 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
@@ -41,6 +44,17 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    public static boolean isNetworkAvailable(Context context) {
+        if(context !=null){
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = cm.getActiveNetworkInfo();
+            if(info !=null){
+                return info.isAvailable();
+            }
+        }
+        return false;
+    }
+
     public static void downloadByUri(Context context, String uriStr) {
         Uri uri = Uri.parse(uriStr);//指定网址
         Intent intent = new Intent();
@@ -286,13 +300,15 @@ public class NormalUtils {
      * @param context
      * @param requestCode
      */
-    public static void requestWritePermission(Activity context, int requestCode) {
+    public static boolean requestPermission(Activity context, int requestCode, @RequiresPermission String permission) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
             //申请WRITE_EXTERNAL_STORAGE权限
-            ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+            ActivityCompat.requestPermissions(context, new String[]{permission},
                     requestCode);
+            return false;
         }
+        return true;
     }
 
     private NormalUtils() {

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Map;
 
@@ -323,7 +324,7 @@ public class PrimaryData {
                                     simpleDaoForFolder.delete(f);
                                 }
                             }
-                        }
+                        } else break;
                         Trace.d("waitToSaveData true");
                         if (doAfter == null)
                             getSimpleEntityFromList(MyApplication.userDefaultFolderId);
@@ -858,6 +859,12 @@ public class PrimaryData {
         map.clear();
 //        ArrayList<Note> list = liteOrmHelper.query(Note.class);
         List<Note> list = helper.getNoteDao().queryForEq("user_tel", MyApplication.user);
+        for (Note n : list) {
+            int i = 0;
+            if (map.get(n.getFolderId()) != null)
+                i = map.get(n.getFolderId());
+            map.put(n.getFolderId(), ++i);
+        }
         Trace.d("getNoteFromData size" + list.size());
         listNote.addAll(list);
         status.isNoteReady = true;
