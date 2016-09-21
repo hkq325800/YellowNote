@@ -1,16 +1,16 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
+//apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 version = "1.0.2"
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "20.0.0"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
 
     defaultConfig {
         minSdkVersion 9
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -32,37 +32,37 @@ def siteUrl = 'https://github.com/saiwu-bigkoo/Android-SnappingStepper'         
 def gitUrl = 'https://github.com/saiwu-bigkoo/Android-SnappingStepper.git'                     // #CONFIG# // project git
 group = "com.bigkoo"
 
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'aar'
-                name 'SnappingStepper For Android'                                   // #CONFIG# // project title
-                url siteUrl
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'sai'                                           // #CONFIG# // your user id (you can write your nickname)
-                        name 'sai.wu'                                       // #CONFIG# // your user name
-                        email 'sai.wu@bigkoo.com'                               // #CONFIG# // your email
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-                }
-            }
-        }
-    }
-}
+//install {
+//    repositories.mavenInstaller {
+//        // This generates POM.xml with proper parameters
+//        pom {
+//            project {
+//                packaging 'aar'
+//                name 'SnappingStepper For Android'                                   // #CONFIG# // project title
+//                url siteUrl
+//                // Set your license
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id 'sai'                                           // #CONFIG# // your user id (you can write your nickname)
+//                        name 'sai.wu'                                       // #CONFIG# // your user name
+//                        email 'sai.wu@bigkoo.com'                               // #CONFIG# // your email
+//                    }
+//                }
+//                scm {
+//                    connection gitUrl
+//                    developerConnection gitUrl
+//                    url siteUrl
+//                }
+//            }
+//        }
+//    }
+//}
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs

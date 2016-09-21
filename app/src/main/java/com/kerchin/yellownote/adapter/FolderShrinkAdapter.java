@@ -22,7 +22,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
     public static int animDuration = 450;
     private Context context;
     private final float childHeight;
-    private List<SimpleEntity> mItems;
+//    private List<SimpleEntity> mItems;
     // header点击事件
     private OnItemClickListener mFolderItemClickListener;
     boolean isAnimating = false;//getLayoutPosition()
@@ -38,7 +38,7 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
         super(context, items, mulItemViewType);
         this.context = context;
         childHeight = context.getResources().getDimension(R.dimen.folder_item_height);
-        this.mItems = items;
+//        this.mList = items;
         this.shownFolderId = shownFolderId;
 //        PrimaryData.getInstance().initData(true, shownFolderId);
 //        mList = mItems;
@@ -47,9 +47,9 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 
     public void setFolders(List<SimpleEntity> items) {
         //shownFolderPosition会跟着改变切不确定会变成什么样故无法判断
-        mData.clear();
-        this.mItems = items;
+        mList.clear();
         addAll(items);
+//        replaceAll(items);
     }
 
     public interface OnItemClickListener {
@@ -184,17 +184,17 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
         if (!isAnimating) {
             isAnimating = true;
             if (!shownFolderId.equals(item.getFolderId())) {//点击了其他目标
-                for (int i = 0; i < mItems.size(); i++) {
-                    if (mItems.get(i).entityType == SimpleEntity.typeNote) {
+                for (int i = 0; i < mList.size(); i++) {
+                    if (getItem(i).entityType == SimpleEntity.typeNote) {
                         //-1
-                        if (mItems.get(i).getFolderId().equals(item.getFolderId())) {
-                            mItems.get(i).setIsShown(true);
-                            mItems.get(i).setHasShownAnim(false);
+                        if (getItem(i).getFolderId().equals(item.getFolderId())) {
+                            getItem(i).setIsShown(true);
+                            getItem(i).setHasShownAnim(false);
                         }
                         //+1
-                        if (mItems.get(i).getFolderId().equals(shownFolderId)) {
-                            mItems.get(i).setIsShown(false);
-                            mItems.get(i).setHasShownAnim(false);
+                        if (getItem(i).getFolderId().equals(shownFolderId)) {
+                            getItem(i).setIsShown(false);
+                            getItem(i).setHasShownAnim(false);
                         }
                     }
                 }
@@ -205,11 +205,11 @@ public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
 //            Trace.d("lastFolderPosition" + lastFolderPosition + "/shownFolderPosition" + shownFolderPosition);
                 notifyDataSetChanged();
             } else {//点击开启着的自身
-                for (int i = 0; i < mItems.size(); i++) {
-                    if (mItems.get(i).entityType == SimpleEntity.typeNote)
-                        if (mItems.get(i).getFolderId().equals(shownFolderId)) {
-                            mItems.get(i).setIsShown(false);
-                            mItems.get(i).setHasShownAnim(false);
+                for (int i = 0; i < mList.size(); i++) {
+                    if (getItem(i).entityType == SimpleEntity.typeNote)
+                        if (getItem(i).getFolderId().equals(shownFolderId)) {
+                            getItem(i).setIsShown(false);
+                            getItem(i).setHasShownAnim(false);
                         }
                 }
                 lastFolderId = shownFolderId;

@@ -87,6 +87,7 @@ public class FolderFragment extends BaseFragment {
                 case GetDataHelper.handle4respond:
                     Trace.d("handlerInFolder handle4respond");
                     primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4respond
+                    Trace.d("size"+primaryData.mItems.size());
 //                    getHeaderListFromFolder();//handle4respond
                     setRecycleView();//respond
                     break;
@@ -258,7 +259,8 @@ public class FolderFragment extends BaseFragment {
             mRecyclerView.setAdapter(folderAdapter);
         } else {
 //            PrimaryData.getInstance().initData(false, folderAdapter.shownFolderId);
-            folderAdapter.setFolders(primaryData.mItems);
+            folderAdapter.setFolders(PrimaryData.getInstance().mItems);
+//            folderAdapter.replaceAll(PrimaryData.getInstance().mItems);
             mRecyclerView.setAdapter(folderAdapter);//不set会少数据 TODO
             //滑动到新添加的笔记夹
 //            folderAdapter.setIsFirstTrue();

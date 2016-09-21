@@ -85,7 +85,7 @@ dependencies {
     //add getState() and HKQController
     compile project(':JJSearchViewAnim')
     //通用adapter持续更新中
-    compile 'org.byteam.superadapter:superadapter:3.+'
+    compile 'org.byteam.superadapter:superadapter:3.3'
     //弹出菜单库 可靠的作者
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码

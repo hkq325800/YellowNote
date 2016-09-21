@@ -511,6 +511,14 @@ public class PrimaryData {
         }
     }
 
+    void editContain(String folderId, boolean isAdd) {
+        int i = 0;
+        if (map.get(folderId) != null)
+            i = map.get(folderId);
+        map.put(folderId, isAdd ? ++i : --i);
+    }
+
+
     private void setContain() {
         for (Folder f : listFolder) {
             if (map.get(f.getObjectId()) == null)
@@ -620,6 +628,7 @@ public class PrimaryData {
                         i = map.get(folderId);
                     map.put(folderId, ++i);
                 }
+                //对离线添加的note进行统计
                 List<Note> list = helper.getNoteDao().queryForEq("isOfflineAdd", true);
                 if (list.size() > 0)
                     for (Note note : list) {

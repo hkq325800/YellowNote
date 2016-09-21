@@ -232,6 +232,7 @@ public class Note implements Serializable {
                     }
                     //folderNum+1
                     PrimaryData.getInstance().getFolder(folderId).addInList();
+                    PrimaryData.getInstance().editContain(folderId, true);
                     FolderFragment.isChanged4folder = true;//saveChange add
                     NoteFragment.isChanged4note = true;//saveChange
                     title = newTitle;
@@ -317,6 +318,7 @@ public class Note implements Serializable {
                     try {
                         NoteService.delete(objectId);
                         deleteLocal(helper, handler, msgExplosion);
+                        PrimaryData.getInstance().editContain(folderId, false);
                     } catch (AVException e) {
                         msgExplosion.what = handle4error;
                         msgExplosion.obj = "目前暂不支持离线删除" + Trace.getErrorMsg(e);

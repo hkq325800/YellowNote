@@ -77,7 +77,7 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     }
 
     public void setList(List<Note> list) {
-        mData = list;
+        mList = list;
         notifyDataSetHasChanged();
     }
 }
