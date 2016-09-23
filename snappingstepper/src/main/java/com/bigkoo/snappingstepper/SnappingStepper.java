@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,10 +30,11 @@ public class SnappingStepper extends RelativeLayout implements View.OnTouchListe
     public static int ANIMATIONDURATION = 300;//恢复动画时间
     public boolean animationing = false;//动画中,不能进行滑动
     private UpdateRunnable updateRunnable;
-    private boolean stepTouch = false;//是否按着，判断是否还要继续更新数值和界面
+    protected boolean stepTouch = false;//是否按着，判断是否还要继续更新数值和界面
 
     //按下后多少间隔触发快速改变模式
     private static final long STEPSPEEDCHANGEDURATION = 1000;
+    private static final long SEEMLIKECLICKDURATION = 500;
     private static long UPDATEDURATIONSLOW = 300;//数值更新频率-慢
     private static long UPDATEDURATIONFAST = 100;//数值更新频率-快
     private int valueSlowStep = 1;//慢速递增值 步长
@@ -208,9 +210,13 @@ public class SnappingStepper extends RelativeLayout implements View.OnTouchListe
                 //如果是两边的按钮，分别设置为点击状态
                 if (v == ivStepperMinus) {
                     ivStepperMinus.setPressed(false);
+                    if (System.currentTimeMillis() - startTime < SEEMLIKECLICKDURATION)//视为点击行为
+                        updateUI();
                     break;
                 } else if (v == ivStepperPlus) {
                     ivStepperPlus.setPressed(false);
+                    if (System.currentTimeMillis() - startTime < SEEMLIKECLICKDURATION)//视为点击行为
+                        updateUI();
                     break;
                 }
                 restoreStepperContent();
@@ -334,7 +340,7 @@ public class SnappingStepper extends RelativeLayout implements View.OnTouchListe
 
         public void run() {
             SnappingStepper stepper = view.get();
-            if (stepper != null) {
+            if (stepper != null && stepper.stepTouch) {
                 stepper.updateUI();
             }
         }
