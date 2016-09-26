@@ -226,7 +226,7 @@ public class FolderFragment extends BaseFragment {
                                                         , new MaterialDialog.SingleButtonCallback() {
                                                             @Override
                                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                                                dialog.dismiss();
+                                                                dismissDialog();
                                                             }
                                                         }, new MaterialDialog.SingleButtonCallback() {
                                                             @Override
@@ -351,7 +351,7 @@ public class FolderFragment extends BaseFragment {
                             note.reName(getActivity()
                                     , input.toString()
                                     , handler, GetDataHelper.handle4respond);
-                            dialog.dismiss();
+                            dismissDialog();
                             MainActivity mainActivity = (MainActivity) getActivity();
                             mainActivity.showBtnAdd();
                         }
@@ -382,7 +382,7 @@ public class FolderFragment extends BaseFragment {
                                 folder.reName(getActivity()
                                         , input.toString()
                                         , handler, GetDataHelper.handle4respond);
-                                dialog.dismiss();
+                                dismissDialog();
                                 MainActivity mainActivity = (MainActivity) getActivity();
                                 mainActivity.showBtnAdd();
                             }
@@ -442,12 +442,12 @@ public class FolderFragment extends BaseFragment {
                     , new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
+                            dismissDialog();
                         }
                     }, new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
+                            dismissDialog();
                             getDataHelper.respond();//deleteFolder->folder.delete
                             primaryData.getFolderAt(position)
                                     .delete(getActivity(), position, handler, GetDataHelper.handle4respond);
@@ -491,7 +491,7 @@ public class FolderFragment extends BaseFragment {
                                         }
                                     }
                                 });
-                                dialog.dismiss();
+                                dismissDialog();
                                 MainActivity mainActivity = (MainActivity) getActivity();
                                 mainActivity.showBtnAdd();
                             }

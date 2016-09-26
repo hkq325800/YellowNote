@@ -21,7 +21,6 @@ import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.bean.PrimaryData;
@@ -29,6 +28,7 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
+import com.kerchin.yellownote.utilities.DialogUtils;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
@@ -70,7 +70,7 @@ public class LoginActivity extends LoginAbstract {
     LinearLayout mLoginFunLiL;
     @BindView(R.id.mLoginIconImg)
     ImageView mLoginIconImg;
-    private SVProgressHUD mSVProgressHUD;
+    //    private SVProgressHUD mSVProgressHUD;
     private final static byte statusInit = -1;//未查询或查询中
     private final static byte statusFalse = 0;//查询结果为假
     private final static byte statusTrue = 1;//查询结果为真
@@ -91,7 +91,7 @@ public class LoginActivity extends LoginAbstract {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        mSVProgressHUD = new SVProgressHUD(this);
+//        mSVProgressHUD = new SVProgressHUD(this);
     }
 
     @Override
@@ -104,6 +104,7 @@ public class LoginActivity extends LoginAbstract {
         if (!MyApplication.user.equals("")) {
             mLoginUserEdt.setText(MyApplication.user);
             mLoginUserEdt.setSelection(MyApplication.user.length());
+//            mLoginPassTextInput.getEditText().setSelected(true);
 //            mLoginPassTextInput.bringToFront();
 //            mLoginPassTextInput.requestFocusFromTouch();
             //TODO mLoginPassEdt获取焦点
@@ -440,7 +441,9 @@ public class LoginActivity extends LoginAbstract {
     protected void loginVerify(final String txtUser, final String txtPass) {
         SoftKeyboardUtils.hideInputMode(LoginActivity.this
                 , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
-        mSVProgressHUD.showWithStatus("加载中...");
+//        mSVProgressHUD.showWithStatus("加载中...");
+        dialog = DialogUtils.showIndeterminateProgressDialog(LoginActivity.this, false
+                , "登录中", "请稍候").show();
         isRegistered(txtUser);//是否注册查询
         new CountDownTimer(Config.timeout_avod, 250) {
             @Override
@@ -449,7 +452,7 @@ public class LoginActivity extends LoginAbstract {
                     Trace.d("CDTimer isRegistered server echo " + millisUntilFinished);
                     if (registerStatus == statusFalse) {
                         Trace.show(getApplicationContext(), "该帐号尚未注册");
-                        dismissProgress();
+                        dismissDialog();
                     } else {
                         //密码查询
                         ThreadPool.getInstance().execute(new Runnable() {
@@ -460,7 +463,7 @@ public class LoginActivity extends LoginAbstract {
                                     if (user != null) {
                                         boolean isFrozen = user.getBoolean("isFrozen");
                                         if (isFrozen) {
-                                            dismissProgress();
+                                            dismissDialog();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
                                             MyApplication.userDefaultFolderId = user.getString("user_default_folderId");
@@ -476,7 +479,7 @@ public class LoginActivity extends LoginAbstract {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
-                                                dismissProgress();
+                                                dismissDialog();
 //                                                mLoginPassEdt.setText("");
                                             }
                                         });
@@ -488,7 +491,7 @@ public class LoginActivity extends LoginAbstract {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            dismissProgress();
+                                            dismissDialog();
                                         }
                                     });
                                     Trace.show(LoginActivity.this, "登陆验证失败" + Trace.getErrorMsg(e));
@@ -579,7 +582,7 @@ public class LoginActivity extends LoginAbstract {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            dismissProgress();
+                            dismissDialog();
                         }
                     });
                     Trace.show(LoginActivity.this, "是否注册验证失败" + Trace.getErrorMsg(e));
@@ -620,7 +623,7 @@ public class LoginActivity extends LoginAbstract {
                 PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
                     @Override
                     public void justNowWithEx(Exception e) {
-                        dismissProgress();
+                        dismissDialog();
                     }
                 });
             }
@@ -664,15 +667,17 @@ public class LoginActivity extends LoginAbstract {
         }
     };
 
-    private void dismissProgress() {
-        if (mSVProgressHUD.isShowing())
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mSVProgressHUD.dismiss();
-                }
-            });
-    }
+//    private void dismissProgress() {
+//        if (dialog != null && dialog.isShowing())
+////        if (mSVProgressHUD.isShowing())
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dialog.dismiss();
+////                    mSVProgressHUD.dismiss();
+//                }
+//            });
+//    }
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {

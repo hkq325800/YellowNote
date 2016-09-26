@@ -85,7 +85,7 @@ dependencies {
     //！已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
     //progressDialog已经停止更新
-    compile 'com.bigkoo:svprogresshud:1.0.6'
+//    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新
     compile project(':SlidingLibrary')
     //add getState() and HKQController

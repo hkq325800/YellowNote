@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
+import com.afollestad.materialdialogs.MaterialDialog;
+
 
 public abstract class BaseFragment extends Fragment {
     /**
@@ -21,7 +23,18 @@ public abstract class BaseFragment extends Fragment {
     private boolean isInitData;
 
     public boolean power;
-    //public ProgressRelativeLayout mProgcess;
+    public MaterialDialog dialog;
+
+    public void dismissDialog() {
+        if (dialog != null && dialog.isShowing())
+            dialog.dismiss();
+//            dialog.getView().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dialog.dismiss();
+//                }
+//            }, 800);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {

@@ -16,6 +16,17 @@ public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
     public final static String TAG = BaseHasSwipeActivity.class.getCanonicalName();
     public MaterialDialog dialog;
 
+    public void dismissDialog() {
+        if (dialog != null && dialog.isShowing())
+            dialog.dismiss();
+//            dialog.getView().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dialog.dismiss();
+//                }
+//            }, 800);
+    }
+
 //    @Override
 //    protected void onSaveInstanceState(Bundle outState) {
 //        Trace.d("onSaveInstanceState");

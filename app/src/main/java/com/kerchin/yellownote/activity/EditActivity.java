@@ -31,7 +31,6 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.cjj.sva.widget.CircleSearchView;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
@@ -44,6 +43,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
+import com.kerchin.yellownote.utilities.DialogUtils;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
@@ -117,7 +117,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private boolean needReUn;//用在onTextChanged判断是否为手动操作还是按钮操作
     private boolean isLeftGray = true;//左侧的控制
     private boolean isRightGray = true;//右侧的控制
-    private SVProgressHUD mSVProgressHUD;
+    //    private SVProgressHUD mSVProgressHUD;
     //用于显示隐藏两栏
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
@@ -193,8 +193,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //                || !mNavigationTitleEdt.getText().toString().equals(mNote.getTitle())) {
 //            //保存至草稿箱 数据库
 //        }
-        if (mSVProgressHUD.isShowing())
-            mSVProgressHUD.dismiss();
+//        if (mSVProgressHUD.isShowing())
+//            mSVProgressHUD.dismiss();
+        dismissDialog();
         viewContainer.clear();
         NormalUtils.clearTextLineCache();
         super.onDestroy();
@@ -246,7 +247,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 userConfirm = true;
-                                mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
+                                EditActivity.this.dialog = DialogUtils.showIndeterminateProgressDialog(EditActivity.this
+                                        , false, "保存中", "请稍候").show();
+//                                mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
                                 saveChangesClick();
                                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                                 executorService.execute(new Runnable() {
@@ -266,7 +269,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @Override
     protected void initializeView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        mSVProgressHUD = new SVProgressHUD(this);
+//        mSVProgressHUD = new SVProgressHUD(this);
         @SuppressLint("InflateParams") View view1 = LayoutInflater.from(this)
                 .inflate(R.layout.viewpager_function_first, null);
         @SuppressLint("InflateParams") View view2 = LayoutInflater.from(this)
@@ -707,7 +710,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
+                            dismissDialog();
                         }
                     }).show();
         } else {
@@ -772,7 +775,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                 }
                             }
                         });
-                        dialog.dismiss();
+                        dismissDialog();
                         mEditEdt.setEnabled(true);
                     }
                 } else {
@@ -801,7 +804,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
+                        dismissDialog();
                         mNote.delete(getHelper(), handler, handle4finish, handle4error);
                         Folder folder = primaryData.getFolder(mNote.getFolderId());
                         if (folder != null) {
@@ -815,7 +818,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        dialog.dismiss();
+                        dismissDialog();
                     }
                 }).show();
     }

@@ -597,7 +597,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            dialog.dismiss();
+                            dismissDialog();
                         }
                     })
                     .onPositive(new MaterialDialog.SingleButtonCallback() {

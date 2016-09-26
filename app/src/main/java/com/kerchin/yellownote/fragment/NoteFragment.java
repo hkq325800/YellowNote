@@ -19,7 +19,6 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
-import com.bigkoo.svprogresshud.SVProgressHUD;
 import com.kerchin.widget.progresslayout.ProgressLayout;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
@@ -31,6 +30,7 @@ import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.utilities.DialogUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
@@ -59,7 +59,7 @@ public class NoteFragment extends BaseFragment
     @BindView(R.id.mProgress)
     ProgressLayout mProgress;
     public static boolean isChanged4note = false;
-    private SVProgressHUD mSVProgressHUD;
+    //    private SVProgressHUD mSVProgressHUD;
     private SearchView.OnQueryTextListener queryTextListener;
     private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private NoteShrinkAdapter noteAdapter;
@@ -170,7 +170,8 @@ public class NoteFragment extends BaseFragment
                     noteAdapter.getListDelete().remove(note);
                     break;
                 case handle4dismiss:
-                    mSVProgressHUD.dismissImmediately();
+//                    mSVProgressHUD.dismissImmediately();
+                    dismissDialog();
                     break;
                 case GetDataHelper.handle4empty:
 //                    AVException e = (AVException) msg.obj;
@@ -270,7 +271,7 @@ public class NoteFragment extends BaseFragment
     public void onViewCreated(View view, final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ButterKnife.bind(this, view);
-        mSVProgressHUD = new SVProgressHUD(getActivity());
+//        mSVProgressHUD = new SVProgressHUD(getActivity());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -386,7 +387,9 @@ public class NoteFragment extends BaseFragment
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
-                                        mSVProgressHUD.showWithStatus("删除中...");
+                                        dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
+                                                , false, "删除中...", "请稍候").show();
+//                                        mSVProgressHUD.showWithStatus("删除中...");
                                         final int num = noteAdapter.getDeleteNum();
                                         getDataHelper.respond();
                                         for (int i = 0; i < num; i++) {
@@ -502,7 +505,7 @@ public class NoteFragment extends BaseFragment
 
     public void showPop(Toolbar v) {
         ActionMenuView actionMenuView = (ActionMenuView) v.getChildAt(2);
-        if(actionMenuView==null)
+        if (actionMenuView == null)
             return;
         FlipShareView share = new FlipShareView.Builder(getActivity(), actionMenuView)
                 .addItem(new ShareItem("按日期降序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
