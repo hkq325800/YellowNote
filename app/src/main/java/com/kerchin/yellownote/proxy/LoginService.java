@@ -58,10 +58,10 @@ public class LoginService {
     }
 
     /**
-     * 注册创建默认笔记夹
+     * 注册创建默认笔记本
      *
      * @param txtUser 用户名
-     * @return String 默认笔记夹唯一Id
+     * @return String 默认笔记本唯一Id
      * @throws AVException
      */
     public static String createDefaultFolder(final String txtUser) throws AVException {
@@ -77,7 +77,7 @@ public class LoginService {
      *
      * @param txtUser         用户名
      * @param txtPass         用户密码
-     * @param defaultFolderId 用户的默认笔记夹Id
+     * @param defaultFolderId 用户的默认笔记本Id
      * @throws AVException
      */
     public static void userSignUp(String txtUser, String txtPass, String defaultFolderId) throws AVException {

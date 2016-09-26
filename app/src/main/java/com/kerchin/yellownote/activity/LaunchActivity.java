@@ -234,7 +234,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                 message.what = reLogForFrozen;
                                 handler.sendMessageDelayed(message, delayTime);
                             } else {
-                                //默认笔记夹id统一在login获取 因为不轻易改变 保存在本地
+                                //默认笔记本id统一在login获取 因为不轻易改变 保存在本地
                                 //userIcon每次获取
                                 MyApplication.setUserIcon(user.getString("user_icon"));
                                 cycleTarget = Message.obtain();//直接进入

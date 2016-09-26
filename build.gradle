@@ -11,6 +11,11 @@ buildscript {
         maven {
             url 'https://dl.bintray.com/wangyuwei/maven'
         }
+        maven {
+            repositories {
+                url 'https://oss.sonatype.org/content/repositories/releases/'//weakHandler
+            }
+        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.0'
@@ -35,6 +40,11 @@ allprojects {
         maven { url "https://jitpack.io" }
         maven {
             url 'https://dl.bintray.com/wangyuwei/maven'
+        }
+        maven {
+            repositories {
+                url 'https://oss.sonatype.org/content/repositories/releases/'//weakHandler
+            }
         }
     }
 }

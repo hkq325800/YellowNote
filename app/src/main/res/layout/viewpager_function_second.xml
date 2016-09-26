@@ -2,11 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="@dimen/edit_function_height"
+    android:background="@color/backgroundFunctionBar"
     android:orientation="vertical">
 
     <com.cjj.sva.widget.CircleSearchView
         android:id="@+id/mEditCircleSearch"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/edit_function_height"
-        android:background="@color/backgroundFunctionBar" />
+        android:layout_height="@dimen/edit_function_height" />
 </LinearLayout>

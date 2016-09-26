@@ -12,6 +12,7 @@
     <dimen name="folder_item_height">50dp</dimen>
     <!--editFunctionBar-->
     <dimen name="edit_function_height">45dp</dimen>
+    <dimen name="edit_function_padding_height">60dp</dimen>
 
     <!--Pattern-->
     <dimen name="screen_edge_horizontal_margin">16dp</dimen>

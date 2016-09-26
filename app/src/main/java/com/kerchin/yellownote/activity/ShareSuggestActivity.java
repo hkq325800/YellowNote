@@ -1,12 +1,11 @@
 package com.kerchin.yellownote.activity;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
@@ -21,7 +22,6 @@ import com.kerchin.yellownote.base.BaseHasSwipeActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
-import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
@@ -62,7 +62,7 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
-    boolean hasConnect = false;
+    boolean isLatest = false;
 
     private SystemHandler handler = new SystemHandler(this) {
 
@@ -90,15 +90,13 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
 
     @OnClick(R.id.mShareSuggestCodeImg)
     public void download() {
-        if (hasConnect) {
-            Intent intent = new Intent(ShareSuggestActivity.this,
-                    DownloadService.class);
-            intent.putExtra("uriStr", getString(R.string.uri_download));
-            intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
-            startService(intent);
-            mShareSuggestCodeImg.setOnClickListener(null);
-        } else
+        mShareSuggestCodeImg.setOnClickListener(null);
+        if (isLatest) {
+            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode);
+        } else {
             NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
+            Trace.show(ShareSuggestActivity.this, "后台下载中...");
+        }
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -203,20 +201,30 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                                 mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
-                                                .setTitle("版本:" + versionCode)
-                                                .setMessage(version.getString("version_content"))
-                                                .setPositiveButton("下载", new DialogInterface.OnClickListener() {
+                                        dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
+                                                .title("升级版本:" + versionCode)
+                                                .content(version.getString("version_content"))
+                                                .positiveText("下载")
+                                                .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                     @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
+                                                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                         download();
                                                     }
-                                                })
-                                                .create();
-                                        alertDialog.show();
+                                                }).show();
+//                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
+//                                                .setTitle("版本:" + versionCode)
+//                                                .setMessage(version.getString("version_content"))
+//                                                .setPositiveButton("下载", new DialogInterface.OnClickListener() {
+//                                                    @Override
+//                                                    public void onClick(DialogInterface dialog, int which) {
+//                                                        download();
+//                                                    }
+//                                                })
+//                                                .create();
+//                                        alertDialog.show();
                                     }
                                 });
-                                hasConnect = true;
+                                isLatest = true;
 //                                Trace.show(getApplicationContext(), version.getString("version_content"));
                             } else {
                                 String str = "当前版本：" + appVersionNow + " 已是最新";
@@ -225,14 +233,17 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                                 mShareSuggestVersionTxt.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
-                                                .setTitle("版本:" + versionCode)
-                                                .setMessage(version.getString("version_content"))
-                                                .create();
-                                        alertDialog.show();
+                                        dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
+                                                .title("当前版本:" + versionCode)
+                                                .content(version.getString("version_content")).show();
+//                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
+//                                                .setTitle("版本:" + versionCode)
+//                                                .setMessage(version.getString("version_content"))
+//                                                .create();
+//                                        alertDialog.show();
                                     }
                                 });
-                                hasConnect = false;
+                                isLatest = false;
                             }
                         }
                     });

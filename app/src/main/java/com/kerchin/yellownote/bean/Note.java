@@ -366,7 +366,7 @@ public class Note implements Serializable {
             });
     }
 
-    //已存在的笔记在笔记夹间移动
+    //已存在的笔记在笔记本间移动
     public void move2folder(final Activity context, final Folder newOne, final Handler handler, final byte handleCode) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -382,8 +382,10 @@ public class Note implements Serializable {
                     return;//终止下一步
                 }
                 PrimaryData.getInstance().getFolder(folderId).decInList();
+                PrimaryData.getInstance().editContain(folderId, false);
                 Trace.d("saveFolderNum-1 成功");
                 PrimaryData.getInstance().getFolder(newOne.getObjectId()).addInList();
+                PrimaryData.getInstance().editContain(newOne.getObjectId(), true);
                 Trace.d("saveFolderNum+1 成功");
                 folder = newOne.getName();
                 folderId = newOne.getObjectId();
@@ -396,7 +398,7 @@ public class Note implements Serializable {
     }
 
     //更名的批量移动
-    public void move2folder(final Activity context, final String newOne, final String newFolderId) {
+    void move2folder(final Activity context, final String newOne, final String newFolderId) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {

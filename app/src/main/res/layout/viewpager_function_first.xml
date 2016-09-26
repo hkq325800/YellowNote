@@ -18,9 +18,10 @@
             android:layout_width="120dp"
             android:layout_height="30dp"
             stepper:stepper_mode="custom"
-            stepper:stepper_leftButtonBackground="@color/backgroundFunctionBar"
+            stepper:stepper_background="@color/transparent"
+            stepper:stepper_leftButtonBackground="@color/transparent"
             stepper:stepper_leftButtonResources="@mipmap/ic_undo_gray"
-            stepper:stepper_rightButtonBackground="@color/backgroundFunctionBar"
+            stepper:stepper_rightButtonBackground="@color/transparent"
             stepper:stepper_rightButtonResources="@mipmap/ic_redo_gray" />
     </LinearLayout>
 

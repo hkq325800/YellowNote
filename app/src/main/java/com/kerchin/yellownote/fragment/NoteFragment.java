@@ -80,7 +80,6 @@ public class NoteFragment extends BaseFragment
     private final byte handle4dismiss = 5;
     private final byte handle4explosion = 6;
     //    private final byte handle4AVException = 40;
-    @SuppressLint("HandlerLeak")
     private SystemHandler handler = new SystemHandler(this) {
         @Override
         public void handlerMessage(Message msg) {
@@ -384,10 +383,10 @@ public class NoteFragment extends BaseFragment
                                 deleteViewShow();
                             } else {
                                 deleteViewHide();
-                                mSVProgressHUD.showWithStatus("删除中...");//TODO
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
+                                        mSVProgressHUD.showWithStatus("删除中...");
                                         final int num = noteAdapter.getDeleteNum();
                                         getDataHelper.respond();
                                         for (int i = 0; i < num; i++) {

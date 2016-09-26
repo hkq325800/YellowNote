@@ -22,7 +22,7 @@ android {
     }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
-        minSdkVersion 16
+        minSdkVersion 15
         targetSdkVersion 24
         versionCode 7
         versionName "1.07"
@@ -56,14 +56,20 @@ dependencies {
     //检测内存泄漏
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-    //material样式库
-    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
+    //weakHandler 未应用
+    compile 'com.badoo.mobile:android-weak-handler:1.1'
+    //疯狂更新的高star对话框
+    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
+    //权限获取 未应用
+    compile 'pub.devrel:easypermissions:0.2.0'
+//    //material样式库
+//    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
     //较好的圆形图像控件 持续修改中
     compile 'de.hdodenhof:circleimageview:2.1.0'
     //磁盘先进先出缓存 基本停止commit
 //    compile 'com.jakewharton:disklrucache:2.0.2'
-    //图片加载框架 更新得很勤
-    debugCompile 'com.github.bumptech.glide:glide:3.7.0'
+//    //图片加载框架 更新得很勤
+//    debugCompile 'com.github.bumptech.glide:glide:3.7.0'
     //安全的preference 慢速更新中
     compile 'com.scottyab:secure-preferences-lib:0.1.4'
     //黄油刀 持续更新中
@@ -84,13 +90,13 @@ dependencies {
     compile project(':SlidingLibrary')
     //add getState() and HKQController
     compile project(':JJSearchViewAnim')
-    //通用adapter持续更新中
+    //通用adapter持续更新中 已有新版但是更新会出问题
     compile 'org.byteam.superadapter:superadapter:3.3'
     //弹出菜单库 可靠的作者
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码
     compile 'cn.yipianfengye.android:zxing-library:1.9'
-    //按住持续作用的控件 已经停止更新 有时间改造一波
+    //按住持续作用的控件 已改造
     compile project(':snappingstepper')
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')

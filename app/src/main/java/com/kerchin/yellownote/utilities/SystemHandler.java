@@ -13,7 +13,7 @@ import java.lang.ref.WeakReference;
 public abstract class SystemHandler extends Handler {
 	private WeakReference<Object> weekReference;
 
-	
+
 
 	public SystemHandler(Object obj) {
 		weekReference = new WeakReference<Object>(obj);

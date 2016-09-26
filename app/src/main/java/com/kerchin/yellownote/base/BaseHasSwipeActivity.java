@@ -2,6 +2,7 @@ package com.kerchin.yellownote.base;
 
 import android.os.Bundle;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.Trace;
 
@@ -13,6 +14,7 @@ import com.kerchin.yellownote.utilities.Trace;
 public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 
     public final static String TAG = BaseHasSwipeActivity.class.getCanonicalName();
+    public MaterialDialog dialog;
 
 //    @Override
 //    protected void onSaveInstanceState(Bundle outState) {

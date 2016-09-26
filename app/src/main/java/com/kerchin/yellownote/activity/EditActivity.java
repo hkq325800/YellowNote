@@ -2,7 +2,6 @@ package com.kerchin.yellownote.activity;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +26,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
@@ -100,13 +101,13 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private boolean userConfirm = false;//保存并退出
     private int lastStepperValue = 0;//用来控制stepper
     private int index = 0;//用来记录当前在textOrder和textSelection中的位置
-    //用于切换笔记夹
+    //用于切换笔记本
     private String[] mFolder;
     private String[] mFolderId;
     private List<String> textOrder = new ArrayList<>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<>();//记录目标步数时的selection
     private Note mNote;//当前编辑的note
-    private Folder thisFolder;//记录目前处在哪个笔记夹
+    private Folder thisFolder;//记录目前处在哪个笔记本 尚未实际保存
     private PrimaryData primaryData;
     private int thisIndex = 1;//用户搜索中UpAndDown的位置
     private List<Integer> searchResult;//记录关键字所在的index
@@ -121,7 +122,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private int navLinearHeight = 0;//导航条高度
     private int funcHeight = 0;//工具条高度
     private Double navRatio, funcRatio;//实践单动画修改两个属性
-    private AlertDialog ad;
     private ArrayList<View> viewContainer = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
@@ -225,36 +225,38 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     || mNote.isOfflineAdd()) {
                 SoftKeyboardUtils.hideInputMode(EditActivity.this
                         , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
-                AlertDialog.Builder ad = new AlertDialog.Builder(EditActivity.this);
-                ad.setTitle("是否保存更改");
-                ad.setOnCancelListener(new DialogInterface.OnCancelListener() {
-                    @Override
-                    public void onCancel(DialogInterface dialog) {
-                        handler.sendEmptyMessageDelayed(handle4quit, 300);
-                    }
-                });
-                ad.setNegativeButton("放弃保存", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        handler.sendEmptyMessageDelayed(handle4quit, 300);
-                    }
-                });
-                ad.setPositiveButton("保存并退出", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        userConfirm = true;
-                        mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
-
-                        ExecutorService executorService = Executors.newSingleThreadExecutor();
-                        executorService.execute(new Runnable() {
+                dialog = new MaterialDialog.Builder(EditActivity.this)
+                        .title(R.string.tips_title)
+                        .content("是否保存更改")
+                        .negativeText("放弃保存")
+                        .positiveText("保存并退出")
+                        .cancelListener(new DialogInterface.OnCancelListener() {
                             @Override
-                            public void run() {
-                                saveDifference(true);
+                            public void onCancel(DialogInterface dialog) {
+                                handler.sendEmptyMessageDelayed(handle4quit, 300);
                             }
-                        });
-                    }
-                });
-                ad.show();
+                        })
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                handler.sendEmptyMessageDelayed(handle4quit, 300);
+                            }
+                        })
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                userConfirm = true;
+                                mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
+                                saveChangesClick();
+                                ExecutorService executorService = Executors.newSingleThreadExecutor();
+                                executorService.execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        saveDifference(true);
+                                    }
+                                });
+                            }
+                        }).show();
             } else
                 finish();
         } else
@@ -325,7 +327,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @Override
     protected void initializeData(Bundle savedInstanceState) {
         mEditCircleSearch.setText("共0当前第0");
-        //初始化笔记夹选择
+        //初始化笔记本选择
         if (savedInstanceState != null) {
             Trace.d("EditActivity initDataFromBundle");
             //恢复primaryData
@@ -690,39 +692,43 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     public void noteMove() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(this);
+//        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
         if (primaryData.getFolderSize() == 1) {
-            builder.setTitle("没有别的笔记夹可以选择\n是否新建？")
-                    .setPositiveButton("确认", new DialogInterface.OnClickListener() {
+            builder.title("没有别的笔记本可以选择\n是否新建？")
+                    .positiveText(R.string.positive_text)
+                    .negativeText(R.string.negative_text)
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             addClick();
                         }
-                    }).setNegativeButton("算了吧", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-            builder.create().show();
+                    })
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    }).show();
         } else {
-            builder.setTitle("选择移至笔记夹");
-            mFolder = primaryData.getFolderArr(mNote.getFolderId());
-            mFolderId = primaryData.getFolderObjectIdArr(mNote.getFolderId());
+            mFolder = primaryData.getFolderArr(thisFolder.getObjectId());
+            mFolderId = primaryData.getFolderObjectIdArr(thisFolder.getObjectId());
             // 设置一个下拉的列表选择项
-            builder.setItems(mFolder, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, final int which) {
-                    isFolderChanged = true;
-                    Trace.show(getApplicationContext(), "选择的笔记夹为：" + mFolder[which]);
-                    //将thisFolder改为目前选择的笔记夹 调整当前的夹为新的夹
-                    thisFolder = primaryData.getFolder(mFolderId[which]);
-                    if (isNew) {//新的笔记先设置已有的笔记在保存时设置
-                        mNote.setFolder(mFolder[which]);
-                        mNote.setFolderId(thisFolder.getObjectId());
-                    }
-                }
-            });
-            builder.show();
+            builder.title("选择移至笔记本")
+                    .items((CharSequence[]) mFolder)
+                    .itemsCallback(new MaterialDialog.ListCallback() {
+                        @Override
+                        public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
+                            isFolderChanged = true;
+                            Trace.show(getApplicationContext(), "选择的笔记本为：" + mFolder[which]);
+                            //将thisFolder改为目前选择的笔记本 调整当前的夹为新的夹
+                            thisFolder = primaryData.getFolder(mFolderId[which]);
+                            if (isNew) {//新的笔记先设置已有的笔记在保存时设置
+                                mNote.setFolder(mFolder[which]);
+                                mNote.setFolderId(thisFolder.getObjectId());
+                            }
+                        }
+                    }).show();
         }
     }
 
@@ -731,9 +737,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
         final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
         final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
-        final AlertDialog alertDialog = new AlertDialog.Builder(EditActivity.this)
-                .setTitle("新增笔记夹")
-                .setView(view).create();
+        dialog = new MaterialDialog.Builder(EditActivity.this)
+                .title("新增笔记本")
+                .customView(view, false).build();
         mConfirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -741,7 +747,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 mEditEdt.setEnabled(false);
                 if (!newFolderName.equals("")) {
                     if (primaryData.isFolderNameContain(newFolderName)) {
-                        Trace.show(getApplicationContext(), "该笔记夹名称已存在");
+                        Trace.show(getApplicationContext(), "该笔记本名称已存在");
                         mEditEdt.setEnabled(true);
                     } else {
                         ThreadPool.getInstance().execute(new Runnable() {
@@ -755,22 +761,22 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                     //添加进内存数据
                                     thisFolder = newFolder;
                                     isFolderChanged = true;
-                                    Trace.show(EditActivity.this, "选择的笔记夹为：" + newFolderName);
+                                    Trace.show(EditActivity.this, "选择的笔记本为：" + newFolderName);
                                     if (isNew) {//新的笔记先设置已有的笔记在保存时设置
                                         mNote.setFolder(newFolderName);
                                         mNote.setFolderId(thisFolder.getObjectId());
                                     }
                                 } catch (AVException e) {
-                                    Trace.show(EditActivity.this, "新增笔记夹失败" + Trace.getErrorMsg(e));
+                                    Trace.show(EditActivity.this, "新增笔记本失败" + Trace.getErrorMsg(e));
                                     e.printStackTrace();
                                 }
                             }
                         });
-                        alertDialog.dismiss();
+                        dialog.dismiss();
                         mEditEdt.setEnabled(true);
                     }
                 } else {
-                    Trace.show(getApplicationContext(), "笔记夹名不能为空");
+                    Trace.show(getApplicationContext(), "笔记本名不能为空");
                     mEditEdt.setEnabled(true);
                 }
             }
@@ -779,40 +785,39 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {//SOFT_INPUT_STATE_ALWAYS_VISIBLE
-                    alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
             }
         });
-        alertDialog.show();
+        dialog.show();
     }
 
     public void noteDelete() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
-        builder.setTitle("删除确认");
-        builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                ad.dismiss();
-                mNote.delete(getHelper(), handler, handle4finish, handle4error);
-                Folder folder = primaryData.getFolder(mNote.getFolderId());
-                if (folder != null) {
-                    FolderFragment.isChanged4folder = true;//edit delete
-                    folder.setContain(folder.getContain() - 1);
-                    Trace.d("saveFolderNum-" + 1 + "成功");
+        dialog = new MaterialDialog.Builder(EditActivity.this)
+                .title(R.string.tips_title)
+                .content("确认删除？")
+                .positiveText(R.string.positive_text)
+                .negativeText(R.string.negative_text)
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                        mNote.delete(getHelper(), handler, handle4finish, handle4error);
+                        Folder folder = primaryData.getFolder(mNote.getFolderId());
+                        if (folder != null) {
+                            FolderFragment.isChanged4folder = true;//edit delete
+                            folder.setContain(folder.getContain() - 1);
+                            Trace.d("saveFolderNum-1成功");
+                        }
 //                    folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据
-                }
-//                PrimaryData primaryData = PrimaryData.getInstance();
-                primaryData.removeNoteById(mNote.getObjectId());//通过id删除因为从Main传进来的是list中的不是listNote中的
-            }
-        });
-        builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                ad.dismiss();
-            }
-        });
-        ad = builder.create();
-        ad.show();
+                    }
+                })
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                }).show();
     }
 
     private void saveDifference(boolean isLast) {
@@ -827,22 +832,23 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     private void backConfirm() {
-        AlertDialog.Builder ad = new AlertDialog.Builder(EditActivity.this);
-        ad.setTitle("是否保存更改");
-        ad.setNegativeButton("放弃保存", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                handler.sendEmptyMessageDelayed(handle4quit, 300);
-            }
-        });
-        ad.setPositiveButton("保存并退出", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                userConfirm = true;
-                saveChangesClick();
-            }
-        });
-        ad.show();
+        dialog = new MaterialDialog.Builder(EditActivity.this)
+                .title(R.string.tips_title)
+                .negativeText("放弃保存")
+                .positiveText("保存并退出")
+                .onNegative(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        handler.sendEmptyMessageDelayed(handle4quit, 300);
+                    }
+                })
+                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        userConfirm = true;
+                        saveChangesClick();
+                    }
+                }).show();
     }
 
     @Override

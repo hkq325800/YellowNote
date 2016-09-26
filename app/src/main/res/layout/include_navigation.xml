@@ -5,8 +5,8 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
         android:background="@color/lightSkyBlue"
+        android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal">
 
         <Button
@@ -46,7 +46,7 @@
                 android:gravity="center"
                 android:hint="此处应有标题"
                 android:inputType="text"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:textColor="@color/textColor"
                 android:textColorHint="@color/textHintColor"
                 android:textCursorDrawable="@null"

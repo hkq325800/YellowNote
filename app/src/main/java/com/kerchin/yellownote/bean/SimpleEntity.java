@@ -13,7 +13,7 @@ public class SimpleEntity implements Serializable {
     private int now;//用于确认note的真实id【folder】
     private String name;//名称
     private int contain;//包含的子项数量【folder】
-    private String folderId;//笔记夹id
+    private String folderId;//笔记本id
     private int folderPosition;//note的folder在mItems中的位置【note】
     private boolean isShown;//是否应当显示 解决动画的显示与否【note】
     private boolean hasShownAnim = true;//是否已通过动画 解决动画的重复 默认true openFolder时设为false 完成动画后设为true

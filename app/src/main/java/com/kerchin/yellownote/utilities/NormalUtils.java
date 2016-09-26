@@ -23,6 +23,10 @@ import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.activity.ShareSuggestActivity;
+import com.kerchin.yellownote.service.DownloadService;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,6 +59,19 @@ public class NormalUtils {
         return false;
     }
 
+    public static void downloadByWeb(Context context, String versionCode){
+        Intent intent = new Intent(context,
+                DownloadService.class);
+        intent.putExtra("uriStr", context.getString(R.string.uri_download));
+        intent.putExtra("fileName", context.getResources().getString(R.string.app_name) + versionCode + ".apk");
+        context.startService(intent);
+    }
+
+    /**
+     * 内部下载
+     * @param context
+     * @param uriStr
+     */
     public static void downloadByUri(Context context, String uriStr) {
         Uri uri = Uri.parse(uriStr);//指定网址
         Intent intent = new Intent();

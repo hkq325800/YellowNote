@@ -4,9 +4,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
@@ -41,6 +39,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
@@ -59,14 +59,12 @@ import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
-import com.kerchin.yellownote.service.DownloadService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.SystemHandler;
 import com.kerchin.yellownote.utilities.SystemUtils;
 import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
-import com.securepreferences.SecurePreferences;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
@@ -107,7 +105,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private FolderFragment folderFragment;
     private ActionBarDrawerToggle toggle;
     private ArrayList<Fragment> fragments = new ArrayList<>();
-    private DayNightHelper mDayNightHelper;
+    public DayNightHelper mDayNightHelper;
 
     private int REQUEST_LOAD_IMAGE = 100;
     private final static int REQUEST_QRCODE = 101;
@@ -323,10 +321,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
         String lastCheck = MyApplication.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
                 , "");
-        SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
         if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
-            editor.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr);
-            editor.apply();
             return;
         }
         ThreadPool.getInstance().execute(new Runnable() {
@@ -346,16 +341,19 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 }
             }
         });
-        editor.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr);
-        editor.apply();
+        MyApplication.getDefaultShared().edit()
+                .putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr)
+                .apply();
     }
 
-    private void download(String versionCode) {
-        Intent intent = new Intent(MainActivity.this,
-                DownloadService.class);
-        intent.putExtra("uriStr", getString(R.string.uri_download));
-        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
-        startService(intent);
+    private void download() {
+//        Intent intent = new Intent(MainActivity.this,
+//                DownloadService.class);
+//        intent.putExtra("uriStr", getString(R.string.uri_download));
+//        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        startService(intent);
+        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
+        Trace.show(MainActivity.this, "后台下载中...");
     }
 
     @Override
@@ -591,29 +589,55 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else if (id == R.id.nav_folder) {
             mMainPager.setCurrentItem(1);
         } else if (id == R.id.nav_logout) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("退出当前账号");
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-            builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //切换本地数据库
-                    MyApplication.logout();
-                    Intent intent = new Intent();
-                    intent.setClass(MainActivity.this, LoginActivity.class);
-                    intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-                    startActivity(intent);
-                    finish();
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
-                }
-            });
-            builder.show();
+            dialog = new MaterialDialog.Builder(this)
+                    .title(R.string.tips_title)
+                    .content("退出当前账号？")
+                    .positiveText(R.string.positive_text)
+                    .negativeText(R.string.negative_text)
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            //切换本地数据库
+                            MyApplication.logout();
+                            Intent intent = new Intent();
+                            intent.setClass(MainActivity.this, LoginActivity.class);
+                            intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+                            startActivity(intent);
+                            finish();
+                            overridePendingTransition(R.anim.push_left_in,
+                                    R.anim.push_left_out);
+                        }
+                    })
+                    .show();
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//            builder.setTitle("退出当前账号");
+//            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    //切换本地数据库
+//                    MyApplication.logout();
+//                    Intent intent = new Intent();
+//                    intent.setClass(MainActivity.this, LoginActivity.class);
+//                    intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+//                    startActivity(intent);
+//                    finish();
+//                    overridePendingTransition(R.anim.push_left_in,
+//                            R.anim.push_left_out);
+//                }
+//            });
+//            builder.show();
             return false;
         } else if (id == R.id.nav_share) {
             handler.sendEmptyMessage(gotoSetting);
@@ -738,17 +762,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         public void handlerMessage(Message msg) {
             switch (msg.what) {
                 case checkUpdate:
-                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this)
-                            .setTitle("版本:" + versionCode)
-                            .setMessage(versionContent)
-                            .setPositiveButton("下载", new DialogInterface.OnClickListener() {
+                    dialog = new MaterialDialog.Builder(MainActivity.this)
+                            .title("升级版本:" + versionCode)
+                            .content(versionContent)
+                            .positiveText("下载")
+                            .onPositive(new MaterialDialog.SingleButtonCallback() {
                                 @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    download(versionCode);
+                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                    download();
                                 }
-                            })
-                            .create();
-                    alertDialog.show();
+                            }).show();
                     break;
                 case gotoThank:
                     ThankActivity.startMe(getApplicationContext());
