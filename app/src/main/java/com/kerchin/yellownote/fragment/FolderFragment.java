@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -16,11 +15,8 @@ import android.support.v7.widget.SearchView;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -30,7 +26,7 @@ import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.FolderShrinkAdapter;
-import com.kerchin.yellownote.base.BaseFragment;
+import com.kerchin.yellownote.base.MyBaseFragment;
 import com.kerchin.yellownote.bean.Folder;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
@@ -40,10 +36,8 @@ import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.FolderService;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
-import com.squareup.haha.perflib.Main;
 
 import org.byteam.superadapter.IMulItemViewType;
 
@@ -51,11 +45,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class FolderFragment extends BaseFragment {
+public class FolderFragment extends MyBaseFragment {
     public static boolean isChanged4folder = false;
     public static boolean hasRefresh = false;
     private RecyclerView mRecyclerView;
-    private MaterialDialog dialog;
     private SearchView.OnQueryTextListener queryTextListener;
     //    private Toolbar.OnMenuItemClickListener toolbarItemClickListener;
     private ToolbarStatus mainStatus;
@@ -65,46 +58,6 @@ public class FolderFragment extends BaseFragment {
     public GetDataHelper getDataHelper;
     private LayoutInflater inflater;
     private final static byte handle4explosion = 99;
-    private SystemHandler handler = new SystemHandler(this) {
-        @Override
-        public void handlerMessage(Message msg) {
-            switch (msg.what) {
-                case handle4explosion:
-                    Trace.d("handlerInFolder handle4explosion");
-                    Note note = (Note) msg.obj;
-                    primaryData.listNote.remove(note);//列表中去除目标
-                    primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
-                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
-                    NoteFragment.isChanged4note = true;//handle4explosion
-//                    primaryData.getSimpleEntityFromList();
-                    setRecycleView();//refresh
-                    break;
-                case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInFolder handle4refresh");
-//                    getHeaderListFromFolder();//handle4refresh
-                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4refresh
-                    setRecycleView();//refresh
-                    break;
-                case GetDataHelper.handle4firstGet:
-                    Trace.d("handlerInFolder handle4firstGet");
-                    primaryData = PrimaryData.getInstance();
-                    setRecycleView();//firstGot
-                    break;
-                case GetDataHelper.handle4respond:
-                    Trace.d("handlerInFolder handle4respond");
-                    primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4respond
-                    Trace.d("size" + primaryData.mItems.size());
-//                    getHeaderListFromFolder();//handle4respond
-                    setRecycleView();//respond
-                    break;
-                case GetDataHelper.handle4error:
-                    String str = (String) msg.obj;
-                    Trace.show(getActivity().getApplicationContext(), str);
-                default:
-                    break;
-            }
-        }
-    };
 
     public static FolderFragment newInstance(Bundle bundle) {
         Trace.d("FolderFragment newInstance");
@@ -115,17 +68,11 @@ public class FolderFragment extends BaseFragment {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Trace.d("FolderFragment onCreate");
         super.onCreate(savedInstanceState);
+        Trace.d("FolderFragment onCreate");
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
         getDataHelper = new GetDataHelper();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.viewpager_folder, container, false);
     }
 
     private void setRecycleView() {
@@ -540,8 +487,63 @@ public class FolderFragment extends BaseFragment {
 //    }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    protected int provideContentViewId() {
+        return R.layout.viewpager_folder;
+    }
+
+    @Override
+    protected void initializeView(View rootView) {
+
+    }
+
+    @Override
+    protected void initializeData(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected void initializeEvent(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        switch (msg.what) {
+            case handle4explosion:
+                Trace.d("handlerInFolder handle4explosion");
+                Note note = (Note) msg.obj;
+                primaryData.listNote.remove(note);//列表中去除目标
+                primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
+                primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
+                NoteFragment.isChanged4note = true;//handle4explosion
+//                    primaryData.getSimpleEntityFromList();
+                setRecycleView();//refresh
+                break;
+            case GetDataHelper.handle4refresh:
+                Trace.d("handlerInFolder handle4refresh");
+//                    getHeaderListFromFolder();//handle4refresh
+                primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4refresh
+                setRecycleView();//refresh
+                break;
+            case GetDataHelper.handle4firstGet:
+                Trace.d("handlerInFolder handle4firstGet");
+                primaryData = PrimaryData.getInstance();
+                setRecycleView();//firstGot
+                break;
+            case GetDataHelper.handle4respond:
+                Trace.d("handlerInFolder handle4respond");
+                primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4respond
+                Trace.d("size" + primaryData.mItems.size());
+//                    getHeaderListFromFolder();//handle4respond
+                setRecycleView();//respond
+                break;
+            case GetDataHelper.handle4error:
+                String str = (String) msg.obj;
+                Trace.show(getActivity().getApplicationContext(), str);
+            default:
+                break;
+        }
+        return false;
     }
 
     public void respondForChange() {

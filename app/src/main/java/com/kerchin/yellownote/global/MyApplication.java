@@ -8,7 +8,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter;
 import com.securepreferences.SecurePreferences;
 import com.squareup.leakcanary.LeakCanary;
@@ -41,6 +41,7 @@ public class MyApplication extends ZApplication {
     @Override
     public void onCreate() {
         context = getApplicationContext();
+        zj.baselibrary.util.Config.isDebugMode = Config.isDebugMode;
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(context
                 , getResources().getString(R.string.APP_ID)

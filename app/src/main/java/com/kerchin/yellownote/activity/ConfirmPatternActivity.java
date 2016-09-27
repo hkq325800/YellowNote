@@ -13,14 +13,14 @@ import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.helper.DayNightHelper;
-import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.patternlock.PatternView;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * 确认密码界面
@@ -45,7 +45,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             setTheme(R.style.AppThemePatternNight);
         }
         super.onCreate(savedInstanceState);
-        NormalUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
+        ImmergeUtils.immerge(ConfirmPatternActivity.this, R.color.lightSkyBlue);
         isFromLaunch = getIntent().getBooleanExtra("isFromLaunch", false);
         if (!isFromLaunch)
 //            overridePendingTransition(R.anim.push_left_in,

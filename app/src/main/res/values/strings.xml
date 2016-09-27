@@ -6,6 +6,9 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="tips_title">操作提示</string>
+    <string name="positive_text">确认</string>
+    <string name="negative_text">取消</string>
 
     <string name="action_settings">Settings</string>
 

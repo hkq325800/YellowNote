@@ -9,20 +9,33 @@ import android.view.ViewGroup;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;
+import com.kerchin.yellownote.R;
+
+import zj.baselibrary.base.BaseActivity;
 
 import static com.kerchin.yellownote.R.drawable.slide_shadow;
 
 /**
- * Created by hailonghan on 15/6/11.
- *
+ * Created by Kerchin Huang on 15/6/11.
  *
  */
-public abstract class BaseSwipeBackActivity extends AppCompatActivity
+public abstract class BaseSwipeBackActivity extends BaseActivity
         implements SlidingMenu.OnOpenedListener {
 
     private SlidingActivityHelper mHelper;
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
+
+    public void dismissDialog() {
+        if (dialog != null && dialog.isShowing())
+            dialog.dismiss();
+//            dialog.getView().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    dialog.dismiss();
+//                }
+//            }, 800);
+    }
 
     /**
      * 禁止滑动退出
@@ -169,5 +182,11 @@ public abstract class BaseSwipeBackActivity extends AppCompatActivity
     @Override
     public void onOpened() {
         this.finish();
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        this.overridePendingTransition(0, R.anim.slide_out_right);
     }
 }

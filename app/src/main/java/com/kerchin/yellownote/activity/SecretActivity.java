@@ -17,28 +17,29 @@ import android.widget.Toast;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
-import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2016/4/9 0009.
  * More Code on hkq325800@163.com
  */
-public class SecretActivity extends BaseHasSwipeActivity {
+public class SecretActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
     @BindView(R.id.mNavigationRightBtn)
@@ -58,20 +59,29 @@ public class SecretActivity extends BaseHasSwipeActivity {
     boolean isForget;
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        setContentView(R.layout.activity_secret);
         isForget = getIntent().getBooleanExtra("isForget", false);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_secret;
     }
 
     @Override

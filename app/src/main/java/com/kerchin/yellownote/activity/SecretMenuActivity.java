@@ -3,6 +3,7 @@ package com.kerchin.yellownote.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -12,25 +13,26 @@ import android.widget.TextView;
 
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * 密码相关
  * Created by Kerchin on 2016/6/6 0006.
  */
-public class SecretMenuActivity extends BaseHasSwipeActivity {
+public class SecretMenuActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
     @BindView(R.id.mNavigationRightBtn)
@@ -54,19 +56,28 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
     DayNightHelper mDayNightHelper;
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        setContentView(R.layout.activity_secret_menu);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_secret_menu;
     }
 
     @Override
@@ -142,16 +153,6 @@ public class SecretMenuActivity extends BaseHasSwipeActivity {
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);
     }
-
-    /**
-     * 手势开关
-     */
-//    @OnClick(R.id.mSecretMenuPatternToggle)
-//    public void toggleClick() {
-//        Intent intent = new Intent(SecretMenuActivity.this
-//                , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
-//        startActivityForResult(intent, requestForPattern);
-//    }
 
     /**
      * 手势开关

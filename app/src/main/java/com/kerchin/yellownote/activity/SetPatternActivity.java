@@ -12,14 +12,14 @@ import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.helper.DayNightHelper;
-import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.patternlock.PatternView;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * 设置密码界面
@@ -36,7 +36,7 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
     protected void onCreate(Bundle savedInstanceState) {
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);
-        NormalUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
+        ImmergeUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.AppThemePatternDay);

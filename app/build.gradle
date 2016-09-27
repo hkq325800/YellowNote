@@ -48,7 +48,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.android.support:recyclerview-v7:24.+'
     compile 'com.android.support:design:24.+'
-//    compile 'com.android.support:support-v4:24.+'
+    //    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
     compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
@@ -62,22 +62,22 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     //权限获取 未应用
     compile 'pub.devrel:easypermissions:0.2.0'
-//    //material样式库
-//    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
+    //    //material样式库
+    //    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
     //较好的圆形图像控件 持续修改中
     compile 'de.hdodenhof:circleimageview:2.1.0'
     //磁盘先进先出缓存 基本停止commit
-//    compile 'com.jakewharton:disklrucache:2.0.2'
-//    //图片加载框架 更新得很勤
-//    debugCompile 'com.github.bumptech.glide:glide:3.7.0'
+    //    compile 'com.jakewharton:disklrucache:2.0.2'
+    //    //图片加载框架 更新得很勤
+    //    debugCompile 'com.github.bumptech.glide:glide:3.7.0'
     //安全的preference 慢速更新中
     compile 'com.scottyab:secure-preferences-lib:0.1.4'
     //黄油刀 持续更新中
-    compile 'com.jakewharton:butterknife:8.0.1'
+    compile 'com.jakewharton:butterknife:8.4.0'
     //共同使用
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.4.0'
     //可靠的作者 No service of type Factory<LoggingManagerInternal> available in ProjectScopeServices.
-//    compile 'com.kaopiz:kprogresshud:1.0.5'
+    //    compile 'com.kaopiz:kprogresshud:1.0.5'
     //手势密码 有时修复bug
     compile 'me.zhanghai.android.patternlock:library:2.0.3'
     //爆炸效果库 已经停止更新
@@ -85,7 +85,7 @@ dependencies {
     //！已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
     //progressDialog已经停止更新
-//    compile 'com.bigkoo:svprogresshud:1.0.6'
+    //    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新
     compile project(':SlidingLibrary')
     //add getState() and HKQController
@@ -102,4 +102,5 @@ dependencies {
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
     compile project(path: ':progresslayout')
+    compile project(':baselibrary')
 }

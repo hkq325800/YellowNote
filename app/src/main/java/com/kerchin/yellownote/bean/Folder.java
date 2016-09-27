@@ -1,15 +1,14 @@
 package com.kerchin.yellownote.bean;
 
 import android.app.Activity;
-import android.os.Handler;
 
 import com.avos.avoscloud.AVException;
+import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.FolderService;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;
@@ -72,7 +71,7 @@ public class Folder implements Serializable {
         return objectId;
     }
 
-    public void reName(final Activity context, final String newName, final Handler handler
+    public void reName(final Activity context, final String newName, final WeakHandler handler
             , final byte handle4respond) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -100,7 +99,7 @@ public class Folder implements Serializable {
         });
     }
 
-    public void delete(final Activity context, final int position, final SystemHandler handler, final byte handle4respond) {
+    public void delete(final Activity context, final int position, final WeakHandler handler, final byte handle4respond) {
         if (contain == 0) {
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override

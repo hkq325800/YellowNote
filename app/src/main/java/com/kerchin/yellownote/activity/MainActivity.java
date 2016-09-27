@@ -60,9 +60,7 @@ import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.SystemUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.ViewPagerTransform.DepthPageTransformer;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
@@ -78,6 +76,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.baselibrary.util.SystemUtils;
 
 public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -117,7 +117,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     String versionContent, versionCode;
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         closeSliding();
         mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
@@ -125,8 +126,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else {
             setTheme(R.style.NightTheme);
         }
-        NormalUtils.immerge(MainActivity.this, R.color.lightSkyBlue);
-        setContentView(R.layout.activity_main);
     }
 
     @Override
@@ -431,6 +430,79 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         });
         toggle.syncState();
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        switch (msg.what) {
+            case checkUpdate:
+                dialog = new MaterialDialog.Builder(MainActivity.this)
+                        .title("升级版本:" + versionCode)
+                        .content(versionContent)
+                        .positiveText("下载")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                download();
+                            }
+                        }).show();
+                break;
+            case gotoThank:
+                ThankActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case gotoSecret:
+                hideBtnAdd();//使进入
+                SecretMenuActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case gotoSetting:
+                hideBtnAdd();
+                ShareSuggestActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case showBtnAdd:
+                mMainFab.animate()
+                        .alpha(1)
+                        .scaleX(1)
+                        .scaleY(1)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                                super.onAnimationStart(animation);
+//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+                                mMainFab.setVisibility(View.VISIBLE);
+                            }
+                        })
+                        .setDuration(300).start();
+                break;
+            case hideBtnAdd://必须使用animate直接设置会丢失十字
+                mMainFab.animate()
+                        .scaleX(0)
+                        .scaleY(0)
+                        .alpha(0)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+//                                    if (mMainFab.getVisibility() == View.VISIBLE)
+                                mMainFab.setVisibility(View.INVISIBLE);
+                            }
+                        })
+                        .setDuration(50).start();
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_main;
     }
 
     @Override
@@ -756,75 +828,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public static final int gotoSecret = 3;
     public static final int gotoThank = 4;
     public static final int checkUpdate = 5;
-    private SystemHandler handler = new SystemHandler(this) {
-
-        @Override
-        public void handlerMessage(Message msg) {
-            switch (msg.what) {
-                case checkUpdate:
-                    dialog = new MaterialDialog.Builder(MainActivity.this)
-                            .title("升级版本:" + versionCode)
-                            .content(versionContent)
-                            .positiveText("下载")
-                            .onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    download();
-                                }
-                            }).show();
-                    break;
-                case gotoThank:
-                    ThankActivity.startMe(getApplicationContext());
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
-                    break;
-                case gotoSecret:
-                    hideBtnAdd();//使进入
-                    SecretMenuActivity.startMe(getApplicationContext());
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
-                    break;
-                case gotoSetting:
-                    hideBtnAdd();
-                    ShareSuggestActivity.startMe(getApplicationContext());
-                    overridePendingTransition(R.anim.push_left_in,
-                            R.anim.push_left_out);
-                    break;
-                case showBtnAdd:
-                    mMainFab.animate()
-                            .alpha(1)
-                            .scaleX(1)
-                            .scaleY(1)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationStart(Animator animation) {
-                                    super.onAnimationStart(animation);
-//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
-                                    mMainFab.setVisibility(View.VISIBLE);
-                                }
-                            })
-                            .setDuration(300).start();
-                    break;
-                case hideBtnAdd://必须使用animate直接设置会丢失十字
-                    mMainFab.animate()
-                            .scaleX(0)
-                            .scaleY(0)
-                            .alpha(0)
-                            .setListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-//                                    if (mMainFab.getVisibility() == View.VISIBLE)
-                                    mMainFab.setVisibility(View.INVISIBLE);
-                                }
-                            })
-                            .setDuration(50).start();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     public void showBtnAdd() {
 //        Trace.d("showBtnAddDelay");

@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.fragment;
 
-import android.annotation.SuppressLint;
-import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,10 +9,8 @@ import android.support.v7.widget.ActionMenuView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -24,15 +20,12 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.activity.EditActivity;
 import com.kerchin.yellownote.activity.MainActivity;
 import com.kerchin.yellownote.adapter.NoteShrinkAdapter;
-import com.kerchin.yellownote.base.BaseFragment;
+import com.kerchin.yellownote.base.MyBaseFragment;
 import com.kerchin.yellownote.bean.GetDataHelper;
 import com.kerchin.yellownote.bean.Note;
 import com.kerchin.yellownote.bean.PrimaryData;
 import com.kerchin.yellownote.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.utilities.DialogUtils;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
@@ -50,8 +43,10 @@ import butterknife.OnItemLongClick;
 import me.wangyuwei.flipshare.FlipShareView;
 import me.wangyuwei.flipshare.ShareItem;
 import tyrantgit.explosionfield.ExplosionField;
+import zj.baselibrary.util.DialogUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 
-public class NoteFragment extends BaseFragment
+public class NoteFragment extends MyBaseFragment
         implements WaterDropListView.IWaterDropListViewListener
         , View.OnCreateContextMenuListener/*, PopupMenu.OnMenuItemClickListener*/ {
     @BindView(R.id.mNoteWDList)
@@ -80,113 +75,6 @@ public class NoteFragment extends BaseFragment
     private final byte handle4dismiss = 5;
     private final byte handle4explosion = 6;
     //    private final byte handle4AVException = 40;
-    private SystemHandler handler = new SystemHandler(this) {
-        @Override
-        public void handlerMessage(Message msg) {
-            stopRefresh();
-            switch (msg.what) {
-                case GetDataHelper.handle4firstGet:
-                    primaryData = PrimaryData.getInstance();
-                    getDataListFromNote(primaryData.listNote);//handle4firstGet
-                    Trace.d("handlerInNote handle4firstGet");
-                    //TODO 删除后避免滑动到顶部
-//                    if (noteAdapter == null) {
-                    noteAdapter = new NoteShrinkAdapter(
-                            getActivity(), list, R.layout.item_note);
-                    mNoteWDList.setAdapter(noteAdapter);
-                    mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-//                    } else {
-//                        noteAdapter.initListDelete();
-//                        noteAdapter.setList(list);
-//                    }
-                    if (primaryData.listNote.size() == 0) {
-                        mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                if (!hasClick) {
-                                    hasClick = true;
-                                    emptyClick();
-                                }
-                            }
-                        });
-                        Trace.d("handlerInNote handle4zero");
-                        mNoteWDList.setVisibility(View.GONE);
-                    } else
-                        mProgress.showListView();//handle4firstGet
-                    //借emptyClickCount做一个标志
-                    if (emptyClickCount >= 3) {
-                        emptyClickCount = 0;
-                        if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                            Trace.show(getActivity().getApplicationContext(), "这个真没有");
-                    }
-                    break;
-                case GetDataHelper.handle4refresh:
-                    Trace.d("handlerInNote handle4refresh");
-                    getDataListFromNote(primaryData.listNote);//handle4refresh
-//                    if (MainActivity.thisPosition == 0) {
-                    mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
-//                    }
-                    if (noteAdapter != null) {
-                        noteAdapter.setList(list);
-                    }
-                    //借emptyClickCount做一个标志
-                    if (emptyClickCount >= 3) {
-                        emptyClickCount = 0;
-                        if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                            Trace.show(getActivity().getApplicationContext(), "这个真没有");
-                    }
-                    break;
-                case GetDataHelper.handle4respond:
-                    Trace.d("handlerInNote handle4respond note:" + list.size());
-                    getDataListFromNote(primaryData.listNote);//handle4respond
-                    mNoteWDList.setVisibility(View.VISIBLE);
-                    mProgress.dismissNoData();
-                    if (mainStatus.isSearchMode()
-                            && !TextUtils.isEmpty(mSearchText))
-                        doSearch();//respondForChange()
-                    else {
-                        noteAdapter.setList(list);
-                        mNoteWDList.setAdapter(noteAdapter);//TODO
-                    }
-                    break;
-                case GetDataHelper.handle4loadMore:
-                    Trace.d("handlerInNote handle4loadMore");
-                    mNoteWDList.stopLoadMore();
-                    break;
-                case handle4explosion:
-                    Trace.d("handlerInNote handle4explosion");
-                    Note note = (Note) msg.obj;
-                    for (int i = 0; i < noteAdapter.getCount(); i++) {
-                        if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
-                            Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
-                            //Explosion Animation
-                            ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
-                            mExplosionField.explode(noteAdapter.getView(i));
-                            break;
-                        }
-                    }
-                    primaryData.getFolder(note.getFolderId()).decInList();
-                    primaryData.listNote.remove(note);//从数据源中删除
-                    noteAdapter.getListDelete().remove(note);
-                    break;
-                case handle4dismiss:
-//                    mSVProgressHUD.dismissImmediately();
-                    dismissDialog();
-                    break;
-                case GetDataHelper.handle4empty:
-//                    AVException e = (AVException) msg.obj;
-////                    if (e.getMessage().contains("UnknownHostException"))
-//                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
-                    break;
-                case GetDataHelper.handle4error:
-                    String str = (String) msg.obj;
-                    Trace.show(getActivity().getApplicationContext(), str);
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     /*data part*/
 
@@ -254,17 +142,138 @@ public class NoteFragment extends BaseFragment
     public void onCreate(Bundle savedInstanceState) {
         Trace.d("NoteFragment onCreate");
         super.onCreate(savedInstanceState);
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("refresh");
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction("refresh");
         mainStatus = new ToolbarStatus();
         list = new ArrayList<>();
         getDataHelper = new GetDataHelper();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.viewpager_note, container, false);
+    protected int provideContentViewId() {
+        return R.layout.viewpager_note;
+    }
+
+    @Override
+    protected void initializeView(View rootView) {
+
+    }
+
+    @Override
+    protected void initializeData(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected void initializeEvent(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        stopRefresh();
+        switch (msg.what) {
+            case GetDataHelper.handle4firstGet:
+                primaryData = PrimaryData.getInstance();
+                getDataListFromNote(primaryData.listNote);//handle4firstGet
+                Trace.d("handlerInNote handle4firstGet");
+                //TODO 删除后避免滑动到顶部
+//                    if (noteAdapter == null) {
+                noteAdapter = new NoteShrinkAdapter(
+                        getActivity(), list, R.layout.item_note);
+                mNoteWDList.setAdapter(noteAdapter);
+                mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
+//                    } else {
+//                        noteAdapter.initListDelete();
+//                        noteAdapter.setList(list);
+//                    }
+                if (primaryData.listNote.size() == 0) {
+                    mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (!hasClick) {
+                                hasClick = true;
+                                emptyClick();
+                            }
+                        }
+                    });
+                    Trace.d("handlerInNote handle4zero");
+                    mNoteWDList.setVisibility(View.GONE);
+                } else
+                    mProgress.showListView();//handle4firstGet
+                //借emptyClickCount做一个标志
+                if (emptyClickCount >= 3) {
+                    emptyClickCount = 0;
+                    if (noteAdapter == null || noteAdapter.getItemCount() == 0)
+                        Trace.show(getActivity().getApplicationContext(), "这个真没有");
+                }
+                break;
+            case GetDataHelper.handle4refresh:
+                Trace.d("handlerInNote handle4refresh");
+                getDataListFromNote(primaryData.listNote);//handle4refresh
+//                    if (MainActivity.thisPosition == 0) {
+                mNoteWDList.setVisibility(list.size() == 0 ? View.GONE : View.VISIBLE);
+//                    }
+                if (noteAdapter != null) {
+                    noteAdapter.setList(list);
+                }
+                //借emptyClickCount做一个标志
+                if (emptyClickCount >= 3) {
+                    emptyClickCount = 0;
+                    if (noteAdapter == null || noteAdapter.getItemCount() == 0)
+                        Trace.show(getActivity().getApplicationContext(), "这个真没有");
+                }
+                break;
+            case GetDataHelper.handle4respond:
+                Trace.d("handlerInNote handle4respond note:" + list.size());
+                getDataListFromNote(primaryData.listNote);//handle4respond
+                mNoteWDList.setVisibility(View.VISIBLE);
+                mProgress.dismissNoData();
+                if (mainStatus.isSearchMode()
+                        && !TextUtils.isEmpty(mSearchText))
+                    doSearch();//respondForChange()
+                else {
+                    noteAdapter.setList(list);
+                    mNoteWDList.setAdapter(noteAdapter);//TODO
+                }
+                break;
+            case GetDataHelper.handle4loadMore:
+                Trace.d("handlerInNote handle4loadMore");
+                mNoteWDList.stopLoadMore();
+                break;
+            case handle4explosion:
+                Trace.d("handlerInNote handle4explosion");
+                Note note = (Note) msg.obj;
+                for (int i = 0; i < noteAdapter.getCount(); i++) {
+                    if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
+                        Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
+                        //Explosion Animation
+                        ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
+                        mExplosionField.explode(noteAdapter.getView(i));
+                        break;
+                    }
+                }
+                primaryData.getFolder(note.getFolderId()).decInList();
+                primaryData.listNote.remove(note);//从数据源中删除
+                noteAdapter.getListDelete().remove(note);
+                break;
+            case handle4dismiss:
+//                    mSVProgressHUD.dismissImmediately();
+                dismissDialog();
+                break;
+            case GetDataHelper.handle4empty:
+//                    AVException e = (AVException) msg.obj;
+////                    if (e.getMessage().contains("UnknownHostException"))
+//                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
+                break;
+            case GetDataHelper.handle4error:
+                String str = (String) msg.obj;
+                Trace.show(getActivity().getApplicationContext(), str);
+                break;
+            default:
+                break;
+        }
+        return false;
     }
 
     @Override

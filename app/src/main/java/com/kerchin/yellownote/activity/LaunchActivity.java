@@ -20,12 +20,13 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * Created by Kerchin on 2016/4/3 0003.
@@ -48,12 +49,10 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //    View view;
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
-//        view = LayoutInflater.from(this).inflate(R.layout.fragment_welcome,
-//                null);
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         closeSliding();
-        setContentView(R.layout.activity_launch);
-        NormalUtils.immerge(LaunchActivity.this, R.color.minionYellow);
+        immergeColor = R.color.minionYellow;
     }
 
     @Override
@@ -73,6 +72,16 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 }
             }
         });
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_launch;
     }
 
     @Override

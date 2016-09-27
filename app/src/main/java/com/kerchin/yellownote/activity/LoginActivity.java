@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
@@ -28,17 +29,17 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.proxy.LoginService;
 import com.kerchin.yellownote.proxy.SecretService;
-import com.kerchin.yellownote.utilities.DialogUtils;
-import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLock.PatternLockUtils;
-import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.DialogUtils;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2015/8/1 0005.
@@ -79,13 +80,11 @@ public class LoginActivity extends LoginAbstract {
     private boolean smsStatus = false;
     private byte registerStatus = -1;
     private int repeatCount = 0;
-    private Handler handler = new Handler();
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         closeSliding();
-        setContentView(R.layout.activity_login);
-        NormalUtils.immerge(LoginActivity.this, R.color.lightSkyBlue);
     }
 
     @Override
@@ -166,6 +165,16 @@ public class LoginActivity extends LoginAbstract {
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
 
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_login;
     }
 
     @OnClick(R.id.mLoginBtn)

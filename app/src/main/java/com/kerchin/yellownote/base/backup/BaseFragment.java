@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.base;
+package com.kerchin.yellownote.base.backup;
 
 
 import android.os.Bundle;
@@ -7,7 +7,9 @@ import android.view.View;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-
+/**
+ * @deprecated
+ */
 public abstract class BaseFragment extends Fragment {
     /**
      * 视图是否创建

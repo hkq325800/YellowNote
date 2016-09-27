@@ -43,11 +43,8 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
-import com.kerchin.yellownote.utilities.DialogUtils;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SoftKeyboardUtils;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -58,6 +55,9 @@ import java.util.concurrent.Executors;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.DialogUtils;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2015/9/30 0030.
@@ -125,60 +125,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private ArrayList<View> viewContainer = new ArrayList<>();
     @SuppressWarnings("FieldCanBeLocal")
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
-    private SystemHandler handler = new SystemHandler(EditActivity.this) {
-        @Override
-        public void handlerMessage(Message msg) {
-            switch (msg.what) {
-                case handle4quit:
-                    finish();
-                    break;
-                case handle4reGet:
-                    primaryData = PrimaryData.getInstance();
-                    break;
-                case handle4finish:
-                    Trace.show(getApplicationContext(), "删除成功");
-                    finish();
-                    break;
-                case handle4noTitle:
-                    Trace.show(getApplicationContext(), "标题不应为空");
-                    break;
-                case handle4noContent:
-                    Trace.show(getApplicationContext(), "内容不应为空");
-                    break;
-                case handle4saveChange:
-                    //respond
-                    if (isNew)
-                        primaryData.newNote(mNote);//handle4saveChange
-                    else
-                        primaryData.editNote(mNote, offlineAddObjectId);
-                    isNew = false;
-                    mNavigationRightBtn.setEnabled(true);
-                    mNavigationRightBtn.setText("保存");
-                    openSliding();
-                    Trace.show(getApplicationContext(), (boolean) msg.obj ? "离线保存成功" : "保存成功");
-                    mEditDeleteLinear.setEnabled(true);
-                    if (userConfirm) {
-                        finish();
-                    }
-//                    } else if (userConfirm)
-                    userConfirm = false;
-                    break;
-                case handle4last:
-                    if (isNew)
-                        primaryData.newNote(mNote);//handle4last
-                    else
-                        primaryData.editNote(mNote, offlineAddObjectId);
-                    finish();
-                    break;
-                case handle4error:
-                    String str = (String) msg.obj;
-                    Trace.show(getApplicationContext(), str + "失败");
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     public static void startMe(Context context, Note note) {
         Intent intent = new Intent(context, EditActivity.class);
@@ -202,15 +148,14 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView(){
+        super.doSthBeforeSetView();
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        setContentView(R.layout.activity_edit);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @Override
@@ -250,7 +195,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                 EditActivity.this.dialog = DialogUtils.showIndeterminateProgressDialog(EditActivity.this
                                         , false, "保存中", "请稍候").show();
 //                                mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
-                                saveChangesClick();
+//                                saveChangesClick();
                                 ExecutorService executorService = Executors.newSingleThreadExecutor();
                                 executorService.execute(new Runnable() {
                                     @Override
@@ -588,6 +533,65 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         });
     }
 
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        switch (msg.what) {
+            case handle4quit:
+                finish();
+                break;
+            case handle4reGet:
+                primaryData = PrimaryData.getInstance();
+                break;
+            case handle4finish:
+                Trace.show(getApplicationContext(), "删除成功");
+                finish();
+                break;
+            case handle4noTitle:
+                Trace.show(getApplicationContext(), "标题不应为空");
+                break;
+            case handle4noContent:
+                Trace.show(getApplicationContext(), "内容不应为空");
+                break;
+            case handle4saveChange:
+                //respond
+                if (isNew)
+                    primaryData.newNote(mNote);//handle4saveChange
+                else
+                    primaryData.editNote(mNote, offlineAddObjectId);
+                isNew = false;
+                mNavigationRightBtn.setEnabled(true);
+                mNavigationRightBtn.setText("保存");
+                openSliding();
+                Trace.show(getApplicationContext(), (boolean) msg.obj ? "离线保存成功" : "保存成功");
+                mEditDeleteLinear.setEnabled(true);
+                if (userConfirm) {
+                    finish();
+                }
+//                    } else if (userConfirm)
+                userConfirm = false;
+                break;
+            case handle4last:
+                if (isNew)
+                    primaryData.newNote(mNote);//handle4last
+                else
+                    primaryData.editNote(mNote, offlineAddObjectId);
+                finish();
+                break;
+            case handle4error:
+                String str = (String) msg.obj;
+                Trace.show(getApplicationContext(), str + "失败");
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_edit;
+    }
+
     private void signTheTarget(String target) {
         needReUn = true;
         int selection = mEditContentEdt.getSelectionEnd();
@@ -809,7 +813,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         Folder folder = primaryData.getFolder(mNote.getFolderId());
                         if (folder != null) {
                             FolderFragment.isChanged4folder = true;//edit delete
+//                            NoteFragment.isChanged4note = true;
                             folder.setContain(folder.getContain() - 1);
+                            PrimaryData.getInstance().editContain(mNote.getFolderId(), false);
                             Trace.d("saveFolderNum-1成功");
                         }
 //                    folder.dec(context, 1);//folder本地修改 网络修改 要求重新加载数据

@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-package com.kerchin.yellownote.utilities.PatternLock;
+package com.kerchin.yellownote.utilities;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -12,7 +12,6 @@ import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.PreferenceContract;
 import com.kerchin.yellownote.proxy.SecretService;
-import com.kerchin.yellownote.utilities.PatternLock.PreferenceUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,6 +20,7 @@ import java.util.Locale;
 
 import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
+import zj.baselibrary.util.PreferenceUtils;
 
 public class PatternLockUtils {
 

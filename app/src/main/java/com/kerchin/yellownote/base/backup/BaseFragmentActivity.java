@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.base;
+package com.kerchin.yellownote.base.backup;
 
 
 import android.os.Bundle;
@@ -10,6 +10,9 @@ import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
 
+/**
+ * @deprecated
+ */
 public abstract class BaseFragmentActivity extends FragmentActivity {
 
     public ImageView mTitleBack;

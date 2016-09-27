@@ -1,15 +1,16 @@
-package com.kerchin.yellownote.base;
+package com.kerchin.yellownote.base.backup;
 
 import android.os.Bundle;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 
 /**
  * Created by hailonghan on 15/6/9.
  *
  * MyOrmLiteBaseActivity的父类 也可以作为Activity直接父类
+ * @deprecated
  */
 public abstract class BaseHasSwipeActivity extends BaseSwipeBackActivity {
 

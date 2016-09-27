@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-package com.kerchin.yellownote.utilities.PatternLock;
+package zj.baselibrary.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;

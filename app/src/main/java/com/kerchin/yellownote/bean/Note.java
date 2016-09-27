@@ -1,11 +1,11 @@
 package com.kerchin.yellownote.bean;
 
 import android.app.Activity;
-import android.os.Handler;
 import android.os.Message;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.fragment.FolderFragment;
@@ -14,7 +14,9 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+
+import zj.baselibrary.util.ThreadPool.ThreadPool;
+
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;
@@ -103,7 +105,7 @@ public class Note implements Serializable {
         //+ " type " + type;
     }
 
-    public boolean equals(Note n){
+    public boolean equals(Note n) {
         return objectId.equals(n.getObjectId());
     }
 
@@ -207,7 +209,7 @@ public class Note implements Serializable {
     //保存更改
     public void saveChange(final OrmLiteHelper helper
             , final String newTitle, final String newContent
-            , final Handler handler, final byte handle4saveChange) {
+            , final WeakHandler handler, final byte handle4saveChange) {
         //use PatternUtils.patternToSha1String(str) to save
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")
@@ -308,7 +310,7 @@ public class Note implements Serializable {
 
     //主界面的删除
     public void delete(final OrmLiteHelper helper
-            , final Handler handler, final Message msgExplosion, final byte handle4error) {
+            , final WeakHandler handler, final Message msgExplosion, final byte handle4error) {
         if (isOfflineAdd) {
             deleteLocal(helper, handler, msgExplosion);
         } else
@@ -329,7 +331,7 @@ public class Note implements Serializable {
             });
     }
 
-    private void deleteLocal(OrmLiteHelper helper, Handler handler, Message msg) {
+    private void deleteLocal(OrmLiteHelper helper, WeakHandler handler, Message msg) {
         helper.getNoteDao().delete(Note.this);
         Trace.d("deleteNote 成功");
         FolderFragment.isChanged4folder = true;//delete Main
@@ -338,7 +340,7 @@ public class Note implements Serializable {
     }
 
     //编辑界面的删除
-    public void delete(final OrmLiteHelper helper, final Handler handler
+    public void delete(final OrmLiteHelper helper, final WeakHandler handler
             , final byte handle4finish, final byte handle4error) {
         if (isOfflineAdd) {
             NoteFragment.isChanged4note = true;//delete edit
@@ -352,6 +354,7 @@ public class Note implements Serializable {
                     try {
                         NoteService.delete(objectId);//笔记网络删除
                         NoteFragment.isChanged4note = true;//delete edit
+                        PrimaryData.getInstance().removeNoteById(objectId);
                         Message msg = Message.obtain();
                         msg.what = handle4finish;
                         deleteLocal(helper, handler, msg);
@@ -367,7 +370,7 @@ public class Note implements Serializable {
     }
 
     //已存在的笔记在笔记本间移动
-    public void move2folder(final Activity context, final Folder newOne, final Handler handler, final byte handleCode) {
+    public void move2folder(final Activity context, final Folder newOne, final WeakHandler handler, final byte handleCode) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
@@ -416,7 +419,7 @@ public class Note implements Serializable {
         });
     }
 
-    public void reName(final Activity context, final String newTitle, final Handler handler
+    public void reName(final Activity context, final String newTitle, final WeakHandler handler
             , final byte handle4respond) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override

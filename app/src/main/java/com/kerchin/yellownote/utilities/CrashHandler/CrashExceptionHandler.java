@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.utilities.SystemUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,6 +18,8 @@ import java.io.RandomAccessFile;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import zj.baselibrary.util.SystemUtils;
 
 /**
  * app奔溃异常处理器

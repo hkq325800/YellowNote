@@ -18,14 +18,12 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.SystemHandler;
-import com.kerchin.yellownote.utilities.SystemUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -34,11 +32,13 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.baselibrary.util.SystemUtils;
 
 /**
  * Created by Kerchin on 2016/3/5 0005.
  */
-public class ShareSuggestActivity extends BaseHasSwipeActivity {
+public class ShareSuggestActivity extends BaseSwipeBackActivity {
     private final static int hideSaveBtn = 0;
     @BindView(R.id.mShareSuggestVersionTxt)
     TextView mShareSuggestVersionTxt;
@@ -64,28 +64,15 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
     String versionCode;
     boolean isLatest = false;
 
-    private SystemHandler handler = new SystemHandler(this) {
-
-        @Override
-        public void handlerMessage(Message msg) {
-            switch (msg.what) {
-                case hideSaveBtn:
-                    mNavigationRightBtn.setVisibility(View.INVISIBLE);
-                    break;
-            }
-        }
-    };
-
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        setContentView(R.layout.activity_share_suggest);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
     }
 
     @OnClick(R.id.mShareSuggestCodeImg)
@@ -166,6 +153,21 @@ public class ShareSuggestActivity extends BaseHasSwipeActivity {
                 }, 400);
             }
         });
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        switch (msg.what) {
+            case hideSaveBtn:
+                mNavigationRightBtn.setVisibility(View.INVISIBLE);
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_share_suggest;
     }
 
     @Override

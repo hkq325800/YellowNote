@@ -83,11 +83,11 @@ public class Trace {
         Toast.makeText(context, msg, length).show();
     }
 
-    public static void show(final Activity context, final String msg, final int length) {
-        context.runOnUiThread(new Runnable() {
+    public static void show(final Activity activity, final String msg, final int length) {
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, msg, length).show();
+                Toast.makeText(activity, msg, length).show();
             }
         });
     }

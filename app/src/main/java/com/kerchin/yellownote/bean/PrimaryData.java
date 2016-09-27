@@ -8,7 +8,7 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.proxy.FolderService;
 import com.kerchin.yellownote.proxy.NoteService;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -511,7 +511,7 @@ public class PrimaryData {
         }
     }
 
-    void editContain(String folderId, boolean isAdd) {
+    public void editContain(String folderId, boolean isAdd) {
         int i = 0;
         if (map.get(folderId) != null)
             i = map.get(folderId);

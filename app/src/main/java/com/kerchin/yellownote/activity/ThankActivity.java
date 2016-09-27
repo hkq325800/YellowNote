@@ -3,6 +3,7 @@ package com.kerchin.yellownote.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
@@ -13,21 +14,22 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.base.BaseHasSwipeActivity;
+import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.ThreadPool.ThreadPool;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * Created by Kerchin on 2016/7/6 0006.
  */
-public class ThankActivity extends BaseHasSwipeActivity {
+public class ThankActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
     @BindView(R.id.mNavigationRightBtn)
@@ -45,20 +47,30 @@ public class ThankActivity extends BaseHasSwipeActivity {
     String todo;
 
     @Override
-    protected void setContentView(Bundle savedInstanceState) {
+    protected void initializeEvent(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        setContentView(R.layout.activity_thank);
-        NormalUtils.immerge(this, R.color.lightSkyBlue);
+
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected boolean initializeCallback(Message msg) {
+        return false;
+    }
 
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_thank;
     }
 
     @Override

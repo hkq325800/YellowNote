@@ -13,7 +13,7 @@ import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
 /**
  * Created by Kerchin on 2016/6/23 0023.
  */
-public abstract class MyOrmLiteBaseActivity<H extends OrmLiteHelper> extends BaseHasSwipeActivity {
+public abstract class MyOrmLiteBaseActivity<H extends OrmLiteHelper> extends BaseSwipeBackActivity {
     private volatile H helper;
     private volatile boolean created = false;
     private volatile boolean destroyed = false;
