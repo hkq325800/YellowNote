@@ -34,10 +34,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.content.ClipboardManager;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -55,12 +57,17 @@ import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 import zj.baselibrary.util.ThreadPool.ThreadPool;
+
 import com.kerchin.yellownote.utilities.Trace;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
@@ -108,7 +115,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private int REQUEST_LOAD_IMAGE = 100;
     private final static int REQUEST_QRCODE = 101;
-    private int REQUEST_PERMISSION = 102;
+    private int REQUEST_WRITE_PERMISSION = 102;
+    private static final int REQUEST_CAMERA_PERMISSION = 103;
 
     File savePath;
     File userIconFile;
@@ -225,7 +233,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 + MyApplication.user + ".jpg";
         userIconFile = new File(userIconPath);
 
-        if (NormalUtils.requestPermission(this, REQUEST_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (NormalUtils.requestPermission(this, REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             setUserIcon();
         }
 
@@ -485,6 +493,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         })
                         .setDuration(50).start();
                 break;
+            case gotoQRCode:
+                Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                startActivityForResult(intent, REQUEST_QRCODE);
+                overridePendingTransition(R.anim.head_in, R.anim.head_out);
+                break;
             default:
                 break;
         }
@@ -503,53 +516,63 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        if (!savePath.exists())
-                            savePath.createNewFile();
-                        String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
-//                        String type = picturePath.substring(picturePath.lastIndexOf("."));
-//                        if(type.contains("gif"))
-//                            type = ".jpg";
-                        final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
-                        //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
-                        NormalUtils.saveBitmap(bitmap, userIconFile);
-                        //没则新增有则创建
-                        if (TextUtils.isEmpty(MyApplication.userIcon)) {
-                            MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath));
-                        } else {
-                            MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath));
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mNavHeaderMainImg.setImageBitmap(bitmap);
-                            }
-                        });
-                        MyApplication.saveUserIcon();
-                    } catch (AVException | IOException e) {
-                        e.printStackTrace();
-                    }
+                    dealPicFromSelect(selectedImage);
                 }
             });
         } else if (requestCode == REQUEST_QRCODE && data != null) {
-            Bundle bundle = data.getExtras();
-            if (bundle == null)
-                return;
-            if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
-                String result = bundle.getString(CodeUtils.RESULT_STRING);
-                if (result != null && result.startsWith("www."))
-                    result = "http://" + result;
-                //用浏览器打开
-                try {
-                    NormalUtils.downloadByUri(MainActivity.this, result);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Trace.show(this, result);
-            } else
-                Trace.show(this, "解析二维码失败");
+            dealQRCode(data);
         }
 //        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void dealQRCode(Intent data) {
+        Bundle bundle = data.getExtras();
+        if (bundle == null)
+            return;
+        if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+            String result = bundle.getString(CodeUtils.RESULT_STRING);
+            if (result != null && result.startsWith("www."))
+                result = "http://" + result;
+            //用浏览器打开
+            try {
+                NormalUtils.downloadByUri(MainActivity.this, result);
+                Trace.show(this, "发现二维码中的网址，将用浏览器打开：\n" + result, Toast.LENGTH_LONG);
+            } catch (Exception e) {
+                e.printStackTrace();
+                ClipBoardUtils.copy(result, MainActivity.this);
+                Trace.show(this, "已将二维码数据复制到剪贴板：\n" + result, Toast.LENGTH_LONG);
+            }
+        } else
+            Trace.show(this, "解析二维码失败");
+    }
+
+    private void dealPicFromSelect(Uri selectedImage) {
+        try {
+            if (!savePath.exists())
+                savePath.createNewFile();
+            String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
+//                        String type = picturePath.substring(picturePath.lastIndexOf("."));
+//                        if(type.contains("gif"))
+//                            type = ".jpg";
+            final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
+            //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
+            NormalUtils.saveBitmap(bitmap, userIconFile);
+            //没则新增有则创建
+            if (TextUtils.isEmpty(MyApplication.userIcon)) {
+                MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath));
+            } else {
+                MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath));
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mNavHeaderMainImg.setImageBitmap(bitmap);
+                }
+            });
+            MyApplication.saveUserIcon();
+        } catch (AVException | IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private ToolbarStatus getFragmentStatus() {
@@ -681,29 +704,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         }
                     })
                     .show();
-//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-//            builder.setTitle("退出当前账号");
-//            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    dialog.dismiss();
-//                }
-//            });
-//            builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    //切换本地数据库
-//                    MyApplication.logout();
-//                    Intent intent = new Intent();
-//                    intent.setClass(MainActivity.this, LoginActivity.class);
-//                    intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-//                    startActivity(intent);
-//                    finish();
-//                    overridePendingTransition(R.anim.push_left_in,
-//                            R.anim.push_left_out);
-//                }
-//            });
-//            builder.show();
             return false;
         } else if (id == R.id.nav_share) {
             handler.sendEmptyMessage(gotoSetting);
@@ -725,9 +725,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         return true;
     }
 
+    @AfterPermissionGranted(REQUEST_CAMERA_PERMISSION)
     private void gotoQRCode() {
-        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-        startActivityForResult(intent, REQUEST_QRCODE);
+        String[] perms = {Manifest.permission.CAMERA};
+        if (EasyPermissions.hasPermissions(MainActivity.this, perms)) {
+            handler.sendEmptyMessageDelayed(gotoQRCode, 600);
+        } else {
+            EasyPermissions.requestPermissions(this, "二维码扫描需要以下权限:\n\n1.拍照", REQUEST_CAMERA_PERMISSION, perms);
+        }
     }
 
     /*夜间模式*/
@@ -822,6 +827,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public static final int gotoSecret = 3;
     public static final int gotoThank = 4;
     public static final int checkUpdate = 5;
+    public static final int gotoQRCode = 6;
 
     public void showBtnAdd() {
 //        Trace.d("showBtnAddDelay");
@@ -837,7 +843,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_PERMISSION) {
+        if (requestCode == REQUEST_WRITE_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Trace.d("permission granted");
                 setUserIcon();
@@ -846,7 +852,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 Trace.d("permission denied");
                 setUserIconByNet();
             }
+        } else if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                handler.sendEmptyMessageDelayed(gotoQRCode, 600);
+            } else {
+                Trace.d("permission denied");
+                Trace.show(MainActivity.this, "无法进行二维码扫描\n缺少拍照权限！");
+            }
         }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);//implement EasyPermissions.PermissionCallbacks
     }
 
     @Override
