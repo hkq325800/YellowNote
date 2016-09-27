@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -122,6 +123,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private int funcHeight = 0;//工具条高度
     private Double navRatio, funcRatio;//实践单动画修改两个属性
     private ArrayList<View> viewContainer = new ArrayList<>();
+    DayNightHelper mDayNightHelper;
     @SuppressWarnings("FieldCanBeLocal")
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
 
@@ -149,7 +151,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @Override
     protected void doSthBeforeSetView(){
         super.doSthBeforeSetView();
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
@@ -173,6 +175,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 dialog = new MaterialDialog.Builder(EditActivity.this)
                         .title(R.string.tips_title)
                         .content("是否保存更改")
+                        .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                        .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                        .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .negativeText("放弃保存")
                         .positiveText("保存并退出")
                         .cancelListener(new DialogInterface.OnCancelListener() {
@@ -703,6 +708,8 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         if (primaryData.getFolderSize() == 1) {
             builder.title("没有别的笔记本可以选择\n是否新建？")
                     .positiveText(R.string.positive_text)
+                    .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
                     .negativeText(R.string.negative_text)
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
@@ -721,7 +728,10 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             mFolderId = primaryData.getFolderObjectIdArr(thisFolder.getObjectId());
             // 设置一个下拉的列表选择项
             builder.title("选择移至笔记本")
+                    .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                    .itemsColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .items((CharSequence[]) mFolder)
+                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
                     .itemsCallback(new MaterialDialog.ListCallback() {
                         @Override
                         public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
@@ -739,69 +749,67 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     public void addClick() {
-        LayoutInflater inflater = LayoutInflater.from(this);
-        @SuppressLint("InflateParams") View view = inflater.inflate(R.layout.dialog_folder_rename, null);
-        final EditText mEditEdt = (EditText) view.findViewById(R.id.mEditEdt);
-        final Button mConfirmBtn = (Button) view.findViewById(R.id.mConfirmBtn);
         dialog = new MaterialDialog.Builder(EditActivity.this)
                 .title("新增笔记本")
-                .customView(view, false).build();
-        mConfirmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String newFolderName = mEditEdt.getText().toString();
-                mEditEdt.setEnabled(false);
-                if (!newFolderName.equals("")) {
-                    if (primaryData.isFolderNameContain(newFolderName)) {
-                        Trace.show(getApplicationContext(), "该笔记本名称已存在");
-                        mEditEdt.setEnabled(true);
-                    } else {
-                        ThreadPool.getInstance().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    String objectId = FolderService.newFolder(MyApplication.user, mEditEdt.getText().toString());
-                                    Trace.d("saveNewFolder 成功");
-                                    Folder newFolder = new Folder(objectId, newFolderName, 0);
-                                    primaryData.addFolder(newFolder);
-                                    //添加进内存数据
-                                    thisFolder = newFolder;
-                                    isFolderChanged = true;
-                                    Trace.show(EditActivity.this, "选择的笔记本为：" + newFolderName);
-                                    if (isNew) {//新的笔记先设置已有的笔记在保存时设置
-                                        mNote.setFolder(newFolderName);
-                                        mNote.setFolderId(thisFolder.getObjectId());
+                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                .inputType(InputType.TYPE_CLASS_TEXT |
+                        InputType.TYPE_TEXT_VARIATION_PERSON_NAME |
+                        InputType.TYPE_TEXT_FLAG_CAP_WORDS)
+//                .inputRange(2, 16)
+                .positiveText(R.string.positive_text)
+                .input("请输入笔记本名称", "", false, new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, final CharSequence input) {
+                        final String newFolderName = input.toString();
+//                        mEditEdt.setEnabled(false);
+                        if (!newFolderName.equals("")) {
+                            if (primaryData.isFolderNameContain(newFolderName)) {
+                                Trace.show(getApplicationContext(), "该笔记本名称已存在");
+//                                mEditEdt.setEnabled(true);
+                            } else {
+                                ThreadPool.getInstance().execute(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            String objectId = FolderService.newFolder(MyApplication.user, input.toString());
+                                            Trace.d("saveNewFolder 成功");
+                                            Folder newFolder = new Folder(objectId, newFolderName, 0);
+                                            primaryData.addFolder(newFolder);
+                                            //添加进内存数据
+                                            thisFolder = newFolder;
+                                            isFolderChanged = true;
+                                            Trace.show(EditActivity.this, "选择的笔记本为：" + newFolderName);
+                                            if (isNew) {//新的笔记先设置已有的笔记在保存时设置
+                                                mNote.setFolder(newFolderName);
+                                                mNote.setFolderId(thisFolder.getObjectId());
+                                            }
+                                        } catch (AVException e) {
+                                            Trace.show(EditActivity.this, "新增笔记本失败" + Trace.getErrorMsg(e));
+                                            e.printStackTrace();
+                                        }
                                     }
-                                } catch (AVException e) {
-                                    Trace.show(EditActivity.this, "新增笔记本失败" + Trace.getErrorMsg(e));
-                                    e.printStackTrace();
-                                }
+                                });
+                                dismissDialog();
+//                                mEditEdt.setEnabled(true);
                             }
-                        });
-                        dismissDialog();
-                        mEditEdt.setEnabled(true);
+                        } else {
+                            Trace.show(getApplicationContext(), "笔记本名不能为空");
+//                            mEditEdt.setEnabled(true);
+                        }
                     }
-                } else {
-                    Trace.show(getApplicationContext(), "笔记本名不能为空");
-                    mEditEdt.setEnabled(true);
-                }
-            }
-        });
-        mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {//SOFT_INPUT_STATE_ALWAYS_VISIBLE
-                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-            }
-        });
-        dialog.show();
+                })
+                .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                .widgetColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)).show();
     }
 
     public void noteDelete() {
         dialog = new MaterialDialog.Builder(EditActivity.this)
                 .title(R.string.tips_title)
                 .content("确认删除？")
+                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .positiveText(R.string.positive_text)
                 .negativeText(R.string.negative_text)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -844,6 +852,8 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 .title(R.string.tips_title)
                 .negativeText("放弃保存")
                 .positiveText("保存并退出")
+                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

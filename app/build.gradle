@@ -43,7 +43,7 @@ android {
 
 dependencies {
     //    compile fileTree(include: ['*.jar'], dir: 'libs')
-    debugCompile 'junit:junit:4.12'
+    testCompile 'junit:junit:4.12'
     //android
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.android.support:recyclerview-v7:24.+'
@@ -56,7 +56,7 @@ dependencies {
     //检测内存泄漏
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
-    //weakHandler 未应用
+    //weakHandler
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     //疯狂更新的高star对话框
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'

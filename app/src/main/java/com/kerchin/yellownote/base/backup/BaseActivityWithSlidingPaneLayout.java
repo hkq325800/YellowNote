@@ -21,7 +21,7 @@ public abstract class BaseActivityWithSlidingPaneLayout extends AppCompatActivit
     //    public boolean isExisTitle = true;
     //是否支持滑动返回
     public boolean isSupportSwipeBack = true;
-    public final static String TAG = BaseActivity.class.getCanonicalName();
+//    public final static String TAG = BaseActivity.class.getCanonicalName();
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

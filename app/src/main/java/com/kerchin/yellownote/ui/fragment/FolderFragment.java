@@ -570,7 +570,7 @@ public class FolderFragment extends MyBaseFragment {
             , MaterialDialog.SingleButtonCallback positiveListener) {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
+                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .title(title)
                 .content(content)
@@ -597,7 +597,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
+                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .items((CharSequence[]) items)
                 .itemsColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
@@ -625,7 +625,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
+                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .cancelListener(new DialogInterface.OnCancelListener() {
                     @Override

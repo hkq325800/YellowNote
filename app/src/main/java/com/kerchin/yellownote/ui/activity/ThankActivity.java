@@ -44,6 +44,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
     ArrayList<String> linkList;
     SpannableString targetLeft, targetRight, targetTop;
     String todo;
+    DayNightHelper mDayNightHelper;
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
@@ -53,7 +54,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
     @Override
     protected void doSthBeforeSetView() {
         super.doSthBeforeSetView();
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
@@ -143,6 +144,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
         mNavigationTitleEdt.setFocusable(false);
         mNavigationTitleEdt.clearFocus();
         mNavigationTitleEdt.setFocusableInTouchMode(false);
+        mThankTopTxt.setTextColor(mDayNightHelper.getColorRes(ThankActivity.this, DayNightHelper.COLOR_TEXT));
     }
 
     public static void startMe(Context context) {

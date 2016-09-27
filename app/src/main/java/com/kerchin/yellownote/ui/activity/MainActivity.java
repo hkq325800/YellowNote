@@ -174,17 +174,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                 @Override
                                 public void run() {
                                     mNavHeaderMainImg.setImageBitmap(b);
-//                                    GlideBuilder gb = new GlideBuilder(MainActivity.this);
-//                                    DiskCache.Factory factory = new DiskCache.Factory() {
-//                                        @Override
-//                                        public DiskCache build() {
-//                                            File cacheLocation = new File(getExternalCacheDir(), "cache_dir_name");
-//                                            cacheLocation.mkdirs();
-//                                            return DiskLruCacheWrapper.get(cacheLocation, bytes.length);
-//                                        }
-//                                    };
-//                                    gb.setDiskCache(factory);
-//                                    Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
                                 }
                             });
                             MyApplication.saveUserIcon();
@@ -439,6 +428,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         .title("升级版本:" + versionCode)
                         .content(versionContent)
                         .positiveText("下载")
+                        .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                        .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                        .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -665,6 +657,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .content("退出当前账号？")
                     .positiveText(R.string.positive_text)
                     .negativeText(R.string.negative_text)
+                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                    .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
+                    .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .onNegative(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

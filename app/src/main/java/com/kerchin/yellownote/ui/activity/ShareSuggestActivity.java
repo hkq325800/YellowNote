@@ -23,7 +23,9 @@ import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+
 import zj.baselibrary.util.ThreadPool.ThreadPool;
+
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
@@ -62,11 +64,12 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     String appVersionNow;
     String versionCode;
     boolean isLatest = false;
+    DayNightHelper mDayNightHelper;
 
     @Override
     protected void doSthBeforeSetView() {
         super.doSthBeforeSetView();
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
@@ -205,6 +208,9 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("升级版本:" + versionCode)
                                                 .content(version.getString("version_content"))
+                                                .backgroundColorRes(mDayNightHelper.getColorResId(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
+                                                .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .positiveText("下载")
                                                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                                                     @Override
@@ -236,6 +242,9 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                     public void onClick(View v) {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("当前版本:" + versionCode)
+                                                .backgroundColorRes(mDayNightHelper.getColorResId(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
+                                                .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .content(version.getString("version_content")).show();
 //                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
 //                                                .setTitle("版本:" + versionCode)

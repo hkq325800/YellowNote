@@ -27,6 +27,7 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.utilities.Trace;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
 import java.util.ArrayList;
@@ -396,8 +397,11 @@ public class NoteFragment extends MyBaseFragment
                                 //统计每个folder被删除了多少
                                 if (noteAdapter != null) {
                                     if (noteAdapter.getDeleteNum() > 0) {
+                                        MainActivity mainActivity = (MainActivity) getActivity();
                                         dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
-                                                , false, "删除中...", "请稍候").show();
+                                                , false, "删除中...", "请稍候")
+                                                .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColorRes(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT)).show();
 //                                        mSVProgressHUD.showWithStatus("删除中...");
                                         final int num = noteAdapter.getDeleteNum();
                                         getDataHelper.respond();
