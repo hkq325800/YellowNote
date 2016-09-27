@@ -14,18 +14,15 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
-import android.view.View;
 import android.view.WindowManager;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.activity.ShareSuggestActivity;
-import com.kerchin.yellownote.service.DownloadService;
+import com.kerchin.yellownote.data.service.DownloadService;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -74,14 +74,14 @@
 #-keep public class * extends android.support.v4.app.Fragment
 #-keep public class * extends android.app.Fragment
 
--keep class com.kerchin.yellownote.helper.sql.OrmLiteHelper { *; }
--keepclassmembers class com.kerchin.yellownote.helper.sql.OrmLiteHelper { *; }
+-keep class OrmLiteHelper { *; }
+-keepclassmembers class OrmLiteHelper { *; }
 -keep class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
 -keepclassmembers class com.kerchin.yellownote.base.MyOrmLiteBaseActivity { *; }
 #-keep class com.kerchin.yellownote.helper.sql.* { *; }
-#-keep class com.kerchin.yellownote.bean.Note { *; }
-#-keep class com.kerchin.yellownote.bean.Folder { *; }
-#-keep class com.kerchin.yellownote.bean.PrimaryData { *; }
+#-keep class Note { *; }
+#-keep class Folder { *; }
+#-keep class PrimaryData { *; }
 ##
 #保留R下面的资源
 #-keep class **.R$*

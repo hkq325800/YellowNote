@@ -8,7 +8,7 @@ import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper;
 import com.j256.ormlite.logger.Logger;
 import com.j256.ormlite.logger.LoggerFactory;
 import com.j256.ormlite.support.ConnectionSource;
-import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
+import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 /**
  * Created by Kerchin on 2016/6/23 0023.

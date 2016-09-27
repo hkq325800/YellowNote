@@ -1,6 +1,6 @@
 package com.kerchin.yellownote.base;
 
-import com.kerchin.yellownote.helper.sql.OrmLiteHelper;
+import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 /**
  * Created by Kerchin on 2015/9/26 0026.

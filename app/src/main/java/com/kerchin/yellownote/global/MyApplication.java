@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.bean.PrimaryData;
+import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;

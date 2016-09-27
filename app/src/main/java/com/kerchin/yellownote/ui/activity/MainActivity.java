@@ -1,0 +1,937 @@
+package com.kerchin.yellownote.ui.activity;
+
+import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Message;
+import android.support.annotation.NonNull;
+import android.support.design.internal.NavigationMenuView;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVFile;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.GetDataCallback;
+import com.kerchin.yellownote.BuildConfig;
+import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.data.adapter.MyFragmentPagerAdapter;
+import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
+import com.kerchin.yellownote.data.bean.PrimaryData;
+import com.kerchin.yellownote.data.bean.ToolbarStatus;
+import com.kerchin.yellownote.ui.fragment.FolderFragment;
+import com.kerchin.yellownote.ui.fragment.NoteFragment;
+import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
+import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
+import com.kerchin.yellownote.data.proxy.LoginService;
+import com.kerchin.yellownote.data.proxy.ShareSuggestService;
+import com.kerchin.yellownote.utilities.NormalUtils;
+import zj.baselibrary.util.ThreadPool.ThreadPool;
+import com.kerchin.yellownote.utilities.Trace;
+import com.uuzuche.lib_zxing.activity.CaptureActivity;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
+import zj.baselibrary.util.SystemUtils;
+import zj.baselibrary.util.ViewPagerTransform.DepthPageTransformer;
+
+public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
+        implements NavigationView.OnNavigationItemSelectedListener {
+    @BindView(R.id.mMainPager)
+    ViewPager mMainPager;
+    @BindView(R.id.mMainFab)
+    public FloatingActionButton mMainFab;
+    @BindView(R.id.mMainNav)
+    NavigationView mMainNav;
+    @BindView(R.id.mMainDrawer)
+    DrawerLayout mMainDrawer;
+    @BindView(R.id.mMainToolbar)
+    Toolbar mMainToolbar;
+    TextView mNavHeaderMainTipTxt;
+    CircleImageView mNavHeaderMainImg;
+    TextView msgNote, msgFolder;
+
+    public static int thisPosition = 0;
+    public boolean isHide = false;
+    //    private static Long mExitTime = (long) 0;//退出时间
+    private boolean isDrawerOpen = false;
+    private SearchView mSearchView;
+    private MenuItem btnSearch, btnSort, btnDelete;
+    private NoteFragment noteFragment;
+    private FolderFragment folderFragment;
+    private ActionBarDrawerToggle toggle;
+    private ArrayList<Fragment> fragments = new ArrayList<>();
+    public DayNightHelper mDayNightHelper;
+
+    private int REQUEST_LOAD_IMAGE = 100;
+    private final static int REQUEST_QRCODE = 101;
+    private int REQUEST_PERMISSION = 102;
+
+    File savePath;
+    File userIconFile;
+    String userIconPath;
+    String versionContent, versionCode;
+
+    @Override
+    protected void doSthBeforeSetView() {
+        super.doSthBeforeSetView();
+        closeSliding();
+        mDayNightHelper = new DayNightHelper(this);
+        if (mDayNightHelper.isDay()) {
+            setTheme(R.style.DayTheme);
+        } else {
+            setTheme(R.style.NightTheme);
+        }
+    }
+
+    @Override
+    protected void initializeView(Bundle savedInstanceState) {
+        ButterKnife.bind(this);
+        mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
+        mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
+        LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
+        msgNote = (TextView) galleryNote.findViewById(R.id.msg);
+        LinearLayout galleryFolder = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_folder).getActionView();
+        msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
+        setSupportActionBar(mMainToolbar);
+        if (BuildConfig.BUILD_TYPE.equals("debug")) {
+            String str = mNavHeaderMainTipTxt.getText() + " Dev" + (Config.isDebugMode ? "Mode" : "");
+            mNavHeaderMainTipTxt.setText(str);
+        }
+        toggle = new ActionBarDrawerToggle(
+                this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        NavigationMenuView navigationMenuView = (NavigationMenuView) mMainNav.getChildAt(0);
+        if (navigationMenuView != null) {
+            navigationMenuView.setVerticalScrollBarEnabled(false);
+        }
+    }
+
+    private void setUserIconByNet() {
+        Trace.d("setUserIconByNet");
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVFile file = LoginService.getUserIcon(MyApplication.userIcon);
+                    file.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(final byte[] bytes, AVException e) {
+                            if (e != null) {
+                                mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+                                e.printStackTrace();
+                                return;
+                            }
+                            final Bitmap b = NormalUtils.bytes2Bitmap(bytes);
+                            try {
+                                NormalUtils.saveBitmap(b, userIconFile);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mNavHeaderMainImg.setImageBitmap(b);
+//                                    GlideBuilder gb = new GlideBuilder(MainActivity.this);
+//                                    DiskCache.Factory factory = new DiskCache.Factory() {
+//                                        @Override
+//                                        public DiskCache build() {
+//                                            File cacheLocation = new File(getExternalCacheDir(), "cache_dir_name");
+//                                            cacheLocation.mkdirs();
+//                                            return DiskLruCacheWrapper.get(cacheLocation, bytes.length);
+//                                        }
+//                                    };
+//                                    gb.setDiskCache(factory);
+//                                    Glide.with(MainActivity.this).load(file.getUrl()).into(mNavHeaderMainImg);
+                                }
+                            });
+                            MyApplication.saveUserIcon();
+                        }
+                    });
+                } catch (AVException | FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
+        outState.putString("user", MyApplication.user);
+        outState.putString("userIcon", MyApplication.userIcon);
+        outState.putString("userDefaultFolderId", MyApplication.userDefaultFolderId);
+//        super.onSaveInstanceState(outState);//解决getActivity()为null
+    }
+
+    @Override
+    protected void initializeData(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            Trace.d("MainActivity initializeData null");
+            noteFragment = NoteFragment.newInstance(null);
+            folderFragment = FolderFragment.newInstance(null);
+        } else {
+            thisPosition = 0;
+            Trace.d("MainActivity initializeData else");
+            MyApplication.setUser(savedInstanceState.getString("user"));
+            MyApplication.setUserIcon(savedInstanceState.getString("userIcon"));
+            MyApplication.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
+//            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
+//            if (noteFragment == null) {
+//                Trace.d("noteFragment null");
+            noteFragment = NoteFragment.newInstance(null);
+//            }
+//            folderFragment = (FolderFragment) getSupportFragmentManager().findFragmentByTag(FolderFragment.class.getName());
+//            if (folderFragment == null) {
+//                Trace.d("folderFragment null");
+            folderFragment = FolderFragment.newInstance(null);
+//            }
+        }
+        //userIcon
+        savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
+                , MyApplication.APP_MAIN_FOLDER_NAME);
+        userIconPath = savePath.getAbsolutePath() + File.separator
+                + MyApplication.user + ".jpg";
+        userIconFile = new File(userIconPath);
+
+        if (NormalUtils.requestPermission(this, REQUEST_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            setUserIcon();
+        }
+
+        checkForUpdate();
+        fragments.add(noteFragment);
+        fragments.add(folderFragment);
+        MyFragmentPagerAdapter adapter = new MyFragmentPagerAdapter(
+                getSupportFragmentManager(), fragments);
+        mMainPager.setOffscreenPageLimit(fragments.size());
+        mMainPager.setAdapter(adapter);
+        mMainPager.setPageTransformer(true, new DepthPageTransformer());
+        mMainPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position,
+                                       float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                thisPosition = position;
+                mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
+                if (position == 0 && btnDelete != null) {
+                    //delete初始化
+                    noteFragment.respondForChange();//onPageSelected
+                    btnSort.setVisible(true);
+                    btnDelete.setVisible(true);
+                    btnSearch.setVisible(true);
+                    mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
+                    mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
+
+//                    if (getFragmentStatus().isDeleteMode())
+//                        noteFragment.deleteViewHide();
+//                    if (noteFragment.getMainStatus().isSearchMode())
+//                        noteFragment.restore();
+//                    if (!getFragmentStatus().isSearchMode())
+                    showBtnAdd();
+//                    else
+//                        hideBtnAdd();
+                } else if (position == 1) {
+                    btnDelete.setVisible(false);
+                    btnSort.setVisible(false);
+                    btnSearch.setVisible(false);
+                    //隐藏软键盘
+                    if (getWindow().getAttributes().softInputMode != WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN) {
+                        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (getCurrentFocus() != null)
+                            inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                    }
+//                    mMainToolbar.setOnMenuItemClickListener(folderFragment.getToolbarItemClickListener());
+//                    mSearchView.setOnQueryTextListener(folderFragment.getQueryTextListener());
+                    FolderFragment.hasRefresh = true;
+                    folderFragment.respondForChange();
+                    showBtnAdd();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+//                if (state == 0 && thisPosition == 1)
+//                    mSearchView.onActionViewCollapsed();
+            }
+        });
+    }
+
+    private void setUserIcon() {
+        if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
+            Trace.d("getLocalMipmap");
+            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
+            Trace.d("getLocalBitmap");
+            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
+            if (!MyApplication.userIcon.equals(
+                    MyApplication.getDefaultShared().getString(Config.KEY_USERICON, "")))
+                setUserIconByNet();
+        } else//userIcon存在但是本地文件不存在 下载并保存、设置
+            setUserIconByNet();
+    }
+
+    private void checkForUpdate() {
+        String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
+        String lastCheck = MyApplication.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
+                , "");
+        if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
+            return;
+        }
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVObject version = ShareSuggestService.getVersionInfo();
+                    String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
+                    versionCode = version.getString("version_name");
+                    versionContent = version.getString("version_content");
+                    if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
+                        //需要更新
+                        handler.sendEmptyMessageDelayed(checkUpdate, 2000);
+                    }
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        MyApplication.getDefaultShared().edit()
+                .putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr)
+                .apply();
+    }
+
+    private void download() {
+//        Intent intent = new Intent(MainActivity.this,
+//                DownloadService.class);
+//        intent.putExtra("uriStr", getString(R.string.uri_download));
+//        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        startService(intent);
+        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
+        Trace.show(MainActivity.this, "后台下载中...");
+    }
+
+    @Override
+    protected void initializeEvent(Bundle savedInstanceState) {
+        mMainNav.setNavigationItemSelectedListener(this);
+        mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(
+                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, REQUEST_LOAD_IMAGE);
+            }
+        });
+        //若新增按钮位置下移 说明软键盘收起
+        mMainFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+//                Trace.d("onLayoutChange", "left" + left + " top" + top + " right" + right + " bottom" + bottom);
+//                Trace.d("onLayoutChangeOld", "left" + oldLeft + " top" + oldTop + " right" + oldRight + " bottom" + oldBottom);
+                if (getFragmentStatus() != null) {
+                    if (top > oldTop) {
+                        getFragmentStatus().setIsSoftKeyboardUp(false);
+//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+//                    mSearchView.onActionViewCollapsed();
+//                    noteFragment.restore();
+                    } else if (top < oldTop) {
+                        getFragmentStatus().setIsSoftKeyboardUp(true);
+//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+                    }
+                } else {
+                    Trace.show(getApplicationContext(), "过久未使用 资源被回收");
+                }
+            }
+        });
+        mMainDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                toggle.onDrawerSlide(drawerView, slideOffset);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                //menu数字
+                String note = PrimaryData.getInstance().getNoteSize() + "";
+                String folder = PrimaryData.getInstance().getFolderSize() + "";
+                msgNote.setText(note);
+                msgFolder.setText(folder);
+                isDrawerOpen = true;
+                btnSearch.setVisible(false);
+                btnSort.setVisible(false);
+                btnDelete.setVisible(false);
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                if (inputMethodManager.isActive()) {
+                    //noinspection ConstantConditions
+                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                }
+//                mSearchView.onActionViewCollapsed();
+//                noteFragment.restore();
+                toggle.onDrawerOpened(drawerView);
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                isDrawerOpen = false;
+                boolean isVisible = thisPosition == 0;
+                btnSearch.setVisible(isVisible);
+                btnDelete.setVisible(isVisible);
+                btnSort.setVisible(isVisible);
+                toggle.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+                toggle.onDrawerStateChanged(newState);
+            }
+        });
+        toggle.syncState();
+    }
+
+    @Override
+    protected boolean initializeCallback(Message msg) {
+        switch (msg.what) {
+            case checkUpdate:
+                dialog = new MaterialDialog.Builder(MainActivity.this)
+                        .title("升级版本:" + versionCode)
+                        .content(versionContent)
+                        .positiveText("下载")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                download();
+                            }
+                        }).show();
+                break;
+            case gotoThank:
+                ThankActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case gotoSecret:
+                hideBtnAdd();//使进入
+                SecretMenuActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case gotoSetting:
+                hideBtnAdd();
+                ShareSuggestActivity.startMe(getApplicationContext());
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
+            case showBtnAdd:
+                mMainFab.animate()
+                        .alpha(1)
+                        .scaleX(1)
+                        .scaleY(1)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationStart(Animator animation) {
+                                super.onAnimationStart(animation);
+//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+                                mMainFab.setVisibility(View.VISIBLE);
+                            }
+                        })
+                        .setDuration(300).start();
+                break;
+            case hideBtnAdd://必须使用animate直接设置会丢失十字
+                mMainFab.animate()
+                        .scaleX(0)
+                        .scaleY(0)
+                        .alpha(0)
+                        .setListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+                                super.onAnimationEnd(animation);
+//                                    if (mMainFab.getVisibility() == View.VISIBLE)
+                                mMainFab.setVisibility(View.INVISIBLE);
+                            }
+                        })
+                        .setDuration(50).start();
+                break;
+            default:
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    protected int provideContentViewId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
+            final Uri selectedImage = data.getData();
+            ThreadPool.getInstance().execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (!savePath.exists())
+                            savePath.createNewFile();
+                        String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
+//                        String type = picturePath.substring(picturePath.lastIndexOf("."));
+//                        if(type.contains("gif"))
+//                            type = ".jpg";
+                        final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
+                        //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
+                        NormalUtils.saveBitmap(bitmap, userIconFile);
+                        //没则新增有则创建
+                        if (TextUtils.isEmpty(MyApplication.userIcon)) {
+                            MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath));
+                        } else {
+                            MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath));
+                        }
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mNavHeaderMainImg.setImageBitmap(bitmap);
+                            }
+                        });
+                        MyApplication.saveUserIcon();
+                    } catch (AVException | IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        } else if (requestCode == REQUEST_QRCODE && data != null) {
+            Bundle bundle = data.getExtras();
+            if (bundle == null)
+                return;
+            if (bundle.getInt(CodeUtils.RESULT_TYPE) == CodeUtils.RESULT_SUCCESS) {
+                String result = bundle.getString(CodeUtils.RESULT_STRING);
+                if (result != null && result.startsWith("www."))
+                    result = "http://" + result;
+                //用浏览器打开
+                try {
+                    NormalUtils.downloadByUri(MainActivity.this, result);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Trace.show(this, result);
+            } else
+                Trace.show(this, "解析二维码失败");
+        }
+//        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private ToolbarStatus getFragmentStatus() {
+        if (noteFragment != null && folderFragment != null) {
+            switch (thisPosition) {
+                case 0:
+                    return noteFragment.getMainStatus();
+                case 1:
+                    return folderFragment.getMainStatus();
+                default:
+                    return noteFragment.getMainStatus();
+            }
+        }
+        return new ToolbarStatus();
+    }
+
+    public static void startMe(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
+        mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
+            showBtnAdd();
+        if (!MyApplication.isLogin()) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+            finish();
+        }
+    }
+
+    public Toolbar getToolbar() {
+        return mMainToolbar;
+    }
+
+//    @Override
+//    public boolean onPrepareOptionsMenu(Menu menu) {
+//        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
+//        return super.onPrepareOptionsMenu(menu);
+//    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        btnSearch = mMainToolbar.getMenu().findItem(R.id.action_search);
+        btnSort = mMainToolbar.getMenu().findItem(R.id.action_sort);
+        btnDelete = mMainToolbar.getMenu().findItem(R.id.action_delete);
+        mSearchView = (SearchView) btnSearch.getActionView();
+        mSearchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noteFragment.getMainStatus().setIsSearchMode(true);
+                noteFragment.deleteViewHide();
+                btnSort.setVisible(false);
+                btnDelete.setVisible(false);
+                //开启搜索模式
+//                hideBtnAdd();
+                noteFragment.disableLoad();
+            }
+        });
+        mSearchView.setQueryHint("可根据标题和内容进行搜索...");
+        mMainToolbar.setOnMenuItemClickListener(noteFragment.getToolbarItemClickListener());
+        mSearchView.setOnQueryTextListener(noteFragment.getQueryTextListener());
+        mSearchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                noteFragment.closeClick();
+                btnSort.setVisible(true);
+                btnDelete.setVisible(true);
+                return false;
+            }
+        });
+
+        //mSearchView.setIconified(true);//取消方法
+//        setSearchView();
+        return true;
+    }
+
+    @OnClick(R.id.mMainFab)
+    public void createNew() {
+        if (thisPosition == 0)
+            noteFragment.addClick();
+        else if (thisPosition == 1) {
+            hideBtnAdd();
+            folderFragment.addClick();
+        }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.nav_note) {
+            mMainPager.setCurrentItem(0);
+        } else if (id == R.id.nav_folder) {
+            mMainPager.setCurrentItem(1);
+        } else if (id == R.id.nav_logout) {
+            dialog = new MaterialDialog.Builder(this)
+                    .title(R.string.tips_title)
+                    .content("退出当前账号？")
+                    .positiveText(R.string.positive_text)
+                    .negativeText(R.string.negative_text)
+                    .onNegative(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            dismissDialog();
+                        }
+                    })
+                    .onPositive(new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                            //切换本地数据库
+                            MyApplication.logout();
+                            Intent intent = new Intent();
+                            intent.setClass(MainActivity.this, LoginActivity.class);
+                            intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+                            startActivity(intent);
+                            finish();
+                            overridePendingTransition(R.anim.push_left_in,
+                                    R.anim.push_left_out);
+                        }
+                    })
+                    .show();
+//            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+//            builder.setTitle("退出当前账号");
+//            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//            builder.setPositiveButton("确认退出", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    //切换本地数据库
+//                    MyApplication.logout();
+//                    Intent intent = new Intent();
+//                    intent.setClass(MainActivity.this, LoginActivity.class);
+//                    intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+//                    startActivity(intent);
+//                    finish();
+//                    overridePendingTransition(R.anim.push_left_in,
+//                            R.anim.push_left_out);
+//                }
+//            });
+//            builder.show();
+            return false;
+        } else if (id == R.id.nav_share) {
+            handler.sendEmptyMessage(gotoSetting);
+            return false;
+        } else if (id == R.id.nav_resetSecret) {
+//            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
+//            startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
+            handler.sendEmptyMessage(gotoSecret);
+            return false;
+        } else if (id == R.id.nav_thank) {
+            handler.sendEmptyMessage(gotoThank);
+            return false;
+        } else if (id == R.id.nav_night) {
+            changeThemeByZhiHu();
+        } else if (id == R.id.nav_qrcode) {
+            gotoQRCode();
+        }
+        mMainDrawer.closeDrawers();
+        return true;
+    }
+
+    private void gotoQRCode() {
+        Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+        startActivityForResult(intent, REQUEST_QRCODE);
+    }
+
+    /*夜间模式*/
+
+    /**
+     * 使用知乎的实现套路来切换夜间主题
+     */
+    private void changeThemeByZhiHu() {
+        showAnimation();
+        toggleThemeSetting();
+//        noteFragment.refreshUI(mDayNightHelper);
+        folderFragment.refreshUI(mDayNightHelper);
+//        refreshStatusBar();//TODO 目前没用到
+    }
+
+    /**
+     * 刷新 StatusBar
+     */
+    private void refreshStatusBar() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            TypedValue typedValue = new TypedValue();
+            Resources.Theme theme = getTheme();
+            theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
+            getWindow().setStatusBarColor(getResources().getColor(typedValue.resourceId));
+        }
+    }
+
+    /**
+     * 切换主题设置
+     */
+    private void toggleThemeSetting() {
+        mDayNightHelper.toggleThemeSetting(MainActivity.this);
+        mMainPager.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND));
+        mMainNav.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
+        mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
+        mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
+//        msgNote.setTextColor(getResources().getColor(background.resourceId));
+//        msgFolder.setTextColor(getResources().getColor(background.resourceId));
+    }
+
+    /**
+     * 展示一个切换动画
+     */
+    private void showAnimation() {
+        final View decorView = getWindow().getDecorView();
+        Bitmap cacheBitmap = getCacheBitmapFromView(decorView);
+        if (decorView instanceof ViewGroup && cacheBitmap != null) {
+            final View view = new View(this);
+            view.setBackgroundDrawable(new BitmapDrawable(getResources(), cacheBitmap));
+            ViewGroup.LayoutParams layoutParam = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT);
+            ((ViewGroup) decorView).addView(view, layoutParam);
+            ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+            objectAnimator.setDuration(300);
+            objectAnimator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    super.onAnimationEnd(animation);
+                    ((ViewGroup) decorView).removeView(view);
+                }
+            });
+            objectAnimator.start();
+        }
+    }
+
+    /**
+     * 获取一个 View 的缓存视图
+     *
+     * @param view
+     * @return
+     */
+    private Bitmap getCacheBitmapFromView(View view) {
+        final boolean drawingCacheEnabled = true;
+        view.setDrawingCacheEnabled(drawingCacheEnabled);
+        view.buildDrawingCache(drawingCacheEnabled);
+        final Bitmap drawingCache = view.getDrawingCache();
+        Bitmap bitmap;
+        if (drawingCache != null) {
+            bitmap = Bitmap.createBitmap(drawingCache);
+            view.setDrawingCacheEnabled(false);
+        } else {
+            bitmap = null;
+        }
+        return bitmap;
+    }
+
+    /*夜间模式*/
+
+    public static final int gotoSetting = 0;
+    public static final int showBtnAdd = 1;
+    public static final int hideBtnAdd = 2;
+    public static final int gotoSecret = 3;
+    public static final int gotoThank = 4;
+    public static final int checkUpdate = 5;
+
+    public void showBtnAdd() {
+//        Trace.d("showBtnAddDelay");
+        isHide = false;
+        handler.sendEmptyMessage(showBtnAdd);
+    }
+
+    public void hideBtnAdd() {
+//        Trace.d("hideBtnAdd");
+        isHide = true;
+        handler.sendEmptyMessage(hideBtnAdd);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_PERMISSION) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Trace.d("permission granted");
+                setUserIcon();
+            } else {
+                //TODO 显示对话框告知用户必须打开权限
+                Trace.d("permission denied");
+                setUserIconByNet();
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isDrawerOpen) {
+            mMainDrawer.closeDrawers();
+        } else if (getFragmentStatus().isSearchMode()) {
+            mSearchView.onActionViewCollapsed();
+            showBtnAdd();
+            if (thisPosition == 0)//应该只有note有搜索
+                noteFragment.restore();
+            getFragmentStatus().setIsSearchMode(false);
+        } else {
+            if (thisPosition == 0) {
+                if (getFragmentStatus().isDeleteMode()) {
+                    noteFragment.deleteViewHide();
+                } else {
+//                    if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
+//                        Trace.show(this, "再点击一次退出应用");
+//                        mExitTime = System.currentTimeMillis();
+//                    } else {
+                    Intent intent = new Intent(Intent.ACTION_MAIN);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addCategory(Intent.CATEGORY_HOME);
+                    startActivity(intent);
+//                    }
+                }
+            } else {
+//                if ((System.currentTimeMillis() - mExitTime) > 2000) {//间隔超过2s
+//                    Trace.show(this, "再点击一次退出应用");
+//                    mExitTime = System.currentTimeMillis();
+//                } else {
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                startActivity(intent);
+//                }
+            }
+        }
+    }
+
+//    public MenuItem getBtnSearch() {
+//        return btnSearch;
+//    }
+//
+//    public MenuItem getBtnSort() {
+//        return btnSort;
+//    }
+//
+//    public MenuItem getBtnDelete() {
+//        return btnDelete;
+//    }
+//
+//    private void setSearchView() {
+//        mSearchView.setIconifiedByDefault(false);
+//        final int icTipId = R.id.search_mag_icon;
+//        final float density = getResources().getDisplayMetrics().density;
+//        LinearLayout editLayout = (LinearLayout) mSearchView.findViewById(R.id.search_plate);
+//        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) editLayout.getLayoutParams();
+//        LinearLayout tipLayout = (LinearLayout) mSearchView.findViewById(R.id.search_edit_frame);
+//        LinearLayout.LayoutParams tipParams = (LinearLayout.LayoutParams) tipLayout.getLayoutParams();
+//        tipParams.leftMargin = 0;
+//        tipParams.rightMargin = 0;
+//        tipLayout.setLayoutParams(tipParams);
+//        ImageView icTip = (ImageView) mSearchView.findViewById(R.id.search_mag_icon);
+//        icTip.setImageResource(R.mipmap.note);
+//        params.topMargin = (int) (4 * density);
+//        editLayout.setLayoutParams(params);
+//    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_MENU) {//拦截menu按钮
+            //弹出侧边栏
+            if (isDrawerOpen)
+                mMainDrawer.closeDrawers();
+            else
+                mMainDrawer.openDrawer(GravityCompat.START);
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
+    }
+}

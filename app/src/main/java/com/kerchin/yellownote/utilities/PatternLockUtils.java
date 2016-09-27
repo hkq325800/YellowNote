@@ -11,7 +11,7 @@ import android.text.TextUtils;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.PreferenceContract;
-import com.kerchin.yellownote.proxy.SecretService;
+import com.kerchin.yellownote.data.proxy.SecretService;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

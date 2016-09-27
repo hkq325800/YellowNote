@@ -83,7 +83,7 @@ dependencies {
     //爆炸效果库 已经停止更新
     compile 'tyrantgit:explosionfield:1.0.1'
     //！已经停止更新
-    compile 'com.nineoldandroids:library:2.4.0'
+//    compile 'com.nineoldandroids:library:2.4.0'
     //progressDialog已经停止更新
     //    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新

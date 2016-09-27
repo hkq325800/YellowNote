@@ -26,7 +26,7 @@
 # --table-end--
 
 # --table-start--
-dataClass=com.kerchin.yellownote.bean.Folder
+dataClass=Folder
 tableName=folder
 # --table-fields-start--
 # --field-start--
@@ -44,7 +44,7 @@ fieldName=contain
 # --table-end--
 
 # --table-start--
-dataClass=com.kerchin.yellownote.bean.Note
+dataClass=Note
 tableName=note
 # --table-fields-start--
 # --field-start--
