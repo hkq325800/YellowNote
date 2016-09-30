@@ -15,7 +15,6 @@
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -52,12 +51,12 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.activity.SetPatternActivity"
-            android:label="设置密码"
+            android:label="@string/set_pattern"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemePatternDay" />
         <activity
             android:name=".ui.activity.ConfirmPatternActivity"
-            android:label="确认密码"
+            android:label="@string/confirm_pattern"
             android:screenOrientation="portrait"
             android:theme="@style/AppThemePatternDay" />
         <activity

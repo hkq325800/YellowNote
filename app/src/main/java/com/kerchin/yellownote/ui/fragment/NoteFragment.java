@@ -95,6 +95,8 @@ public class NoteFragment extends MyBaseFragment
         list.clear();//getDataListFromNote
         for (int i = 0; i < order.size(); i++) {
             list.add(order.get(i));
+//            if(i==0)
+//                list.add(order.get(0));
         }
     }
 

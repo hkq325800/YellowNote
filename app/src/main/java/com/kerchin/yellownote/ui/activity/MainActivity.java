@@ -69,6 +69,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import zj.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
+import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
@@ -391,6 +392,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
+                TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
                 //menu数字
                 String note = PrimaryData.getInstance().getNoteSize() + "";
                 String folder = PrimaryData.getInstance().getFolderSize() + "";
