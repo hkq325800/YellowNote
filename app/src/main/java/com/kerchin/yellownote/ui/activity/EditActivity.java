@@ -40,7 +40,7 @@ import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
@@ -293,7 +293,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , MyApplication.userDefaultFolderId, "text");
+                        , SampleApplicationLike.userDefaultFolderId, "text");
             } else {
                 isNew = false;
             }
@@ -306,7 +306,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , MyApplication.userDefaultFolderId, "text");
+                        , SampleApplicationLike.userDefaultFolderId, "text");
             } else {
                 isNew = false;
             }
@@ -772,7 +772,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(MyApplication.user, input.toString());
+                                            String objectId = FolderService.newFolder(SampleApplicationLike.user, input.toString());
                                             Trace.d("saveNewFolder 成功");
                                             Folder newFolder = new Folder(objectId, newFolderName, 0);
                                             primaryData.addFolder(newFolder);

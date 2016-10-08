@@ -33,7 +33,7 @@ import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.SimpleEntity;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import zj.baselibrary.util.ThreadPool.ThreadPool;
@@ -81,12 +81,12 @@ public class FolderFragment extends MyBaseFragment {
 //            final ItemTouchHelper helper = new ItemTouchHelper(callback);
             GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
             for (SimpleEntity entity : primaryData.mItems) {
-                if (entity.getFolderId().equals(MyApplication.userDefaultFolderId))
+                if (entity.getFolderId().equals(SampleApplicationLike.userDefaultFolderId))
                     entity.setIsShown(true);
                 else
                     entity.setIsShown(false);
             }
-            folderAdapter = new FolderShrinkAdapter(getActivity(), MyApplication.userDefaultFolderId
+            folderAdapter = new FolderShrinkAdapter(getActivity(), SampleApplicationLike.userDefaultFolderId
                     , primaryData.mItems, new IMulItemViewType<SimpleEntity>() {
                 @Override
                 public int getViewTypeCount() {
@@ -134,7 +134,7 @@ public class FolderFragment extends MyBaseFragment {
                 @Override
                 public void onItemLongClick(View v, final int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
-                        if (item.getFolderId().equals(MyApplication.userDefaultFolderId))
+                        if (item.getFolderId().equals(SampleApplicationLike.userDefaultFolderId))
                             Trace.show(getActivity().getApplicationContext(), "好孩子不要动这个哦");
                         else
                             singleChooseDialogMaker(getActivity(), "笔记本操作"
@@ -341,7 +341,7 @@ public class FolderFragment extends MyBaseFragment {
     //restart problem
     public LayoutInflater getInflater() {
         if (inflater == null)
-            inflater = LayoutInflater.from(MyApplication.getContext());
+            inflater = LayoutInflater.from(getActivity());
         return inflater;
     }
 
@@ -424,7 +424,7 @@ public class FolderFragment extends MyBaseFragment {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(MyApplication.user, input.toString());
+                                            String objectId = FolderService.newFolder(SampleApplicationLike.user, input.toString());
                                             Trace.show(getActivity(), "保存成功");
                                             Trace.d("saveNewFolder 成功");
                                             primaryData.addFolder(new Folder(objectId, newFolderName, 0));

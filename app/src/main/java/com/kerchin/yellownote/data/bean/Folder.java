@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.avos.avoscloud.AVException;
 import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.data.proxy.FolderService;
@@ -33,7 +34,7 @@ public class Folder implements Serializable {
     }
 
     public Folder(String objectId, String name, int contain) {
-        user_tel = MyApplication.user;
+        user_tel = SampleApplicationLike.user;
         this.name = name;
 //        this.contain = contain;//useless
         this.objectId = objectId;

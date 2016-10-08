@@ -29,7 +29,7 @@ android {
         /**
          * you can use multiDex and install it in your ApplicationLifeCycle implement
          */
-        multiDexEnabled true
+        multiDexEnabled true//
         /**
          * not like proguard, multiDexKeepProguard is not a list, so we can't just
          * add for you in our task. you can copy tinker keep rules at
@@ -47,16 +47,34 @@ android {
          * so we can get the newly git version easily!
          */
         buildConfigField "String", "CLIENTVERSION", "\"${gitSha()}\""
-        buildConfigField "String", "PLATFORM",  "\"all\""
+        buildConfigField "String", "PLATFORM", "\"all\""
+    }
+    signingConfigs {
+        release {
+            try {
+                storeFile file("./keystore/release.keystore")
+                storePassword "123456"
+                keyAlias "test"
+                keyPassword "123456"
+            } catch (ex) {
+                throw new InvalidUserDataException(ex.toString())
+            }
+        }
+
+        debug {
+            storeFile file("./keystore/debug.keystore")
+        }
     }
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
             minifyEnabled false
             debuggable true
+            signingConfig signingConfigs.debug
 //            zipAlignEnabled true
 //            shrinkResources true
 //            buildConfigField "String", "CHANNEL", "\"dev\""
@@ -82,8 +100,8 @@ dependencies {
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
     compile 'cn.leancloud.android:fastjson:1.1.40-leancloud'
     //检测内存泄漏
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+//    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+//    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //weakHandler
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     //疯狂更新的高star对话框
@@ -138,6 +156,7 @@ dependencies {
     compile project(path: ':progresslayout')
     compile project(':baselibrary')
 }
+
 def gitSha() {
     try {
         String gitRev = 'git rev-parse --short HEAD'.execute().text.trim()
@@ -149,6 +168,7 @@ def gitSha() {
         throw new GradleException("can't get git rev, you should add git to system path or just input test value, such as 'testTinkerId'")
     }
 }
+
 def bakPath = file("${buildDir}/bakApk/")
 /**
  * you can use assembleRelease to build you base apk
@@ -160,12 +180,13 @@ ext {
     tinkerEnabled = true
     //you should bak the following files
     //old apk file to build patch apk
-    tinkerOldApkPath = "${bakPath}/app-debug-0930-17-22-38.apk"
+    tinkerOldApkPath = "${bakPath}/app-debug-1008-15-52-25.apk"
     //proguard mapping file to build patch apk
     tinkerApplyMappingPath = "${bakPath}/"
     //resource R.txt to build patch apk, must input if there is resource changed
     tinkerApplyResourcePath = "${bakPath}/"
 }
+
 def getOldApkPath() {
     return hasProperty("OLD_APK") ? OLD_APK : ext.tinkerOldApkPath
 }
@@ -275,13 +296,19 @@ if (buildWithTinker()) {
              */
             loader = ["com.tencent.tinker.loader.*",
                       "com.kerchin.yellownote.global.MyApplication",
-                    "com.kerchin.yellownote.utilities.*",
-                    "com.kerchin.yellownote.data.bean.PrimaryData",
-                    "com.avos.avoscloud.AVOSCloud",
-                    "com.securepreferences.SecurePreferences",
-                    "com.squareup.leakcanary.LeakCanary",
-                    "com.uuzuche.lib_zxing.ZApplication",
-                    "com.squareup.haha.guava.*"
+                      "com.kerchin.yellownote.data.bean.PrimaryData",
+                      "com.avos.avoscloud.AVOSCloud",
+                      "com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler",
+                      "com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter",
+                      "com.kerchin.yellownote.utilities.NormalUtils",
+                      "com.kerchin.yellownote.utilities.PatternLockUtils",
+                      "com.kerchin.yellownote.utilities.tinker.TinkerManager",
+                      "com.kerchin.yellownote.utilities.tinker.MyLogImp",
+                      "com.securepreferences.SecurePreferences",
+                      "com.tencent.tinker.*",
+                      "com.uuzuche.lib_zxing.DisplayUtil"/*,
+                      "com.squareup.haha.guava.*",
+                      "com.squareup.leakcanary.LeakCanary"*/
                       //use sample, let BaseBuildInfo unchangeable with tinker
 //                      "tinker.sample.android.app.BaseBuildInfo"
             ]

@@ -56,7 +56,7 @@ import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
@@ -69,7 +69,9 @@ import pub.devrel.easypermissions.EasyPermissions;
 import zj.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
+import com.tencent.tinker.lib.tinker.Tinker;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
+import com.tencent.tinker.lib.tinker.TinkerLoadResult;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
@@ -164,7 +166,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void run() {
                 try {
-                    final AVFile file = LoginService.getUserIcon(MyApplication.userIcon);
+                    final AVFile file = LoginService.getUserIcon(SampleApplicationLike.userIcon);
                     file.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(final byte[] bytes, AVException e) {
@@ -185,7 +187,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                     mNavHeaderMainImg.setImageBitmap(b);
                                 }
                             });
-                            MyApplication.saveUserIcon();
+                            SampleApplicationLike.saveUserIcon();
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -198,9 +200,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
-        outState.putString("user", MyApplication.user);
-        outState.putString("userIcon", MyApplication.userIcon);
-        outState.putString("userDefaultFolderId", MyApplication.userDefaultFolderId);
+        outState.putString("user", SampleApplicationLike.user);
+        outState.putString("userIcon", SampleApplicationLike.userIcon);
+        outState.putString("userDefaultFolderId", SampleApplicationLike.userDefaultFolderId);
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -213,9 +215,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else {
             thisPosition = 0;
             Trace.d("MainActivity initializeData else");
-            MyApplication.setUser(savedInstanceState.getString("user"));
-            MyApplication.setUserIcon(savedInstanceState.getString("userIcon"));
-            MyApplication.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
+            SampleApplicationLike.setUser(savedInstanceState.getString("user"));
+            SampleApplicationLike.setUserIcon(savedInstanceState.getString("userIcon"));
+            SampleApplicationLike.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
 //            if (noteFragment == null) {
 //                Trace.d("noteFragment null");
@@ -229,9 +231,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
         //userIcon
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                , MyApplication.APP_MAIN_FOLDER_NAME);
+                , SampleApplicationLike.APP_MAIN_FOLDER_NAME);
         userIconPath = savePath.getAbsolutePath() + File.separator
-                + MyApplication.user + ".jpg";
+                + SampleApplicationLike.user + ".jpg";
         userIconFile = new File(userIconPath);
 
         if (NormalUtils.requestPermission(this, REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -300,14 +302,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     private void setUserIcon() {
-        if (TextUtils.isEmpty(MyApplication.userIcon)) {//使用默认头像
+        if (TextUtils.isEmpty(SampleApplicationLike.userIcon)) {//使用默认头像
             Trace.d("getLocalMipmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
-            if (!MyApplication.userIcon.equals(
-                    MyApplication.getDefaultShared().getString(Config.KEY_USERICON, "")))
+            if (!SampleApplicationLike.userIcon.equals(
+                    SampleApplicationLike.getDefaultShared().getString(Config.KEY_USERICON, "")))
                 setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
@@ -315,7 +317,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private void checkForUpdate() {
         String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
-        String lastCheck = MyApplication.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
+        String lastCheck = SampleApplicationLike.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
                 , "");
         if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
             return;
@@ -337,7 +339,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 }
             }
         });
-        MyApplication.getDefaultShared().edit()
+        SampleApplicationLike.getDefaultShared().edit()
                 .putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr)
                 .apply();
     }
@@ -393,6 +395,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onDrawerOpened(View drawerView) {
                 TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
+//                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
+//                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
+//                }
                 //menu数字
                 String note = PrimaryData.getInstance().getNoteSize() + "";
                 String folder = PrimaryData.getInstance().getFolderSize() + "";
@@ -560,10 +565,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
             NormalUtils.saveBitmap(bitmap, userIconFile);
             //没则新增有则创建
-            if (TextUtils.isEmpty(MyApplication.userIcon)) {
-                MyApplication.setUserIcon(LoginService.saveUserIcon(userIconPath));
+            if (TextUtils.isEmpty(SampleApplicationLike.userIcon)) {
+                SampleApplicationLike.setUserIcon(LoginService.saveUserIcon(userIconPath));
             } else {
-                MyApplication.setUserIcon(LoginService.saveUserIconById(userIconPath));
+                SampleApplicationLike.setUserIcon(LoginService.saveUserIconById(userIconPath));
             }
             runOnUiThread(new Runnable() {
                 @Override
@@ -571,7 +576,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     mNavHeaderMainImg.setImageBitmap(bitmap);
                 }
             });
-            MyApplication.saveUserIcon();
+            SampleApplicationLike.saveUserIcon();
         } catch (AVException | IOException e) {
             e.printStackTrace();
         }
@@ -604,7 +609,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
         if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
             showBtnAdd();
-        if (!MyApplication.isLogin()) {
+        if (!SampleApplicationLike.isLogin()) {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
@@ -695,7 +700,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                             //切换本地数据库
-                            MyApplication.logout();
+                            SampleApplicationLike.logout();
                             Intent intent = new Intent();
                             intent.setClass(MainActivity.this, LoginActivity.class);
                             intent.putExtra("logoutFlag", true);//使得欢迎界面不显示

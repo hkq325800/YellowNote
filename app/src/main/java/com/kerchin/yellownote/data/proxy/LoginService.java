@@ -5,7 +5,7 @@ import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 
 import java.io.FileNotFoundException;
 
@@ -25,7 +25,7 @@ public class LoginService {
     public static AVObject loginVerify(String txtUser, String txtPass) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
-        query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
+        query.whereEqualTo("user_pass", SampleApplicationLike.Secret(txtPass));
         return query.getFirst();
     }
 
@@ -40,7 +40,7 @@ public class LoginService {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
         AVObject user = query.getFirst();//query.get(objectId);
-        user.put("user_pass", MyApplication.Secret(txtPass));
+        user.put("user_pass", SampleApplicationLike.Secret(txtPass));
         user.save();
     }
 
@@ -84,7 +84,7 @@ public class LoginService {
         AVObject user = new AVObject("mUser");
         user.put("user_tel", txtUser);
         user.put("user_default_folderId", defaultFolderId);
-        user.put("user_pass", MyApplication.Secret(txtPass));
+        user.put("user_pass", SampleApplicationLike.Secret(txtPass));
         user.save();
     }
 
@@ -118,10 +118,10 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIcon(String path) throws AVException, FileNotFoundException {
-        AVFile file = AVFile.withAbsoluteLocalPath(MyApplication.user + ".jpg", path);
+        AVFile file = AVFile.withAbsoluteLocalPath(SampleApplicationLike.user + ".jpg", path);
         file.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        query.whereEqualTo("user_tel", MyApplication.user);
+        query.whereEqualTo("user_tel", SampleApplicationLike.user);
         AVObject user = query.getFirst();
         user.put("user_icon", file.getObjectId());
         user.save();
@@ -130,12 +130,12 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
-        AVFile file = AVFile.withObjectId(MyApplication.userIcon);
+        AVFile file = AVFile.withObjectId(SampleApplicationLike.userIcon);
         file.delete();
-        AVFile newFile = AVFile.withAbsoluteLocalPath(MyApplication.user + ".jpg", path);
+        AVFile newFile = AVFile.withAbsoluteLocalPath(SampleApplicationLike.user + ".jpg", path);
         newFile.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        query.whereEqualTo("user_tel", MyApplication.user);
+        query.whereEqualTo("user_tel", SampleApplicationLike.user);
         AVObject user = query.getFirst();
         user.put("user_icon", newFile.getObjectId());
         user.save();

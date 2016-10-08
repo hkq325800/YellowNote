@@ -16,7 +16,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -89,8 +89,8 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        String str = null;
 //        str.toCharArray();
         //只为有缓存登录的用户初始化数据
-        if (MyApplication.isLogin()) {
-            MyApplication.userDefaultFolderId = MyApplication.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");
+        if (SampleApplicationLike.isLogin()) {
+            SampleApplicationLike.userDefaultFolderId = SampleApplicationLike.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -100,7 +100,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
                         @Override
                         public void justNowWithEx(Exception e) {
-                            if (!MyApplication.getDefaultShared().getBoolean(Config.KEY_CAN_OFFLINE, true)) {
+                            if (!SampleApplicationLike.getDefaultShared().getBoolean(Config.KEY_CAN_OFFLINE, true)) {
                                 isNeedToRefresh = true;
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -115,7 +115,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 }
             });
         }
-        loginVerify(MyApplication.user);
+        loginVerify(SampleApplicationLike.user);
     }
 
     @Override
@@ -212,7 +212,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     //登录操作确认
     protected void loginVerify(final String txtUser) {
         //缓存查询流程
-        if (!txtUser.equals("") && !MyApplication.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
+        if (!txtUser.equals("") && !SampleApplicationLike.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
             //密码查询
             mWelcomeTxt.setText("查询到缓存 正在进行验证...");
             ThreadPool.getInstance().execute(new Runnable() {
@@ -221,7 +221,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     Trace.d("loginVerify" + Thread.currentThread().getId());
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
-                        AVObject user = LoginService.loginVerify(txtUser, MyApplication.getDefaultShared().getString(Config.KEY_PASS, ""));
+                        AVObject user = LoginService.loginVerify(txtUser, SampleApplicationLike.getDefaultShared().getString(Config.KEY_PASS, ""));
 //                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
 //                        }
                         if (user != null) {
@@ -244,7 +244,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             } else {
                                 //默认笔记本id统一在login获取 因为不轻易改变 保存在本地
                                 //userIcon每次获取
-                                MyApplication.setUserIcon(user.getString("user_icon"));
+                                SampleApplicationLike.setUserIcon(user.getString("user_icon"));
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转
@@ -258,7 +258,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     } catch (AVException e) {
                         e.printStackTrace();
                         //无网络时如果已经有缓存登录，还是允许进入查看离线消息
-                        if (MyApplication.isLogin()) {
+                        if (SampleApplicationLike.isLogin()) {
                             cycleTarget = Message.obtain();//直接进入
                             cycleTarget.what = next;
                             handler.post(runnableForData);//无网络时

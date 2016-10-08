@@ -19,7 +19,7 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
@@ -142,7 +142,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     try {
                         AVObject avObjects = isForget
                                 ? LoginService.loginVerify(mSecretPassEdt.getText().toString(), mSecretNewPassEdt.getText().toString())
-                                : LoginService.loginVerify(MyApplication.user, mSecretPassEdt.getText().toString());
+                                : LoginService.loginVerify(SampleApplicationLike.user, mSecretPassEdt.getText().toString());
                         if (avObjects != null) {
                             Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");
@@ -157,10 +157,10 @@ public class SecretActivity extends BaseSwipeBackActivity {
                                     SoftKeyboardUtils.KeyBoardCancel(SecretActivity.this);
                                     finish();
                                 } else {
-                                    SecretService.alterSecret(MyApplication.user, mSecretNewPassEdt.getText().toString());
+                                    SecretService.alterSecret(SampleApplicationLike.user, mSecretNewPassEdt.getText().toString());
                                     //存入shared
-                                    SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
-                                    editor.putString(Config.KEY_USER, MyApplication.user);
+                                    SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
+                                    editor.putString(Config.KEY_USER, SampleApplicationLike.user);
                                     editor.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString());
                                     editor.apply();
                                     //密码正确进行修改
@@ -222,7 +222,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     || TextUtils.isEmpty(mSecretNewPassEdt.getText())) {
                 Trace.show(getApplicationContext(), "请将信息填写完整");
                 return false;
-            } else if (!mSecretPassEdt.getText().toString().equals(MyApplication.user)) {
+            } else if (!mSecretPassEdt.getText().toString().equals(SampleApplicationLike.user)) {
                 Trace.show(getApplicationContext(), "用户名与本地不同");
                 return false;
             }

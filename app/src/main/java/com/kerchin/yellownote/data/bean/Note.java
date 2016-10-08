@@ -8,9 +8,10 @@ import com.avos.avoscloud.AVObject;
 import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -61,7 +62,7 @@ public class Note implements Serializable {
      */
 //    public Note(String objectId, String title, Date date, String contentCode
 //            , String folder, String folderId, String type) {
-//        user_tel = MyApplication.user;
+//        user_tel = SampleApplicationLike.user;
 //        this.objectId = objectId;
 //        this.title = title;
 //        this.date = date;
@@ -80,7 +81,7 @@ public class Note implements Serializable {
      */
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
-        user_tel = MyApplication.user;
+        user_tel = SampleApplicationLike.user;
         hasEdited = false;
         this.objectId = objectId;
         this.title = title;
@@ -213,7 +214,7 @@ public class Note implements Serializable {
         //use PatternUtils.patternToSha1String(str) to save
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")
-                || objectId.contains(MyApplication.user)) {//新增
+                || objectId.contains(SampleApplicationLike.user)) {//新增
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -221,14 +222,14 @@ public class Note implements Serializable {
                     AVObject newNote = null;
                     try {
                         newNote = NoteService.addNewNote(
-                                MyApplication.user, newTitle
+                                SampleApplicationLike.user, newTitle
                                 , NormalUtils.stringToSha1String(newContent), folder, folderId);
                     } catch (AVException e) {
                         isOffline = true;
                         //离线新增给objectId 编辑离线新增不再赋值
 //                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         if (objectId.equals(""))
-                            objectId = MyApplication.user + "_" + date.getTime();
+                            objectId = SampleApplicationLike.user + "_" + date.getTime();
                         e.printStackTrace();
 //                        return;//终止下一步
                     }

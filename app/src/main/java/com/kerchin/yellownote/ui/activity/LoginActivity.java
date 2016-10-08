@@ -26,7 +26,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
@@ -99,9 +99,9 @@ public class LoginActivity extends LoginAbstract {
 
     @Override
     protected void initializeEvent(Bundle savedInstanceState) {
-        if (!MyApplication.user.equals("")) {
-            mLoginUserEdt.setText(MyApplication.user);
-            mLoginUserEdt.setSelection(MyApplication.user.length());
+        if (!SampleApplicationLike.user.equals("")) {
+            mLoginUserEdt.setText(SampleApplicationLike.user);
+            mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
 //            mLoginPassTextInput.getEditText().setSelected(true);
 //            mLoginPassTextInput.bringToFront();
 //            mLoginPassTextInput.requestFocusFromTouch();
@@ -179,7 +179,7 @@ public class LoginActivity extends LoginAbstract {
     @OnClick(R.id.mLoginBtn)
     public void loginClick() {
         mLoginPassTextInput.setHint("请输入密码");
-        //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
+        //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + SampleApplicationLike.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
             mSignUpRelative.setVisibility(View.GONE);
             mLoginForgetBtn.setVisibility(View.VISIBLE);
@@ -474,8 +474,8 @@ public class LoginActivity extends LoginAbstract {
                                             dismissDialog();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
                                         } else {
-                                            MyApplication.userDefaultFolderId = user.getString("user_default_folderId");
-                                            MyApplication.setUserIcon(user.getString("user_icon"));
+                                            SampleApplicationLike.userDefaultFolderId = user.getString("user_default_folderId");
+                                            SampleApplicationLike.setUserIcon(user.getString("user_icon"));
                                             String pattern = SecretService.getPatternStr(txtUser);
                                             PatternLockUtils.setPattern(pattern, getApplicationContext());
                                             if (Config.isDebugMode)
@@ -525,7 +525,7 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    MyApplication.userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
+                    SampleApplicationLike.userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
                     Trace.d("signUpVerify 默认文件夹创建完成");
                 } catch (AVException e) {
                     Trace.e("创建默认笔记夹失败" + Trace.getErrorMsg(e));
@@ -533,8 +533,8 @@ public class LoginActivity extends LoginAbstract {
                     Trace.show(LoginActivity.this, "创建默认笔记夹失败" + Trace.getErrorMsg(e));
                 }
                 try {
-                    if (!MyApplication.userDefaultFolderId.equals("")) {
-                        LoginService.userSignUp(txtUser, txtPass, MyApplication.userDefaultFolderId);
+                    if (!SampleApplicationLike.userDefaultFolderId.equals("")) {
+                        LoginService.userSignUp(txtUser, txtPass, SampleApplicationLike.userDefaultFolderId);
                         Trace.d("signUpVerify 用户注册完成");
                         Trace.show(LoginActivity.this, txtUser + "注册成功");
                         goToMain();//注册登录
@@ -637,10 +637,10 @@ public class LoginActivity extends LoginAbstract {
             }
         });
         //存入shared
-        MyApplication.setUser(mLoginUserEdt.getText().toString());
-        SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
+        SampleApplicationLike.setUser(mLoginUserEdt.getText().toString());
+        SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
         editor.putString(Config.KEY_USER, mLoginUserEdt.getText().toString());
-        editor.putString(Config.KEY_DEFAULT_FOLDER, MyApplication.userDefaultFolderId);
+        editor.putString(Config.KEY_DEFAULT_FOLDER, SampleApplicationLike.userDefaultFolderId);
         editor.putBoolean(Config.KEY_ISLOGIN, true);
         editor.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString());
         editor.apply();
@@ -656,6 +656,7 @@ public class LoginActivity extends LoginAbstract {
                     && PrimaryData.status.isHeaderReady
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
+                dismissDialog();
                 MainActivity.startMe(getApplicationContext());
 //                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();

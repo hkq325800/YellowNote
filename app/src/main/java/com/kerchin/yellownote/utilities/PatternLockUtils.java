@@ -12,6 +12,7 @@ import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.PreferenceContract;
 import com.kerchin.yellownote.data.proxy.SecretService;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,7 +77,7 @@ public class PatternLockUtils {
      * 本地+网络清除密码
      */
     public static void clearPattern(final Context context) throws AVException {
-        SecretService.setPatternStr(MyApplication.user, "");
+        SecretService.setPatternStr(SampleApplicationLike.user, "");
         PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
     }
 

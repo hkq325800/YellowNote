@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,6 +38,7 @@ import zj.baselibrary.util.SystemUtils;
 public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
+    public static final  int    MAX_CRASH_COUNT     = 3;
     /**
      * 默认存放闪退信息的文件夹名称
      */
@@ -70,7 +72,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
      * @param crashInfoFolderName 闪退日志保存目录名，配置后位于 appMainFolderName 配置的一级目录下
      */
     public CrashExceptionHandler(Context context, String appMainFolderName, String crashInfoFolderName) {
-        this.mApplicationContext = context.getApplicationContext();
+        this.mApplicationContext = context;
         if (!TextUtils.isEmpty(appMainFolderName)) {
             this.mAppMainFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), appMainFolderName);
         } else {
@@ -152,7 +154,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 if (!mCrashInfoFolder.exists()) {//闪退日志目录不存在则先创建闪退日志目录
                     mCrashInfoFolder.mkdirs();
                 }
-                String crashLogFileName = MyApplication.user + "_" + timeStampString + ".txt";
+                String crashLogFileName = SampleApplicationLike.user + "_" + timeStampString + ".txt";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
 

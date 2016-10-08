@@ -15,7 +15,7 @@ import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -86,7 +86,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    String str = SecretService.getPatternStr(MyApplication.user);
+                    String str = SecretService.getPatternStr(SampleApplicationLike.user);
                     PatternLockUtils.setPattern(str, getApplicationContext());
                     hasPattern = !TextUtils.isEmpty(str);
                     runOnUiThread(new Runnable() {
@@ -164,7 +164,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    final String str = SecretService.getPatternStr(MyApplication.user);
+                    final String str = SecretService.getPatternStr(SampleApplicationLike.user);
                     if (hasPattern == !TextUtils.isEmpty(str)) {//与网络相同
                         mSecretMenuPatternToggleLiL.setClickable(true);
                         Intent intent = new Intent(SecretMenuActivity.this
@@ -200,7 +200,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    final String str = SecretService.getPatternStr(MyApplication.user);
+                    final String str = SecretService.getPatternStr(SampleApplicationLike.user);
                     if (TextUtils.isEmpty(str)) {//与网络不同
                         hasPattern = false;
                         runOnUiThread(new Runnable() {
@@ -245,7 +245,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                 public void run() {
                     try {
                         if (!hasPattern) {//开启手势
-                            SecretService.setPatternStr(MyApplication.user, patternFromOthers);
+                            SecretService.setPatternStr(SampleApplicationLike.user, patternFromOthers);
                             PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
                             if (Config.isDebugMode)
                                 Trace.show(SecretMenuActivity.this, patternFromOthers);
@@ -307,7 +307,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                 @Override
                 public void run() {
                     try {
-                        SecretService.setPatternStr(MyApplication.user, patternFromOthers);
+                        SecretService.setPatternStr(SampleApplicationLike.user, patternFromOthers);
                         PatternLockUtils.setPattern(patternFromOthers, getApplicationContext());
                         if (Config.isDebugMode)
                             Trace.show(SecretMenuActivity.this, patternFromOthers);

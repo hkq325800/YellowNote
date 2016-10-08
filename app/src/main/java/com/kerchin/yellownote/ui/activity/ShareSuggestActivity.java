@@ -19,7 +19,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
-import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
@@ -59,7 +59,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     ScrollView mShareSuggestScV;
     //防止多次提交数据
     private boolean isPosting = false;
-    int quickSuggestTimes = MyApplication.getDefaultShared().getInt("quickSuggestTimes", 0);
+    int quickSuggestTimes = SampleApplicationLike.getDefaultShared().getInt("quickSuggestTimes", 0);
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
@@ -101,10 +101,10 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                     @Override
                     public void run() {
                         try {
-                            ShareSuggestService.pushSuggest(MyApplication.user, msg, mShareSuggestTouchEdt.getText().toString());
+                            ShareSuggestService.pushSuggest(SampleApplicationLike.user, msg, mShareSuggestTouchEdt.getText().toString());
                             long thisSuggestTime = new Date().getTime();
-                            long lastSuggestTime = MyApplication.getDefaultShared().getLong("lastSuggestTime", thisSuggestTime);
-                            SecurePreferences.Editor editor = (SecurePreferences.Editor) MyApplication.getDefaultShared().edit();
+                            long lastSuggestTime = SampleApplicationLike.getDefaultShared().getLong("lastSuggestTime", thisSuggestTime);
+                            SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
                             editor.putLong("lastSuggestTime", thisSuggestTime);
                             //距离上一次提交意见30秒内再次提交记一次违规 3次违规禁止提交 重装恢复
                             editor.putInt("quickSuggestTimes",
@@ -126,7 +126,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                 Trace.show(getApplicationContext(), "您宝贵的意见正在提交中···");
             }
             if (quickSuggestTimes >= 2) {
-                ShareSuggestService.setUnableToSuggest(MyApplication.user);
+                ShareSuggestService.setUnableToSuggest(SampleApplicationLike.user);
             }
         }
     }
@@ -179,8 +179,8 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    boolean flag = ShareSuggestService.isAbleToSuggest(MyApplication.user);
-                    Trace.d("查询isAbleToSuggest 查询到" + MyApplication.user + " 的记录为" + flag);
+                    boolean flag = ShareSuggestService.isAbleToSuggest(SampleApplicationLike.user);
+                    Trace.d("查询isAbleToSuggest 查询到" + SampleApplicationLike.user + " 的记录为" + flag);
                     if (!flag) {
                         handler.sendEmptyMessage(hideSaveBtn);
                     }

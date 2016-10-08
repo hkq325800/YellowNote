@@ -4,6 +4,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.global.SampleApplicationLike;
 
 /**
  * Created by Kerchin on 2016/4/9 0009.
@@ -15,7 +16,7 @@ public class SecretService {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
         AVObject user = query.getFirst();
-        user.put("user_pass", MyApplication.Secret(txtPass));
+        user.put("user_pass", SampleApplicationLike.Secret(txtPass));
         user.save();
     }
 

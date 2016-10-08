@@ -5,7 +5,19 @@
     *;
 }
 
--keep class tinker.sample.android.app.SampleApplication {
+-keep class com.kerchin.yellownote.global.MyApplication {
+    *;
+}
+
+-keep class com.kerchin.yellownote.utilities.* {
+    *;
+}
+
+-keep class com.kerchin.yellownote.data.bean.PrimaryData {
+    *;
+}
+
+-keep class com.uuzuche.lib_zxing.DisplayUtil {
     *;
 }
 
