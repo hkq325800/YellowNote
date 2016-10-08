@@ -403,7 +403,7 @@ public class NoteFragment extends MyBaseFragment
                                         dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
                                                 , false, "删除中...", "请稍候")
                                                 .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
-                                                .backgroundColorRes(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT)).show();
+                                                .backgroundColorRes(mainActivity.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_TEXT)).show();
 //                                        mSVProgressHUD.showWithStatus("删除中...");
                                         final int num = noteAdapter.getDeleteNum();
                                         getDataHelper.respond();
