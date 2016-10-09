@@ -104,32 +104,28 @@ public class SampleApplicationLike extends DefaultApplicationLike {
     @Override
     public void onBaseContextAttached(Context base) {
         super.onBaseContextAttached(base);
-        super.onCreate();
         //you must install multiDex whatever tinker is installed!
         MultiDex.install(base);
 
         context = getApplication();
+        zj.baselibrary.util.Config.isDebugMode = Config.isDebugMode;
+
         TinkerManager.setTinkerApplicationLike(this);
         TinkerManager.initFastCrashProtect();
         //should set before tinker is installed
         TinkerManager.setUpgradeRetryEnable(true);
-
         //optional set logIml, or you can use default debug log
         TinkerInstaller.setLogIml(new MyLogImp());
-
         //installTinker after load multiDex
         //or you can put com.tencent.tinker.** to main dex
         TinkerManager.installTinker(this);
 
-        zj.baselibrary.util.Config.isDebugMode = Config.isDebugMode;
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(getApplication()
                 , getApplication().getResources().getString(R.string.APP_ID)
                 , getApplication().getResources().getString(R.string.APP_KEY));
 //        if (Config.isLeakCanary)
 //            LeakCanary.install(this);
-//        CrashHandler crashHandler = CrashHandler.getInstance();
-//        crashHandler.init(context);
         configCollectCrashInfo();
         shared = new SecurePreferences(getApplication());
         user = shared.getString(Config.KEY_USER, "");
@@ -141,7 +137,6 @@ public class SampleApplicationLike extends DefaultApplicationLike {
     public void registerActivityLifecycleCallbacks(Application.ActivityLifecycleCallbacks callback) {
         getApplication().registerActivityLifecycleCallbacks(callback);
     }
-
 
     private void initDisplayOpinion() {
         DisplayMetrics dm = getApplication().getResources().getDisplayMetrics();

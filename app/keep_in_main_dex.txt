@@ -5,19 +5,51 @@
     *;
 }
 
--keep class com.kerchin.yellownote.global.MyApplication {
+-keep public class com.kerchin.yellownote.global.MyApplication {
     *;
 }
 
--keep class com.kerchin.yellownote.utilities.* {
+-keep public class com.avos.avoscloud.AVOSCloud {
     *;
 }
 
--keep class com.kerchin.yellownote.data.bean.PrimaryData {
+-keep public class com.kerchin.yellownote.R {
     *;
 }
 
--keep class com.uuzuche.lib_zxing.DisplayUtil {
+-keep public class com.kerchin.yellownote.data.bean.PrimaryData {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.NormalUtils {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.PatternLockUtils {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.tinker.TinkerManager {
+    *;
+}
+
+-keep public class com.kerchin.yellownote.utilities.tinker.MyLogImp {
+    *;
+}
+
+-keep public class com.securepreferences.SecurePreferences {
+    *;
+}
+
+-keep public class com.uuzuche.lib_zxing.DisplayUtil {
     *;
 }
 
