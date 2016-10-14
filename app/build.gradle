@@ -6,7 +6,7 @@ apply plugin: 'com.tencent.tinker.patch'//apply tinker插件
 def javaVersion = JavaVersion.VERSION_1_7
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.2'
+    buildToolsVersion '24.0.3'
 
     compileOptions {
         sourceCompatibility javaVersion
@@ -100,7 +100,7 @@ dependencies {
     compile 'com.android.support:design:24.+'
     //    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
-    compile 'cn.leancloud.android:avoscloud-sdk:v3.+'
+    compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
     compile 'cn.leancloud.android:fastjson:1.1.40-leancloud'
     //检测内存泄漏
@@ -142,7 +142,7 @@ dependencies {
     compile project(':JJSearchViewAnim')
     //通用adapter持续更新中 已有新版但是更新会出问题
     compile 'org.byteam.superadapter:superadapter:3.3'
-    //弹出菜单库 可靠的作者
+    //弹出菜单库 可靠的作者 minSDK = 15
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码
     compile 'cn.yipianfengye.android:zxing-library:1.9'

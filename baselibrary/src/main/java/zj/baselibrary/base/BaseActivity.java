@@ -33,12 +33,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         initializeView(savedInstanceState);
         initializeData(savedInstanceState);
         initializeEvent(savedInstanceState);
-//        handler.setCallback(new InitializeCallback() {
-//            @Override
-//            public void handleMessage(Message msg) {
-//                initializeCallback(msg);
-//            }
-//        });
     }
 
     protected void doSthBeforeSetView() {
