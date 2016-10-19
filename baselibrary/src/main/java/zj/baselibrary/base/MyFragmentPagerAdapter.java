@@ -1,4 +1,4 @@
-package zj.baselibrary;
+package zj.baselibrary.base;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

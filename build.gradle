@@ -18,7 +18,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0'
+        classpath 'com.android.tools.build:gradle:2.2.1'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'//apt支持
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.1'//方法数检查
         classpath ('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker

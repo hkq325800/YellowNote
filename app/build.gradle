@@ -89,10 +89,15 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 }
 
 dependencies {
-    //    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     //android
     compile 'com.android.support:appcompat-v7:24.+'
@@ -133,21 +138,26 @@ dependencies {
     //爆炸效果库 已经停止更新
     compile 'tyrantgit:explosionfield:1.0.1'
     //！已经停止更新
-//    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.nineoldandroids:library:2.4.0'
     //progressDialog已经停止更新
     //    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新
-    compile project(':SlidingLibrary')
+//    compile project(':SlidingLibrary')
+    compile(name: 'SlidingLibrary-release', ext: 'aar')
     //add getState() and HKQController
-    compile project(':JJSearchViewAnim')
+//    compile project(':JJSearchViewAnim')
+    compile(name: 'JJSearchViewAnim-release', ext: 'aar')
+    //按住持续作用的控件 已改造
+//    compile project(':snappingstepper')
+    compile(name: 'snappingstepper-release', ext: 'aar')
+//    compile project(path: ':progresslayout')
+    compile(name: 'progresslayout-release', ext: 'aar')
     //通用adapter持续更新中 已有新版但是更新会出问题
     compile 'org.byteam.superadapter:superadapter:3.3'
     //弹出菜单库 可靠的作者 minSDK = 15
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码
     compile 'cn.yipianfengye.android:zxing-library:1.9'
-    //按住持续作用的控件 已改造
-    compile project(':snappingstepper')
     //multidex
     compile "com.android.support:multidex:1.0.1"
     //可选，用于生成application类
@@ -157,7 +167,6 @@ dependencies {
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
-    compile project(path: ':progresslayout')
     compile project(':baselibrary')
 }
 

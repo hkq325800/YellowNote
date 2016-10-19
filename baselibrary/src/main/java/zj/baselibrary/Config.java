@@ -1,4 +1,4 @@
-package zj.baselibrary.util;
+package zj.baselibrary;
 
 /**
  * Created by ucmed on 2016/9/19.
