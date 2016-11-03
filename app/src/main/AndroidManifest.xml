@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!--这里找不到是因为Tinker动态生成-->
     <application
         android:name=".global.MyApplication"
         android:allowBackup="false"
