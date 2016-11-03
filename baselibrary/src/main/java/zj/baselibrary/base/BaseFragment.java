@@ -27,7 +27,7 @@ public abstract class BaseFragment extends Fragment {
         handler = new WeakHandler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                return initializeCallback(msg);
+                return initCallback(msg);
             }
         });
 
@@ -37,16 +37,20 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(provideContentViewId(), container, false);
         ButterKnife.bind(this, rootView);
-        initializeView(rootView);
-        initializeData(savedInstanceState);
-        initializeEvent(savedInstanceState);
+        initView(rootView);
+        initData(savedInstanceState);
+        initEvent(savedInstanceState);
         return rootView;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
+    /**
+     * 回调初始化
+     * 自带handler 初始化Message时记得用Message.obtain()
+     *
+     * @param msg
+     * @return True if no further handling is desired
+     */
+    protected abstract boolean initCallback(Message msg);
 
     protected abstract int provideContentViewId();
 
@@ -56,7 +60,7 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param rootView
      */
-    protected abstract void initializeView(View rootView);
+    protected abstract void initView(View rootView);
 
     /**
      * 数据初始化
@@ -64,7 +68,7 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param savedInstanceState
      */
-    protected abstract void initializeData(Bundle savedInstanceState);
+    protected abstract void initData(Bundle savedInstanceState);
 
     /**
      * 事件初始化
@@ -72,14 +76,10 @@ public abstract class BaseFragment extends Fragment {
      *
      * @param savedInstanceState
      */
-    protected abstract void initializeEvent(Bundle savedInstanceState);
+    protected abstract void initEvent(Bundle savedInstanceState);
 
-    /**
-     * 回调初始化
-     * 自带handler 初始化Message时记得用Message.obtain()
-     *
-     * @param msg
-     * @return True if no further handling is desired
-     */
-    protected abstract boolean initializeCallback(Message msg);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

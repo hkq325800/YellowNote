@@ -70,11 +70,11 @@ public class SecretActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         return false;
     }
 
@@ -84,7 +84,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         mNavigationTitleEdt.setText(isForget ? "忘记密码" : "登录密码修改");
         mNavigationRightBtn.setText("提交");
         if (isForget) {
@@ -97,7 +97,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
 //        setSlidingModeRight();
         mSecretPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});

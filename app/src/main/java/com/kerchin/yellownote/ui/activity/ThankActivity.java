@@ -47,7 +47,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
     DayNightHelper mDayNightHelper;
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
 
     }
 
@@ -60,11 +60,11 @@ public class ThankActivity extends BaseSwipeBackActivity {
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-
+        immergeColor = R.color.colorPrimary;
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         return false;
     }
 
@@ -74,7 +74,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         thankList = new ArrayList<>();
         linkList = new ArrayList<>();
         todo = getResources().getString(R.string.todo);
@@ -136,7 +136,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mNavigationRightBtn.setVisibility(View.INVISIBLE);
         mNavigationTitleEdt.setEnabled(false);

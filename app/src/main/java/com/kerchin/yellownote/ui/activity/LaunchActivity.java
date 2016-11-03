@@ -55,26 +55,26 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
         mWelcomeRetryReL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (isNeedToRefresh) {
                     isNeedToRefresh = false;
                     PrimaryData.getInstance().clearData();
-                    initializeData(null);
+                    initData(null);
                 }
             }
         });
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         return false;
     }
 
@@ -84,7 +84,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         //test crash
 //        String str = null;
 //        str.toCharArray();

@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.badoo.mobile.util.WeakHandler;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import zj.baselibrary.R;
@@ -23,8 +23,9 @@ import zj.baselibrary.util.Immerge.ImmergeUtils;
 public abstract class BaseFragmentActivity extends AppCompatActivity {
 
     public final static String TAG = BaseFragmentActivity.class.getCanonicalName();
-    @ColorRes protected int immergeColor = R.color.colorPrimary;
-    protected List<Fragment> fragments;
+    @ColorRes
+    protected int immergeColor = R.color.colorPrimary;
+    protected ArrayList<Fragment> fragments = new ArrayList<>();
     protected WeakHandler handler;
     protected int lastTabIndex;
     protected int nextTabIndex;
@@ -52,44 +53,20 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
         setContentView(provideContentViewId());
         ImmergeUtils.immerge(this, immergeColor);
         ButterKnife.bind(this);
-        initializeView(savedInstanceState);
-        initializeFragments(savedInstanceState);
-        initializeData(savedInstanceState);
-        initializeEvent(savedInstanceState);
+        initFragments(savedInstanceState);
+        initView(savedInstanceState);
+        initData(savedInstanceState);
+        initEvent(savedInstanceState);
     }
 
     protected void doSthBeforeSetView() {
         handler = new WeakHandler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                return initializeCallback(msg);
+                return initCallback(msg);
             }
         });
     }
-
-    /**
-     * 控件初始化
-     * setContentView ButterKnife.bind(this);
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeView(Bundle savedInstanceState);
-
-    /**
-     * 数据初始化
-     * 对proxy的调用
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeData(Bundle savedInstanceState);
-
-    /**
-     * 事件初始化
-     * 或可用ButterKnife的@OnClick替代
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeEvent(Bundle savedInstanceState);
 
     /**
      * 回调初始化
@@ -98,7 +75,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
      * @param msg
      * @return True if no further handling is desired
      */
-    protected abstract boolean initializeCallback(Message msg);
+    protected abstract boolean initCallback(Message msg);
 
     protected abstract int provideContentViewId();//用于引入布局文件
 
@@ -110,7 +87,30 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
      * .beginTransaction()
      * .add(R.id.container, mHomePageFragment)
      * .show(mHomePageFragment).commit();
-     *
      */
-    protected abstract void initializeFragments(Bundle savedInstanceState) ;
+    protected abstract void initFragments(Bundle savedInstanceState);
+
+    /**
+     * 控件初始化
+     * setContentView ButterKnife.bind(this);
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initView(Bundle savedInstanceState);
+
+    /**
+     * 数据初始化
+     * 对proxy的调用
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initData(Bundle savedInstanceState);
+
+    /**
+     * 事件初始化
+     * 或可用ButterKnife的@OnClick替代
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initEvent(Bundle savedInstanceState);
 }

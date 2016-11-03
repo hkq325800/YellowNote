@@ -492,22 +492,22 @@ public class FolderFragment extends MyBaseFragment {
     }
 
     @Override
-    protected void initializeView(View rootView) {
+    protected void initView(View rootView) {
 
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
 
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
 
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         switch (msg.what) {
             case handle4explosion:
                 Trace.d("handlerInFolder handle4explosion");

@@ -19,54 +19,33 @@ import zj.baselibrary.util.Immerge.ImmergeUtils;
 public abstract class BaseActivity extends AppCompatActivity {
 
     protected final static String TAG = BaseActivity.class.getCanonicalName();
-    @ColorRes protected int immergeColor = R.color.colorPrimary;
+    @ColorRes
+    protected int immergeColor = R.color.colorPrimary;
     protected WeakHandler handler;
     public MaterialDialog dialog;
+    protected boolean isImmerge = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         doSthBeforeSetView();
         setContentView(provideContentViewId());
-        ImmergeUtils.immerge(this, immergeColor);
+        if (isImmerge)
+            ImmergeUtils.immerge(this, immergeColor);
         ButterKnife.bind(this);
-        initializeView(savedInstanceState);
-        initializeData(savedInstanceState);
-        initializeEvent(savedInstanceState);
+        initView(savedInstanceState);
+        initData(savedInstanceState);
+        initEvent(savedInstanceState);
     }
 
     protected void doSthBeforeSetView() {
         handler = new WeakHandler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
-                return initializeCallback(msg);
+                return initCallback(msg);
             }
         });
     }
-
-    /**
-     * 控件初始化
-     * setContentView ButterKnife.bind(this);
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeView(Bundle savedInstanceState);
-
-    /**
-     * 数据初始化
-     * 对proxy的调用
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeData(Bundle savedInstanceState);
-
-    /**
-     * 事件初始化
-     * 或可用ButterKnife的@OnClick替代
-     *
-     * @param savedInstanceState
-     */
-    protected abstract void initializeEvent(Bundle savedInstanceState);
 
     /**
      * 回调初始化
@@ -75,9 +54,33 @@ public abstract class BaseActivity extends AppCompatActivity {
      * @param msg
      * @return True if no further handling is desired
      */
-    protected abstract boolean initializeCallback(Message msg);
+    protected abstract boolean initCallback(Message msg);
 
     protected abstract int provideContentViewId();//用于引入布局文件
+
+    /**
+     * 控件初始化
+     * setContentView ButterKnife.bind(this);
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initView(Bundle savedInstanceState);
+
+    /**
+     * 数据初始化
+     * 对proxy的调用
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initData(Bundle savedInstanceState);
+
+    /**
+     * 事件初始化
+     * 或可用ButterKnife的@OnClick替代
+     *
+     * @param savedInstanceState
+     */
+    protected abstract void initEvent(Bundle savedInstanceState);
 
 //    public static class MyHandler extends Handler {
 //        private final WeakReference<Activity> mActivity;

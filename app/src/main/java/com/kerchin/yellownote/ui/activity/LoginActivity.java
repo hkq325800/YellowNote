@@ -87,18 +87,18 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
 //        mSVProgressHUD = new SVProgressHUD(this);
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
 
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
         if (!SampleApplicationLike.user.equals("")) {
             mLoginUserEdt.setText(SampleApplicationLike.user);
             mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
@@ -167,7 +167,7 @@ public class LoginActivity extends LoginAbstract {
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         return false;
     }
 

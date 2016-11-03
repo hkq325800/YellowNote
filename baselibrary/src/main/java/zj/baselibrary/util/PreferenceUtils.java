@@ -13,7 +13,8 @@ import java.util.Set;
 
 public class PreferenceUtils {
 
-    private PreferenceUtils() {}
+    private PreferenceUtils() {
+    }
 
     public static SharedPreferences getPreferences(Context context) {
         return PreferenceManager.getDefaultSharedPreferences(context);

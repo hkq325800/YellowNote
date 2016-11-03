@@ -216,7 +216,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
 //        mSVProgressHUD = new SVProgressHUD(this);
         @SuppressLint("InflateParams") View view1 = LayoutInflater.from(this)
@@ -277,7 +277,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         mEditCircleSearch.setText("共0当前第0");
         //初始化笔记本选择
         if (savedInstanceState != null) {
@@ -344,7 +344,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -538,7 +538,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         switch (msg.what) {
             case handle4quit:
                 finish();

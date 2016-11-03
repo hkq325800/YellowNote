@@ -15,8 +15,13 @@ import java.io.FileNotFoundException;
 
 public class NormalUtils {
 
+    public static void killSelf() {
+        android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
     /**
      * 判断网络是否可用
+     *
      * @param context
      * @return
      */

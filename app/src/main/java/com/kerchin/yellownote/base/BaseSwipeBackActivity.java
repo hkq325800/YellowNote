@@ -50,6 +50,7 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        isImmerge = true;
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);
 

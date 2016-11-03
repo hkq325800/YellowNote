@@ -137,7 +137,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
         mNavigationTitleEdt.setText("分享与反馈");
         mNavigationRightBtn.setText("提交");
         mNavigationRightBtn.setVisibility(View.VISIBLE);
@@ -158,7 +158,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         switch (msg.what) {
             case hideSaveBtn:
                 mNavigationRightBtn.setVisibility(View.INVISIBLE);
@@ -173,7 +173,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -265,7 +265,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
 //        setSlidingModeRight();
     }

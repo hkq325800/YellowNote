@@ -66,11 +66,11 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         return false;
     }
 
@@ -80,7 +80,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         //从本地数据判断手势密码状态
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -114,7 +114,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mNavigationTitleEdt.setText("密码相关");
         mNavigationRightBtn.setVisibility(View.INVISIBLE);

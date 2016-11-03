@@ -20,6 +20,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:2.2.2'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'//apt支持
+        classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'//R2支持
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.1'//方法数检查
         classpath ('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker
         //from stepper

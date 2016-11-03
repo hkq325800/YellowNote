@@ -139,7 +139,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     @Override
-    protected void initializeView(Bundle savedInstanceState) {
+    protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
         mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
@@ -207,14 +207,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
-            Trace.d("MainActivity initializeData null");
+            Trace.d("MainActivity initData null");
             noteFragment = NoteFragment.newInstance(null);
             folderFragment = FolderFragment.newInstance(null);
         } else {
             thisPosition = 0;
-            Trace.d("MainActivity initializeData else");
+            Trace.d("MainActivity initData else");
             SampleApplicationLike.setUser(savedInstanceState.getString("user"));
             SampleApplicationLike.setUserIcon(savedInstanceState.getString("userIcon"));
             SampleApplicationLike.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
@@ -355,7 +355,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
         mMainNav.setNavigationItemSelectedListener(this);
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -436,7 +436,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         switch (msg.what) {
             case checkUpdate:
                 dialog = new MaterialDialog.Builder(MainActivity.this)

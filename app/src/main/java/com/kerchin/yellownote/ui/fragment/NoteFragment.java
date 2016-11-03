@@ -158,22 +158,22 @@ public class NoteFragment extends MyBaseFragment
     }
 
     @Override
-    protected void initializeView(View rootView) {
+    protected void initView(View rootView) {
 
     }
 
     @Override
-    protected void initializeData(Bundle savedInstanceState) {
+    protected void initData(Bundle savedInstanceState) {
 
     }
 
     @Override
-    protected void initializeEvent(Bundle savedInstanceState) {
+    protected void initEvent(Bundle savedInstanceState) {
 
     }
 
     @Override
-    protected boolean initializeCallback(Message msg) {
+    protected boolean initCallback(Message msg) {
         stopRefresh();
         switch (msg.what) {
             case GetDataHelper.handle4firstGet:
