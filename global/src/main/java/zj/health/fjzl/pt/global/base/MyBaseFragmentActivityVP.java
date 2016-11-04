@@ -4,8 +4,8 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 
 import butterknife.BindView;
-import zj.health.fjzl.pt.base.base.MyFragmentPagerAdapter;
 
+import zj.baselibrary.base.MyFragmentPagerAdapter;
 import zj.health.fjzl.pt.global.R;
 
 /**

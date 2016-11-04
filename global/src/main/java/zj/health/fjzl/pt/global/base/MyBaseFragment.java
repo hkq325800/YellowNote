@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import zj.health.fjzl.pt.base.base.BaseFragment;
+import zj.baselibrary.base.BaseFragment;
 import zj.health.fjzl.pt.global.R;
 
 /**

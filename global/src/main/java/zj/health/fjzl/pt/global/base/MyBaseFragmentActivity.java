@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.TypedValue;
 
-import zj.health.fjzl.pt.base.base.BaseFragmentActivity;
+import zj.baselibrary.base.BaseFragmentActivity;
 import zj.health.fjzl.pt.global.R;
 
 /**

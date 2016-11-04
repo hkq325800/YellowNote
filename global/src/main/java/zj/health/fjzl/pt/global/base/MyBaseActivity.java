@@ -7,7 +7,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.TypedValue;
 import android.view.MenuItem;
 
-import zj.health.fjzl.pt.base.base.BaseActivity;
+import zj.baselibrary.base.BaseActivity;
 import zj.health.fjzl.pt.global.R;
 
 /**
