@@ -54,3 +54,46 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - [Android 6.0 运行时权限处理](http://www.jianshu.com/p/b4a8b3d4f587)
 - [原生NavigationView菜单中添加消息提醒（小红点）](http://www.jianshu.com/p/90eb9d06480d)
 
+###sth. about modularization
+- baselibrary组件 包含最为广泛的通用项目如BaseActivity、BaseFragment及常用的utils，如TreadPool(线程池)、Immerge(沉浸式状态栏)。引入第三方包butterknife、android-weak-handler、material-dialogs，先以aar的形式导入global，依赖也由global代为引入
+- global组件 引入baselibrary，包含一个项目需要自定义的第三方库，例如网络请求框架、图片加载框架、eventbus、dagger2等，全局的内容，如网络单例、application、自定义widget、Config、通用layout、color、style、drawable等
+- 模块组件 用到全局内容就引入global组件，唯一需要注意的就是butterknife在使用时要用R2
+- app 引入global以及其他模块的组件，androidManifest中需要注册global中的application和设置入口
+
+当前github上同类中较为优秀的
+- material样式库 
+compile 'com.github.vajro:MaterialDesignLibrary:1.6'
+- butterknife 绑定框架
+- eventbus 事件框架
+- retrofit2 网络框架
+- glide 图片框架
+- android-weak-handler 弱引用的handler
+compile 'com.badoo.mobile:android-weak-handler:1.1'
+- material-dialogs 对话框
+compile 'com.afollestad.material-dialogs:core:0.9.0.2'
+- easypermissions 权限获取
+compile 'pub.devrel:easypermissions:0.2.0'
+- bga-photopicker 图片选取
+compile 'cn.bingoogolapple:bga-adapter:1.1.0@aar'
+compile 'cn.bingoogolapple:bga-photopicker:1.1.3'
+- FlycoTabLayout_Lib 可做顶栏或底栏
+compile 'com.flyco.tablayout:FlycoTabLayout_Lib:2.0.8@aar'
+- superadapter 通用适配器
+compile 'org.byteam.superadapter:superadapter:3.6.5'
+- FlipShare/SlideBottomPanel/BottomSheetBuilder 弹出菜单栏 
+- pullloadmorerecyclerview 刷新加载更多列表
+- ormlite/realm 数据库
+- flowlayout 标签布局
+compile 'com.zhy:flowlayout-lib:1.0.1'
+- materialsearchview 搜索栏
+compile 'com.miguelcatalan:materialsearchview:1.4.0'
+- circleimageview 圆形图片
+compile 'de.hdodenhof:circleimageview:2.1.0'
+- blurview 模糊
+compile 'net.robinx:lib.blurview:1.0.2'
+- zxing 二维码
+compile 'cn.yipianfengye.android:zxing-library:1.9'
+- patternlock 手势密码
+compile 'me.zhanghai.android.patternlock:library:2.0.3'
+- explosionfield 爆炸效果
+compile 'tyrantgit:explosionfield:1.0.1'

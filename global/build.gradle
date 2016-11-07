@@ -36,28 +36,27 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    //    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-    //        exclude group: 'com.android.support', module: 'support-annotations'
-    //    })
-//    testCompile 'junit:junit:4.12'
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.2.1'
     //黄油刀 持续更新中
     compile 'com.jakewharton:butterknife:8.4.0'
     //与黄油刀共同使用
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
-    //理论上只应该有application的依赖
-    compile 'com.github.bumptech.glide:glide:3.6.1'//由BannerLayout引入
     //网络库
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+    //multidex
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    //base依赖
     //weakHandler
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     //疯狂更新的高star对话框
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
-    //multidex
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'org.greenrobot:eventbus:3.0.0'
     //为了将影响覆盖到base里的Config
 //    compile project(':baselibrary')
     compile(name: 'baselibrary-release', ext: 'aar')

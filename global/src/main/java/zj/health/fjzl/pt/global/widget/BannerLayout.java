@@ -7,6 +7,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -20,8 +22,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
-
-import com.bumptech.glide.Glide;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -65,6 +65,18 @@ public class BannerLayout extends RelativeLayout {
 
     private int defaultImage;
 
+    public ImageSetListener getListener() {
+        return listener;
+    }
+
+    public void setListener(ImageSetListener listener) {
+        this.listener = listener;
+    }
+
+    private ImageSetListener listener;
+
+    private int currentPosition;
+
     private enum Shape {
         rect, oval
     }
@@ -84,7 +96,7 @@ public class BannerLayout extends RelativeLayout {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what == WHAT_AUTO_PLAY) {
-                if (pager != null) {
+                if (pager != null && isAutoPlay) {
                     pager.setCurrentItem(pager.getCurrentItem() + 1, true);
                     handler.sendEmptyMessageDelayed(WHAT_AUTO_PLAY, autoPlayDuration);
                 }
@@ -94,13 +106,11 @@ public class BannerLayout extends RelativeLayout {
     });
 
     public BannerLayout(Context context) {
-        super(context);
-        init(null, 0);
+        this(context,null);
     }
 
     public BannerLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(attrs, 0);
+        this(context, attrs,0);
     }
 
     public BannerLayout(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -207,7 +217,8 @@ public class BannerLayout extends RelativeLayout {
             }
         });
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Glide.with(getContext()).load(res).centerCrop().into(imageView);
+        listener.setImage(res, imageView, defaultImage);
+//        Glide.with(getContext()).load(res).centerCrop().into(imageView);
         return imageView;
     }
 
@@ -247,16 +258,17 @@ public class BannerLayout extends RelativeLayout {
             }
         });
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        if (defaultImage != 0){
-            Glide.with(getContext()).load(url).placeholder(defaultImage).centerCrop().into(imageView);
-        }else {
-            Glide.with(getContext()).load(url).centerCrop().into(imageView);
-        }
+        listener.setImage(url, imageView, defaultImage);
+//        if (defaultImage != 0){
+//            Glide.with(getContext()).load(url).placeholder(defaultImage).centerCrop().into(imageView);
+//        }else {
+//            Glide.with(getContext()).load(url).centerCrop().into(imageView);
+//        }
         return imageView;
     }
 
     //添加任意View视图
-    private void setViews(final List<View> views) {
+    public void setViews(final List<View> views) {
         //初始化pager
         pager = new ViewPager(getContext());
         //添加viewpager到SliderLayout
@@ -265,7 +277,7 @@ public class BannerLayout extends RelativeLayout {
         //初始化indicatorContainer
         indicatorContainer = new LinearLayout(getContext());
         indicatorContainer.setGravity(Gravity.CENTER_VERTICAL);
-        RelativeLayout.LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
         switch (indicatorPosition) {
             case centerBottom:
@@ -311,15 +323,19 @@ public class BannerLayout extends RelativeLayout {
         //设置当前item到Integer.MAX_VALUE中间的一个值，看起来像无论是往前滑还是往后滑都是ok的
         //如果不设置，用户往左边滑动的时候已经划不动了
         int targetItemPosition = Integer.MAX_VALUE / 2 - Integer.MAX_VALUE / 2 % itemCount;
+        currentPosition = targetItemPosition;
         pager.setCurrentItem(targetItemPosition);
         switchIndicator(targetItemPosition % itemCount);
         pager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                currentPosition = position;
                 switchIndicator(position % itemCount);
             }
         });
-        startAutoPlay();
+        if (isAutoPlay) {
+            startAutoPlay();
+        }
 
     }
 
@@ -338,7 +354,7 @@ public class BannerLayout extends RelativeLayout {
     /**
      * 开始自动轮播
      */
-    public void startAutoPlay() {
+    private void startAutoPlay() {
         stopAutoPlay(); // 避免重复消息
         if (isAutoPlay) {
             handler.sendEmptyMessageDelayed(WHAT_AUTO_PLAY, autoPlayDuration);
@@ -359,11 +375,20 @@ public class BannerLayout extends RelativeLayout {
     /**
      * 停止自动轮播
      */
-    public void stopAutoPlay() {
+    private void stopAutoPlay() {
         if (isAutoPlay) {
             handler.removeMessages(WHAT_AUTO_PLAY);
         }
     }
+
+    /**
+     *
+     * @param autoPlay 是否自动轮播
+     */
+    public void setAutoPlay(boolean autoPlay) {
+        isAutoPlay = autoPlay;
+    }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -398,6 +423,54 @@ public class BannerLayout extends RelativeLayout {
     public interface OnBannerItemClickListener {
         void onItemClick(int position);
     }
+
+    @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        currentPosition = savedState.currentPosition;
+        requestLayout();
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.currentPosition = currentPosition;
+        return savedState;
+    }
+
+    static class SavedState extends BaseSavedState {
+        int currentPosition;
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        private SavedState(Parcel in) {
+            super(in);
+            currentPosition = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeInt(currentPosition);
+        }
+
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
+    }
+
 
     public class LoopPagerAdapter extends PagerAdapter {
         private List<View> views;
@@ -464,6 +537,10 @@ public class BannerLayout extends RelativeLayout {
             // Ignore received duration, use fixed one instead
             super.startScroll(startX, startY, dx, dy, mDuration);
         }
+    }
+
+    public interface ImageSetListener{
+        void setImage(Object res, ImageView imageView, int defaultImage);
     }
 }
 
