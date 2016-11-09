@@ -60,29 +60,19 @@ git clone https://github.com/hkq325800/YellowNote.git --depth=1
 - 模块组件 用到全局内容就引入global组件，唯一需要注意的就是butterknife在使用时要用R2
 - app 引入global以及其他模块的组件，androidManifest中需要注册global中的application和设置入口
 
-当前github上同类中较为优秀的
+###当前github上同类中较为优秀的
 - material样式库 
 compile 'com.github.vajro:MaterialDesignLibrary:1.6'
-- butterknife 绑定框架
-- eventbus 事件框架
-- retrofit2 网络框架
-- glide 图片框架
-- android-weak-handler 弱引用的handler
-compile 'com.badoo.mobile:android-weak-handler:1.1'
 - material-dialogs 对话框
 compile 'com.afollestad.material-dialogs:core:0.9.0.2'
-- easypermissions 权限获取
-compile 'pub.devrel:easypermissions:0.2.0'
-- bga-photopicker 图片选取
-compile 'cn.bingoogolapple:bga-adapter:1.1.0@aar'
-compile 'cn.bingoogolapple:bga-photopicker:1.1.3'
 - FlycoTabLayout_Lib 可做顶栏或底栏
 compile 'com.flyco.tablayout:FlycoTabLayout_Lib:2.0.8@aar'
-- superadapter 通用适配器
-compile 'org.byteam.superadapter:superadapter:3.6.5'
 - FlipShare/SlideBottomPanel/BottomSheetBuilder 弹出菜单栏 
+compile 'me.wangyuwei:FlipShare:1.0.1'
+compile 'com.github.kingideayou:SlideBottomPanel:1.0.6'
+compile 'com.github.rubensousa:BottomSheetBuilder:1.3'
 - pullloadmorerecyclerview 刷新加载更多列表
-- ormlite/realm 数据库
+compile 'com.wuxiaolong.pullloadmorerecyclerview:library:1.1.1'
 - flowlayout 标签布局
 compile 'com.zhy:flowlayout-lib:1.0.1'
 - materialsearchview 搜索栏
@@ -91,9 +81,58 @@ compile 'com.miguelcatalan:materialsearchview:1.4.0'
 compile 'de.hdodenhof:circleimageview:2.1.0'
 - blurview 模糊
 compile 'net.robinx:lib.blurview:1.0.2'
+- explosionfield 爆炸效果
+compile 'tyrantgit:explosionfield:1.0.1'
+- convenientBanner 轮播图
+compile 'com.nineoldandroids:library:2.4.0'
+compile 'com.android.support:support-v4:latestVersion'
+compile 'cn.bingoogolapple:bga-banner:latestVersion@aar'
+
+- butterknife 绑定框架
+classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'
+classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'com.jakewharton.butterknife'
+compile 'com.jakewharton:butterknife:8.4.0'
+apt 'com.jakewharton:butterknife-compiler:8.4.0'
+- eventbus 事件框架
+compile 'org.greenrobot:eventbus:3.0.0'
+- retrofit2 网络框架
+compile 'com.squareup.retrofit2:retrofit:2.1.0'
+compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+debugCompile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
+- glide 图片框架
+compile 'com.github.bumptech.glide:glide:3.7.0'
+- android-weak-handler 弱引用的handler
+compile 'com.badoo.mobile:android-weak-handler:1.1'
+- easypermissions 权限获取
+compile 'pub.devrel:easypermissions:0.2.0'
+- bga-photopicker 图片选取
+compile 'cn.bingoogolapple:bga-adapter:1.1.0@aar'
+compile 'cn.bingoogolapple:bga-photopicker:1.1.3'
+- superadapter 通用适配器
+compile 'org.byteam.superadapter:superadapter:3.6.5'
+- ormlite/realm 数据库(lib)
+compile 'com.j256.ormlite:ormlite-android:5.0'
+compile 'com.j256.ormlite:ormlite-core:5.0'
 - zxing 二维码
 compile 'cn.yipianfengye.android:zxing-library:1.9'
 - patternlock 手势密码
 compile 'me.zhanghai.android.patternlock:library:2.0.3'
-- explosionfield 爆炸效果
-compile 'tyrantgit:explosionfield:1.0.1'
+- leakcanary 内存泄漏
+debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+- 安全的preference
+compile 'com.scottyab:secure-preferences-lib:0.1.4'
+- multidex
+compile "com.android.support:multidex:1.0.1"
+"defaultConfig multiDexEnabled true"
+
+- 列表加载动画(lib)
+progresslayout
+- 按住持续作用的控件(lib)
+snappingstepper
+- 右划退出库(lib)
+SlidingLibrary
+
+- 缓存？
