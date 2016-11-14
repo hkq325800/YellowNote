@@ -87,6 +87,10 @@ compile 'tyrantgit:explosionfield:1.0.1'
 compile 'com.nineoldandroids:library:2.4.0'
 compile 'com.android.support:support-v4:latestVersion'
 compile 'cn.bingoogolapple:bga-banner:latestVersion@aar'
+- titleBar 标题栏
+compile 'cn.bingoogolapple:bga-titlebar:latestVersion@aar'
+- 徽章控件 BGABadgeView-Android
+compile 'cn.bingoogolapple:bga-badgeview:latestVersion@aar'
 
 - butterknife 绑定框架
 classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'

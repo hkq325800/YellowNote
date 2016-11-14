@@ -26,17 +26,6 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
 
-    public void dismissDialog() {
-        if (dialog != null && dialog.isShowing())
-            dialog.dismiss();
-//            dialog.getView().postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    dialog.dismiss();
-//                }
-//            }, 800);
-    }
-
     /**
      * 禁止滑动退出
      */

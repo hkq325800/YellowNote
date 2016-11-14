@@ -82,6 +82,11 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     protected abstract void initEvent(Bundle savedInstanceState);
 
+    protected void dismissDialog(){
+        if(dialog!=null && dialog.isShowing())
+            dialog.dismiss();
+    }
+
 //    public static class MyHandler extends Handler {
 //        private final WeakReference<Activity> mActivity;
 //        private InitializeCallback callback;
