@@ -30,6 +30,8 @@ import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+
+import zj.baselibrary.util.KeyboardUtil;
 import zj.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
@@ -102,12 +104,21 @@ public class LoginActivity extends LoginAbstract {
         if (!SampleApplicationLike.user.equals("")) {
             mLoginUserEdt.setText(SampleApplicationLike.user);
             mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
-//            mLoginPassTextInput.getEditText().setSelected(true);
-//            mLoginPassTextInput.bringToFront();
-//            mLoginPassTextInput.requestFocusFromTouch();
-            //TODO mLoginPassEdt获取焦点
+            mLoginPassEdt.requestFocus();
+            //TODO 软键盘无法弹出
+            mLoginPassTextInput.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginPassTextInput);
+                }
+            }, 800);
         } else
-            mLoginUserEdt.requestFocus();
+            mLoginUserEdt.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginUserEdt);
+                }
+            }, 800);
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
