@@ -11,12 +11,11 @@ import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
-import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
 

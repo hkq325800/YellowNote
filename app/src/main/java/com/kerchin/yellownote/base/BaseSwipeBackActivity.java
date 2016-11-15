@@ -1,7 +1,6 @@
 package com.kerchin.yellownote.base;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.View;
@@ -11,7 +10,7 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;
 import com.kerchin.yellownote.R;
 
-import zj.baselibrary.base.BaseActivity;
+import zj.remote.baselibrary.base.BaseActivity;
 
 import static com.kerchin.yellownote.R.drawable.slide_shadow;
 

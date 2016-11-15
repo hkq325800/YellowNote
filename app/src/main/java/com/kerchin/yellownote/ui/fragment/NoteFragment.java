@@ -44,8 +44,8 @@ import butterknife.OnItemLongClick;
 import me.wangyuwei.flipshare.FlipShareView;
 import me.wangyuwei.flipshare.ShareItem;
 import tyrantgit.explosionfield.ExplosionField;
-import zj.baselibrary.util.DialogUtils;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 public class NoteFragment extends MyBaseFragment
         implements WaterDropListView.IWaterDropListViewListener

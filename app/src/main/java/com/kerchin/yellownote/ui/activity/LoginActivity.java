@@ -31,16 +31,16 @@ import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
-import zj.baselibrary.util.KeyboardUtil;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.KeyboardUtil;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import zj.baselibrary.util.DialogUtils;
-import zj.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2015/8/1 0005.

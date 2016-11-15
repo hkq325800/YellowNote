@@ -24,7 +24,7 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
@@ -34,7 +34,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import zj.baselibrary.util.SystemUtils;
+import zj.remote.baselibrary.util.SystemUtils;
 
 /**
  * Created by Kerchin on 2016/3/5 0005.

@@ -36,7 +36,7 @@ import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;

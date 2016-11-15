@@ -2,7 +2,7 @@ package com.kerchin.yellownote.base;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 
-import zj.baselibrary.base.BaseFragment;
+import zj.remote.baselibrary.base.BaseFragment;
 
 /**
  * Created by ucmed on 2016/9/27.

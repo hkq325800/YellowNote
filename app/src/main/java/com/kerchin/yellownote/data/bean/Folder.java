@@ -7,9 +7,8 @@ import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.data.proxy.FolderService;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.io.Serializable;

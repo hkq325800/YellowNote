@@ -9,7 +9,6 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.AVException;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.PreferenceContract;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.global.SampleApplicationLike;
@@ -21,7 +20,7 @@ import java.util.Locale;
 
 import me.zhanghai.android.patternlock.PatternUtils;
 import me.zhanghai.android.patternlock.PatternView;
-import zj.baselibrary.util.PreferenceUtils;
+import zj.remote.baselibrary.util.PreferenceUtils;
 
 public class PatternLockUtils {
 

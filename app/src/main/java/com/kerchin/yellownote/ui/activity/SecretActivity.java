@@ -25,14 +25,14 @@ import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import zj.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2016/4/9 0009.

@@ -20,7 +20,7 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import butterknife.BindView;

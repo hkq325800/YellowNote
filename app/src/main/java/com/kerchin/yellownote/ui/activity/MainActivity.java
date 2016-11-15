@@ -34,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.content.ClipboardManager;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
@@ -66,12 +65,10 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
-import com.tencent.tinker.lib.tinker.Tinker;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
-import com.tencent.tinker.lib.tinker.TinkerLoadResult;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
@@ -85,8 +82,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
-import zj.baselibrary.util.SystemUtils;
-import zj.baselibrary.util.ViewPagerTransform.DepthPageTransformer;
+import zj.remote.baselibrary.util.SystemUtils;
+import zj.remote.baselibrary.util.ViewPagerTransform.DepthPageTransformer;
 
 public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         implements NavigationView.OnNavigationItemSelectedListener {

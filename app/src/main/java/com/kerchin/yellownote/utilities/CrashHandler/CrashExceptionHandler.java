@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 
 import java.io.File;
@@ -20,7 +19,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import zj.baselibrary.util.SystemUtils;
+import zj.remote.baselibrary.util.SystemUtils;
 
 /**
  * app奔溃异常处理器

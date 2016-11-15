@@ -20,7 +20,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.zhanghai.android.patternlock.PatternView;
-import zj.baselibrary.util.Immerge.ImmergeUtils;
+import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
  * 确认密码界面

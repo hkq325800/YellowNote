@@ -108,7 +108,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         MultiDex.install(base);
 
         context = getApplication();
-        zj.baselibrary.Config.isDebugMode = Config.isDebugMode;
+        zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
 
         TinkerManager.setTinkerApplicationLike(this);
         TinkerManager.initFastCrashProtect();

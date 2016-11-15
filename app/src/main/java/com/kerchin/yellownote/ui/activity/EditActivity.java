@@ -20,7 +20,6 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -45,7 +44,7 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import zj.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 
 import java.util.ArrayList;
@@ -56,8 +55,8 @@ import java.util.concurrent.Executors;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import zj.baselibrary.util.DialogUtils;
-import zj.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.SoftKeyboardUtils;
 
 /**
  * Created by Kerchin on 2015/9/30 0030.
