@@ -167,7 +167,8 @@ dependencies {
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
-    compile project(':baselibrary')
+//    compile project(':baselibrary')
+    compile(name: 'baselibrary-release', ext: 'aar')
 }
 
 def gitSha() {

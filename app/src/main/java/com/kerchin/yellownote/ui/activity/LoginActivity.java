@@ -105,20 +105,8 @@ public class LoginActivity extends LoginAbstract {
             mLoginUserEdt.setText(SampleApplicationLike.user);
             mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
             mLoginPassEdt.requestFocus();
-            //TODO 软键盘无法弹出
-            mLoginPassTextInput.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginPassTextInput);
-                }
-            }, 800);
-        } else
-            mLoginUserEdt.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginUserEdt);
-                }
-            }, 800);
+            //干脆地使用初始设置 键盘自动弹出
+        }
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -134,23 +122,23 @@ public class LoginActivity extends LoginAbstract {
             }
         });
         //禁止scrollview的滑动
-        mLoginScV.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View arg0, MotionEvent arg1) {
-                return true;
-            }
-        });
-        mLoginFunLiL.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mLoginScV.smoothScrollTo(0, mLoginScV.getHeight());
-                    }
-                }, 400);
-            }
-        });
+//        mLoginScV.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View arg0, MotionEvent arg1) {
+//                return true;
+//            }
+//        });
+//        mLoginFunLiL.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+//            @Override
+//            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+//                new Handler().postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        mLoginScV.smoothScrollTo(0, mLoginScV.getHeight());
+//                    }
+//                }, 400);
+//            }
+//        });
         mLoginProveEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -170,11 +158,11 @@ public class LoginActivity extends LoginAbstract {
                 return false;
             }
         });
+
 //        mLoginPassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
 //        mLoginRePassEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(13)});
         mLoginProveEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
         mLoginUserEdt.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
-
     }
 
     @Override
