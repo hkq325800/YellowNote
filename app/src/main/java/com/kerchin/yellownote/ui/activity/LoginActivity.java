@@ -3,13 +3,11 @@ package com.kerchin.yellownote.ui.activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -18,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
@@ -25,22 +24,20 @@ import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.data.bean.PrimaryData;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
+import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-
-import zj.remote.baselibrary.util.KeyboardUtil;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import com.kerchin.yellownote.utilities.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import zj.remote.baselibrary.util.DialogUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 /**
  * Created by Kerchin on 2015/8/1 0005.
@@ -72,6 +69,8 @@ public class LoginActivity extends LoginAbstract {
     LinearLayout mLoginFunLiL;
     @BindView(R.id.mLoginIconImg)
     ImageView mLoginIconImg;
+    @BindView(R.id.mLoginMineTxt)
+    TextView mLoginMineTxt;
     //    private SVProgressHUD mSVProgressHUD;
     private final static byte statusInit = -1;//未查询或查询中
     private final static byte statusFalse = 0;//查询结果为假
@@ -90,8 +89,34 @@ public class LoginActivity extends LoginAbstract {
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        ButterKnife.bind(this);
 //        mSVProgressHUD = new SVProgressHUD(this);
+        String str = mLoginMineTxt.getText().toString();
+        try {
+            str = str + "\nV" + NormalUtils.getVersionName(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mLoginMineTxt.setText(str);
+        if (!SampleApplicationLike.user.equals("")) {
+            mLoginUserEdt.setText(SampleApplicationLike.user);
+            mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
+            mLoginPassEdt.requestFocus();
+//            mLoginPassTextInput.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginPassTextInput);
+//                }
+//            }, 1000);
+            //干脆地使用初始设置 键盘自动弹出
+        }
+//        else {
+//            mLoginUserEdt.postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginUserEdt);
+//                }
+//            }, 800);
+//        }
     }
 
     @Override
@@ -101,12 +126,6 @@ public class LoginActivity extends LoginAbstract {
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
-        if (!SampleApplicationLike.user.equals("")) {
-            mLoginUserEdt.setText(SampleApplicationLike.user);
-            mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
-            mLoginPassEdt.requestFocus();
-            //干脆地使用初始设置 键盘自动弹出
-        }
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {

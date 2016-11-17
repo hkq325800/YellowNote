@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -45,18 +46,27 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    public static String getVersionName(Context context) throws Exception {
+        // 获取packagemanager的实例
+        PackageManager packageManager = context.getPackageManager();
+        // getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+        String version = packInfo.versionName;
+        return version;
+    }
+
     public static boolean isNetworkAvailable(Context context) {
-        if(context !=null){
+        if (context != null) {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo info = cm.getActiveNetworkInfo();
-            if(info !=null){
+            if (info != null) {
                 return info.isAvailable();
             }
         }
         return false;
     }
 
-    public static void downloadByWeb(Context context, String versionCode){
+    public static void downloadByWeb(Context context, String versionCode) {
         Intent intent = new Intent(context,
                 DownloadService.class);
         intent.putExtra("uriStr", context.getString(R.string.uri_download));
@@ -66,6 +76,7 @@ public class NormalUtils {
 
     /**
      * 内部下载
+     *
      * @param context
      * @param uriStr
      */
@@ -393,7 +404,7 @@ public class NormalUtils {
         try {
             FileOutputStream out = new FileOutputStream(f);
 //            if (type.contains("jpg") || type.contains("jpeg"))
-                bm.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            bm.compress(Bitmap.CompressFormat.JPEG, 90, out);
 //            else
 //                bm.compress(Bitmap.CompressFormat.PNG, 70, out);
             out.flush();

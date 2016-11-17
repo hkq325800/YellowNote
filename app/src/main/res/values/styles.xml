@@ -38,9 +38,15 @@
         <item name="clockTextColor">@color/colorPrimary</item>
     </style>
 
-    <style name="AppTheme.Splash" parent="AppTheme">
+    <style name="AppTheme.Splash" parent="Theme.AppCompat.Light">
         <item name="android:windowBackground">@drawable/splash</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="colorPrimary">@color/fabPrimary</item>
+        <!--@color/colorPrimary-->
+        <item name="colorPrimaryDark">@color/fabPrimary</item>
+        <!--@color/colorPrimaryDark-->
+        <item name="colorAccent">@color/fabPrimary</item>
+        <item name="colorControlHighlight">@color/fabPrimary</item>
+        <!--<item name="android:windowFullscreen">true</item>-->
     </style>
 
     <style name="AppTheme.NoActionBar" parent="AppTheme">

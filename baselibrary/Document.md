@@ -16,7 +16,7 @@ fragment_(场景名称)_(作用)——fragment_address_map
 【调换位置】并以text_size、height、width、margin开头方便分类寻找，再在后面加上【所代表的数值】一目了然
 ```
 large_text_size——text_size_large_16sp
-head_text_height——height_head_text_25dp
+head_text_height——length_head_text_25dp
 tool_margins——margin_tool_5dp
 ```
 3. layout中id的命名

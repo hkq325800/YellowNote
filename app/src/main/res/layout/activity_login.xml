@@ -1,6 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/lightSkyBlue">
 
     <ScrollView
@@ -27,12 +28,13 @@
                 android:src="@mipmap/icon" />
 
             <TextView
+                android:id="@+id/mLoginMineTxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
                 android:gravity="center_horizontal"
-                android:text="@string/declare"
-                android:textColor="@color/textColor"
-                android:layout_marginTop="5dp"/>
+                tools:text="@string/declare"
+                android:textColor="@color/textColor" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/mLoginUserTextInput"
