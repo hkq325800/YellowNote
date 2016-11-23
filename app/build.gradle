@@ -167,8 +167,10 @@ dependencies {
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
-//    compile project(':baselibrary')
-    compile(name: 'baselibrary-release', ext: 'aar')
+    compile project(':baselibrary')
+//    compile(name: 'baselibrary-release', ext: 'aar')
+//    compile 'com.oguzdev:CircularFloatingActionMenu:1.0.2'
+    compile project(':fabmenu')
 }
 
 def gitSha() {

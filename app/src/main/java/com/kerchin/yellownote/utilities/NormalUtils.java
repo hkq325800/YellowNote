@@ -21,6 +21,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Base64;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.data.service.DownloadService;
@@ -46,6 +49,29 @@ import java.util.Locale;
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {
+    public static String result;
+    public static void onlyGetTitleFromUrl(Context context, String url) {
+        WebView webView = new WebView(context);
+        WebChromeClient wvcc = new WebChromeClient() {
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                result = title;
+//                Log.d("ANDROID_LAB", "TITLE="+title);
+                //title 就是网页的title
+            }
+        };
+        webView.setWebChromeClient(wvcc);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        webView.loadUrl(url);
+    }
+
     public static String getVersionName(Context context) throws Exception {
         // 获取packagemanager的实例
         PackageManager packageManager = context.getPackageManager();

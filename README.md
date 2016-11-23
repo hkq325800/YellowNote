@@ -131,6 +131,8 @@ compile 'com.scottyab:secure-preferences-lib:0.1.4'
 - multidex
 compile "com.android.support:multidex:1.0.1"
 "defaultConfig multiDexEnabled true"
+- utilcode 各种工具类库
+compile 'com.blankj:utilcode:1.3.4'
 
 - 列表加载动画(lib)
 progresslayout
@@ -139,4 +141,5 @@ snappingstepper
 - 右划退出库(lib)
 SlidingLibrary
 
-- 缓存？
+Timber 日志记录
+Dagger2 依赖注入

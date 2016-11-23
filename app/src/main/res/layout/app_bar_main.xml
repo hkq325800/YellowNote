@@ -1,48 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context=".MainActivity">
 
-    <!--<android.support.design.widget.AppBarLayout
-        android:layout_height="?attr/actionBarSize"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:fab="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:context=".MainActivity">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+            android:theme="@style/AppTheme.AppBarOverlay"
+            fab:elevation="0dp">
 
-    </android.support.design.widget.AppBarLayout>-->
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/mMainToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorPrimary"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="@style/AppTheme.AppBarOverlay" />
 
-    <!--<include layout="@layout/content_main" />-->
+        </android.support.design.widget.AppBarLayout>
+
+        <!--<android.support.design.widget.AppBarLayout
+            android:layout_height="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:theme="@style/AppTheme.AppBarOverlay">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/mMainToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                fab:popupTheme="@style/AppTheme.PopupOverlay" />
+
+        </android.support.design.widget.AppBarLayout>-->
+
+        <!--<include layout="@layout/content_main" />-->
 
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/mMainPager"
-        android:layout_width="fill_parent"
-        android:background="?attr/clockBackground"
-        android:layout_height="wrap_content" />
-    <!--android:layout_marginTop="?attr/actionBarSize"-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/mMainPager"
+            android:layout_width="fill_parent"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_height="wrap_content"
+            android:background="?attr/clockBackground" />
+        <!--android:layout_marginTop="?attr/actionBarSize"-->
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/mMainFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        fab:borderWidth="0dp"
-        fab:rippleColor="@color/minionYellow_pressed"
-        fab:backgroundTint="@color/minionYellow"
-        android:src="@mipmap/btn_menu" /><!--@android:drawable/ic_dialog_email-->
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/mMainFab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:fitsSystemWindows="true"
+            android:src="@mipmap/btn_menu"
+            fab:backgroundTint="@color/minionYellow"
+            fab:borderWidth="0dp"
+            fab:rippleColor="@color/minionYellow_pressed" /><!--@android:drawable/ic_dialog_email-->
 
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>
 </merge>

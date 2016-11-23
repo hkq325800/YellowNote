@@ -92,7 +92,7 @@ public class LoginActivity extends LoginAbstract {
 //        mSVProgressHUD = new SVProgressHUD(this);
         String str = mLoginMineTxt.getText().toString();
         try {
-            str = str + "\nV" + NormalUtils.getVersionName(this);
+            str = str + "V" + NormalUtils.getVersionName(this);
         } catch (Exception e) {
             e.printStackTrace();
         }

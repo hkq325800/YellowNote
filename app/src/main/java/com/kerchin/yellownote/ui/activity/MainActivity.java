@@ -90,7 +90,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @BindView(R.id.mMainPager)
     ViewPager mMainPager;
     @BindView(R.id.mMainFab)
-    public FloatingActionButton mMainFab;
+    FloatingActionButton mMainFab;
     @BindView(R.id.mMainNav)
     NavigationView mMainNav;
     @BindView(R.id.mMainDrawer)
@@ -101,9 +101,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     CircleImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
 
-    public static int thisPosition = 0;
     public boolean isHide = false;
     //    private static Long mExitTime = (long) 0;//退出时间
+    private int thisPosition = 0;
     private boolean isDrawerOpen = false;
     private SearchView mSearchView;
     private MenuItem btnSearch, btnSort, btnDelete;
@@ -113,15 +113,15 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private ArrayList<Fragment> fragments = new ArrayList<>();
     public DayNightHelper mDayNightHelper;
 
-    private int REQUEST_LOAD_IMAGE = 100;
-    private final static int REQUEST_QRCODE = 101;
-    private int REQUEST_WRITE_PERMISSION = 102;
+    private static final int REQUEST_LOAD_IMAGE = 100;
+    private static final int REQUEST_QRCODE = 101;
+    private static final int REQUEST_WRITE_PERMISSION = 102;
     private static final int REQUEST_CAMERA_PERMISSION = 103;
 
-    File savePath;
-    File userIconFile;
-    String userIconPath;
-    String versionContent, versionCode;
+    private File savePath;
+    private File userIconFile;
+    private String userIconPath;
+    private String versionContent, versionCode;
 
     @Override
     protected void doSthBeforeSetView() {
@@ -255,6 +255,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void onPageSelected(int position) {
                 thisPosition = position;
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
+                if (mMainFab.getTag() != null && (boolean) mMainFab.getTag())
+                    mMainFab.callOnClick();
                 if (position == 0 && btnDelete != null) {
                     //delete初始化
                     noteFragment.respondForChange();//onPageSelected
@@ -362,25 +364,28 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 startActivityForResult(i, REQUEST_LOAD_IMAGE);
             }
         });
-        //若新增按钮位置下移 说明软键盘收起
+        //若新增按钮位置下移 说明软键盘收起 还有可能是虚拟键盘问题
         mMainFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 //                Trace.d("onLayoutChange", "left" + left + " top" + top + " right" + right + " bottom" + bottom);
 //                Trace.d("onLayoutChangeOld", "left" + oldLeft + " top" + oldTop + " right" + oldRight + " bottom" + oldBottom);
-                if (getFragmentStatus() != null) {
-                    if (top > oldTop) {
-                        getFragmentStatus().setIsSoftKeyboardUp(false);
-//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
-//                    mSearchView.onActionViewCollapsed();
-//                    noteFragment.restore();
-                    } else if (top < oldTop) {
-                        getFragmentStatus().setIsSoftKeyboardUp(true);
-//                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
-                    }
-                } else {
-                    Trace.show(getApplicationContext(), "过久未使用 资源被回收");
-                }
+                //TODO test
+                if (mMainFab.getTag() != null && (boolean) mMainFab.getTag())
+                    mMainFab.callOnClick();
+//                if (getFragmentStatus() != null) {
+//                    if (top > oldTop) {
+//                        getFragmentStatus().setIsSoftKeyboardUp(false);
+////                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+////                    mSearchView.onActionViewCollapsed();
+////                    noteFragment.restore();
+//                    } else if (top < oldTop) {
+//                        getFragmentStatus().setIsSoftKeyboardUp(true);
+////                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
+//                    }
+//                } else {
+//                    Trace.show(getApplicationContext(), "过久未使用 资源被回收");
+//                }
             }
         });
         mMainDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
@@ -391,7 +396,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
+                //TODO Tinker就以下一句
+//                TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
 //                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
 //                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
 //                }
@@ -749,7 +755,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         toggleThemeSetting();
 //        noteFragment.refreshUI(mDayNightHelper);
         folderFragment.refreshUI(mDayNightHelper);
-//        refreshStatusBar();//TODO 目前没用到
+//        refreshStatusBar();//目前没用到
     }
 
     /**
