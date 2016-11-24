@@ -4,6 +4,7 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -599,10 +600,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         return new ToolbarStatus();
     }
 
-    public static void startMe(Context context) {
+    public static void startMe(Activity context) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+        context.overridePendingTransition(R.anim.push_left_in,
+                R.anim.push_left_out);
     }
 
     @Override

@@ -356,7 +356,7 @@ public class NoteFragment extends MyBaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity().getApplicationContext()//addClick
+            EditActivity.startMe(getActivity()//addClick
                     , null);
         } else
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
@@ -618,7 +618,7 @@ public class NoteFragment extends MyBaseFragment
         if (PrimaryData.status.isFolderReady) {
             MainActivity m = (MainActivity) getActivity();
             m.hideBtnAdd();
-            EditActivity.startMe(getActivity().getApplicationContext()//OnItemClick
+            EditActivity.startMe(getActivity()//OnItemClick
                     , primaryData.getNote(noteAdapter.getItem(position - 1).getObjectId()));
         } else {
             Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");

@@ -71,7 +71,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             @Override
             public void run() {
                 if (isFromLaunch) {
-                    MainActivity.startMe(getApplicationContext());
+                    MainActivity.startMe(ConfirmPatternActivity.this);
                 } else {
                     setResult(RESULT_OK);
                 }
@@ -132,7 +132,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == requestForForget && resultCode == RESULT_OK) {
-            MainActivity.startMe(getApplicationContext());
+            MainActivity.startMe(ConfirmPatternActivity.this);
             finish();
             overridePendingTransition(R.anim.push_left_in,
                     R.anim.push_left_out);

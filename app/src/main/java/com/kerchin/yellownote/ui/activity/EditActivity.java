@@ -2,6 +2,7 @@ package com.kerchin.yellownote.ui.activity;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -126,11 +127,13 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @SuppressWarnings("FieldCanBeLocal")
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
 
-    public static void startMe(Context context, Note note) {
+    public static void startMe(Activity context, Note note) {
         Intent intent = new Intent(context, EditActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.putExtra("mNote", note);
         context.startActivity(intent);
+        context.overridePendingTransition(R.anim.push_left_in,
+                R.anim.push_left_out);
     }
 
     @Override

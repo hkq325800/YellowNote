@@ -37,6 +37,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private static final byte next = 1;
     private static final byte reLog = 2;
     private static final byte reLogForFrozen = 4;
+    private static final byte just = 5;
     @BindView(R.id.mWelcomeRetryReL)
     RelativeLayout mWelcomeRetryReL;
     @BindView(R.id.mWelcomeTxt)
@@ -149,10 +150,13 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                         intent.putExtra("isFromLaunch", true);
                         startActivity(intent);
                     } else
-                        MainActivity.startMe(getApplicationContext());
+                        MainActivity.startMe(LaunchActivity.this);
 //                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
-                    finish();
+                    handler.sendEmptyMessageDelayed(just, 800);//为解决闪屏问题
+//                    finish();
                     break;
+                case just:
+                    finish();
                 default:
                     break;
             }

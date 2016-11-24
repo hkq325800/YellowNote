@@ -675,11 +675,9 @@ public class LoginActivity extends LoginAbstract {
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
                 dismissDialog();
-                MainActivity.startMe(getApplicationContext());
+                MainActivity.startMe(LoginActivity.this);
 //                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
                 finish();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
             } else {
                 if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {
                     if (PrimaryData.status != null)
