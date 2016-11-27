@@ -1,13 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     repositories {
         jcenter()
         maven {
-            url "http://repo2.maven.org/maven2/"
+            url "http://mvn.leancloud.cn/nexus/content/repositories/public"
         }
         maven {
-            url "http://mvn.leancloud.cn/nexus/content/repositories/releases"
+            url "http://repo2.maven.org/maven2/"
         }
         maven {
             url 'https://dl.bintray.com/wangyuwei/maven'
@@ -23,7 +22,7 @@ buildscript {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'//apt支持
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'//R2支持
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.1'//方法数检查
-        classpath ('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker
+        classpath('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker
         //from stepper
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
 //        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4'
@@ -33,15 +32,14 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
-
 allprojects {
     repositories {
         jcenter()
         maven {
-            url "http://repo2.maven.org/maven2/"
+            url "http://mvn.leancloud.cn/nexus/content/repositories/public"
         }
         maven {
-            url "http://mvn.leancloud.cn/nexus/content/repositories/releases"
+            url "http://repo2.maven.org/maven2/"
         }
         maven { url "https://jitpack.io" }
         maven {
@@ -54,7 +52,6 @@ allprojects {
         }
     }
 }
-
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
