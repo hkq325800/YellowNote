@@ -10,6 +10,7 @@
         tools:context=".MainActivity">
 
         <android.support.design.widget.AppBarLayout
+            android:id="@+id/mMainAbl"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:theme="@style/AppTheme.AppBarOverlay"

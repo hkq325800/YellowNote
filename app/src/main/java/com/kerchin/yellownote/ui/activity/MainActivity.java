@@ -19,6 +19,8 @@ import android.os.Environment;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.internal.NavigationMenuView;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -47,6 +49,8 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.GetDataCallback;
+import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
+import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
 import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.data.adapter.MyFragmentPagerAdapter;
@@ -98,6 +102,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     DrawerLayout mMainDrawer;
     @BindView(R.id.mMainToolbar)
     Toolbar mMainToolbar;
+    @BindView(R.id.mMainAbl)
+    AppBarLayout mMainAbl;
     TextView mNavHeaderMainTipTxt;
     CircleImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
@@ -113,6 +119,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private ActionBarDrawerToggle toggle;
     private ArrayList<Fragment> fragments = new ArrayList<>();
     public DayNightHelper mDayNightHelper;
+    private BottomSheetDialog mBottomSheetDialog;
 
     private static final int REQUEST_LOAD_IMAGE = 100;
     private static final int REQUEST_QRCODE = 101;
@@ -256,8 +263,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void onPageSelected(int position) {
                 thisPosition = position;
                 mMainToolbar.setTitle(position == 0 ? "笔记" : "笔记本");
-                if (mMainFab.getTag() != null && (boolean) mMainFab.getTag())
-                    mMainFab.callOnClick();
+//                if (mMainFab.getTag() != null && (boolean) mMainFab.getTag())//TODO 等以后按钮式召出菜单时需要设置
+//                    mMainFab.callOnClick();
                 if (position == 0 && btnDelete != null) {
                     //delete初始化
                     noteFragment.respondForChange();//onPageSelected
@@ -371,9 +378,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
 //                Trace.d("onLayoutChange", "left" + left + " top" + top + " right" + right + " bottom" + bottom);
 //                Trace.d("onLayoutChangeOld", "left" + oldLeft + " top" + oldTop + " right" + oldRight + " bottom" + oldBottom);
-                //TODO test
-                if (mMainFab.getTag() != null && (boolean) mMainFab.getTag())
-                    mMainFab.callOnClick();
 //                if (getFragmentStatus() != null) {
 //                    if (top > oldTop) {
 //                        getFragmentStatus().setIsSoftKeyboardUp(false);
@@ -672,9 +676,31 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     @OnClick(R.id.mMainFab)
     public void createNew() {
-        if (thisPosition == 0)
-            noteFragment.addClick();
-        else if (thisPosition == 1) {
+        if (thisPosition == 0) {
+            mBottomSheetDialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
+                    .setMode(BottomSheetBuilder.MODE_GRID)
+                    .setAppBarLayout(mMainAbl)
+                    .setMenu(R.menu.menu_bottom_grid_tablet_sheet)
+                    .expandOnStart(true)
+                    .setItemClickListener(new BottomSheetItemClickListener() {
+                        @Override
+                        public void onBottomSheetItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.mKeepMenu:
+                                    noteFragment.addClick();
+                                    break;
+                                case R.id.mIndexMenu:
+                                    Trace.show(MainActivity.this, item.getItemId() + "");
+                                    break;
+                                case R.id.mHangoutsMenu:
+                                    Trace.show(MainActivity.this, item.getItemId() + "");
+                                    break;
+                            }
+                        }
+                    })
+                    .createDialog();
+            mBottomSheetDialog.show();
+        } else if (thisPosition == 1) {
             hideBtnAdd();
             folderFragment.addClick();
         }

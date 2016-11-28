@@ -67,7 +67,7 @@ compile 'com.github.vajro:MaterialDesignLibrary:1.6'
 compile 'com.afollestad.material-dialogs:core:0.9.0.2'
 - FlycoTabLayout_Lib 可做顶栏或底栏
 compile 'com.flyco.tablayout:FlycoTabLayout_Lib:2.0.8@aar'
-- FlipShare/SlideBottomPanel/BottomSheetBuilder 弹出菜单栏 
+- FlipShare/SlideBottomPanel/!BottomSheetBuilder 弹出菜单栏 
 compile 'me.wangyuwei:FlipShare:1.0.1'
 compile 'com.github.kingideayou:SlideBottomPanel:1.0.6'
 compile 'com.github.rubensousa:BottomSheetBuilder:1.3'

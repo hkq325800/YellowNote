@@ -24,7 +24,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
 
     public final static String TAG = BaseFragmentActivity.class.getCanonicalName();
     @ColorRes
-    protected int immergeColor = R.color.colorPrimary;
+    protected int immergeColor = 0;
     protected ArrayList<Fragment> fragments = new ArrayList<>();
     protected WeakHandler handler;
     protected int lastTabIndex;
@@ -51,7 +51,8 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         doSthBeforeSetView();
         setContentView(provideContentViewId());
-        ImmergeUtils.immerge(this, immergeColor);
+        if (immergeColor != 0)
+            ImmergeUtils.immerge(this, immergeColor);
         ButterKnife.bind(this);
         initFragments(savedInstanceState);
         initView(savedInstanceState);

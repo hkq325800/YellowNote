@@ -20,17 +20,16 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     protected final static String TAG = BaseActivity.class.getCanonicalName();
     @ColorRes
-    protected int immergeColor = R.color.colorPrimary;
+    protected int immergeColor = 0;
     protected WeakHandler handler;
     public MaterialDialog dialog;
-    protected boolean isImmerge = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         doSthBeforeSetView();
         setContentView(provideContentViewId());
-        if (isImmerge)
+        if (immergeColor != 0)
             ImmergeUtils.immerge(this, immergeColor);
         ButterKnife.bind(this);
         initView(savedInstanceState);
@@ -82,8 +81,8 @@ public abstract class BaseActivity extends AppCompatActivity {
      */
     protected abstract void initEvent(Bundle savedInstanceState);
 
-    protected void dismissDialog(){
-        if(dialog!=null && dialog.isShowing())
+    protected void dismissDialog() {
+        if (dialog != null && dialog.isShowing())
             dialog.dismiss();
     }
 

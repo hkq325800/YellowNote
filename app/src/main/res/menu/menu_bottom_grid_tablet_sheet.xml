@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/mKeepMenu"
+        android:icon="@drawable/ic_keep_48dp"
+        android:title="Keep" />
+
+    <item
+        android:id="@+id/mIndexMenu"
+        android:icon="@drawable/ic_inbox_48dp"
+        android:title="Inbox" />
+
+    <item
+        android:id="@+id/mHangoutsMenu"
+        android:icon="@drawable/ic_hangouts_48dp"
+        android:title="Hangouts" />
+
+</menu>

@@ -169,7 +169,7 @@ dependencies {
     compile files('libs/ormlite-core-5.0.jar')
     compile project(':baselibrary')
 //    compile(name: 'baselibrary-release', ext: 'aar')
-//    compile 'com.oguzdev:CircularFloatingActionMenu:1.0.2'
+    compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
 }
 
 def gitSha() {

@@ -38,7 +38,7 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        isImmerge = true;
+        immergeColor = R.color.colorPrimary;
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);
 
