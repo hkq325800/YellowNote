@@ -14,7 +14,7 @@ import com.badoo.mobile.util.WeakHandler;
 import butterknife.ButterKnife;
 
 /**
- * Created by ucmed on 2016/9/19.
+ * Created by hkq325800 on 2016/9/19.
  */
 public abstract class BaseFragment extends Fragment {
     protected final static String TAG = BaseFragment.class.getCanonicalName();

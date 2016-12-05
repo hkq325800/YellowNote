@@ -82,8 +82,8 @@ public class LoginActivity extends LoginAbstract {
     private int repeatCount = 0;
 
     @Override
-    protected void doSthBeforeSetView() {
-        super.doSthBeforeSetView();
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
     }
 

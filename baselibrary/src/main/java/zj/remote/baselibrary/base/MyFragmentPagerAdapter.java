@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import java.util.List;
 
 /**
- * Created by ucmed on 2016/9/19.
+ * Created by hkq325800 on 2016/9/19.
  */
 public class MyFragmentPagerAdapter extends FragmentPagerAdapter {
     private List<Fragment> fragments;

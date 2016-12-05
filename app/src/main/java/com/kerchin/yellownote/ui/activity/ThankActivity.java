@@ -52,8 +52,8 @@ public class ThankActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void doSthBeforeSetView() {
-        super.doSthBeforeSetView();
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);

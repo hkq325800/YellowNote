@@ -58,8 +58,8 @@ public class SecretActivity extends BaseSwipeBackActivity {
     boolean isForget;
 
     @Override
-    protected void doSthBeforeSetView() {
-        super.doSthBeforeSetView();
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         DayNightHelper mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);

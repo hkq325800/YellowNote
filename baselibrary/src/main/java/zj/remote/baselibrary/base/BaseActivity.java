@@ -10,11 +10,10 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.badoo.mobile.util.WeakHandler;
 
 import butterknife.ButterKnife;
-import zj.remote.baselibrary.R;
 import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
- * Created by ucmed on 2016/9/14.
+ * Created by hkq325800 on 2016/9/14.
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
@@ -27,17 +26,25 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doSthBeforeSetView();
+        //setContentView之前 通常为getIntent获取上层数据及设置immergeColor handler
+        doSthBeforeSetView(savedInstanceState);
+        //通过provideContentViewId获取R.layout
         setContentView(provideContentViewId());
-        if (immergeColor != 0)
-            ImmergeUtils.immerge(this, immergeColor);
+        //setContentView之后 为了不通过重写initView初始化标题栏 而设置此方法
+        doSthAfterSetView();
+        //ButterKnife绑定
         ButterKnife.bind(this);
         initView(savedInstanceState);
         initData(savedInstanceState);
         initEvent(savedInstanceState);
     }
 
-    protected void doSthBeforeSetView() {
+    protected void doSthAfterSetView() {
+        if (immergeColor != 0)
+            ImmergeUtils.immerge(this, immergeColor);
+    }
+
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
         handler = new WeakHandler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -59,7 +66,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 控件初始化
-     * setContentView ButterKnife.bind(this);
      *
      * @param savedInstanceState
      */
@@ -67,15 +73,15 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 数据初始化
-     * 对proxy的调用
+     * 对proxy的调用 以及后期通过savedInstanceState对重启应用的支持
      *
      * @param savedInstanceState
      */
     protected abstract void initData(Bundle savedInstanceState);
 
     /**
-     * 事件初始化
-     * 或可用ButterKnife的@OnClick替代
+     * 第三方控件事件初始化
+     * 常用控件可用ButterKnife的@OnClick替代
      *
      * @param savedInstanceState
      */

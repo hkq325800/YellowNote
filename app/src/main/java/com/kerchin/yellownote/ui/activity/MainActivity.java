@@ -132,8 +132,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private String versionContent, versionCode;
 
     @Override
-    protected void doSthBeforeSetView() {
-        super.doSthBeforeSetView();
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
         mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {

@@ -49,8 +49,8 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //    View view;
 
     @Override
-    protected void doSthBeforeSetView() {
-        super.doSthBeforeSetView();
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
         immergeColor = R.color.minionYellow;
     }

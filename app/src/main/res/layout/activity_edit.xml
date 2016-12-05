@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:stepper="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/clockBackground"
@@ -17,13 +16,19 @@
             android:layout_height="?attr/actionBarSize" />
     </LinearLayout>
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/mEditFuncViP"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparent"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/edit_function_height" />
+
     <ScrollView
         android:id="@+id/mEditScroll"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_below="@id/mEditNavLinear"
-        android:layout_weight="1"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/mEditFuncViP"
         android:fillViewport="true">
 
         <EditText
@@ -38,12 +43,5 @@
             android:paddingRight="16dp"
             android:paddingTop="10dp" />
     </ScrollView>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/mEditFuncViP"
-        android:layout_alignParentBottom="true"
-        android:background="@color/transparent"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/edit_function_height" />
 
 </RelativeLayout>

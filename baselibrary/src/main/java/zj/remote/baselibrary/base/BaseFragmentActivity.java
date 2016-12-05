@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.ColorRes;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import com.badoo.mobile.util.WeakHandler;
@@ -13,12 +12,11 @@ import com.badoo.mobile.util.WeakHandler;
 import java.util.ArrayList;
 
 import butterknife.ButterKnife;
-import zj.remote.baselibrary.R;
 import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 
 /**
- * Created by ucmed on 2016/9/19.
- * 没有toolbar canBack
+ * 需要自定义fragments
+ * Created by hkq325800 on 2016/9/19.
  */
 public abstract class BaseFragmentActivity extends AppCompatActivity {
 
@@ -30,26 +28,26 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
     protected int lastTabIndex;
     protected int nextTabIndex;
 
-    /**
-     * Fragment切换
-     *
-     * @param resId
-     */
-    protected void switchFragment(int resId) {
-
-        FragmentTransaction trx = getSupportFragmentManager().beginTransaction();
-        trx.hide(fragments.get(lastTabIndex));
-        if (!fragments.get(nextTabIndex).isAdded()) {
-            trx.add(resId, fragments.get(nextTabIndex));
-        }
-        trx.show(fragments.get(nextTabIndex)).commit();
-        lastTabIndex = nextTabIndex;
-    }
+//    /**
+//     * Fragment切换
+//     *
+//     * @param resId
+//     */
+//    protected void switchFragment(int resId) {
+//
+//        FragmentTransaction trx = getSupportFragmentManager().beginTransaction();
+//        trx.hide(fragments.get(lastTabIndex));
+//        if (!fragments.get(nextTabIndex).isAdded()) {
+//            trx.add(resId, fragments.get(nextTabIndex));
+//        }
+//        trx.show(fragments.get(nextTabIndex)).commit();
+//        lastTabIndex = nextTabIndex;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        doSthBeforeSetView();
+        doSthBeforeSetView(savedInstanceState);
         setContentView(provideContentViewId());
         if (immergeColor != 0)
             ImmergeUtils.immerge(this, immergeColor);
@@ -60,7 +58,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {
         initEvent(savedInstanceState);
     }
 
-    protected void doSthBeforeSetView() {
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
         handler = new WeakHandler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
