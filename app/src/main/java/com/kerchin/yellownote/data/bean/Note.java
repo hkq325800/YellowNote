@@ -15,6 +15,7 @@ import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 
+import zj.remote.baselibrary.util.Base64Util;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import com.kerchin.yellownote.utilities.Trace;
@@ -87,7 +88,7 @@ public class Note implements Serializable {
         this.date = new Date(date);
         this.folder = folder;
         this.folderId = folderId;
-        this.content = NormalUtils.sha1StringToString(contentCode);
+        this.content = Base64Util.sha1StringToString(contentCode);
         if (content.length() > 70)
             preview = content.substring(0, 70).replace("\n", " ");
         else
@@ -222,7 +223,7 @@ public class Note implements Serializable {
                     try {
                         newNote = NoteService.addNewNote(
                                 SampleApplicationLike.user, newTitle
-                                , NormalUtils.stringToSha1String(newContent), folder, folderId);
+                                , Base64Util.stringToSha1String(newContent), folder, folderId);
                     } catch (AVException e) {
                         isOffline = true;
                         //离线新增给objectId 编辑离线新增不再赋值
@@ -275,7 +276,7 @@ public class Note implements Serializable {
                     boolean isOffline = false;
                     try {
                         NoteService.saveEdit(objectId, newTitle
-                                , NormalUtils.stringToSha1String(newContent));
+                                , Base64Util.stringToSha1String(newContent));
                         Trace.d("saveModifyNote 成功");
                     } catch (AVException e) {
 //                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));

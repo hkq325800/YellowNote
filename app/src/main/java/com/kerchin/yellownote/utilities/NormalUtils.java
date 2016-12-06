@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.utilities;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -180,22 +179,6 @@ public class NormalUtils {
 //    }
 
     /**
-     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
-     */
-    public static int px2dip(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
-    }
-
-    /**
-     * 根据手机的分辨率从 dp(像素) 的单位 转成为 px
-     */
-    public static int dip2px(Context context, float dipValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) ((dipValue - 0.5f) * scale);
-    }
-
-    /**
      * 跳转activity
      *
      * @param context  上下文
@@ -272,43 +255,6 @@ public class NormalUtils {
         return result;
     }
 
-    //encode
-
-    private static byte[] sha1(byte[] input) {
-        try {
-            return MessageDigest.getInstance("SHA-1").digest(input);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static byte[] stringToSha1(String str) {
-        return /*sha1(*/str.getBytes(Charset.forName("UTF-8"))/*)*/;
-    }
-
-    public static String stringToSha1String(String string) {
-        return bytesToString(stringToSha1(string));
-    }
-
-    private static String bytesToString(byte[] bytes) {
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
-    }
-
-    //decode
-
-    private static byte[] stringToBytes(String string) {
-        return Base64.decode(string, Base64.DEFAULT);
-    }
-
-    public static String sha1StringToString(String string) {
-        try {
-            return new String(stringToBytes(string), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
-
     private static final Field TEXT_LINE_CACHED;
 
     static {
@@ -352,7 +298,7 @@ public class NormalUtils {
      * @param requestCode
      */
     public static boolean requestPermission(Activity context, int requestCode, @RequiresPermission String permission) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        if (ContextCompat.checkSelfPermission(context, permission)
                 != PackageManager.PERMISSION_GRANTED) {
             //申请WRITE_EXTERNAL_STORAGE权限
             ActivityCompat.requestPermissions(context, new String[]{permission},

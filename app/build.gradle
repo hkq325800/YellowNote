@@ -170,6 +170,7 @@ dependencies {
     compile project(':baselibrary')
 //    compile(name: 'baselibrary-release', ext: 'aar')
     compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
+    compile 'me.immortalz:transitionhelper:1.0.6'
 }
 
 def gitSha() {

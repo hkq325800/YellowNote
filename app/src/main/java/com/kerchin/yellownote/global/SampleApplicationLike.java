@@ -111,7 +111,8 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
 
         TinkerManager.setTinkerApplicationLike(this);
-        TinkerManager.initFastCrashProtect();
+        //阻碍了crash信息收集
+//        TinkerManager.initFastCrashProtect();
         //should set before tinker is installed
         TinkerManager.setUpgradeRetryEnable(true);
         //optional set logIml, or you can use default debug log
@@ -130,6 +131,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         shared = new SecurePreferences(getApplication());
         user = shared.getString(Config.KEY_USER, "");
         isLogin = shared.getBoolean(Config.KEY_ISLOGIN, false);
+        //来自手势密码
         initDisplayOpinion();
     }
 
