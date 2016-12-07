@@ -172,6 +172,8 @@ dependencies {
 //    compile(name: 'baselibrary-release', ext: 'aar')
     compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
     compile 'me.immortalz:transitionhelper:1.0.6'
+    compile 'com.yalantis:ucrop:2.2.0'
+    compile 'org.greenrobot:eventbus:3.0.0'
 }
 
 def gitSha() {

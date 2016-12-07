@@ -13,7 +13,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.webkit.MimeTypeMap;
 
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import java.io.File;
 

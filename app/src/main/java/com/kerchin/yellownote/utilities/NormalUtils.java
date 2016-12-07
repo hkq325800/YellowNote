@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.annotation.RequiresPermission;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
@@ -42,6 +43,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * com.kerchin.yellownote.utilities
@@ -409,6 +412,8 @@ public class NormalUtils {
     }
 
     public static String getPathFromUri(Context context, Uri selectedImage) {
+        if(!TextUtils.isEmpty(selectedImage.getEncodedPath()))
+            return selectedImage.getEncodedPath();
         String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
         Cursor cursor = context.getContentResolver().query(selectedImage,

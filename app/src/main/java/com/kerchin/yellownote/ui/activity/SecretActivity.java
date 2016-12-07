@@ -26,7 +26,7 @@ import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
@@ -183,7 +183,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                                 mNavigationRightBtn.setEnabled(true);
                             }
                         });
-                        Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), Toast.LENGTH_LONG);
+                        Trace.show(getApplicationContext(), "请检查网络后单击图标重试" + Trace.getErrorMsg(e), false);
                     }
                 }
             });
@@ -201,7 +201,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     mNavigationRightBtn.setEnabled(true);
                     break;
                 case reLogForFrozen:
-                    Trace.show(getApplicationContext(), "您操作的账号已被冻结,请联系 hkq325800@163.com", Toast.LENGTH_LONG);
+                    Trace.show(getApplicationContext(), "您操作的账号已被冻结,请联系 hkq325800@163.com", false);
                     mNavigationRightBtn.setEnabled(true);
                     break;
                 case trueForSecret:

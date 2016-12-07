@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import java.lang.reflect.Field;
 

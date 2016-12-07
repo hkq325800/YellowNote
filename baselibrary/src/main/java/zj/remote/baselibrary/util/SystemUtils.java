@@ -51,11 +51,15 @@ public class SystemUtils {
      * @return
      */
     public static String getDeviceIMEI(Context context) {
-        TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        if (telephonyManager == null || TextUtils.isEmpty(telephonyManager.getDeviceId())) {
-            return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        } else {
-            return telephonyManager.getDeviceId();
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (telephonyManager == null || TextUtils.isEmpty(telephonyManager.getDeviceId())) {
+                return Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+            } else {
+                return telephonyManager.getDeviceId();
+            }
+        } catch (Exception e){
+            return "";
         }
     }
 

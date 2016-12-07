@@ -63,6 +63,18 @@ public class Trace {
         }
     }
 
+    public static void e(String msg, Throwable tr) {
+        if (Config.isDebugMode) {
+            Log.e(TAG, msg, tr);
+        }
+    }
+
+    public static void e(String TAG, String msg, Throwable tr) {
+        if (Config.isDebugMode) {
+            Log.e(TAG, msg, tr);
+        }
+    }
+
     public static void show(final Context context, final String msg) {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }

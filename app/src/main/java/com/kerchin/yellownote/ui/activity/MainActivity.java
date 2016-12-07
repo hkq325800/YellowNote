@@ -62,6 +62,7 @@ import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
+import com.kerchin.yellownote.utilities.CropUtil;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
@@ -72,10 +73,11 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
+import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -526,18 +528,52 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            final Uri selectedImage = data.getData();
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_LOAD_IMAGE && null != data) {
+                final Uri selectedImage = data.getData();
+                CropUtil.startCropActivity(MainActivity.this, selectedImage);
+//                ThreadPool.getInstance().execute(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        dealPicFromSelect(selectedImage);
+//                    }
+//                });
+            } else if (requestCode == REQUEST_QRCODE && data != null) {
+                dealQRCode(data);
+            } else if (requestCode == UCrop.REQUEST_CROP) {
+                handleCropResult(data);
+            }
+        } else if (resultCode == UCrop.RESULT_ERROR) {
+            handleCropError(data);
+        }
+//        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void handleCropError(@NonNull Intent result) {
+        final Throwable cropError = UCrop.getError(result);
+        if (cropError != null) {
+            Trace.e(TAG, "handleCropError: ", cropError);
+            Trace.show(MainActivity.this, cropError.getMessage(), false);
+        } else {
+            Trace.show(MainActivity.this, "UnExpected Error");
+        }
+    }
+
+    private void handleCropResult(@NonNull Intent result) {
+        //得到结果的uri
+        final Uri resultUri = UCrop.getOutput(result);
+        if (resultUri != null) {
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
-                    dealPicFromSelect(selectedImage);
+                    dealPicFromSelect(resultUri);
                 }
             });
-        } else if (requestCode == REQUEST_QRCODE && data != null) {
-            dealQRCode(data);
+            //传送到结果界面预览
+//            ResultActivity.startWithUri(MainActivity.this, resultUri);
+        } else {
+            Toast.makeText(MainActivity.this, "Cannot retrieve cropped image", Toast.LENGTH_SHORT).show();
         }
-//        super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void dealQRCode(Intent data) {
@@ -551,11 +587,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //用浏览器打开
             try {
                 NormalUtils.downloadByUri(MainActivity.this, result);
-                Trace.show(this, "发现二维码中的网址，将用浏览器打开：\n" + result, Toast.LENGTH_LONG);
+                Trace.show(this, "发现二维码中的网址，将用浏览器打开：\n" + result, false);
             } catch (Exception e) {
                 e.printStackTrace();
                 ClipBoardUtils.copy(result, MainActivity.this);
-                Trace.show(this, "已将二维码数据复制到剪贴板：\n" + result, Toast.LENGTH_LONG);
+                Trace.show(this, "已将二维码数据复制到剪贴板：\n" + result, false);
             }
         } else
             Trace.show(this, "解析二维码失败");

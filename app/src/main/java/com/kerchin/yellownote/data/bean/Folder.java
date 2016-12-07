@@ -5,11 +5,15 @@ import android.app.Activity;
 import com.avos.avoscloud.AVException;
 import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.data.proxy.FolderService;
+
+import org.greenrobot.eventbus.EventBus;
+
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import java.io.Serializable;
 import java.util.List;
@@ -90,7 +94,8 @@ public class Folder implements Serializable {
                         }
                         NoteFragment.isChanged4note = true;//reName
                     }
-                    handler.sendEmptyMessage(handle4respond);
+                    EventBus.getDefault().post(new FolderRespondEvent());
+//                    handler.sendEmptyMessage(handle4respond);
                 } catch (AVException e) {
                     Trace.show(context, "目前暂不支持离线重命名" + Trace.getErrorMsg(e));
                     e.printStackTrace();
@@ -108,7 +113,8 @@ public class Folder implements Serializable {
                         FolderService.delete(objectId);
                         PrimaryData.getInstance().removeFolderByPosition(position);
                         Trace.show(context, "删除成功");
-                        handler.sendEmptyMessage(handle4respond);
+                        EventBus.getDefault().post(new FolderRespondEvent());
+//                        handler.sendEmptyMessage(handle4respond);
                     } catch (AVException e) {
                         e.printStackTrace();
                         Trace.show(context, "目前暂不支持离线删除" + Trace.getErrorMsg(e));

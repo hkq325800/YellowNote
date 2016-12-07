@@ -9,7 +9,7 @@ import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.data.proxy.NoteService;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import java.util.ArrayList;
 import java.util.Collections;

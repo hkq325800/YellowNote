@@ -24,6 +24,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.MyBaseFragment;
@@ -37,9 +38,11 @@ import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import org.byteam.superadapter.IMulItemViewType;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -73,6 +76,7 @@ public class FolderFragment extends MyBaseFragment {
         IntentFilter filter = new IntentFilter();
         filter.addAction("refresh");
         getDataHelper = new GetDataHelper();
+        EventBus.getDefault().register(this);
     }
 
     private void setRecycleView() {
@@ -642,6 +646,11 @@ public class FolderFragment extends MyBaseFragment {
                 .input(hint, preFill, false, listener)
                 .contentColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .widgetColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT)).show();
+    }
+
+    @Subscribe
+    public void onEvent(FolderRespondEvent event){
+        handler.sendEmptyMessage(GetDataHelper.handle4respond);
     }
 
     /**

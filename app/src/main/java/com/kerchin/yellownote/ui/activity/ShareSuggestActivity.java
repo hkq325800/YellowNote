@@ -26,7 +26,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 import com.securepreferences.SecurePreferences;
 
 import java.util.Date;

@@ -21,7 +21,7 @@ import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

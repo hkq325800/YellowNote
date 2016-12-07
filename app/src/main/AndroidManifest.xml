@@ -87,6 +87,10 @@
             android:theme="@style/TransparentThemeDay"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity android:name=".ui.activity.OrmLiteConsoleActivity" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
 
         <service android:name="com.kerchin.yellownote.data.service.DownloadService">
             <intent-filter android:priority="1000">

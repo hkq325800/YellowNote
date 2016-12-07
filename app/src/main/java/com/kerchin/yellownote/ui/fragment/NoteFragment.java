@@ -26,7 +26,9 @@ import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.utilities.Trace;
+
+import zj.remote.baselibrary.util.Trace;
+
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
@@ -397,29 +399,27 @@ public class NoteFragment extends MyBaseFragment
                             } else {
                                 deleteViewHide();
                                 //统计每个folder被删除了多少
-                                if (noteAdapter != null) {
-                                    if (noteAdapter.getDeleteNum() > 0) {
-                                        MainActivity mainActivity = (MainActivity) getActivity();
-                                        dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
-                                                , false, "删除中...", "请稍候")
-                                                .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
-                                                .backgroundColorRes(mainActivity.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_TEXT)).show();
+                                if (noteAdapter != null && noteAdapter.getDeleteNum() > 0) {
+                                    MainActivity mainActivity = (MainActivity) getActivity();
+                                    dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
+                                            , false, "删除中...", "请稍候")
+                                            .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                                            .backgroundColorRes(mainActivity.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_TEXT)).show();
 //                                        mSVProgressHUD.showWithStatus("删除中...");
-                                        final int num = noteAdapter.getDeleteNum();
-                                        getDataHelper.respond();
-                                        for (int i = 0; i < num; i++) {
-                                            final Note note = noteAdapter.getDeleteItem(i);
-                                            //线上删除
-                                            Trace.d("readyToDelete " + note.getTitle());
-                                            Message msg = new Message();
-                                            msg.obj = note;
-                                            msg.what = handle4explosion;//ui特效
-                                            MainActivity m = (MainActivity) getActivity();
-                                            note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
-                                        }
-                                        //循环查询是否删除 从数据源中重新获取list并设置到adapter中
-                                        handler.post(runnableForDataAfterDelete);
+                                    final int num = noteAdapter.getDeleteNum();
+                                    getDataHelper.respond();
+                                    for (int i = 0; i < num; i++) {
+                                        final Note note = noteAdapter.getDeleteItem(i);
+                                        //线上删除
+                                        Trace.d("readyToDelete " + note.getTitle());
+                                        Message msg = new Message();
+                                        msg.obj = note;
+                                        msg.what = handle4explosion;//ui特效
+                                        MainActivity m = (MainActivity) getActivity();
+                                        note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
                                     }
+                                    //循环查询是否删除 从数据源中重新获取list并设置到adapter中
+                                    handler.post(runnableForDataAfterDelete);
                                 }
                             }
                             break;

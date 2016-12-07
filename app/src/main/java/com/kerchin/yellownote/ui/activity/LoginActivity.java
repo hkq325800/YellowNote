@@ -30,7 +30,7 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
@@ -490,7 +490,7 @@ public class LoginActivity extends LoginAbstract {
                                         boolean isFrozen = user.getBoolean("isFrozen");
                                         if (isFrozen) {
                                             dismissDialog();
-                                            Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", Toast.LENGTH_LONG);
+                                            Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", false);
                                         } else {
                                             SampleApplicationLike.userDefaultFolderId = user.getString("user_default_folderId");
                                             SampleApplicationLike.setUserIcon(user.getString("user_icon"));

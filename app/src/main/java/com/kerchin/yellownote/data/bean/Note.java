@@ -18,7 +18,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import zj.remote.baselibrary.util.Base64Util;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
-import com.kerchin.yellownote.utilities.Trace;
+import zj.remote.baselibrary.util.Trace;
 
 import java.io.Serializable;
 import java.util.Date;
