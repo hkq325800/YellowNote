@@ -126,6 +126,7 @@ public class LoginActivity extends LoginAbstract {
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
         mLoginPassEdt.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {

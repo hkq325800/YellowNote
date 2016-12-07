@@ -10,13 +10,14 @@ import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;
 import com.kerchin.yellownote.R;
 
+import org.greenrobot.eventbus.EventBus;
+
 import zj.remote.baselibrary.base.BaseActivity;
 
 import static com.kerchin.yellownote.R.drawable.slide_shadow;
 
 /**
  * Created by Kerchin Huang on 15/6/11.
- *
  */
 public abstract class BaseSwipeBackActivity extends BaseActivity
         implements SlidingMenu.OnOpenedListener {
@@ -25,23 +26,25 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
 
+    protected boolean hasEventBus = false;
+
     /**
      * 禁止滑动退出
      */
-    public void closeSliding(){
+    public void closeSliding() {
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_NONE);
     }
 
-    public void openSliding(){
+    public void openSliding() {
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void doSthBeforeSetView(Bundle savedInstanceState) {
+        super.doSthBeforeSetView(savedInstanceState);
         immergeColor = R.color.colorPrimary;
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);
-
         setSlidingActionBarEnabled(false);
         //这里借用了SlidingMenu的setBehindContentView方法来设置一个透明菜单
         View behindView = new View(this);
@@ -63,13 +66,18 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
         //因为微信是只有边缘滑动，我们设置成TOUCHMODE_MARGIN模式，如果你想要全屏幕滑动，只需要把这个改成TOUCHMODE_FULLSCREEN就OK了
         mSlidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
         setSlidingMargin(40f);
-        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void initEvent(Bundle savedInstanceState) {
+        if (hasEventBus)
+            EventBus.getDefault().register(this);
     }
 
     /**
      * 设置左滑动
      */
-    public void setSlidingModeRight(){
+    public void setSlidingModeRight() {
         mSlidingMenu.setMode(SlidingMenu.RIGHT);
         mSlidingMenu.setShadowWidth(-100);
         setSlidingMargin(48f);
@@ -77,9 +85,10 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
 
     /**
      * 设置滑动边距
+     *
      * @param dp 边距
      */
-    public void setSlidingMargin(float dp){
+    public void setSlidingMargin(float dp) {
         mSlidingMenu.setTouchmodeMarginThreshold((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 dp, getResources().getDisplayMetrics()));//默认48dp
     }
@@ -177,5 +186,12 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
     public void finish() {
         super.finish();
         this.overridePendingTransition(0, R.anim.slide_out_right);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (hasEventBus)
+            EventBus.getDefault().unregister(this);
     }
 }

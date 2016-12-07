@@ -6,7 +6,7 @@ import com.kerchin.yellownote.data.bean.Note;
  * Created by hkq325800 on 2016/12/7.
  */
 
-public class NoteDeleteEvent {
+public class FolderDeleteEvent {
     public Note getNote() {
         return note;
     }
@@ -17,7 +17,7 @@ public class NoteDeleteEvent {
 
     private Note note;
 
-    public NoteDeleteEvent(Note note) {
+    public FolderDeleteEvent(Note note) {
         this.note = note;
     }
 }

@@ -138,6 +138,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
         mNavigationTitleEdt.setText("分享与反馈");
         mNavigationRightBtn.setText("提交");
         mNavigationRightBtn.setVisibility(View.VISIBLE);
@@ -208,7 +209,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("升级版本:" + versionCode)
                                                 .content(version.getString("version_content"))
-                                                .backgroundColorRes(mDayNightHelper.getColorResId(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .positiveText("下载")
@@ -242,7 +243,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                     public void onClick(View v) {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("当前版本:" + versionCode)
-                                                .backgroundColorRes(mDayNightHelper.getColorResId(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .content(version.getString("version_content")).show();

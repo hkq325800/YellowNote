@@ -1,6 +1,10 @@
 package com.kerchin.yellownote.base;
 
+import android.os.Bundle;
+
 import com.afollestad.materialdialogs.MaterialDialog;
+
+import org.greenrobot.eventbus.EventBus;
 
 import zj.remote.baselibrary.base.BaseFragment;
 
@@ -11,6 +15,12 @@ import zj.remote.baselibrary.base.BaseFragment;
 public abstract class MyBaseFragment extends BaseFragment {
     public MaterialDialog dialog;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
     public void dismissDialog() {
         if (dialog != null && dialog.isShowing())
             dialog.dismiss();
@@ -20,5 +30,11 @@ public abstract class MyBaseFragment extends BaseFragment {
 //                    dialog.dismiss();
 //                }
 //            }, 800);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

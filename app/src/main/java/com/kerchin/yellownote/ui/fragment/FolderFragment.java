@@ -24,6 +24,8 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.FolderDeleteEvent;
 import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
@@ -73,10 +75,9 @@ public class FolderFragment extends MyBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Trace.d("FolderFragment onCreate");
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("refresh");
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction("refresh");
         getDataHelper = new GetDataHelper();
-        EventBus.getDefault().register(this);
     }
 
     private void setRecycleView() {
@@ -183,11 +184,8 @@ public class FolderFragment extends MyBaseFragment {
                                                             @Override
                                                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                                                 Trace.d("readyToDelete " + note.getTitle());
-                                                                Message msg = new Message();
-                                                                msg.obj = note;
-                                                                msg.what = handle4explosion;//ui特效
                                                                 MainActivity m = (MainActivity) getActivity();
-                                                                note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
+                                                                note.delete(m.getHelper(), note, Note.FROM_FOLDER);
                                                             }
                                                         });
                                                 break;
@@ -233,7 +231,7 @@ public class FolderFragment extends MyBaseFragment {
             public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
                 getDataHelper.respond();//reTitleNoteDialogShow->note.reName
                 primaryData.getNote(item.getObjectId()).move2folder(getActivity()
-                        , primaryData.getFolder(mFolderId[position]), handler, GetDataHelper.handle4respond);
+                        , primaryData.getFolder(mFolderId[position]));
                 Trace.show(getActivity(), "移动成功！");
             }
         });
@@ -299,9 +297,7 @@ public class FolderFragment extends MyBaseFragment {
                             Trace.show(getActivity(), "不要与默认笔记本重名");
                         } else {
                             getDataHelper.respond();//reTitleNoteDialogShow->note.reName
-                            note.reName(getActivity()
-                                    , input.toString()
-                                    , handler, GetDataHelper.handle4respond);
+                            note.reName(getActivity(), input.toString());
                             dismissDialog();
                             MainActivity mainActivity = (MainActivity) getActivity();
                             mainActivity.showBtnAdd();
@@ -330,9 +326,7 @@ public class FolderFragment extends MyBaseFragment {
                                 Trace.show(getActivity(), "已存在相同名称的笔记本");
                             } else {
                                 getDataHelper.respond();//reTitleFolderDialogShow->folder.reName
-                                folder.reName(getActivity()
-                                        , input.toString()
-                                        , handler, GetDataHelper.handle4respond);
+                                folder.reName(getActivity(), input.toString());
                                 dismissDialog();
                                 MainActivity mainActivity = (MainActivity) getActivity();
                                 mainActivity.showBtnAdd();
@@ -401,7 +395,7 @@ public class FolderFragment extends MyBaseFragment {
                             dismissDialog();
                             getDataHelper.respond();//deleteFolder->folder.delete
                             primaryData.getFolderAt(position)
-                                    .delete(getActivity(), position, handler, GetDataHelper.handle4respond);
+                                    .delete(getActivity(), position);
                         }
                     });
         }
@@ -513,16 +507,16 @@ public class FolderFragment extends MyBaseFragment {
     @Override
     protected boolean initCallback(Message msg) {
         switch (msg.what) {
-            case handle4explosion:
-                Trace.d("handlerInFolder handle4explosion");
-                Note note = (Note) msg.obj;
-                primaryData.listNote.remove(note);//列表中去除目标
-                primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
-                primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
-                NoteFragment.isChanged4note = true;//handle4explosion
-//                    primaryData.getSimpleEntityFromList();
-                setRecycleView();//refresh
-                break;
+//            case handle4explosion:
+//                Trace.d("handlerInFolder handle4explosion");
+//                Note note = (Note) msg.obj;
+//                primaryData.listNote.remove(note);//列表中去除目标
+//                primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
+//                primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
+//                NoteFragment.isChanged4note = true;//handle4explosion
+////                    primaryData.getSimpleEntityFromList();
+//                setRecycleView();//refresh
+//                break;
             case GetDataHelper.handle4refresh:
                 Trace.d("handlerInFolder handle4refresh");
 //                    getHeaderListFromFolder();//handle4refresh
@@ -541,9 +535,9 @@ public class FolderFragment extends MyBaseFragment {
 //                    getHeaderListFromFolder();//handle4respond
                 setRecycleView();//respond
                 break;
-            case GetDataHelper.handle4error:
-                String str = (String) msg.obj;
-                Trace.show(getActivity().getApplicationContext(), str);
+//            case GetDataHelper.handle4error:
+//                String str = (String) msg.obj;
+//                Trace.show(getActivity().getApplicationContext(), str);
             default:
                 break;
         }
@@ -574,7 +568,7 @@ public class FolderFragment extends MyBaseFragment {
             , MaterialDialog.SingleButtonCallback positiveListener) {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .title(title)
                 .content(content)
@@ -601,7 +595,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .items((CharSequence[]) items)
                 .itemsColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
@@ -629,7 +623,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColorRes(main.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .cancelListener(new DialogInterface.OnCancelListener() {
                     @Override
@@ -646,11 +640,6 @@ public class FolderFragment extends MyBaseFragment {
                 .input(hint, preFill, false, listener)
                 .contentColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .widgetColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT)).show();
-    }
-
-    @Subscribe
-    public void onEvent(FolderRespondEvent event){
-        handler.sendEmptyMessage(GetDataHelper.handle4respond);
     }
 
     /**
@@ -697,6 +686,30 @@ public class FolderFragment extends MyBaseFragment {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    @Subscribe
+    public void onEvent(FolderRespondEvent event){
+        handler.sendEmptyMessage(GetDataHelper.handle4respond);
+    }
+
+    @Subscribe
+    public void onEvent(FolderDeleteEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Trace.d("handlerInFolder handle4explosion");
+        Note note = event.getNote();
+        primaryData.listNote.remove(note);//列表中去除目标
+        primaryData.getFolder(note.getFolderId()).decInList();//列表包含数-1
+        primaryData.getSimpleEntityFromList(folderAdapter.shownFolderId);//handle4explosion
+        NoteFragment.isChanged4note = true;//handle4explosion
+//                    primaryData.getSimpleEntityFromList();
+        setRecycleView();//refresh
+    }
+
+    @Subscribe
+    public void onEvent(FolderDeleteErrorEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Trace.show(getActivity().getApplicationContext(), event.getStr());
     }
 }
 //        mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {

@@ -38,6 +38,9 @@ import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.Folder;
 import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
+import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
+import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
@@ -45,6 +48,10 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -83,7 +90,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private LinearLayout mEditMoveLinear;
     private static long menuButtonMillion = 0;
     private static final byte handle4noTitle = 0;
-    private static final byte handle4finish = 1;
+//    private static final byte handle4finish = 1;
     private static final byte handle4noContent = 2;
     private static final byte handle4saveChange = 3;
     private static final byte handle4last = 4;
@@ -153,6 +160,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState){
         super.doSthBeforeSetView(savedInstanceState);
+        hasEventBus = true;
         mDayNightHelper = new DayNightHelper(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
@@ -177,7 +185,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 dialog = new MaterialDialog.Builder(EditActivity.this)
                         .title(R.string.tips_title)
                         .content("是否保存更改")
-                        .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                        .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                         .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .negativeText("放弃保存")
@@ -347,6 +355,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
         mEditMoveLinear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -548,10 +557,10 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             case handle4reGet:
                 primaryData = PrimaryData.getInstance();
                 break;
-            case handle4finish:
-                Trace.show(getApplicationContext(), "删除成功");
-                finish();
-                break;
+//            case handle4finish:
+//                Trace.show(getApplicationContext(), "删除成功");
+//                finish();
+//                break;
             case handle4noTitle:
                 Trace.show(getApplicationContext(), "标题不应为空");
                 break;
@@ -711,7 +720,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             builder.title("没有别的笔记本可以选择\n是否新建？")
                     .positiveText(R.string.positive_text)
                     .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
-                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                    .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                     .negativeText(R.string.negative_text)
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
@@ -733,7 +742,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .itemsColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .items((CharSequence[]) mFolder)
-                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                    .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                     .itemsCallback(new MaterialDialog.ListCallback() {
                         @Override
                         public void onSelection(MaterialDialog dialog, View itemView, int which, CharSequence text) {
@@ -753,7 +762,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     public void addClick() {
         dialog = new MaterialDialog.Builder(EditActivity.this)
                 .title("新增笔记本")
-                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .inputType(InputType.TYPE_CLASS_TEXT |
                         InputType.TYPE_TEXT_VARIATION_PERSON_NAME |
@@ -809,7 +818,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         dialog = new MaterialDialog.Builder(EditActivity.this)
                 .title(R.string.tips_title)
                 .content("确认删除？")
-                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .positiveText(R.string.positive_text)
@@ -818,7 +827,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dismissDialog();
-                        mNote.delete(getHelper(), handler, handle4finish, handle4error);
+                        mNote.delete(getHelper());
                         Folder folder = primaryData.getFolder(mNote.getFolderId());
                         if (folder != null) {
                             FolderFragment.isChanged4folder = true;//edit delete
@@ -842,9 +851,9 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         mNote.saveChange(getHelper()
                 , mNavigationTitleEdt.getText().toString()
                 , mEditContentEdt.getText().toString()
-                , handler, isLast ? handle4last : handle4saveChange);
+                , isLast);
         if (!isNew && isFolderChanged) {
-            mNote.move2folder(EditActivity.this, thisFolder, null, (byte) 0x0);//byte的正确传入方式
+            mNote.move2folder(EditActivity.this, thisFolder);//byte的正确传入方式
         }
         isFolderChanged = false;
     }
@@ -854,7 +863,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 .title(R.string.tips_title)
                 .negativeText("放弃保存")
                 .positiveText("保存并退出")
-                .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                 .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
@@ -935,5 +944,26 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             }
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Subscribe
+    public void onEvent(NoteSaveChangeEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Message msg = Message.obtain();
+        msg.what = event.isLast() ? handle4last : handle4saveChange;
+        msg.obj = event.isOffline();
+        handler.sendMessage(msg);
+    }
+
+    @Subscribe
+    public void onEvent(EditDeleteFinishEvent event){
+        Trace.show(getApplicationContext(), "删除成功");
+        finish();
+    }
+
+    @Subscribe
+    public void onEvent(EditDeleteErrorEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Trace.show(getApplicationContext(), event.getStr());
     }
 }

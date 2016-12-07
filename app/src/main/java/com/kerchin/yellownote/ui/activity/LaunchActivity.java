@@ -61,6 +61,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
         mWelcomeRetryReL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

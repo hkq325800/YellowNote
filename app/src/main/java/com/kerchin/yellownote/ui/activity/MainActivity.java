@@ -365,6 +365,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     @Override
     protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
         mMainNav.setNavigationItemSelectedListener(this);
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,7 +454,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         .title("升级版本:" + versionCode)
                         .content(versionContent)
                         .positiveText("下载")
-                        .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                        .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                         .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -755,7 +756,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .content("退出当前账号？")
                     .positiveText(R.string.positive_text)
                     .negativeText(R.string.negative_text)
-                    .backgroundColorRes(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND))
+                    .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
                     .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .onNegative(new MaterialDialog.SingleButtonCallback() {

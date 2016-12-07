@@ -1,19 +1,28 @@
 package com.kerchin.yellownote.data.bean;
 
 import android.app.Activity;
-import android.os.Message;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.badoo.mobile.util.WeakHandler;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
+import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.FolderDeleteEvent;
+import com.kerchin.yellownote.data.event.FolderRespondEvent;
+import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.NoteDeleteEvent;
+import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
 import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.NoteService;
 import com.kerchin.yellownote.utilities.NormalUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import zj.remote.baselibrary.util.Base64Util;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
@@ -209,8 +218,7 @@ public class Note implements Serializable {
 
     //保存更改
     public void saveChange(final OrmLiteHelper helper
-            , final String newTitle, final String newContent
-            , final WeakHandler handler, final byte handle4saveChange) {
+            , final String newTitle, final String newContent, final boolean isLast) {
         //use PatternUtils.patternToSha1String(str) to save
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")
@@ -261,18 +269,13 @@ public class Note implements Serializable {
                         }
                     }
                     Trace.d("saveFolderNum+1 成功");
-                    Message msg = Message.obtain();
-                    msg.what = handle4saveChange;
-                    msg.obj = isOffline;
-                    handler.sendMessage(msg);
+                    EventBus.getDefault().postSticky(new NoteSaveChangeEvent(isOffline, isLast));
                 }
             });
         } else {//编辑
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
-                    Message msg = Message.obtain();
-                    msg.what = handle4saveChange;
                     boolean isOffline = false;
                     try {
                         NoteService.saveEdit(objectId, newTitle
@@ -283,15 +286,14 @@ public class Note implements Serializable {
                         e.printStackTrace();
                         isOffline = true;
                     }
-                    msg.obj = isOffline;
-                    handler.sendMessage(msg);
+                    EventBus.getDefault().postSticky(new NoteSaveChangeEvent(isOffline, isLast));
+                    hasEdited = isOffline;
+                    FolderFragment.isChanged4folder = true;//saveChange edit
+                    NoteFragment.isChanged4note = true;//saveChange
                     title = newTitle;
                     content = newContent;
                     date = new Date();
-                    hasEdited = isOffline;
                     setPreview(isOffline);
-                    NoteFragment.isChanged4note = true;//saveChange
-                    FolderFragment.isChanged4folder = true;//saveChange edit
                     if (simpleDaoForNote != null) {
                         Note localNote = simpleDaoForNote.queryForSameId(Note.this);
                         if (localNote != null) {
@@ -309,45 +311,60 @@ public class Note implements Serializable {
         }
     }
 
+    public static final boolean FROM_NOTE = true;
+    public static final boolean FROM_FOLDER = false;
+
     //主界面的删除
-    public void delete(final OrmLiteHelper helper
-            , final WeakHandler handler, final Message msgExplosion, final byte handle4error) {
+    public void delete(final OrmLiteHelper helper, final Note note, final boolean from) {
+//        final Message msg = new Message();
+//        msg.obj = note;
+//        msg.what = handle4explosion;//ui特效
         if (isOfflineAdd) {
-            deleteLocal(helper, handler, msgExplosion);
+//            deleteLocal(helper, handler, msgExplosion);
+            helper.getNoteDao().delete(Note.this);
+            Trace.d("deleteNote 成功");
+            FolderFragment.isChanged4folder = true;//delete Main
+            EventBus.getDefault().postSticky(from ? new NoteDeleteEvent(note) : new FolderDeleteEvent(note));
+//            if (handler != null)
+//                handler.sendMessage(msg);
         } else
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         NoteService.delete(objectId);
-                        deleteLocal(helper, handler, msgExplosion);
+//                        deleteLocal(helper, handler, msgExplosion);
+                        helper.getNoteDao().delete(Note.this);
+                        Trace.d("deleteNote 成功");
+                        FolderFragment.isChanged4folder = true;//delete Main
+                        EventBus.getDefault().postSticky(from ? new NoteDeleteEvent(note) : new FolderDeleteEvent(note));
+//                        if (handler != null)
+//                            handler.sendMessage(msg);
                         PrimaryData.getInstance().editContain(folderId, false);
                     } catch (AVException e) {
-                        msgExplosion.what = handle4error;
-                        msgExplosion.obj = "目前暂不支持离线删除" + Trace.getErrorMsg(e);
-                        handler.sendMessage(msgExplosion);
+                        EventBus.getDefault().postSticky(from
+                                ? new NoteDeleteErrorEvent("目前暂不支持离线删除" + Trace.getErrorMsg(e))
+                                : new FolderDeleteErrorEvent("目前暂不支持离线删除" + Trace.getErrorMsg(e)));
                         e.printStackTrace();
                     }
                 }
             });
     }
 
-    private void deleteLocal(OrmLiteHelper helper, WeakHandler handler, Message msg) {
+    private void deleteLocal(OrmLiteHelper helper) {
         helper.getNoteDao().delete(Note.this);
         Trace.d("deleteNote 成功");
         FolderFragment.isChanged4folder = true;//delete Main
-        if (handler != null)
-            handler.sendMessage(msg);
     }
 
     //编辑界面的删除
-    public void delete(final OrmLiteHelper helper, final WeakHandler handler
-            , final byte handle4finish, final byte handle4error) {
+    public void delete(final OrmLiteHelper helper) {
         if (isOfflineAdd) {
             NoteFragment.isChanged4note = true;//delete edit
-            Message msg = Message.obtain();
-            msg.what = handle4finish;
-            deleteLocal(helper, handler, msg);
+            helper.getNoteDao().delete(Note.this);
+            Trace.d("deleteNote 成功");
+            FolderFragment.isChanged4folder = true;//delete Main
+            EventBus.getDefault().post(new EditDeleteFinishEvent());
         } else
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
@@ -356,14 +373,12 @@ public class Note implements Serializable {
                         NoteService.delete(objectId);//笔记网络删除
                         NoteFragment.isChanged4note = true;//delete edit
                         PrimaryData.getInstance().removeNoteById(objectId);
-                        Message msg = Message.obtain();
-                        msg.what = handle4finish;
-                        deleteLocal(helper, handler, msg);
+                        helper.getNoteDao().delete(Note.this);
+                        Trace.d("deleteNote 成功");
+                        FolderFragment.isChanged4folder = true;//delete Main
+                        EventBus.getDefault().post(new EditDeleteFinishEvent());
                     } catch (AVException e) {
-                        Message msg = Message.obtain();
-                        msg.obj = "目前暂不支持离线删除" + Trace.getErrorMsg(e);
-                        msg.what = handle4error;
-                        handler.sendMessage(msg);
+                        EventBus.getDefault().postSticky(new EditDeleteErrorEvent("目前暂不支持离线删除" + Trace.getErrorMsg(e)));
                         e.printStackTrace();
                     }
                 }
@@ -371,7 +386,7 @@ public class Note implements Serializable {
     }
 
     //已存在的笔记在笔记本间移动
-    public void move2folder(final Activity context, final Folder newOne, final WeakHandler handler, final byte handleCode) {
+    public void move2folder(final Activity context, final Folder newOne) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
@@ -393,10 +408,11 @@ public class Note implements Serializable {
                 Trace.d("saveFolderNum+1 成功");
                 folder = newOne.getName();
                 folderId = newOne.getObjectId();
-                if (handler == null)
+                if (context instanceof EditActivity) {
                     FolderFragment.isChanged4folder = true;//move2folder
-                else
-                    handler.sendEmptyMessage(handleCode);
+                } else {
+                    EventBus.getDefault().post(new FolderRespondEvent());//respond
+                }
             }
         });
     }
@@ -420,8 +436,7 @@ public class Note implements Serializable {
         });
     }
 
-    public void reName(final Activity context, final String newTitle, final WeakHandler handler
-            , final byte handle4respond) {
+    public void reName(final Activity context, final String newTitle) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
@@ -432,7 +447,7 @@ public class Note implements Serializable {
                     title = newTitle;
                     Trace.show(context, "更名成功");
                     NoteFragment.isChanged4note = true;//reName
-                    handler.sendEmptyMessage(handle4respond);
+                    EventBus.getDefault().post(new FolderRespondEvent());
                 } catch (AVException e) {
                     Trace.show(context, "目前暂不支持离线重命名" + Trace.getErrorMsg(e));
                     e.printStackTrace();

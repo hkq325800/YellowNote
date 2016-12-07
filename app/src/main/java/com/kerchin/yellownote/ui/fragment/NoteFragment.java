@@ -17,6 +17,8 @@ import android.widget.ImageView;
 
 import com.kerchin.widget.progresslayout.ProgressLayout;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.NoteDeleteEvent;
 import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.data.adapter.NoteShrinkAdapter;
@@ -31,6 +33,9 @@ import zj.remote.baselibrary.util.Trace;
 
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -271,10 +276,10 @@ public class NoteFragment extends MyBaseFragment
 ////                    if (e.getMessage().contains("UnknownHostException"))
 //                    Trace.show(getActivity().getApplicationContext(), "网络不太通畅 目前处于离线状态");
                 break;
-            case GetDataHelper.handle4error:
-                String str = (String) msg.obj;
-                Trace.show(getActivity().getApplicationContext(), str);
-                break;
+//            case GetDataHelper.handle4error:
+//                String str = (String) msg.obj;
+//                Trace.show(getActivity().getApplicationContext(), str);
+//                break;
             default:
                 break;
         }
@@ -403,8 +408,10 @@ public class NoteFragment extends MyBaseFragment
                                     MainActivity mainActivity = (MainActivity) getActivity();
                                     dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
                                             , false, "删除中...", "请稍候")
-                                            .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
-                                            .backgroundColorRes(mainActivity.mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_TEXT)).show();
+                                            .titleColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
+                                            .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
+                                            .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                                            .show();
 //                                        mSVProgressHUD.showWithStatus("删除中...");
                                     final int num = noteAdapter.getDeleteNum();
                                     getDataHelper.respond();
@@ -412,11 +419,8 @@ public class NoteFragment extends MyBaseFragment
                                         final Note note = noteAdapter.getDeleteItem(i);
                                         //线上删除
                                         Trace.d("readyToDelete " + note.getTitle());
-                                        Message msg = new Message();
-                                        msg.obj = note;
-                                        msg.what = handle4explosion;//ui特效
                                         MainActivity m = (MainActivity) getActivity();
-                                        note.delete(m.getHelper(), handler, msg, GetDataHelper.handle4error);
+                                        note.delete(m.getHelper(), note, Note.FROM_NOTE);
                                     }
                                     //循环查询是否删除 从数据源中重新获取list并设置到adapter中
                                     handler.post(runnableForDataAfterDelete);
@@ -746,6 +750,35 @@ public class NoteFragment extends MyBaseFragment
             Trace.d("emptyClickCount" + emptyClickCount);
             mNoteWDList.stopRefresh();
         }
+    }
+
+    @Subscribe
+    public void onEvent(NoteDeleteEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Message msg = Message.obtain();
+        msg.what = handle4explosion;
+        msg.obj = event.getNote();
+        handler.sendMessage(msg);
+//        Trace.d("handlerInNote handle4explosion");
+//        Note note = event.getNote();
+//        for (int i = 0; i < noteAdapter.getCount(); i++) {
+//            if (note.getObjectId().equals(noteAdapter.getItem(i).getObjectId())) {
+//                Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
+//                //Explosion Animation
+//                ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
+//                mExplosionField.explode(noteAdapter.getView(i));
+//                break;
+//            }
+//        }
+//        primaryData.getFolder(note.getFolderId()).decInList();
+//        primaryData.listNote.remove(note);//从数据源中删除
+//        noteAdapter.getListDelete().remove(note);
+    }
+
+    @Subscribe
+    public void onEvent(NoteDeleteErrorEvent event){
+        EventBus.getDefault().removeStickyEvent(event);
+        Trace.show(getActivity().getApplicationContext(), event.getStr());
     }
 
 //    /**

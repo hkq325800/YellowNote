@@ -66,10 +66,6 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initEvent(Bundle savedInstanceState) {
-    }
-
-    @Override
     protected boolean initCallback(Message msg) {
         return false;
     }
@@ -227,8 +223,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     private void enablePattern(boolean enable) {
         mSecretMenuPatternEditLiL.setClickable(enable);
         if (enable)
-            mSecretMenuPatternEditTxt.setTextColor(getResources()
-                    .getColor(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_TEXT)));
+            mSecretMenuPatternEditTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
         else
             mSecretMenuPatternEditTxt.setTextColor(getResources()
                     .getColor(R.color.light_gray));

@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 例：setTextColor为@ColorInt 需要getResource
+ * 而backgroundColorRes为@ColorRes
  * Created by Clock on 2016/8/24.
  */
 public class DayNightHelper {

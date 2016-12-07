@@ -47,11 +47,6 @@ public class ThankActivity extends BaseSwipeBackActivity {
     DayNightHelper mDayNightHelper;
 
     @Override
-    protected void initEvent(Bundle savedInstanceState) {
-
-    }
-
-    @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
         mDayNightHelper = new DayNightHelper(this);

@@ -70,10 +70,6 @@ public class SecretActivity extends BaseSwipeBackActivity {
     }
 
     @Override
-    protected void initEvent(Bundle savedInstanceState) {
-    }
-
-    @Override
     protected boolean initCallback(Message msg) {
         return false;
     }
