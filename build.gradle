@@ -25,6 +25,7 @@ buildscript {
         classpath('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker
         //from stepper
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.antfortune.freeline:gradle:0.8.3'
 //        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4'
 //        classpath "io.realm:realm-gradle-plugin:0.90.0"
 

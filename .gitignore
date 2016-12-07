@@ -74,3 +74,10 @@ $RECYCLE.BIN/
 *.lnk
 
 *.iml
+
+#Freeline
+Freeline/
+Freeline_core/
+release-tools/
+freeline.py
+freeline_project_description.json

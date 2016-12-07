@@ -79,7 +79,7 @@ compile 'com.zhy:flowlayout-lib:1.0.1'
 compile 'com.miguelcatalan:materialsearchview:1.4.0'
 - circleimageview 圆形图片
 compile 'de.hdodenhof:circleimageview:2.1.0'
-- circleMenu
+- circleMenu (虽然能修改的参数变多了但是使用场景仍然狭窄)
 compile 'com.github.Hitomis:CircleMenu:v1.0.2' (jitpack)
 - blurview 模糊
 compile 'net.robinx:lib.blurview:1.0.2'

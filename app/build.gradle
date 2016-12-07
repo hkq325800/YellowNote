@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
 apply plugin: 'com.tencent.tinker.patch'//apply tinker插件
+apply plugin: 'com.antfortune.freeline'
 //apply plugin: 'realm-android'
 def javaVersion = JavaVersion.VERSION_1_7
 android {
