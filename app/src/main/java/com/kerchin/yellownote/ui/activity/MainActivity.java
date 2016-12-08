@@ -137,7 +137,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
-        mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = DayNightHelper.getInstance(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.DayTheme);
         } else {
@@ -841,8 +841,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
      */
     private void toggleThemeSetting() {
         mDayNightHelper.toggleThemeSetting(MainActivity.this);
-        mMainPager.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_BACKGROUND));
-        mMainNav.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
+        mMainPager.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND));
+        mMainNav.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
         mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
         mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));

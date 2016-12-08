@@ -60,7 +60,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
     @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        DayNightHelper mDayNightHelper = DayNightHelper.getInstance(this);;
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {

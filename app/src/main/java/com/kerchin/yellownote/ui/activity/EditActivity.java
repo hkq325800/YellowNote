@@ -161,7 +161,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     protected void doSthBeforeSetView(Bundle savedInstanceState){
         super.doSthBeforeSetView(savedInstanceState);
         hasEventBus = true;
-        mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = DayNightHelper.getInstance(this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {

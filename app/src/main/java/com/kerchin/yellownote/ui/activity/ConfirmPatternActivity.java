@@ -38,7 +38,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        DayNightHelper mDayNightHelper = DayNightHelper.getInstance(this);;
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.AppThemePatternDay);
         } else {

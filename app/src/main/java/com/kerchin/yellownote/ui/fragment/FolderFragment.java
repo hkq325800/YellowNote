@@ -652,12 +652,12 @@ public class FolderFragment extends MyBaseFragment {
         for (int childIndex = 0; childIndex < childCount; childIndex++) {
             ViewGroup childView = (ViewGroup) mRecyclerView.getChildAt(childIndex);
             if (childView.findViewById(R.id.mFolderItemTxt) != null) {//item
-                childView.setBackgroundResource(mDayNightHelper.getColorResId(getContext(), DayNightHelper.COLOR_BACKGROUND));//itemView
+                childView.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));//itemView
                 TextView mFolderItemTxt = (TextView) childView.findViewById(R.id.mFolderItemTxt);
-                mFolderItemTxt.setBackgroundResource(mDayNightHelper.getColorResId(getContext(), DayNightHelper.COLOR_BACKGROUND));
+                mFolderItemTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));
             } else if (childView.findViewById(R.id.mFolderHeaderContainTxt) != null) {//header
                 TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);
-                mFolderHeaderContainTxt.setBackgroundResource(mDayNightHelper.getColorResId(getContext(), DayNightHelper.COLOR_BACKGROUND));
+                mFolderHeaderContainTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));
 //                TextView mFolderHeaderNameTxt = (TextView) childView.findViewById(R.id.mFolderHeaderNameTxt);
 //                mFolderHeaderNameTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
             }

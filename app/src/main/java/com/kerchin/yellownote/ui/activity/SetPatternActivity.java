@@ -37,7 +37,7 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);
         ImmergeUtils.immerge(SetPatternActivity.this, R.color.lightSkyBlue);
-        DayNightHelper mDayNightHelper = new DayNightHelper(this);
+        DayNightHelper mDayNightHelper = DayNightHelper.getInstance(this);;
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.AppThemePatternDay);
         } else {

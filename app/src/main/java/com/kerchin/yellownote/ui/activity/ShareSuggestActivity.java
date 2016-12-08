@@ -69,7 +69,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
-        mDayNightHelper = new DayNightHelper(this);
+        mDayNightHelper = DayNightHelper.getInstance(this);;
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {
@@ -80,11 +80,11 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     @OnClick(R.id.mShareSuggestCodeImg)
     public void download() {
         mShareSuggestCodeImg.setOnClickListener(null);
-        if (isLatest) {
+        if (!isLatest) {
             NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode);
         } else {
             NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
-            Trace.show(ShareSuggestActivity.this, "后台下载中...");
+//            Trace.show(ShareSuggestActivity.this, "后台下载中...");
         }
     }
 
@@ -232,7 +232,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
 //                                        alertDialog.show();
                                     }
                                 });
-                                isLatest = true;
+                                isLatest = false;
 //                                Trace.show(getApplicationContext(), version.getString("version_content"));
                             } else {
                                 String str = "当前版本：" + appVersionNow + " 已是最新";
@@ -254,7 +254,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
 //                                        alertDialog.show();
                                     }
                                 });
-                                isLatest = false;
+                                isLatest = true;
                             }
                         }
                     });
