@@ -71,10 +71,14 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
+import zhy.com.highlight.HighLight;
+import zhy.com.highlight.position.OnRightPosCallback;
+import zhy.com.highlight.shape.RectLightShape;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import zj.remote.baselibrary.util.Trace;
-import com.tencent.tinker.lib.tinker.TinkerInstaller;
+
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.yalantis.ucrop.UCrop;
@@ -109,6 +113,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     TextView mNavHeaderMainTipTxt;
     CircleImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
+    HighLight highLight;
 
     public boolean isHide = false;
     //    private static Long mExitTime = (long) 0;//退出时间
@@ -210,6 +215,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         outState.putString("user", SampleApplicationLike.user);
         outState.putString("userIcon", SampleApplicationLike.userIcon);
         outState.putString("userDefaultFolderId", SampleApplicationLike.userDefaultFolderId);
+        if (highLight != null && highLight.isShowing()) highLight.remove();
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
@@ -418,6 +424,21 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 btnSearch.setVisible(false);
                 btnSort.setVisible(false);
                 btnDelete.setVisible(false);
+                if(PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)){
+                    PreferenceUtils.putBoolean(Config.HIGHLIGHT_NAV, false, MainActivity.this);
+                    highLight = new HighLight(MainActivity.this)
+                            .addHighLight(R.id.mNavHeaderMainImg, R.layout.info_nav_first, new OnRightPosCallback(55), new RectLightShape())
+                            .autoRemove(false)
+                            .enableNext()
+                            .setClickCallback(new HighLight.OnClickCallback() {
+                                @Override
+                                public void onClick() {
+                                    Toast.makeText(MainActivity.this, "clicked and show next tip view by yourself", Toast.LENGTH_SHORT).show();
+                                    highLight.next();
+                                }
+                            })
+                            .show();
+                }
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager.isActive()) {
                     //noinspection ConstantConditions
@@ -845,6 +866,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainNav.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
         mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
         mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
+
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));
 //        msgFolder.setTextColor(getResources().getColor(background.resourceId));
     }

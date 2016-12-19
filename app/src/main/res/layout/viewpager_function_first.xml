@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/edit_function_height"
     xmlns:stepper="http://schemas.android.com/apk/res-auto"
-    android:background="@color/backgroundFunctionBar"
+    android:background="@color/colorPrimary"
     android:baselineAligned="false">
 
     <LinearLayout

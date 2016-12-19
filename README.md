@@ -117,7 +117,7 @@ compile 'pub.devrel:easypermissions:0.2.0'
 compile 'cn.bingoogolapple:bga-adapter:1.1.0@aar'
 compile 'cn.bingoogolapple:bga-photopicker:1.1.3'
 - 单张图片(头像)选取
-- YellowNotePicker+uCrop
+YellowNotePicker+uCrop
 - superadapter 通用适配器
 compile 'org.byteam.superadapter:superadapter:3.6.5'
 - ormlite/realm 数据库(lib)
@@ -139,6 +139,11 @@ compile "com.android.support:multidex:1.0.1"
 compile 'com.blankj:utilcode:1.3.4'
 - uCrop 图片裁剪库
 compile 'com.yalantis:ucrop:2.2.0'
+- material-ripple/Ripple Effect 按钮水波纹
+compile 'com.balysv:material-ripple:1.0.2'
+compile 'com.github.traex.rippleeffect:library:1.3'
+- Highlight 高亮用户操作提示
+compile 'com.isanwenyu.highlight:highlight:1.7.3'
 
 - 列表加载动画(lib)
 progresslayout

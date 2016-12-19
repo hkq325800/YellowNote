@@ -6,7 +6,7 @@ package com.kerchin.yellownote.global;
 public class Config {
 
     public static boolean isLeakCanary = false;
-    public static boolean isDebugMode = false;
+    public static boolean isDebugMode = true;
     /**
      * Settings
      */
@@ -28,4 +28,9 @@ public class Config {
     public static final int timeout_avod = 15000;//mill 轮询间隔
     public static final int timeout_runnable = 20000;
     public static final int period_runnable = 100;
+
+    /**
+     * highLight
+     */
+    public static final String HIGHLIGHT_NAV = "HIGHLIGHT_NAV";
 }
