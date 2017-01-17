@@ -30,8 +30,9 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.Trace;
-import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -657,12 +658,10 @@ public class LoginActivity extends LoginAbstract {
         });
         //存入shared
         SampleApplicationLike.setUser(mLoginUserEdt.getText().toString());
-        SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
-        editor.putString(Config.KEY_USER, mLoginUserEdt.getText().toString());
-        editor.putString(Config.KEY_DEFAULT_FOLDER, SampleApplicationLike.userDefaultFolderId);
-        editor.putBoolean(Config.KEY_ISLOGIN, true);
-        editor.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString());
-        editor.apply();
+        PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
+        PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, SampleApplicationLike.userDefaultFolderId, this);
+        PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);
+        PreferenceUtils.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString(), this);
         handler.post(runnableForData);//goToMain
     }
 

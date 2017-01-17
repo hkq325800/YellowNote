@@ -36,13 +36,14 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.tinker.TinkerManager;
 import com.kerchin.yellownote.utilities.tinker.MyLogImp;
-import com.securepreferences.SecurePreferences;
 import com.tencent.tinker.anno.DefaultLifeCycle;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.tencent.tinker.loader.app.ApplicationLifeCycle;
 import com.tencent.tinker.loader.app.DefaultApplicationLike;
 import com.tencent.tinker.loader.shareutil.ShareConstants;
 import com.uuzuche.lib_zxing.DisplayUtil;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 
 
 /**
@@ -80,8 +81,8 @@ public class SampleApplicationLike extends DefaultApplicationLike {
      * 本地存放闪退日志的目录
      */
     public final static String CRASH_FOLDER_NAME = "crash";
-    public static Context context;
-    private static SharedPreferences shared;
+    public static MyApplication context;
+//    private static SharedPreferences shared;
     private static final String SaltKey = "xiaohuangj";
     private static boolean isLogin = false;
     public static String user;
@@ -107,7 +108,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         //you must install multiDex whatever tinker is installed!
         MultiDex.install(base);
 
-        context = getApplication();
+        context = (MyApplication) getApplication();
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
 
         TinkerManager.setTinkerApplicationLike(this);
@@ -128,9 +129,9 @@ public class SampleApplicationLike extends DefaultApplicationLike {
 //        if (Config.isLeakCanary)
 //            LeakCanary.install(this);
         configCollectCrashInfo();
-        shared = new SecurePreferences(getApplication());
-        user = shared.getString(Config.KEY_USER, "");
-        isLogin = shared.getBoolean(Config.KEY_ISLOGIN, false);
+//        shared = new SecurePreferences(getApplication());
+        user = PreferenceUtils.getString(Config.KEY_USER, "", context);
+        isLogin = PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, context);
         //来自手势密码
         initDisplayOpinion();
     }
@@ -160,9 +161,9 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         Thread.setDefaultUncaughtExceptionHandler(crashExceptionHandler);
     }
 
-    public static SharedPreferences getDefaultShared() {//可在应用间共享数据
-        return shared;
-    }
+//    public static SharedPreferences getDefaultShared() {//可在应用间共享数据
+//        return shared;
+//    }
 
     public static String Secret(String val) {
         return NormalUtils.md5(val + SaltKey);
@@ -182,7 +183,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
     }
 
     public static void saveUserIcon() {
-        shared.edit().putString(Config.KEY_USERICON, userIcon).apply();
+        PreferenceUtils.putString(Config.KEY_USERICON, userIcon, context);
     }
 
     public static void logout() {
@@ -190,11 +191,10 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         PrimaryData.getInstance().clearData();
         PatternLockUtils.clearLocalPattern(context);
         //清除密码缓存
-        shared.edit().putBoolean(Config.KEY_ISLOGIN, false)
-                .putString(Config.KEY_PASS, "")
-                .putString(Config.KEY_DEFAULT_FOLDER, "")
-                .putBoolean(Config.KEY_CAN_OFFLINE, true)
-                .putString(Config.KEY_WHEN_CHECK_UPDATE, "")
-                .apply();
+        PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, false, context);
+        PreferenceUtils.putString(Config.KEY_PASS, "", context);
+        PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, "", context);
+        PreferenceUtils.putBoolean(Config.KEY_CAN_OFFLINE, true, context);
+        PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, "", context);
     }
 }

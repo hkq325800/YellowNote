@@ -24,10 +24,10 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import zj.remote.baselibrary.util.Trace;
-import com.securepreferences.SecurePreferences;
 
 import java.util.Date;
 
@@ -59,7 +59,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     ScrollView mShareSuggestScV;
     //防止多次提交数据
     private boolean isPosting = false;
-    int quickSuggestTimes = SampleApplicationLike.getDefaultShared().getInt("quickSuggestTimes", 0);
+    int quickSuggestTimes = PreferenceUtils.getInt("quickSuggestTimes", 0, ShareSuggestActivity.this);
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
@@ -103,14 +103,12 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                         try {
                             ShareSuggestService.pushSuggest(SampleApplicationLike.user, msg, mShareSuggestTouchEdt.getText().toString());
                             long thisSuggestTime = new Date().getTime();
-                            long lastSuggestTime = SampleApplicationLike.getDefaultShared().getLong("lastSuggestTime", thisSuggestTime);
-                            SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
-                            editor.putLong("lastSuggestTime", thisSuggestTime);
+                            long lastSuggestTime = PreferenceUtils.getLong("lastSuggestTime", thisSuggestTime, ShareSuggestActivity.this);
+                            PreferenceUtils.putLong("lastSuggestTime", thisSuggestTime, ShareSuggestActivity.this);
                             //距离上一次提交意见30秒内再次提交记一次违规 3次违规禁止提交 重装恢复
-                            editor.putInt("quickSuggestTimes",
-                                    thisSuggestTime - lastSuggestTime < deadLine ? quickSuggestTimes + 1 : 1);
+                            PreferenceUtils.putInt("quickSuggestTimes",
+                                    thisSuggestTime - lastSuggestTime < deadLine ? quickSuggestTimes + 1 : 1, ShareSuggestActivity.this);
                             Trace.d("quickSuggestTimes " + quickSuggestTimes + " boolean " + (thisSuggestTime - lastSuggestTime < 30000));
-                            editor.apply();
                             Trace.show(ShareSuggestActivity.this, "非常感谢您的建议，我会做得更好");
                             finish();
                         } catch (AVException e) {

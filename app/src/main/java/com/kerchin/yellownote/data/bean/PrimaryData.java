@@ -4,10 +4,13 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.data.proxy.NoteService;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -108,8 +111,8 @@ public class PrimaryData {
      * @param doAfter 接口
      */
     private void initData(OrmLiteHelper helper, DoAfter doAfter) {
-        boolean canOffline = SampleApplicationLike.getDefaultShared()
-                .getBoolean(Config.KEY_CAN_OFFLINE, true);
+        boolean canOffline = PreferenceUtils
+                .getBoolean(Config.KEY_CAN_OFFLINE, true, SampleApplicationLike.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
@@ -216,8 +219,8 @@ public class PrimaryData {
      * @param helper ormLite帮助类
      */
     public void initData(OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
-        boolean canOffline = SampleApplicationLike.getDefaultShared()
-                .getBoolean(Config.KEY_CAN_OFFLINE, true);
+        boolean canOffline = PreferenceUtils
+                .getBoolean(Config.KEY_CAN_OFFLINE, true, SampleApplicationLike.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下

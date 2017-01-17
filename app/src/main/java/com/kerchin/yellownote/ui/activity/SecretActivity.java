@@ -25,9 +25,10 @@ import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.utilities.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
-import com.securepreferences.SecurePreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -155,10 +156,8 @@ public class SecretActivity extends BaseSwipeBackActivity {
                                 } else {
                                     SecretService.alterSecret(SampleApplicationLike.user, mSecretNewPassEdt.getText().toString());
                                     //存入shared
-                                    SecurePreferences.Editor editor = (SecurePreferences.Editor) SampleApplicationLike.getDefaultShared().edit();
-                                    editor.putString(Config.KEY_USER, SampleApplicationLike.user);
-                                    editor.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString());
-                                    editor.apply();
+                                    PreferenceUtils.putString(Config.KEY_USER, SampleApplicationLike.user, SecretActivity.this);
+                                    PreferenceUtils.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString(), SecretActivity.this);
                                     //密码正确进行修改
                                     Message message = Message.obtain();//直接进入
                                     message.what = trueForSecret;

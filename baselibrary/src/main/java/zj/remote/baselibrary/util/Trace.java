@@ -53,25 +53,25 @@ public class Trace {
 
     public static void e(String msg) {
         if (Config.isDebugMode) {
-            Log.e(TAG, msg);
+            Log.e(TAG, msg == null ? "" : msg);
         }
     }
 
     public static void e(String TAG, String msg) {
         if (Config.isDebugMode) {
-            Log.e(TAG, msg);
+            Log.e(TAG, msg == null ? "" : msg);
         }
     }
 
     public static void e(String msg, Throwable tr) {
         if (Config.isDebugMode) {
-            Log.e(TAG, msg, tr);
+            Log.e(TAG, msg == null ? "" : msg, tr);
         }
     }
 
     public static void e(String TAG, String msg, Throwable tr) {
         if (Config.isDebugMode) {
-            Log.e(TAG, msg, tr);
+            Log.e(TAG, msg == null ? "" : msg, tr);
         }
     }
 

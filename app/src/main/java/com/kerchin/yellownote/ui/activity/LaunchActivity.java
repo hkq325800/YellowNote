@@ -23,6 +23,7 @@ import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -91,7 +92,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        str.toCharArray();
         //只为有缓存登录的用户初始化数据
         if (SampleApplicationLike.isLogin()) {
-            SampleApplicationLike.userDefaultFolderId = SampleApplicationLike.getDefaultShared().getString(Config.KEY_DEFAULT_FOLDER, "");
+            SampleApplicationLike.userDefaultFolderId = PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", this);
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -101,7 +102,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
                         @Override
                         public void justNowWithEx(Exception e) {
-                            if (!SampleApplicationLike.getDefaultShared().getBoolean(Config.KEY_CAN_OFFLINE, true)) {
+                            if (!PreferenceUtils.getBoolean(Config.KEY_CAN_OFFLINE, true, LaunchActivity.this)) {
                                 isNeedToRefresh = true;
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -216,7 +217,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     //登录操作确认
     protected void loginVerify(final String txtUser) {
         //缓存查询流程
-        if (!txtUser.equals("") && !SampleApplicationLike.getDefaultShared().getString(Config.KEY_PASS, "").equals("")) {
+        if (!txtUser.equals("") && !PreferenceUtils.getString(Config.KEY_PASS, "", LaunchActivity.this).equals("")) {
             //密码查询
             mWelcomeTxt.setText("查询到缓存 正在进行验证...");
             ThreadPool.getInstance().execute(new Runnable() {
@@ -225,7 +226,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     Trace.d("loginVerify" + Thread.currentThread().getId());
                     android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     try {
-                        AVObject user = LoginService.loginVerify(txtUser, SampleApplicationLike.getDefaultShared().getString(Config.KEY_PASS, ""));
+                        AVObject user = LoginService.loginVerify(txtUser, PreferenceUtils.getString(Config.KEY_PASS, "", LaunchActivity.this));
 //                        if (PatternLockUtils.isDateTooLong(getApplicationContext())) {//超过一天重新获取一次阅读密码的设置
 //                        }
                         if (user != null) {

@@ -324,7 +324,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
             if (!SampleApplicationLike.userIcon.equals(
-                    SampleApplicationLike.getDefaultShared().getString(Config.KEY_USERICON, "")))
+                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
                 setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
@@ -332,8 +332,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private void checkForUpdate() {
         String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
-        String lastCheck = SampleApplicationLike.getDefaultShared().getString(Config.KEY_WHEN_CHECK_UPDATE
-                , "");
+        String lastCheck = PreferenceUtils.getString(Config.KEY_WHEN_CHECK_UPDATE
+                , "", MainActivity.this);
         if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
             return;
         }
@@ -354,9 +354,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 }
             }
         });
-        SampleApplicationLike.getDefaultShared().edit()
-                .putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr)
-                .apply();
+        PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr, MainActivity.this);
     }
 
     private void download() {
