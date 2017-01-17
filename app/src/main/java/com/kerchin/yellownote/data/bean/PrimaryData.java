@@ -156,7 +156,7 @@ public class PrimaryData {
                 while (true) {
                     Trace.d("waitForFlag");
                     if (status.isNoteReady && status.isFolderReady) {
-                        getSimpleEntityFromList(SampleApplicationLike.userDefaultFolderId, doAfter);
+                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), doAfter);
                         break;
                     } else {
                         try {
@@ -259,7 +259,7 @@ public class PrimaryData {
             waitToSaveData(helper, doAfter);//initData login
         else {
             if (doAfter == null)
-                getSimpleEntityFromList(SampleApplicationLike.userDefaultFolderId);
+                getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
             else {
                 Trace.d("has sort");
                 Collections.sort(listNote, new Comparator<Note>() {
@@ -330,7 +330,7 @@ public class PrimaryData {
                         } else break;
                         Trace.d("waitToSaveData true");
                         if (doAfter == null)
-                            getSimpleEntityFromList(SampleApplicationLike.userDefaultFolderId);
+                            getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
                         else {
                             Trace.d("has sort");
                             Collections.sort(listNote, new Comparator<Note>() {
@@ -383,7 +383,7 @@ public class PrimaryData {
                 while (true) {
                     Trace.d("waitForFlag");
                     if (status.isNoteReady && status.isFolderReady) {
-                        getSimpleEntityFromList(SampleApplicationLike.userDefaultFolderId);
+                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
                         break;
                     } else {
                         try {

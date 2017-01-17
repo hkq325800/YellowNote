@@ -92,7 +92,6 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        str.toCharArray();
         //只为有缓存登录的用户初始化数据
         if (PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, this)) {
-            SampleApplicationLike.userDefaultFolderId = PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", this);
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -249,7 +248,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             } else {
                                 //默认笔记本id统一在login获取 因为不轻易改变 保存在本地
                                 //userIcon每次获取
-                                SampleApplicationLike.setUserIcon(user.getString("user_icon"));
+                                PreferenceUtils.putString(Config.KEY_USERICON, user.getString("user_icon"), SampleApplicationLike.context);
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转

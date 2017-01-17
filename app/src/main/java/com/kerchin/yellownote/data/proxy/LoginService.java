@@ -135,7 +135,7 @@ public class LoginService {
     //保存文件
     public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
         String mUser = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
-        AVFile file = AVFile.withObjectId(SampleApplicationLike.userIcon);
+        AVFile file = AVFile.withObjectId(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context));
         file.delete();
         AVFile newFile = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
         newFile.save();

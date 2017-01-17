@@ -60,7 +60,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     ScrollView mShareSuggestScV;
     //防止多次提交数据
     private boolean isPosting = false;
-    int quickSuggestTimes = PreferenceUtils.getInt("quickSuggestTimes", 0, ShareSuggestActivity.this);
+    int quickSuggestTimes;
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
@@ -70,7 +70,8 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
-        mDayNightHelper = DayNightHelper.getInstance(this);;
+        mDayNightHelper = DayNightHelper.getInstance(this);
+        quickSuggestTimes = PreferenceUtils.getInt("quickSuggestTimes", 0, ShareSuggestActivity.this);
         if (mDayNightHelper.isDay()) {
             setTheme(R.style.TransparentThemeDay);
         } else {

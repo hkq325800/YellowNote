@@ -496,8 +496,8 @@ public class LoginActivity extends LoginAbstract {
                                             dismissDialog();
                                             Trace.show(LoginActivity.this, "您的账号已被冻结,请联系hkq325800@163.com", false);
                                         } else {
-                                            SampleApplicationLike.userDefaultFolderId = user.getString("user_default_folderId");
-                                            SampleApplicationLike.setUserIcon(user.getString("user_icon"));
+                                            PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, user.getString("user_default_folderId"), LoginActivity.this);
+                                            PreferenceUtils.putString(Config.KEY_USERICON, user.getString("user_icon"), LoginActivity.this);
                                             String pattern = SecretService.getPatternStr(txtUser);
                                             PatternLockUtils.setPattern(pattern, getApplicationContext());
                                             if (Config.isDebugMode)
@@ -547,7 +547,7 @@ public class LoginActivity extends LoginAbstract {
             @Override
             public void run() {
                 try {
-                    SampleApplicationLike.userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
+                    PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, LoginService.createDefaultFolder(txtUser), LoginActivity.this);
                     Trace.d("signUpVerify 默认文件夹创建完成");
                 } catch (AVException e) {
                     Trace.e("创建默认笔记夹失败" + Trace.getErrorMsg(e));
@@ -555,8 +555,9 @@ public class LoginActivity extends LoginAbstract {
                     Trace.show(LoginActivity.this, "创建默认笔记夹失败" + Trace.getErrorMsg(e));
                 }
                 try {
-                    if (!SampleApplicationLike.userDefaultFolderId.equals("")) {
-                        LoginService.userSignUp(txtUser, txtPass, SampleApplicationLike.userDefaultFolderId);
+                    String userDefaultFolderId = PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", LoginActivity.this);
+                    if (!userDefaultFolderId.equals("")) {
+                        LoginService.userSignUp(txtUser, txtPass, userDefaultFolderId);
                         Trace.d("signUpVerify 用户注册完成");
                         Trace.show(LoginActivity.this, txtUser + "注册成功");
                         goToMain();//注册登录
@@ -660,7 +661,6 @@ public class LoginActivity extends LoginAbstract {
         });
         //存入shared
         PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
-        PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, SampleApplicationLike.userDefaultFolderId, this);
         PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);
         PreferenceUtils.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString(), this);
         handler.post(runnableForData);//goToMain

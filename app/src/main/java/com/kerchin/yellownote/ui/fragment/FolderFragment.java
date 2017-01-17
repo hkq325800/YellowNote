@@ -89,12 +89,12 @@ public class FolderFragment extends MyBaseFragment {
 //            final ItemTouchHelper helper = new ItemTouchHelper(callback);
             GridLayoutManager manager = new GridLayoutManager(getActivity(), 6);
             for (SimpleEntity entity : primaryData.mItems) {
-                if (entity.getFolderId().equals(SampleApplicationLike.userDefaultFolderId))
+                if (entity.getFolderId().equals(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", getContext())))
                     entity.setIsShown(true);
                 else
                     entity.setIsShown(false);
             }
-            folderAdapter = new FolderShrinkAdapter(getActivity(), SampleApplicationLike.userDefaultFolderId
+            folderAdapter = new FolderShrinkAdapter(getActivity(), PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", getContext())
                     , primaryData.mItems, new IMulItemViewType<SimpleEntity>() {
                 @Override
                 public int getViewTypeCount() {
@@ -142,7 +142,7 @@ public class FolderFragment extends MyBaseFragment {
                 @Override
                 public void onItemLongClick(View v, final int position, int viewType, final SimpleEntity item) {
                     if (viewType == SimpleEntity.typeFolder) {
-                        if (item.getFolderId().equals(SampleApplicationLike.userDefaultFolderId))
+                        if (item.getFolderId().equals(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", getContext())))
                             Trace.show(getActivity().getApplicationContext(), "好孩子不要动这个哦");
                         else
                             singleChooseDialogMaker(getActivity(), "笔记本操作"

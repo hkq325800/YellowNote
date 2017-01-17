@@ -78,9 +78,8 @@ public class SampleApplicationLike extends DefaultApplicationLike {
     public final static String CRASH_FOLDER_NAME = "crash";
     public static MyApplication context;
     private static final String SaltKey = "xiaohuangj";
-    //TODO 去除
-    public static String userDefaultFolderId = "";
-    public static String userIcon;//永远是最新的
+//    public static String userDefaultFolderId = "";
+//    public static String userIcon;//永远是最新的
 
     public SampleApplicationLike(Application application, int tinkerFlags, boolean tinkerLoadVerifyFlag,
                                  long applicationStartElapsedTime, long applicationStartMillisTime, Intent tinkerResultIntent,
@@ -158,9 +157,5 @@ public class SampleApplicationLike extends DefaultApplicationLike {
 
     public static String Secret(String val) {
         return NormalUtils.md5(val + SaltKey);
-    }
-
-    public static void setUserIcon(String icon) {
-        userIcon = icon;
     }
 }

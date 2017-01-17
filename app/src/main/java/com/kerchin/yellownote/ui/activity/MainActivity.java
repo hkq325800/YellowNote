@@ -179,7 +179,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void run() {
                 try {
-                    final AVFile file = LoginService.getUserIcon(SampleApplicationLike.userIcon);
+                    final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context));
                     file.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(final byte[] bytes, AVException e) {
@@ -200,7 +200,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                     mNavHeaderMainImg.setImageBitmap(b);
                                 }
                             });
-                            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
+//                            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -213,8 +213,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
-        outState.putString("userIcon", SampleApplicationLike.userIcon);
-        outState.putString("userDefaultFolderId", SampleApplicationLike.userDefaultFolderId);
         if (highLight != null && highLight.isShowing()) highLight.remove();
 //        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
@@ -228,8 +226,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else {
             thisPosition = 0;
             Trace.d("MainActivity initData else");
-            SampleApplicationLike.setUserIcon(savedInstanceState.getString("userIcon"));
-            SampleApplicationLike.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
 //            if (noteFragment == null) {
 //                Trace.d("noteFragment null");
@@ -316,14 +312,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     private void setUserIcon() {
-        if (TextUtils.isEmpty(SampleApplicationLike.userIcon)) {//使用默认头像
+        if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context))) {//使用默认头像
             Trace.d("getLocalMipmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
-            if (!SampleApplicationLike.userIcon.equals(
-                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
+//            if (!SampleApplicationLike.userIcon.equals(
+//                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
                 setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
@@ -628,10 +624,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
             NormalUtils.saveBitmap(bitmap, userIconFile);
             //没则新增有则创建
-            if (TextUtils.isEmpty(SampleApplicationLike.userIcon)) {
-                SampleApplicationLike.setUserIcon(LoginService.saveUserIcon(userIconPath));
+            if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context))) {
+                PreferenceUtils.putString(Config.KEY_USERICON, LoginService.saveUserIcon(userIconPath), MainActivity.this);
             } else {
-                SampleApplicationLike.setUserIcon(LoginService.saveUserIconById(userIconPath));
+                PreferenceUtils.putString(Config.KEY_USERICON, LoginService.saveUserIconById(userIconPath), MainActivity.this);
             }
             runOnUiThread(new Runnable() {
                 @Override
@@ -639,8 +635,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     mNavHeaderMainImg.setImageBitmap(bitmap);
                 }
             });
-
-            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
         } catch (AVException | IOException e) {
             e.printStackTrace();
         }
@@ -675,12 +669,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
         if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
             showBtnAdd();
-        if (!PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, MainActivity.this)) {
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
+//        if (!PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, MainActivity.this)) {
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intent);
+//            finish();
+//        }
     }
 
     public Toolbar getToolbar() {
@@ -974,6 +968,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             mMainDrawer.closeDrawers();
         } else if (getFragmentStatus().isSearchMode()) {
             mSearchView.onActionViewCollapsed();
+            btnSort.setVisible(true);
+            btnDelete.setVisible(true);
+            btnSearch.setVisible(true);
             showBtnAdd();
             if (thisPosition == 0)//应该只有note有搜索
                 noteFragment.restore();

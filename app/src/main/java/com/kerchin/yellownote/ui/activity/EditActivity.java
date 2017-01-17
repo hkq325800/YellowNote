@@ -304,7 +304,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , SampleApplicationLike.userDefaultFolderId, "text");
+                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), "text");
             } else {
                 isNew = false;
             }
@@ -317,7 +317,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , SampleApplicationLike.userDefaultFolderId, "text");
+                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), "text");
             } else {
                 isNew = false;
             }
