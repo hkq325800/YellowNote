@@ -63,6 +63,7 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.CropUtil;
+import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
@@ -199,7 +200,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                     mNavHeaderMainImg.setImageBitmap(b);
                                 }
                             });
-                            SampleApplicationLike.saveUserIcon();
+                            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -212,7 +213,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
         Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
-        outState.putString("user", SampleApplicationLike.user);
         outState.putString("userIcon", SampleApplicationLike.userIcon);
         outState.putString("userDefaultFolderId", SampleApplicationLike.userDefaultFolderId);
         if (highLight != null && highLight.isShowing()) highLight.remove();
@@ -228,7 +228,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         } else {
             thisPosition = 0;
             Trace.d("MainActivity initData else");
-            SampleApplicationLike.setUser(savedInstanceState.getString("user"));
             SampleApplicationLike.setUserIcon(savedInstanceState.getString("userIcon"));
             SampleApplicationLike.userDefaultFolderId = savedInstanceState.getString("userDefaultFolderId");
 //            noteFragment = (NoteFragment) getSupportFragmentManager().findFragmentByTag(NoteFragment.class.getName());
@@ -246,7 +245,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 , SampleApplicationLike.APP_MAIN_FOLDER_NAME);
         userIconPath = savePath.getAbsolutePath() + File.separator
-                + SampleApplicationLike.user + ".jpg";
+                + PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context) + ".jpg";
         userIconFile = new File(userIconPath);
 
         if (NormalUtils.requestPermission(this, REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -640,7 +639,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     mNavHeaderMainImg.setImageBitmap(bitmap);
                 }
             });
-            SampleApplicationLike.saveUserIcon();
+
+            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
         } catch (AVException | IOException e) {
             e.printStackTrace();
         }
@@ -675,7 +675,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
         if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
             showBtnAdd();
-        if (!SampleApplicationLike.isLogin()) {
+        if (!PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, MainActivity.this)) {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
@@ -789,8 +789,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .onPositive(new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                            //切换本地数据库
-                            SampleApplicationLike.logout();
+                            PrimaryData.getInstance().clearData();
+                            PatternLockUtils.clearLocalPattern(MainActivity.this);
+                            //清除密码缓存
+                            PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, false, MainActivity.this);
+                            PreferenceUtils.putString(Config.KEY_PASS, "", MainActivity.this);
+                            PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, "", MainActivity.this);
+                            PreferenceUtils.putBoolean(Config.KEY_CAN_OFFLINE, true, MainActivity.this);
+                            PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, "", MainActivity.this);
                             Intent intent = new Intent();
                             intent.setClass(MainActivity.this, LoginActivity.class);
                             intent.putExtra("logoutFlag", true);//使得欢迎界面不显示

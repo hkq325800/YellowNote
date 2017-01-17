@@ -19,6 +19,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
@@ -101,7 +102,8 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                     @Override
                     public void run() {
                         try {
-                            ShareSuggestService.pushSuggest(SampleApplicationLike.user, msg, mShareSuggestTouchEdt.getText().toString());
+                            ShareSuggestService.pushSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                                    , msg, mShareSuggestTouchEdt.getText().toString());
                             long thisSuggestTime = new Date().getTime();
                             long lastSuggestTime = PreferenceUtils.getLong("lastSuggestTime", thisSuggestTime, ShareSuggestActivity.this);
                             PreferenceUtils.putLong("lastSuggestTime", thisSuggestTime, ShareSuggestActivity.this);
@@ -124,7 +126,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                 Trace.show(getApplicationContext(), "您宝贵的意见正在提交中···");
             }
             if (quickSuggestTimes >= 2) {
-                ShareSuggestService.setUnableToSuggest(SampleApplicationLike.user);
+                ShareSuggestService.setUnableToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
             }
         }
     }
@@ -178,8 +180,8 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    boolean flag = ShareSuggestService.isAbleToSuggest(SampleApplicationLike.user);
-                    Trace.d("查询isAbleToSuggest 查询到" + SampleApplicationLike.user + " 的记录为" + flag);
+                    boolean flag = ShareSuggestService.isAbleToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+                    Trace.d("查询isAbleToSuggest 查询到" + PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context) + " 的记录为" + flag);
                     if (!flag) {
                         handler.sendEmptyMessage(hideSaveBtn);
                     }

@@ -118,16 +118,10 @@ dependencies {
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     //权限获取 未应用
     compile 'pub.devrel:easypermissions:0.2.0'
-    //    //material样式库
-    //    compile 'com.github.vajro:MaterialDesignLibrary:1.6'
     //较好的圆形图像控件 持续修改中
     compile 'de.hdodenhof:circleimageview:2.1.0'
-    //磁盘先进先出缓存 基本停止commit
-    //    compile 'com.jakewharton:disklrucache:2.0.2'
     //    //图片加载框架 更新得很勤
     //    debugCompile 'com.github.bumptech.glide:glide:3.7.0'
-    //安全的preference 慢速更新中
-    compile 'com.scottyab:secure-preferences-lib:0.1.4'
     //黄油刀 持续更新中
     compile 'com.jakewharton:butterknife:8.4.0'
     //共同使用
@@ -140,8 +134,6 @@ dependencies {
     compile 'tyrantgit:explosionfield:1.0.1'
     //！已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
-    //progressDialog已经停止更新
-    //    compile 'com.bigkoo:svprogresshud:1.0.6'
     //右划退出库 已经停止更新
 //    compile project(':SlidingLibrary')
     compile(name: 'SlidingLibrary-release', ext: 'aar')
@@ -171,9 +163,12 @@ dependencies {
     compile project(':baselibrary')
 //    compile(name: 'baselibrary-release', ext: 'aar')
     compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
+    //
     compile 'me.immortalz:transitionhelper:1.0.6'
+    //图片裁剪库
     compile 'com.yalantis:ucrop:2.2.0'
     compile 'org.greenrobot:eventbus:3.0.0'
+    //用户操作指引库
     compile 'com.isanwenyu.highlight:highlight:1.7.3'
 }
 

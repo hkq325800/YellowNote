@@ -118,7 +118,7 @@ public class PrimaryData {
         //TODO getNote和getFolder在同一个线程下
         try {
 //        if (getNoteFromData())
-            final List<AVObject> avObjects = NoteService.getUserNote(SampleApplicationLike.user);
+            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
             //skip += avObjects.size();
             Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
             getNotes(avObjects, helper);//initData
@@ -227,7 +227,7 @@ public class PrimaryData {
         boolean isOffline = false;
         try {
 //        if (getNoteFromData())
-            final List<AVObject> avObjects = NoteService.getUserNote(SampleApplicationLike.user);
+            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
             //skip += avObjects.size();
             Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
             getNotes(avObjects, helper);//initData
@@ -313,14 +313,15 @@ public class PrimaryData {
                                 else
                                     simpleDaoForFolder.update(folder);
                             }
+                            String user = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
                             //检查查是否存在不在list中只在local中的数据
-                            for (Note n : simpleDaoForNote.queryForEq("user_tel", SampleApplicationLike.user)) {
+                            for (Note n : simpleDaoForNote.queryForEq("user_tel", user)) {
                                 if (!noteListContain(listNote, n)) {
                                     Trace.d("delete " + n.getTitle());
                                     simpleDaoForNote.delete(n);
                                 }
                             }
-                            for (Folder f : simpleDaoForFolder.queryForEq("user_tel", SampleApplicationLike.user)) {
+                            for (Folder f : simpleDaoForFolder.queryForEq("user_tel", user)) {
                                 if (!folderListContain(listFolder, f)) {
                                     Trace.d("delete " + f.getName());
                                     simpleDaoForFolder.delete(f);
@@ -565,7 +566,7 @@ public class PrimaryData {
      * @throws AVException
      */
     private void getFolderFromCloud() throws AVException {
-        final List<AVObject> avObjects = FolderService.getUserFolders(SampleApplicationLike.user);
+        final List<AVObject> avObjects = FolderService.getUserFolders(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
         Trace.d("getData4Folder成功 查询到" + avObjects.size() + " 条符合条件的数据");
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -853,7 +854,7 @@ public class PrimaryData {
     private void getFolderFromData(OrmLiteHelper helper) {
         listFolder.clear();
 //        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-        List<Folder> list = helper.getFolderDao().queryForEq("user_tel", SampleApplicationLike.user);
+        List<Folder> list = helper.getFolderDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
         Trace.d("getFolderFromData size" + list.size());
         listFolder.addAll(list);
         Trace.d("isFolderReady true");
@@ -869,7 +870,7 @@ public class PrimaryData {
         listNote.clear();
         map.clear();
 //        ArrayList<Note> list = liteOrmHelper.query(Note.class);
-        List<Note> list = helper.getNoteDao().queryForEq("user_tel", SampleApplicationLike.user);
+        List<Note> list = helper.getNoteDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
         for (Note n : list) {
             int i = 0;
             if (map.get(n.getFolderId()) != null)

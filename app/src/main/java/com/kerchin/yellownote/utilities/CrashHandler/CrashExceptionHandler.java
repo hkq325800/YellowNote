@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
 
 /**
@@ -153,7 +154,8 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 if (!mCrashInfoFolder.exists()) {//闪退日志目录不存在则先创建闪退日志目录
                     mCrashInfoFolder.mkdirs();
                 }
-                String crashLogFileName = SampleApplicationLike.user + "_" + timeStampString + ".txt";
+                String crashLogFileName = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                        + "_" + timeStampString + ".txt";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();
 

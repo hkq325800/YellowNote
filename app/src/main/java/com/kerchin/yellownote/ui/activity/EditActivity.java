@@ -52,6 +52,7 @@ import com.kerchin.yellownote.utilities.NormalUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -783,7 +784,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(SampleApplicationLike.user, input.toString());
+                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context), input.toString());
                                             Trace.d("saveNewFolder 成功");
                                             Folder newFolder = new Folder(objectId, newFolderName, 0);
                                             primaryData.addFolder(newFolder);

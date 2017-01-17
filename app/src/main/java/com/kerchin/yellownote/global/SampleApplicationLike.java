@@ -20,7 +20,6 @@ import android.annotation.TargetApi;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.Build;
@@ -29,11 +28,9 @@ import android.util.DisplayMetrics;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
 import com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter;
 import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.tinker.TinkerManager;
 import com.kerchin.yellownote.utilities.tinker.MyLogImp;
 import com.tencent.tinker.anno.DefaultLifeCycle;
@@ -42,8 +39,6 @@ import com.tencent.tinker.loader.app.ApplicationLifeCycle;
 import com.tencent.tinker.loader.app.DefaultApplicationLike;
 import com.tencent.tinker.loader.shareutil.ShareConstants;
 import com.uuzuche.lib_zxing.DisplayUtil;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
 
 
 /**
@@ -82,10 +77,8 @@ public class SampleApplicationLike extends DefaultApplicationLike {
      */
     public final static String CRASH_FOLDER_NAME = "crash";
     public static MyApplication context;
-//    private static SharedPreferences shared;
     private static final String SaltKey = "xiaohuangj";
-    private static boolean isLogin = false;
-    public static String user;
+    //TODO 去除
     public static String userDefaultFolderId = "";
     public static String userIcon;//永远是最新的
 
@@ -130,8 +123,6 @@ public class SampleApplicationLike extends DefaultApplicationLike {
 //            LeakCanary.install(this);
         configCollectCrashInfo();
 //        shared = new SecurePreferences(getApplication());
-        user = PreferenceUtils.getString(Config.KEY_USER, "", context);
-        isLogin = PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, context);
         //来自手势密码
         initDisplayOpinion();
     }
@@ -169,32 +160,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         return NormalUtils.md5(val + SaltKey);
     }
 
-    public static boolean isLogin() {
-        return isLogin;
-    }
-
-    public static void setUser(String u) {
-        user = u;
-        isLogin = true;
-    }
-
     public static void setUserIcon(String icon) {
         userIcon = icon;
-    }
-
-    public static void saveUserIcon() {
-        PreferenceUtils.putString(Config.KEY_USERICON, userIcon, context);
-    }
-
-    public static void logout() {
-        isLogin = false;
-        PrimaryData.getInstance().clearData();
-        PatternLockUtils.clearLocalPattern(context);
-        //清除密码缓存
-        PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, false, context);
-        PreferenceUtils.putString(Config.KEY_PASS, "", context);
-        PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, "", context);
-        PreferenceUtils.putBoolean(Config.KEY_CAN_OFFLINE, true, context);
-        PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, "", context);
     }
 }

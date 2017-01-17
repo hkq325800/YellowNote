@@ -115,8 +115,9 @@ compile 'pub.devrel:easypermissions:0.2.0'
 - bga-photopicker 图片选取(九宫格)
 compile 'cn.bingoogolapple:bga-adapter:1.1.0@aar'
 compile 'cn.bingoogolapple:bga-photopicker:1.1.3'
-- 单张图片(头像)选取
+- 单张图片(头像)选取+裁剪
 YellowNotePicker+uCrop
+compile 'com.yalantis:ucrop:2.2.0'
 - superadapter 通用适配器
 compile 'org.byteam.superadapter:superadapter:3.6.5'
 - ormlite/realm 数据库(lib)

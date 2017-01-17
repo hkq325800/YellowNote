@@ -7,6 +7,7 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.text.InputFilter;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -98,9 +99,10 @@ public class LoginActivity extends LoginAbstract {
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
-        if (!SampleApplicationLike.user.equals("")) {
-            mLoginUserEdt.setText(SampleApplicationLike.user);
-            mLoginUserEdt.setSelection(SampleApplicationLike.user.length());
+        String user = PreferenceUtils.getString(Config.KEY_USER, "", LoginActivity.this);
+        if (!TextUtils.isEmpty(user)) {
+            mLoginUserEdt.setText(user);
+            mLoginUserEdt.setSelection(user.length());
             mLoginPassEdt.requestFocus();
 //            mLoginPassTextInput.postDelayed(new Runnable() {
 //                @Override
@@ -657,7 +659,6 @@ public class LoginActivity extends LoginAbstract {
             }
         });
         //存入shared
-        SampleApplicationLike.setUser(mLoginUserEdt.getText().toString());
         PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
         PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, SampleApplicationLike.userDefaultFolderId, this);
         PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);

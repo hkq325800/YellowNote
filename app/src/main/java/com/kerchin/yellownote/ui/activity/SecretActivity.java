@@ -139,7 +139,8 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     try {
                         AVObject avObjects = isForget
                                 ? LoginService.loginVerify(mSecretPassEdt.getText().toString(), mSecretNewPassEdt.getText().toString())
-                                : LoginService.loginVerify(SampleApplicationLike.user, mSecretPassEdt.getText().toString());
+                                : LoginService.loginVerify(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                                , mSecretPassEdt.getText().toString());
                         if (avObjects != null) {
                             Trace.d("查询 用户" + avObjects.get("user_tel") + "旧密码正确");
                             boolean isFrozen = avObjects.getBoolean("isFrozen");
@@ -154,9 +155,9 @@ public class SecretActivity extends BaseSwipeBackActivity {
                                     SoftKeyboardUtils.KeyBoardCancel(SecretActivity.this);
                                     finish();
                                 } else {
-                                    SecretService.alterSecret(SampleApplicationLike.user, mSecretNewPassEdt.getText().toString());
+                                    SecretService.alterSecret(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                                            , mSecretNewPassEdt.getText().toString());
                                     //存入shared
-                                    PreferenceUtils.putString(Config.KEY_USER, SampleApplicationLike.user, SecretActivity.this);
                                     PreferenceUtils.putString(Config.KEY_PASS, mSecretNewPassEdt.getText().toString(), SecretActivity.this);
                                     //密码正确进行修改
                                     Message message = Message.obtain();//直接进入
@@ -217,7 +218,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     || TextUtils.isEmpty(mSecretNewPassEdt.getText())) {
                 Trace.show(getApplicationContext(), "请将信息填写完整");
                 return false;
-            } else if (!mSecretPassEdt.getText().toString().equals(SampleApplicationLike.user)) {
+            } else if (!mSecretPassEdt.getText().toString().equals(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context))) {
                 Trace.show(getApplicationContext(), "用户名与本地不同");
                 return false;
             }

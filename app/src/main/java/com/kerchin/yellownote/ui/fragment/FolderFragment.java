@@ -27,6 +27,7 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.FolderDeleteEvent;
 import com.kerchin.yellownote.data.event.FolderRespondEvent;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.MyBaseFragment;
@@ -39,6 +40,8 @@ import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -422,7 +425,8 @@ public class FolderFragment extends MyBaseFragment {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(SampleApplicationLike.user, input.toString());
+                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                                                            , input.toString());
                                             Trace.show(getActivity(), "保存成功");
                                             Trace.d("saveNewFolder 成功");
                                             primaryData.addFolder(new Folder(objectId, newFolderName, 0));

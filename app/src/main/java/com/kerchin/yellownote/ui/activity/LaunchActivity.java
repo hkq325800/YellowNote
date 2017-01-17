@@ -91,7 +91,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        String str = null;
 //        str.toCharArray();
         //只为有缓存登录的用户初始化数据
-        if (SampleApplicationLike.isLogin()) {
+        if (PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, this)) {
             SampleApplicationLike.userDefaultFolderId = PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", this);
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
@@ -117,7 +117,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 }
             });
         }
-        loginVerify(SampleApplicationLike.user);
+        loginVerify(PreferenceUtils.getString(Config.KEY_USER, "", LaunchActivity.this));
     }
 
     @Override
@@ -263,7 +263,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                     } catch (AVException e) {
                         e.printStackTrace();
                         //无网络时如果已经有缓存登录，还是允许进入查看离线消息
-                        if (SampleApplicationLike.isLogin()) {
+                        if (PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, LaunchActivity.this)) {
                             cycleTarget = Message.obtain();//直接进入
                             cycleTarget.what = next;
                             handler.post(runnableForData);//无网络时

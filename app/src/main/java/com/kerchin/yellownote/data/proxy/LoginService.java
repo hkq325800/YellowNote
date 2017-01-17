@@ -5,9 +5,12 @@ import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 
 import java.io.FileNotFoundException;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
 
 /**
  * Created by Kerchin on 2016/4/5 0005.
@@ -118,10 +121,11 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIcon(String path) throws AVException, FileNotFoundException {
-        AVFile file = AVFile.withAbsoluteLocalPath(SampleApplicationLike.user + ".jpg", path);
+        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
+        AVFile file = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
         file.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        query.whereEqualTo("user_tel", SampleApplicationLike.user);
+        query.whereEqualTo("user_tel", mUser);
         AVObject user = query.getFirst();
         user.put("user_icon", file.getObjectId());
         user.save();
@@ -130,12 +134,13 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
+        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
         AVFile file = AVFile.withObjectId(SampleApplicationLike.userIcon);
         file.delete();
-        AVFile newFile = AVFile.withAbsoluteLocalPath(SampleApplicationLike.user + ".jpg", path);
+        AVFile newFile = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
         newFile.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
-        query.whereEqualTo("user_tel", SampleApplicationLike.user);
+        query.whereEqualTo("user_tel", mUser);
         AVObject user = query.getFirst();
         user.put("user_icon", newFile.getObjectId());
         user.save();
