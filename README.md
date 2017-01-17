@@ -86,9 +86,8 @@ compile 'net.robinx:lib.blurview:1.0.2'
 - explosionfield 爆炸效果
 compile 'tyrantgit:explosionfield:1.0.1'
 - convenientBanner 轮播图
-compile 'com.nineoldandroids:library:2.4.0'
 compile 'com.android.support:support-v4:latestVersion'
-compile 'cn.bingoogolapple:bga-banner:latestVersion@aar'
+    compile 'cn.bingoogolapple:bga-banner:latestVersion@aar'
 - titleBar 标题栏
 compile 'cn.bingoogolapple:bga-titlebar:latestVersion@aar'
 - 徽章控件 BGABadgeView-Android
@@ -142,8 +141,10 @@ compile 'com.yalantis:ucrop:2.2.0'
 - material-ripple/Ripple Effect 按钮水波纹
 compile 'com.balysv:material-ripple:1.0.2'
 compile 'com.github.traex.rippleeffect:library:1.3'
-- Highlight 高亮用户操作提示
+- Highlight 高亮用户操作提示 引导操作
 compile 'com.isanwenyu.highlight:highlight:1.7.3'
+- statebutton
+单文件
 
 - 列表加载动画(lib)
 progresslayout

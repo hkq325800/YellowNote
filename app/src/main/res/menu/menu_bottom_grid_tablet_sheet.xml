@@ -2,18 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/mKeepMenu"
+        android:id="@+id/mMenuNote"
         android:icon="@drawable/ic_keep_48dp"
-        android:title="Keep" />
+        android:title="Note" />
 
     <item
-        android:id="@+id/mIndexMenu"
+        android:id="@+id/mMenuGIF"
         android:icon="@drawable/ic_inbox_48dp"
-        android:title="Inbox" />
+        android:title="GIF" />
 
     <item
-        android:id="@+id/mHangoutsMenu"
+        android:id="@+id/mMenuVideo"
         android:icon="@drawable/ic_hangouts_48dp"
-        android:title="Hangouts" />
+        android:title="Video" />
 
 </menu>

@@ -744,14 +744,16 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         @Override
                         public void onBottomSheetItemClick(MenuItem item) {
                             switch (item.getItemId()) {
-                                case R.id.mKeepMenu:
+                                case R.id.mMenuNote:
                                     noteFragment.addClick();
                                     break;
-                                case R.id.mIndexMenu:
-                                    Trace.show(MainActivity.this, item.getItemId() + "");
+                                case R.id.mMenuGIF:
+                                    //TODO gif录制
+                                    Trace.show(MainActivity.this, "功能暂未完善");
                                     break;
-                                case R.id.mHangoutsMenu:
-                                    Trace.show(MainActivity.this, item.getItemId() + "");
+                                case R.id.mMenuVideo:
+                                    //TODO video录制
+                                    Trace.show(MainActivity.this, "功能暂未完善");
                                     break;
                             }
                         }
