@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.kerchin.yellownote.utilities.tinker;
+package com.kerchin.yellownote.global.tinker;
 
-import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
+import com.kerchin.yellownote.global.CrashHandler.CrashExceptionHandler;
 import com.tencent.tinker.lib.listener.PatchListener;
 import com.tencent.tinker.lib.patch.AbstractPatch;
 import com.tencent.tinker.lib.patch.RepairPatch;
@@ -29,6 +29,7 @@ import com.tencent.tinker.loader.app.ApplicationLike;
 
 import static com.kerchin.yellownote.global.SampleApplicationLike.APP_MAIN_FOLDER_NAME;
 import static com.kerchin.yellownote.global.SampleApplicationLike.CRASH_FOLDER_NAME;
+
 
 /**
  * Created by zhangshaowen on 16/7/3.

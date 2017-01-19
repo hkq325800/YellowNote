@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-package com.kerchin.yellownote.global;
+package com.kerchin.yellownote.utilities;
 
 public class PreferenceContract {
 

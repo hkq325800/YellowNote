@@ -18,7 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -28,8 +27,7 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import zj.remote.baselibrary.util.PreferenceUtils;

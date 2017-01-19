@@ -1,8 +1,6 @@
-package com.kerchin.yellownote.utilities.CrashHandler;
+package com.kerchin.yellownote.global.CrashHandler;
 
 import com.avos.avoscloud.AVFile;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
 
 import java.io.File;
 import java.io.FileNotFoundException;

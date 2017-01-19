@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.utilities.CrashHandler;
+package com.kerchin.yellownote.global.CrashHandler;
 
 import android.content.Context;
 import android.os.Environment;

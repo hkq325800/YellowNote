@@ -3,7 +3,7 @@ package com.kerchin.yellownote.data.proxy;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
-import com.kerchin.yellownote.global.MyApplication;
+
 import com.kerchin.yellownote.global.SampleApplicationLike;
 
 /**

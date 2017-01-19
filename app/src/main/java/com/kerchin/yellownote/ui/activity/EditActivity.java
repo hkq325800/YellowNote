@@ -47,7 +47,7 @@ import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

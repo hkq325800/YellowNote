@@ -21,11 +21,11 @@
     *;
 }
 
--keep public class com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler {
+-keep public class CrashExceptionHandler {
     *;
 }
 
--keep public class com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter {
+-keep public class SimpleCrashReporter {
     *;
 }
 
@@ -37,11 +37,11 @@
     *;
 }
 
--keep public class com.kerchin.yellownote.utilities.tinker.TinkerManager {
+-keep public class TinkerManager {
     *;
 }
 
--keep public class com.kerchin.yellownote.utilities.tinker.MyLogImp {
+-keep public class MyLogImp {
     *;
 }
 

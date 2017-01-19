@@ -17,7 +17,7 @@ import android.view.animation.DecelerateInterpolator;
 
 import com.kerchin.yellownote.R;
 
-import static com.kerchin.yellownote.utilities.NormalUtils.drawableToBitmap;
+import static com.kerchin.yellownote.global.NormalUtils.drawableToBitmap;
 
 
 /**

@@ -110,8 +110,8 @@ dependencies {
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
     compile 'cn.leancloud.android:fastjson:1.1.40-leancloud'
     //检测内存泄漏
-//    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
-//    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
+    //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
+    //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //weakHandler
     compile 'com.badoo.mobile:android-weak-handler:1.1'
     //疯狂更新的高star对话框
@@ -135,15 +135,15 @@ dependencies {
     //！已经停止更新
     compile 'com.nineoldandroids:library:2.4.0'
     //右划退出库 已经停止更新
-//    compile project(':SlidingLibrary')
+    //    compile project(':SlidingLibrary')
     compile(name: 'SlidingLibrary-release', ext: 'aar')
     //add getState() and HKQController
-//    compile project(':JJSearchViewAnim')
+    //    compile project(':JJSearchViewAnim')
     compile(name: 'JJSearchViewAnim-release', ext: 'aar')
     //按住持续作用的控件 已改造
-//    compile project(':snappingstepper')
+    //    compile project(':snappingstepper')
     compile(name: 'snappingstepper-release', ext: 'aar')
-//    compile project(path: ':progresslayout')
+    //    compile project(path: ':progresslayout')
     compile(name: 'progresslayout-release', ext: 'aar')
     //通用adapter持续更新中 已有新版但是更新会出问题
     compile 'org.byteam.superadapter:superadapter:3.3'
@@ -151,17 +151,15 @@ dependencies {
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码
     compile 'cn.yipianfengye.android:zxing-library:1.9'
-    //multidex
-    compile "com.android.support:multidex:1.0.1"
     //可选，用于生成application类
-    compile('com.tencent.tinker:tinker-android-anno:1.6.2')
+    compile 'com.tencent.tinker:tinker-android-anno:1.6.2'
     //tinker的核心库
-    compile('com.tencent.tinker:tinker-android-lib:1.6.2')
+    compile 'com.tencent.tinker:tinker-android-lib:1.6.2'
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
     compile project(':baselibrary')
-//    compile(name: 'baselibrary-release', ext: 'aar')
+    //    compile(name: 'baselibrary-release', ext: 'aar')
     compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
     //
     compile 'me.immortalz:transitionhelper:1.0.6'
@@ -170,6 +168,7 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     //用户操作指引库
     compile 'com.isanwenyu.highlight:highlight:1.7.3'
+    compile project(':global')
 }
 
 def gitSha() {
@@ -314,12 +313,12 @@ if (buildWithTinker()) {
                       "com.avos.avoscloud.AVOSCloud",
                       "com.kerchin.yellownote.R",
                       "com.kerchin.yellownote.data.bean.PrimaryData",
-                      "com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler",
-                      "com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter",
+                      "CrashExceptionHandler",
+                      "SimpleCrashReporter",
                       "com.kerchin.yellownote.utilities.NormalUtils",
                       "com.kerchin.yellownote.utilities.PatternLockUtils",
-                      "com.kerchin.yellownote.utilities.tinker.TinkerManager",
-                      "com.kerchin.yellownote.utilities.tinker.MyLogImp",
+                      "TinkerManager",
+                      "MyLogImp",
                       "com.securepreferences.SecurePreferences",
                       "com.uuzuche.lib_zxing.DisplayUtil"
                       //use sample, let BaseBuildInfo unchangeable with tinker

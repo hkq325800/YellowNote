@@ -4,7 +4,7 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
+
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.FolderService;

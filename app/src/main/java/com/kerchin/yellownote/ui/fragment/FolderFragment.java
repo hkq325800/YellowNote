@@ -3,7 +3,6 @@ package com.kerchin.yellownote.ui.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Message;

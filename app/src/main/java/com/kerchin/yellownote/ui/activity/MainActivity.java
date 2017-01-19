@@ -68,7 +68,7 @@ import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;

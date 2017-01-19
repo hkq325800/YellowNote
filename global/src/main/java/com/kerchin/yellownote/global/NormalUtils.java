@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.utilities;
+package com.kerchin.yellownote.global;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,9 +23,6 @@ import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.data.service.DownloadService;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -90,11 +87,10 @@ public class NormalUtils {
         return false;
     }
 
-    public static void downloadByWeb(Context context, String versionCode) {
-        Intent intent = new Intent(context,
-                DownloadService.class);
-        intent.putExtra("uriStr", context.getString(R.string.uri_download));
-        intent.putExtra("fileName", context.getResources().getString(R.string.app_name) + versionCode + ".apk");
+    public static void downloadByWeb(Context context, String versionCode, Class<?> serviceClass, String uriStr, String fileName) {
+        Intent intent = new Intent(context, serviceClass);
+        intent.putExtra("uriStr", uriStr);//context.getString(R.string.uri_download)
+        intent.putExtra("fileName", fileName);//context.getResources().getString(R.string.app_name) + versionCode + ".apk"
         context.startService(intent);
     }
 

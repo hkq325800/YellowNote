@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.kerchin.yellownote.utilities.tinker;
+package com.kerchin.yellownote.global.tinker;
 
 import android.util.Log;
 

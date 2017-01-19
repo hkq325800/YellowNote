@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.kerchin.yellownote.utilities.tinker;
+package com.kerchin.yellownote.global.tinker;
 
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
+import com.kerchin.yellownote.global.CrashHandler.CrashExceptionHandler;
 import com.tencent.tinker.lib.listener.DefaultPatchListener;
 import com.tencent.tinker.lib.tinker.Tinker;
 import com.tencent.tinker.lib.tinker.TinkerLoadResult;

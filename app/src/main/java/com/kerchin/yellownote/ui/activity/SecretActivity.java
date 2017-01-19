@@ -12,7 +12,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -23,7 +22,7 @@ import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import zj.remote.baselibrary.util.PreferenceUtils;

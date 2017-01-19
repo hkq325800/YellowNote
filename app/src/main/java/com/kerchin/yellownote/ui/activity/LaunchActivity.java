@@ -17,7 +17,7 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 

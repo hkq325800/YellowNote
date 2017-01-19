@@ -18,7 +18,7 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import zj.remote.baselibrary.util.PreferenceUtils;

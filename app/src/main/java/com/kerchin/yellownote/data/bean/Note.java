@@ -15,13 +15,13 @@ import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.NoteDeleteEvent;
 import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
 import com.kerchin.yellownote.global.Config;
+import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 import com.kerchin.yellownote.data.proxy.NoteService;
-import com.kerchin.yellownote.utilities.NormalUtils;
 
 import org.greenrobot.eventbus.EventBus;
 

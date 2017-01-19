@@ -23,7 +23,7 @@ import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.utilities.NormalUtils;
+import com.kerchin.yellownote.global.NormalUtils;
 
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
@@ -83,7 +83,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     public void download() {
         mShareSuggestCodeImg.setOnClickListener(null);
         if (!isLatest) {
-            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode);
+            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, ShareSuggestService.class, getString(R.string.uri_download), getResources().getString(R.string.app_name) + versionCode + ".apk");
         } else {
             NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
 //            Trace.show(ShareSuggestActivity.this, "后台下载中...");

@@ -27,12 +27,11 @@ import android.support.multidex.MultiDex;
 import android.util.DisplayMetrics;
 
 import com.avos.avoscloud.AVOSCloud;
-import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.utilities.CrashHandler.CrashExceptionHandler;
-import com.kerchin.yellownote.utilities.CrashHandler.SimpleCrashReporter;
-import com.kerchin.yellownote.utilities.NormalUtils;
-import com.kerchin.yellownote.utilities.tinker.TinkerManager;
-import com.kerchin.yellownote.utilities.tinker.MyLogImp;
+import com.kerchin.global.R;
+import com.kerchin.yellownote.global.CrashHandler.CrashExceptionHandler;
+import com.kerchin.yellownote.global.CrashHandler.SimpleCrashReporter;
+import com.kerchin.yellownote.global.tinker.MyLogImp;
+import com.kerchin.yellownote.global.tinker.TinkerManager;
 import com.tencent.tinker.anno.DefaultLifeCycle;
 import com.tencent.tinker.lib.tinker.TinkerInstaller;
 import com.tencent.tinker.loader.app.ApplicationLifeCycle;
@@ -76,7 +75,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
      * 本地存放闪退日志的目录
      */
     public final static String CRASH_FOLDER_NAME = "crash";
-    public static MyApplication context;
+    public static Context context;
     private static final String SaltKey = "xiaohuangj";
 //    public static String userDefaultFolderId = "";
 //    public static String userIcon;//永远是最新的
@@ -100,7 +99,7 @@ public class SampleApplicationLike extends DefaultApplicationLike {
         //you must install multiDex whatever tinker is installed!
         MultiDex.install(base);
 
-        context = (MyApplication) getApplication();
+        context = getApplication();
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
 
         TinkerManager.setTinkerApplicationLike(this);
