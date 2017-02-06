@@ -74,7 +74,6 @@ public class NoteFragment extends MyBaseFragment
     private int emptyClickCount = 0;//控制空白点击次数 三次则重新网络获取
     private int lastVisibleItemPosition;//用于显示隐藏浮动按钮
     //    private int skip = 0;
-//    private final static int sortByName = 0;
     private final static int sortByDateDesc = 1;
     private final static int sortByFolder = 2;
     private final static int sortByDateAsc = 3;
@@ -244,7 +243,7 @@ public class NoteFragment extends MyBaseFragment
                     doSearch();//respondForChange()
                 else {
                     noteAdapter.setList(list);
-                    mNoteWDList.setAdapter(noteAdapter);//TODO
+                    mNoteWDList.setAdapter(noteAdapter);
                 }
                 break;
             case GetDataHelper.handle4loadMore:
@@ -539,10 +538,6 @@ public class NoteFragment extends MyBaseFragment
             @Override
             public void onItemClick(int position) {
                 switch (position) {
-                    //TODO sortByName
-//            case R.id.name:
-//                doSort(sortByName);
-//                break;
                     case 0:
                         doSort(sortByDateDesc);
                         break;

@@ -881,16 +881,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                 }).show();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // TODO how to load pic from phone
-//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//            Uri selectedImage = data.getData();
-//            NormalUtils.setDrawableToWidget(this, selectedImage, ivMove);
-//        }
-    }
-
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             if (!mEditContentEdt.getText().toString().equals(mNote.getContent())

@@ -96,13 +96,8 @@ public class PrimaryData {
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                Trace.d("PrimaryData initDataWithDoAfter");
-                initData(helper, doAfter);//在首次手动调用 为了catch
-            }
-        });
+        Trace.d("PrimaryData initDataWithDoAfter");
+        initData(helper, doAfter);//在首次手动调用 为了catch
     }
 
     /**
@@ -110,37 +105,45 @@ public class PrimaryData {
      *
      * @param doAfter 接口
      */
-    private void initData(OrmLiteHelper helper, DoAfter doAfter) {
-        boolean canOffline = PreferenceUtils
+    private void initData(final OrmLiteHelper helper, DoAfter doAfter) {
+        final boolean canOffline = PreferenceUtils
                 .getBoolean(Config.KEY_CAN_OFFLINE, true, SampleApplicationLike.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
-        try {
-//        if (getNoteFromData())
-            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
-            //skip += avObjects.size();
-            Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
-            getNotes(avObjects, helper);//initData
-        } catch (AVException e) {
-            e.printStackTrace();
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline note");
-                getNoteFromData(helper);
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+                    //skip += avObjects.size();
+                    Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
+                    getNotes(avObjects, helper);//initData
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    isOffline = true;
+                    if (canOffline) {
+                        Trace.d("offline note");
+                        getNoteFromData(helper);
+                    }
+                }
             }
-        }
-        try {
-//        if (getFolderFromData())
-            getFolderFromCloud();//initData
-        } catch (AVException e) {
-            e.printStackTrace();
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline folder");
-                getFolderFromData(helper);
+        });
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    getFolderFromCloud();//initData
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    isOffline = true;
+                    if (canOffline) {
+                        Trace.d("offline folder");
+                        getFolderFromData(helper);
+                    }
+                }
             }
-        }
+        });
         waitForFlag(doAfter);
     }
 

@@ -946,7 +946,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 Trace.d("permission granted");
                 setUserIcon();
             } else {
-                //TODO 显示对话框告知用户必须打开权限
                 Trace.d("permission denied");
                 setUserIconByNet();
             }
