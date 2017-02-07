@@ -186,16 +186,16 @@ public class NoteFragment extends MyBaseFragment
                 primaryData = PrimaryData.getInstance();
                 getDataListFromNote(primaryData.listNote);//handle4firstGet
                 Trace.d("handlerInNote handle4firstGet");
-                //TODO 删除后避免滑动到顶部
-//                    if (noteAdapter == null) {
-                noteAdapter = new NoteShrinkAdapter(
-                        getActivity(), list, R.layout.item_note);
-                mNoteWDList.setAdapter(noteAdapter);
-                mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
-//                    } else {
-//                        noteAdapter.initListDelete();
-//                        noteAdapter.setList(list);
-//                    }
+                //TODO　删除会刷新列表 等去除waterDrop后修复
+                if (noteAdapter == null) {
+                    noteAdapter = new NoteShrinkAdapter(
+                            getActivity(), list, R.layout.item_note);
+                    mNoteWDList.setAdapter(noteAdapter);
+                    mNoteWDList.setWaterDropListViewListener(NoteFragment.this);
+                } else {
+                    noteAdapter.initListDelete();
+                    noteAdapter.replaceAll(list);
+                }
                 if (primaryData.listNote.size() == 0) {
                     mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
                         @Override
@@ -748,7 +748,7 @@ public class NoteFragment extends MyBaseFragment
     }
 
     @Subscribe
-    public void onEvent(NoteDeleteEvent event){
+    public void onEvent(NoteDeleteEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
         Message msg = Message.obtain();
         msg.what = handle4explosion;
@@ -771,7 +771,7 @@ public class NoteFragment extends MyBaseFragment
     }
 
     @Subscribe
-    public void onEvent(NoteDeleteErrorEvent event){
+    public void onEvent(NoteDeleteErrorEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
         Trace.show(getActivity().getApplicationContext(), event.getStr());
     }

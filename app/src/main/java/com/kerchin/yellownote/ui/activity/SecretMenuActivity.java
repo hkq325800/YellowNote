@@ -14,12 +14,16 @@ import android.widget.TextView;
 import com.avos.avoscloud.AVException;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
+import com.kerchin.yellownote.data.event.GetPatternEvent;
 import com.kerchin.yellownote.global.Config;
 import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.SecretService;
 import com.kerchin.yellownote.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
@@ -52,6 +56,8 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     private final static int requestForForget = 2;//校验用户名密码 然后清除密码并关闭手势密码
     private final static int requestForConfirmPattern = 3;
     private final static int requestForEditPattern = 4;
+
+    private String patternFromOthers;
     //    private SVProgressHUD mSVProgressHUD;
     private boolean hasPattern;
     DayNightHelper mDayNightHelper;
@@ -109,6 +115,17 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             }
         });
 //        mSecretMenuPatternToggle.setChecked(hasPattern);
+    }
+
+    @Override
+    protected void initEvent(Bundle savedInstanceState) {
+        super.initEvent(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Subscribe
+    public void onEvent(GetPatternEvent event){
+        patternFromOthers = event.getStrFromPattern();
     }
 
     @Override
@@ -230,8 +247,6 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             mSecretMenuPatternEditTxt.setTextColor(getResources()
                     .getColor(R.color.light_gray));
     }
-
-    public static String patternFromOthers;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

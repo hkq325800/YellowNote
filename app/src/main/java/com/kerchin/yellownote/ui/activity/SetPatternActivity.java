@@ -11,8 +11,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.data.event.GetPatternEvent;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -65,21 +68,12 @@ public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatte
 //        }
 //    }
 
-    /**
-     * startActivityForResult失效
-     * @param pattern 手势
-     */
-//    public static void startMe(Activity activity, int requestCode) {
-//        Intent intent = new Intent(activity, SetPatternActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        activity.startActivityForResult(intent, requestCode);
-//    }
-
     //两次绘制相同后返回
     @Override
     protected void onSetPattern(final List<PatternView.Cell> pattern) {
 //        PatternLockUtils.setPattern(pattern, this);
-        //TODO 数据传输有问题
-        SecretMenuActivity.patternFromOthers = PatternLockUtils.getStrFromPattern(pattern);
+        GetPatternEvent event = new GetPatternEvent();
+        event.setStrFromPattern(PatternLockUtils.getStrFromPattern(pattern));
+        EventBus.getDefault().post(event);
     }
 }

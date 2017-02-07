@@ -727,31 +727,30 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @OnClick(R.id.mMainFab)
     public void createNew() {
         if (thisPosition == 0) {
-            mBottomSheetDialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
-                    .setMode(BottomSheetBuilder.MODE_GRID)
-                    .setAppBarLayout(mMainAbl)
-                    .setMenu(R.menu.menu_bottom_grid_tablet_sheet)
-                    .expandOnStart(true)
-                    .setItemClickListener(new BottomSheetItemClickListener() {
-                        @Override
-                        public void onBottomSheetItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.mMenuNote:
-                                    noteFragment.addClick();
-                                    break;
-                                case R.id.mMenuGIF:
-                                    //TODO gif录制
-                                    Trace.show(MainActivity.this, "功能暂未完善");
-                                    break;
-                                case R.id.mMenuVideo:
-                                    //TODO video录制
-                                    Trace.show(MainActivity.this, "功能暂未完善");
-                                    break;
-                            }
-                        }
-                    })
-                    .createDialog();
-            mBottomSheetDialog.show();
+            noteFragment.addClick();
+//            mBottomSheetDialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
+//                    .setMode(BottomSheetBuilder.MODE_GRID)
+//                    .setAppBarLayout(mMainAbl)
+//                    .setMenu(R.menu.menu_bottom_grid_tablet_sheet)
+//                    .expandOnStart(true)
+//                    .setItemClickListener(new BottomSheetItemClickListener() {
+//                        @Override
+//                        public void onBottomSheetItemClick(MenuItem item) {
+//                            switch (item.getItemId()) {
+//                                case R.id.mMenuNote:
+//                                    noteFragment.addClick();
+//                                    break;
+//                                /*case R.id.mMenuGIF:
+//                                    Trace.show(MainActivity.this, "功能暂未完善");
+//                                    break;
+//                                case R.id.mMenuVideo:
+//                                    Trace.show(MainActivity.this, "功能暂未完善");
+//                                    break;*/
+//                            }
+//                        }
+//                    })
+//                    .createDialog();
+//            mBottomSheetDialog.show();
         } else if (thisPosition == 1) {
             hideBtnAdd();
             folderFragment.addClick();
