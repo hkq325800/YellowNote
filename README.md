@@ -147,6 +147,12 @@ compile 'com.isanwenyu.highlight:highlight:1.7.3'
 - statebutton
 单文件
 
+compile('com.yalantis:ucrop:2.2.0') {
+        exclude group: 'com.android.support'
+        exclude group: 'com.squareup.okio'
+        exclude group: 'com.squareup.okhttp3'
+    }
+
 - 列表加载动画(lib)
 progresslayout
 - 按住持续作用的控件(lib)

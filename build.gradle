@@ -22,7 +22,7 @@ buildscript {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'//apt支持
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'//R2支持
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.1'//方法数检查
-        classpath('com.tencent.tinker:tinker-patch-gradle-plugin:1.6.2')//tinker
+        classpath('com.tencent.tinker:tinker-patch-gradle-plugin:1.7.7')//tinker
         //from stepper
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
         classpath 'com.antfortune.freeline:gradle:0.8.5'

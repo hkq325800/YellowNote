@@ -63,8 +63,7 @@ import com.uuzuche.lib_zxing.DisplayUtil;
  */
 @SuppressWarnings("unused")
 @DefaultLifeCycle(application = "com.kerchin.yellownote.global.MyApplication",
-        flags = ShareConstants.TINKER_ENABLE_ALL,
-        loadVerifyFlag = false)
+        flags = ShareConstants.TINKER_ENABLE_ALL)
 public class SampleApplicationLike extends DefaultApplicationLike {
     private static final String TAG = "global.SampleApplicationLike";
     /**
