@@ -28,8 +28,6 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.1.0'
     testCompile 'junit:junit:4.12'
-    compile 'com.tencent.tinker:tinker-android-anno:1.6.2'
-    compile 'com.tencent.tinker:tinker-android-lib:1.6.2'
     //multidex
     compile 'com.android.support:multidex:1.0.1'
     compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'

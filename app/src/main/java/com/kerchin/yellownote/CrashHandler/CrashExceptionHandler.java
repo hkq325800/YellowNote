@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.global.CrashHandler;
+package com.kerchin.yellownote.CrashHandler;
 
 import android.content.Context;
 import android.os.Environment;
@@ -6,8 +6,8 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -154,7 +154,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
                 if (!mCrashInfoFolder.exists()) {//闪退日志目录不存在则先创建闪退日志目录
                     mCrashInfoFolder.mkdirs();
                 }
-                String crashLogFileName = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                String crashLogFileName = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context)
                         + "_" + timeStampString + ".txt";
                 File crashLogFile = new File(mCrashInfoFolder, crashLogFileName);
                 crashLogFile.createNewFile();

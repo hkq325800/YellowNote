@@ -15,22 +15,19 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.kerchin.global.Config;
 import com.kerchin.widget.progresslayout.ProgressLayout;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
-import com.kerchin.yellownote.data.event.NoteDeleteEvent;
-import com.kerchin.yellownote.ui.activity.EditActivity;
-import com.kerchin.yellownote.ui.activity.MainActivity;
-import com.kerchin.yellownote.data.adapter.NoteShrinkAdapter;
 import com.kerchin.yellownote.base.MyBaseFragment;
+import com.kerchin.yellownote.data.adapter.NoteShrinkAdapter;
 import com.kerchin.yellownote.data.bean.GetDataHelper;
 import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
-import com.kerchin.yellownote.global.Config;
-
-import zj.remote.baselibrary.util.Trace;
-
+import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.NoteDeleteEvent;
+import com.kerchin.yellownote.ui.activity.EditActivity;
+import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
 
@@ -53,6 +50,7 @@ import me.wangyuwei.flipshare.ShareItem;
 import tyrantgit.explosionfield.ExplosionField;
 import zj.remote.baselibrary.util.DialogUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 public class NoteFragment extends MyBaseFragment
         implements WaterDropListView.IWaterDropListViewListener

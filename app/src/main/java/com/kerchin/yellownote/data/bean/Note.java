@@ -6,6 +6,9 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
 import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
@@ -14,25 +17,21 @@ import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.NoteDeleteEvent;
 import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.NormalUtils;
-import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.yellownote.data.proxy.NoteService;
 import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
-import com.kerchin.yellownote.data.proxy.NoteService;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.Serializable;
+import java.util.Date;
 
 import zj.remote.baselibrary.util.Base64Util;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-
 import zj.remote.baselibrary.util.Trace;
-
-import java.io.Serializable;
-import java.util.Date;
 
 
 /**
@@ -73,7 +72,7 @@ public class Note implements Serializable {
      */
 //    public Note(String objectId, String title, Date date, String contentCode
 //            , String folder, String folderId, String type) {
-//        user_tel = SampleApplicationLike.user;
+//        user_tel = MyApplication.user;
 //        this.objectId = objectId;
 //        this.title = title;
 //        this.date = date;
@@ -92,7 +91,7 @@ public class Note implements Serializable {
      */
     public Note(String objectId, String title, Long date, String contentCode
             , String folder, String folderId, String type) {
-        user_tel = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
+        user_tel = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
         hasEdited = false;
         this.objectId = objectId;
         this.title = title;
@@ -224,7 +223,7 @@ public class Note implements Serializable {
         //use PatternUtils.patternToSha1String(str) to save
         final RuntimeExceptionDao<Note, Integer> simpleDaoForNote = helper.getNoteDao();
         if (objectId.equals("")
-                || objectId.contains(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context))) {//新增
+                || objectId.contains(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context))) {//新增
             ThreadPool.getInstance().execute(new Runnable() {
                 @Override
                 public void run() {
@@ -232,14 +231,14 @@ public class Note implements Serializable {
                     AVObject newNote = null;
                     try {
                         newNote = NoteService.addNewNote(
-                                PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context), newTitle
+                                PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context), newTitle
                                 , Base64Util.stringToSha1String(newContent), folder, folderId);
                     } catch (AVException e) {
                         isOffline = true;
                         //离线新增给objectId 编辑离线新增不再赋值
 //                        Trace.show(context, "已离线保存" + Trace.getErrorMsg(e));
                         if (objectId.equals(""))
-                            objectId = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context) + "_" + date.getTime();
+                            objectId = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context) + "_" + date.getTime();
                         e.printStackTrace();
 //                        return;//终止下一步
                     }

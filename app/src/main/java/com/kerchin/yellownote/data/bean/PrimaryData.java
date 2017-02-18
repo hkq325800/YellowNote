@@ -3,16 +3,11 @@ package com.kerchin.yellownote.data.bean;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
-import com.kerchin.yellownote.global.Config;
-
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.data.proxy.NoteService;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import zj.remote.baselibrary.util.Trace;
+import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,6 +15,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * 数据的集中处理 采用单例模式
@@ -107,7 +106,7 @@ public class PrimaryData {
      */
     private void initData(final OrmLiteHelper helper, DoAfter doAfter) {
         final boolean canOffline = PreferenceUtils
-                .getBoolean(Config.KEY_CAN_OFFLINE, true, SampleApplicationLike.context);
+                .getBoolean(Config.KEY_CAN_OFFLINE, true, MyApplication.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
@@ -115,7 +114,7 @@ public class PrimaryData {
             @Override
             public void run() {
                 try {
-                    final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+                    final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
                     //skip += avObjects.size();
                     Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
                     getNotes(avObjects, helper);//initData
@@ -159,7 +158,7 @@ public class PrimaryData {
                 while (true) {
                     Trace.d("waitForFlag");
                     if (status.isNoteReady && status.isFolderReady) {
-                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), doAfter);
+                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context), doAfter);
                         break;
                     } else {
                         try {
@@ -223,14 +222,14 @@ public class PrimaryData {
      */
     public void initData(OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
         boolean canOffline = PreferenceUtils
-                .getBoolean(Config.KEY_CAN_OFFLINE, true, SampleApplicationLike.context);
+                .getBoolean(Config.KEY_CAN_OFFLINE, true, MyApplication.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         boolean isOffline = false;
         try {
 //        if (getNoteFromData())
-            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
             //skip += avObjects.size();
             Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
             getNotes(avObjects, helper);//initData
@@ -262,7 +261,7 @@ public class PrimaryData {
             waitToSaveData(helper, doAfter);//initData login
         else {
             if (doAfter == null)
-                getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
+                getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context));
             else {
                 Trace.d("has sort");
                 Collections.sort(listNote, new Comparator<Note>() {
@@ -316,7 +315,7 @@ public class PrimaryData {
                                 else
                                     simpleDaoForFolder.update(folder);
                             }
-                            String user = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
+                            String user = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
                             //检查查是否存在不在list中只在local中的数据
                             for (Note n : simpleDaoForNote.queryForEq("user_tel", user)) {
                                 if (!noteListContain(listNote, n)) {
@@ -333,7 +332,7 @@ public class PrimaryData {
                         } else break;
                         Trace.d("waitToSaveData true");
                         if (doAfter == null)
-                            getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
+                            getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context));
                         else {
                             Trace.d("has sort");
                             Collections.sort(listNote, new Comparator<Note>() {
@@ -386,7 +385,7 @@ public class PrimaryData {
                 while (true) {
                     Trace.d("waitForFlag");
                     if (status.isNoteReady && status.isFolderReady) {
-                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context));
+                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context));
                         break;
                     } else {
                         try {
@@ -569,14 +568,14 @@ public class PrimaryData {
      * @throws AVException
      */
     private void getFolderFromCloud() throws AVException {
-        final List<AVObject> avObjects = FolderService.getUserFolders(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+        final List<AVObject> avObjects = FolderService.getUserFolders(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
         Trace.d("getData4Folder成功 查询到" + avObjects.size() + " 条符合条件的数据");
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 listFolder.clear();
                 for (AVObject avObject : avObjects) {
-//                    Realm realm = Realm.getInstance(SampleApplicationLike.getContext());
+//                    Realm realm = Realm.getInstance(MyApplication.getContext());
 //                    realm.beginTransaction();
 //                    Folder f = realm.createObject(Folder.class);
 //                    f.setObjectId(avObject.getObjectId());
@@ -857,7 +856,7 @@ public class PrimaryData {
     private void getFolderFromData(OrmLiteHelper helper) {
         listFolder.clear();
 //        ArrayList<Folder> list = liteOrmHelper.query(Folder.class);
-        List<Folder> list = helper.getFolderDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+        List<Folder> list = helper.getFolderDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
         Trace.d("getFolderFromData size" + list.size());
         listFolder.addAll(list);
         Trace.d("isFolderReady true");
@@ -873,7 +872,7 @@ public class PrimaryData {
         listNote.clear();
         map.clear();
 //        ArrayList<Note> list = liteOrmHelper.query(Note.class);
-        List<Note> list = helper.getNoteDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+        List<Note> list = helper.getNoteDao().queryForEq("user_tel", PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
         for (Note n : list) {
             int i = 0;
             if (map.get(n.getFolderId()) != null)

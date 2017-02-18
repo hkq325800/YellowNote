@@ -15,9 +15,9 @@ import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.global.NormalUtils;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
@@ -248,7 +248,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             } else {
                                 //默认笔记本id统一在login获取 因为不轻易改变 保存在本地
                                 //userIcon每次获取
-                                PreferenceUtils.putString(Config.KEY_USERICON, user.getString("user_icon"), SampleApplicationLike.context);
+                                PreferenceUtils.putString(Config.KEY_USERICON, user.getString("user_icon"), MyApplication.context);
                                 cycleTarget = Message.obtain();//直接进入
                                 cycleTarget.what = next;
                                 handler.post(runnableForData);//缓存正确跳转

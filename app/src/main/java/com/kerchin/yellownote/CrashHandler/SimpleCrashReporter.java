@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.global.CrashHandler;
+package com.kerchin.yellownote.CrashHandler;
 
 import com.avos.avoscloud.AVFile;
 

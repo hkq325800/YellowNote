@@ -49,37 +49,25 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.GetDataCallback;
-import com.github.rubensousa.bottomsheetbuilder.BottomSheetBuilder;
-import com.github.rubensousa.bottomsheetbuilder.adapter.BottomSheetItemClickListener;
 import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.data.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
+import com.kerchin.yellownote.data.adapter.MyFragmentPagerAdapter;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
+import com.kerchin.yellownote.data.proxy.LoginService;
+import com.kerchin.yellownote.data.proxy.ShareSuggestService;
+import com.kerchin.global.Config;
+import com.kerchin.global.NormalUtils;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.CropUtil;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
-import com.kerchin.yellownote.data.proxy.LoginService;
-import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.global.NormalUtils;
-
-import pub.devrel.easypermissions.AfterPermissionGranted;
-import pub.devrel.easypermissions.EasyPermissions;
-import zhy.com.highlight.HighLight;
-import zhy.com.highlight.position.OnRightPosCallback;
-import zhy.com.highlight.shape.RectLightShape;
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-
-import zj.remote.baselibrary.util.Trace;
-
+import com.tinkerpatch.sdk.TinkerPatch;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 import com.yalantis.ucrop.UCrop;
@@ -94,7 +82,15 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import de.hdodenhof.circleimageview.CircleImageView;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+import zhy.com.highlight.HighLight;
+import zhy.com.highlight.position.OnRightPosCallback;
+import zhy.com.highlight.shape.RectLightShape;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 import zj.remote.baselibrary.util.ViewPagerTransform.DepthPageTransformer;
 
 public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
@@ -154,6 +150,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
+        Trace.e("patch APK");
+//        Trace.e("base APK");
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
         mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
@@ -179,7 +177,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void run() {
                 try {
-                    final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context));
+                    final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
                     file.getDataInBackground(new GetDataCallback() {
                         @Override
                         public void done(final byte[] bytes, AVException e) {
@@ -200,7 +198,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                     mNavHeaderMainImg.setImageBitmap(b);
                                 }
                             });
-//                            PreferenceUtils.putString(Config.KEY_USERICON, SampleApplicationLike.userIcon, MainActivity.this);
+//                            PreferenceUtils.putString(Config.KEY_USERICON, MyApplication.userIcon, MainActivity.this);
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -239,9 +237,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
         //userIcon
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                , SampleApplicationLike.APP_MAIN_FOLDER_NAME);
+                , MyApplication.APP_MAIN_FOLDER_NAME);
         userIconPath = savePath.getAbsolutePath() + File.separator
-                + PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context) + ".jpg";
+                + PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context) + ".jpg";
         userIconFile = new File(userIconPath);
 
         if (NormalUtils.requestPermission(this, REQUEST_WRITE_PERMISSION, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
@@ -312,13 +310,13 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     private void setUserIcon() {
-        if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context))) {//使用默认头像
+        if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {//使用默认头像
             Trace.d("getLocalMipmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
             mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
-//            if (!SampleApplicationLike.userIcon.equals(
+//            if (!MyApplication.userIcon.equals(
 //                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
                 setUserIconByNet();
         } else//userIcon存在但是本地文件不存在 下载并保存、设置
@@ -403,8 +401,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                //TODO Tinker就以下一句
+                //TODO Tinker的生效就以下一句
 //                TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
+                TinkerPatch.with().fetchPatchUpdate(true);
 //                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
 //                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
 //                }
@@ -624,7 +623,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
             NormalUtils.saveBitmap(bitmap, userIconFile);
             //没则新增有则创建
-            if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context))) {
+            if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {
                 PreferenceUtils.putString(Config.KEY_USERICON, LoginService.saveUserIcon(userIconPath), MainActivity.this);
             } else {
                 PreferenceUtils.putString(Config.KEY_USERICON, LoginService.saveUserIconById(userIconPath), MainActivity.this);

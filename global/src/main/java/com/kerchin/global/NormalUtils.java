@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.global;
+package com.kerchin.global;
 
 import android.app.Activity;
 import android.content.Context;
@@ -40,7 +40,7 @@ import java.util.Locale;
 import zj.remote.baselibrary.util.Trace;
 
 /**
- * com.kerchin.yellownote.utilities
+ * com.kerchin.utilities
  * Created by hzhuangkeqing on 2015/9/23 0023.
  */
 public class NormalUtils {

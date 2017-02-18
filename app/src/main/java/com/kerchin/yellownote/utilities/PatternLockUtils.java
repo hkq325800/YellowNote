@@ -9,9 +9,9 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.AVException;
-import com.kerchin.yellownote.global.Config;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.yellownote.global.MyApplication;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -76,7 +76,7 @@ public class PatternLockUtils {
      * 本地+网络清除密码
      */
     public static void clearPattern(final Context context) throws AVException {
-        SecretService.setPatternStr(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context), "");
+        SecretService.setPatternStr(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context), "");
         PreferenceUtils.remove(PreferenceContract.KEY_PATTERN_SHA1, context);
     }
 

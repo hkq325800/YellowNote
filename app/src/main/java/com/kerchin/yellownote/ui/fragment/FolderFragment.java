@@ -22,27 +22,23 @@ import android.widget.TextView;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.R;
-import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
-import com.kerchin.yellownote.data.event.FolderDeleteEvent;
-import com.kerchin.yellownote.data.event.FolderRespondEvent;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.ui.activity.MainActivity;
-import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.base.MyBaseFragment;
+import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
 import com.kerchin.yellownote.data.bean.Folder;
 import com.kerchin.yellownote.data.bean.GetDataHelper;
 import com.kerchin.yellownote.data.bean.Note;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.SimpleEntity;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.utilities.helper.DayNightHelper;
+import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
+import com.kerchin.yellownote.data.event.FolderDeleteEvent;
+import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.data.proxy.FolderService;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import zj.remote.baselibrary.util.Trace;
+import com.kerchin.yellownote.ui.activity.MainActivity;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import org.byteam.superadapter.IMulItemViewType;
 import org.greenrobot.eventbus.EventBus;
@@ -51,6 +47,10 @@ import org.greenrobot.eventbus.Subscribe;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import zj.remote.baselibrary.util.PreferenceUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 public class FolderFragment extends MyBaseFragment {
     public static boolean isChanged4folder = false;
@@ -424,7 +424,7 @@ public class FolderFragment extends MyBaseFragment {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context)
                                                             , input.toString());
                                             Trace.show(getActivity(), "保存成功");
                                             Trace.d("saveNewFolder 成功");

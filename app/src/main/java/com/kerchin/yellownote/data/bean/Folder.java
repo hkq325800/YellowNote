@@ -5,19 +5,19 @@ import android.app.Activity;
 import com.avos.avoscloud.AVException;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.yellownote.data.event.FolderRespondEvent;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.data.proxy.FolderService;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.yellownote.ui.fragment.NoteFragment;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.Serializable;
+import java.util.List;
 
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * Created by Kerchin on 2015/9/26 0026.
@@ -38,7 +38,7 @@ public class Folder implements Serializable {
     }
 
     public Folder(String objectId, String name, int contain) {
-        user_tel = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
+        user_tel = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
         this.name = name;
 //        this.contain = contain;//useless
         this.objectId = objectId;

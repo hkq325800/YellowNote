@@ -33,6 +33,9 @@ import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.cjj.sva.widget.CircleSearchView;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.Folder;
@@ -41,20 +44,13 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
 import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
+import com.kerchin.yellownote.data.proxy.FolderService;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
-import com.kerchin.yellownote.data.proxy.FolderService;
-import com.kerchin.yellownote.global.NormalUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import zj.remote.baselibrary.util.Trace;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +61,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * Created by Kerchin on 2015/9/30 0030.
@@ -304,7 +303,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), "text");
+                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context), "text");
             } else {
                 isNew = false;
             }
@@ -317,7 +316,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             if (mNote == null) {
                 isNew = true;
                 mNote = new Note("", "", System.currentTimeMillis(), "", "默认"
-                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", SampleApplicationLike.context), "text");
+                        , PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context), "text");
             } else {
                 isNew = false;
             }
@@ -784,7 +783,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                     @Override
                                     public void run() {
                                         try {
-                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context), input.toString());
+                                            String objectId = FolderService.newFolder(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context), input.toString());
                                             Trace.d("saveNewFolder 成功");
                                             Folder newFolder = new Folder(objectId, newFolderName, 0);
                                             primaryData.addFolder(newFolder);

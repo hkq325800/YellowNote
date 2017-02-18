@@ -17,25 +17,23 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
+import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
-import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.global.NormalUtils;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-
-import zj.remote.baselibrary.util.Trace;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * Created by Kerchin on 2016/3/5 0005.
@@ -103,7 +101,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                     @Override
                     public void run() {
                         try {
-                            ShareSuggestService.pushSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context)
+                            ShareSuggestService.pushSuggest(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context)
                                     , msg, mShareSuggestTouchEdt.getText().toString());
                             long thisSuggestTime = new Date().getTime();
                             long lastSuggestTime = PreferenceUtils.getLong("lastSuggestTime", thisSuggestTime, ShareSuggestActivity.this);
@@ -127,7 +125,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                 Trace.show(getApplicationContext(), "您宝贵的意见正在提交中···");
             }
             if (quickSuggestTimes >= 2) {
-                ShareSuggestService.setUnableToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
+                ShareSuggestService.setUnableToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
             }
         }
     }
@@ -181,8 +179,8 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
             @Override
             public void run() {
                 try {
-                    boolean flag = ShareSuggestService.isAbleToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context));
-                    Trace.d("查询isAbleToSuggest 查询到" + PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context) + " 的记录为" + flag);
+                    boolean flag = ShareSuggestService.isAbleToSuggest(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
+                    Trace.d("查询isAbleToSuggest 查询到" + PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context) + " 的记录为" + flag);
                     if (!flag) {
                         handler.sendEmptyMessage(hideSaveBtn);
                     }

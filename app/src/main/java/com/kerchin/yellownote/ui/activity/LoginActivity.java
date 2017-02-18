@@ -26,8 +26,8 @@ import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.NormalUtils;
+import com.kerchin.global.Config;
+import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 
 import zj.remote.baselibrary.util.PreferenceUtils;
@@ -199,7 +199,7 @@ public class LoginActivity extends LoginAbstract {
     @OnClick(R.id.mLoginBtn)
     public void loginClick() {
         mLoginPassTextInput.setHint("请输入密码");
-        //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + SampleApplicationLike.SaltKey));
+        //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
             mSignUpRelative.setVisibility(View.GONE);
             mLoginForgetBtn.setVisibility(View.VISIBLE);

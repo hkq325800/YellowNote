@@ -5,8 +5,8 @@ import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
-import com.kerchin.yellownote.global.Config;
-import com.kerchin.yellownote.global.SampleApplicationLike;
+import com.kerchin.global.Config;
+import com.kerchin.yellownote.global.MyApplication;
 
 import java.io.FileNotFoundException;
 
@@ -28,7 +28,7 @@ public class LoginService {
     public static AVObject loginVerify(String txtUser, String txtPass) throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
-        query.whereEqualTo("user_pass", SampleApplicationLike.Secret(txtPass));
+        query.whereEqualTo("user_pass", MyApplication.Secret(txtPass));
         return query.getFirst();
     }
 
@@ -43,7 +43,7 @@ public class LoginService {
         AVQuery<AVObject> query = new AVQuery<>("mUser");
         query.whereEqualTo("user_tel", txtUser);
         AVObject user = query.getFirst();//query.get(objectId);
-        user.put("user_pass", SampleApplicationLike.Secret(txtPass));
+        user.put("user_pass", MyApplication.Secret(txtPass));
         user.save();
     }
 
@@ -87,7 +87,7 @@ public class LoginService {
         AVObject user = new AVObject("mUser");
         user.put("user_tel", txtUser);
         user.put("user_default_folderId", defaultFolderId);
-        user.put("user_pass", SampleApplicationLike.Secret(txtPass));
+        user.put("user_pass", MyApplication.Secret(txtPass));
         user.save();
     }
 
@@ -121,7 +121,7 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIcon(String path) throws AVException, FileNotFoundException {
-        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
+        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
         AVFile file = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
         file.save();
         AVQuery<AVObject> query = new AVQuery<>("mUser");
@@ -134,8 +134,8 @@ public class LoginService {
 
     //保存文件
     public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
-        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", SampleApplicationLike.context);
-        AVFile file = AVFile.withObjectId(PreferenceUtils.getString(Config.KEY_USERICON, "", SampleApplicationLike.context));
+        String mUser = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
+        AVFile file = AVFile.withObjectId(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
         file.delete();
         AVFile newFile = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
         newFile.save();

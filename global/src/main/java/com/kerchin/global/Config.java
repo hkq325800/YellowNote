@@ -1,4 +1,4 @@
-package com.kerchin.yellownote.global;
+package com.kerchin.global;
 
 /**
  * Created by Kerchin on 2015/11/2 0002.

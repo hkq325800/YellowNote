@@ -20,7 +20,7 @@ import android.widget.ProgressBar;
 
 import com.kerchin.yellownote.R;
 
-import static com.kerchin.yellownote.global.NormalUtils.mapValueFromRangeToRange;
+import static com.kerchin.global.NormalUtils.mapValueFromRangeToRange;
 
 
 public class WaterDropListViewHeader extends FrameLayout {
