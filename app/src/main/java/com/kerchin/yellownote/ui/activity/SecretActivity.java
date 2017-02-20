@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.ui.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,31 +11,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.alibaba.android.arouter.facade.annotation.Param;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
-import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.global.NormalUtils;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import zj.remote.baselibrary.util.Trace;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.NormalUtils;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * Created by Kerchin on 2016/4/9 0009.
  * More Code on hkq325800@163.com
  */
+@Route(path = "/yellow/secret")
 public class SecretActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
@@ -55,6 +55,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
     TextInputLayout mSecretRePassTextInput;
     @BindView(R.id.mSecretRePassAgainTextInput)
     TextInputLayout mSecretRePassAgainTextInput;
+    @Param
     boolean isForget;
 
     @Override
@@ -103,12 +104,6 @@ public class SecretActivity extends BaseSwipeBackActivity {
         mNavigationTitleEdt.setEnabled(false);
         mNavigationTitleEdt.setFocusable(false);
         mNavigationTitleEdt.setFocusableInTouchMode(true);
-    }
-
-    public static void startMe(Context context) {
-        Intent intent = new Intent(context, SecretActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
     }
 
     @Override
@@ -201,11 +196,7 @@ public class SecretActivity extends BaseSwipeBackActivity {
                     break;
                 case trueForSecret:
                     Trace.show(getApplicationContext(), "密码修改成功");
-                    mNavigationRightBtn.setEnabled(true);
-                    mSecretNewPassEdt.setText("");
-                    mSecretPassEdt.setText("");
-                    mSecretNewPassAgainEdt.setText("");
-                    mSecretPassEdt.requestFocus();
+                    finish();
                     break;
             }
         }

@@ -109,7 +109,6 @@ public class PrimaryData {
                 .getBoolean(Config.KEY_CAN_OFFLINE, true, MyApplication.context);
         Trace.d("loadData");
         status.clear();
-        //TODO getNote和getFolder在同一个线程下
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
@@ -206,12 +205,7 @@ public class PrimaryData {
         listNote = new ArrayList<>();
         mItems = new ArrayList<>();
 //        liteOrmHelper = new LiteOrmHelper();
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                initData(helper, null, doAfterWithEx);//在首次手动调用 为了catch
-            }
-        });
+        initData(helper, null, doAfterWithEx);//在首次手动调用 为了catch
     }
 
     /**
@@ -220,13 +214,18 @@ public class PrimaryData {
      *
      * @param helper ormLite帮助类
      */
-    public void initData(OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
-        boolean canOffline = PreferenceUtils
+    public void initData(final OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
+        final boolean canOffline = PreferenceUtils
                 .getBoolean(Config.KEY_CAN_OFFLINE, true, MyApplication.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
         boolean isOffline = false;
+//        ThreadPool.getInstance().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        });
         try {
 //        if (getNoteFromData())
             final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
@@ -244,6 +243,11 @@ public class PrimaryData {
             if (doAfterWithEx != null)
                 doAfterWithEx.justNowWithEx(e);
         }
+//        ThreadPool.getInstance().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//            }
+//        });
         try {
 //        if (getFolderFromData())
             getFolderFromCloud();//initData
@@ -257,7 +261,7 @@ public class PrimaryData {
 //            if (doAfterWithEx != null)
 //                doAfterWithEx.justNowWithEx(e);
         }
-        if (!isOffline)
+        if (!isOffline)//若不是离线则保存数据至数据库
             waitToSaveData(helper, doAfter);//initData login
         else {
             if (doAfter == null)
@@ -591,15 +595,6 @@ public class PrimaryData {
 //                    long l = liteOrmHelper.save(folder);
                 }
                 //sortByContain
-//                Collections.sort(listFolder, new Comparator<Folder>() {
-//                    @Override
-//                    public int compare(Folder lhs, Folder rhs) {
-//                        if (lhs.getContain() < rhs.getContain())
-//                            return 1;
-//                        else
-//                            return -1;
-//                    }
-//                });
                 Trace.d("isFolderReady true");
                 status.isFolderReady = true;
             }

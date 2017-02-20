@@ -4,7 +4,6 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -45,10 +44,15 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.GetDataCallback;
+import zj.remote.baselibrary.util.BitmapUtil;
+import com.kerchin.global.Config;
+import com.kerchin.global.DateUtil;
 import com.kerchin.yellownote.BuildConfig;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
@@ -57,8 +61,6 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.global.Config;
-import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
@@ -87,12 +89,14 @@ import pub.devrel.easypermissions.EasyPermissions;
 import zhy.com.highlight.HighLight;
 import zhy.com.highlight.position.OnRightPosCallback;
 import zhy.com.highlight.shape.RectLightShape;
+import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 import zj.remote.baselibrary.util.ViewPagerTransform.DepthPageTransformer;
 
+@Route(path = "/yellow/main")
 public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         implements NavigationView.OnNavigationItemSelectedListener {
     @BindView(R.id.mMainPager)
@@ -150,8 +154,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     @Override
     protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
-        Trace.e("patch APK");
-//        Trace.e("base APK");
+//        Trace.e("patch APK");
+        Trace.e("base APK");
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
         mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
@@ -160,8 +164,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
         setSupportActionBar(mMainToolbar);
         if (BuildConfig.BUILD_TYPE.equals("debug")) {
-            String str = mNavHeaderMainTipTxt.getText() + " Dev" + (Config.isDebugMode ? "Mode" : "");
-            mNavHeaderMainTipTxt.setText(str);
+            //TODO
+//            String str = mNavHeaderMainTipTxt.getText() + " Dev"/* + (Config.isDebugMode ? "Mode" : "")*/;
+            mNavHeaderMainTipTxt.setText("Yellow Note Dev");
         }
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -186,9 +191,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                                 e.printStackTrace();
                                 return;
                             }
-                            final Bitmap b = NormalUtils.bytes2Bitmap(bytes);
+                            final Bitmap b = BitmapUtil.bytes2Bitmap(bytes);
                             try {
-                                NormalUtils.saveBitmap(b, userIconFile);
+                                BitmapUtil.saveBitmap(b, userIconFile);
                             } catch (IOException e1) {
                                 e1.printStackTrace();
                             }
@@ -315,7 +320,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
         } else if (userIconFile.exists()) {//本地缓存的头像文件存在
             Trace.d("getLocalBitmap");
-            mNavHeaderMainImg.setImageBitmap(NormalUtils.getLocalBitmap(userIconPath));
+            mNavHeaderMainImg.setImageBitmap(BitmapUtil.getLocalBitmap(userIconPath));
 //            if (!MyApplication.userIcon.equals(
 //                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
                 setUserIconByNet();
@@ -324,7 +329,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     private void checkForUpdate() {
-        String nowDateStr = NormalUtils.getDateStr(new Date(), "yyyy-MM-dd");
+        String nowDateStr = DateUtil.getDateStr(new Date(), "yyyy-MM-dd");
         String lastCheck = PreferenceUtils.getString(Config.KEY_WHEN_CHECK_UPDATE
                 , "", MainActivity.this);
         if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
@@ -367,9 +372,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(
-                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, REQUEST_LOAD_IMAGE);
+                //TODO 调用系统自带 会导致不同系统有不同表现
+                zj.remote.baselibrary.util.NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
+//                Intent i = new Intent(
+//                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(i, REQUEST_LOAD_IMAGE);
             }
         });
         //若新增按钮位置下移 说明软键盘收起 还有可能是虚拟键盘问题
@@ -478,19 +485,19 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         }).show();
                 break;
             case gotoThank:
-                ThankActivity.startMe(getApplicationContext());
+                ARouter.getInstance().build("/yellow/thank").navigation();
                 overridePendingTransition(R.anim.push_left_in,
                         R.anim.push_left_out);
                 break;
             case gotoSecret:
                 hideBtnAdd();//使进入
-                SecretMenuActivity.startMe(getApplicationContext());
+                ARouter.getInstance().build("/yellow/secret_menu").navigation();
                 overridePendingTransition(R.anim.push_left_in,
                         R.anim.push_left_out);
                 break;
             case gotoSetting:
                 hideBtnAdd();
-                ShareSuggestActivity.startMe(getApplicationContext());
+                ARouter.getInstance().build("/yellow/share_suggest").navigation();
                 overridePendingTransition(R.anim.push_left_in,
                         R.anim.push_left_out);
                 break;
@@ -615,13 +622,13 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         try {
             if (!savePath.exists())
                 savePath.createNewFile();
-            String picturePath = NormalUtils.getPathFromUri(MainActivity.this, selectedImage);
+            String picturePath = BitmapUtil.getPathFromUri(MainActivity.this, selectedImage);
 //                        String type = picturePath.substring(picturePath.lastIndexOf("."));
 //                        if(type.contains("gif"))
 //                            type = ".jpg";
-            final Bitmap bitmap = NormalUtils.zoomImage(picturePath);
+            final Bitmap bitmap = BitmapUtil.zoomImage(picturePath);
             //将zoom过的bitmap保存到主文件夹下然后把path传给LoginService
-            NormalUtils.saveBitmap(bitmap, userIconFile);
+            BitmapUtil.saveBitmap(bitmap, userIconFile);
             //没则新增有则创建
             if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {
                 PreferenceUtils.putString(Config.KEY_USERICON, LoginService.saveUserIcon(userIconPath), MainActivity.this);
@@ -651,14 +658,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             }
         }
         return new ToolbarStatus();
-    }
-
-    public static void startMe(Activity context) {
-        Intent intent = new Intent(context, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-        context.overridePendingTransition(R.anim.push_left_in,
-                R.anim.push_left_out);
     }
 
     @Override
@@ -789,10 +788,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, "", MainActivity.this);
                             PreferenceUtils.putBoolean(Config.KEY_CAN_OFFLINE, true, MainActivity.this);
                             PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, "", MainActivity.this);
-                            Intent intent = new Intent();
-                            intent.setClass(MainActivity.this, LoginActivity.class);
-                            intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
-                            startActivity(intent);
+                            ARouter.getInstance().build("/yellow/login").withBoolean("logoutFlag", true).navigation();
+//                            Intent intent = new Intent();
+//                            intent.setClass(MainActivity.this, LoginActivity.class);
+//                            intent.putExtra("logoutFlag", true);//使得欢迎界面不显示
+//                            startActivity(intent);
                             finish();
                             overridePendingTransition(R.anim.push_left_in,
                                     R.anim.push_left_out);

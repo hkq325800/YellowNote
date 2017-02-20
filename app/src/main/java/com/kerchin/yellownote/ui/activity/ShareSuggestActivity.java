@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.ui.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -15,14 +13,14 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import java.util.Date;
@@ -30,6 +28,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
@@ -38,6 +37,7 @@ import zj.remote.baselibrary.util.Trace;
 /**
  * Created by Kerchin on 2016/3/5 0005.
  */
+@Route(path = "share_suggest")
 public class ShareSuggestActivity extends BaseSwipeBackActivity {
     private final static int hideSaveBtn = 0;
     @BindView(R.id.mShareSuggestVersionTxt)
@@ -268,12 +268,6 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     protected void initView(Bundle savedInstanceState) {
         ButterKnife.bind(this);
 //        setSlidingModeRight();
-    }
-
-    public static void startMe(Context context) {
-        Intent intent = new Intent(context, ShareSuggestActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
     }
 
     @Override

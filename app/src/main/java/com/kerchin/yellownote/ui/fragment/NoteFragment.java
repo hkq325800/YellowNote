@@ -15,6 +15,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.kerchin.global.Config;
 import com.kerchin.widget.progresslayout.ProgressLayout;
 import com.kerchin.yellownote.R;
@@ -26,7 +27,6 @@ import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.bean.ToolbarStatus;
 import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.NoteDeleteEvent;
-import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
@@ -357,13 +357,11 @@ public class NoteFragment extends MyBaseFragment
     /*menu*/
 
     public void addClick() {
-        if (PrimaryData.status.isFolderReady) {
-            MainActivity m = (MainActivity) getActivity();
-            m.hideBtnAdd();
-            EditActivity.startMe(getActivity()//addClick
-                    , null);
-        } else
-            Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
+        MainActivity m = (MainActivity) getActivity();
+        m.hideBtnAdd();
+        ARouter.getInstance().build("/yellow/edit").navigation();
+//        EditActivity.startMe(getActivity()//addClick
+//                , null);
     }
 
     public SearchView.OnQueryTextListener getQueryTextListener() {
@@ -612,14 +610,10 @@ public class NoteFragment extends MyBaseFragment
 
     @OnItemClick(R.id.mNoteWDList)
     public void listItemClick(int position) {
-        if (PrimaryData.status.isFolderReady) {
-            MainActivity m = (MainActivity) getActivity();
-            m.hideBtnAdd();
-            EditActivity.startMe(getActivity()//OnItemClick
-                    , primaryData.getNote(noteAdapter.getItem(position - 1).getObjectId()));
-        } else {
-            Trace.show(getActivity().getApplicationContext(), "笔记夹加载中\n稍后重试咯~");
-        }
+        MainActivity m = (MainActivity) getActivity();
+        m.hideBtnAdd();
+        ARouter.getInstance().build("/yellow/edit").withSerializable("mNote", primaryData.getNote(noteAdapter.getItem(position - 1).getObjectId()))
+                .navigation();
     }
 
     @OnItemLongClick(R.id.mNoteWDList)

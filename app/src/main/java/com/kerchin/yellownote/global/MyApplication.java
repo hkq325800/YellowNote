@@ -5,15 +5,17 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.util.DisplayMetrics;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVOSCloud;
 import com.kerchin.global.Config;
 import com.kerchin.yellownote.CrashHandler.CrashExceptionHandler;
 import com.kerchin.yellownote.CrashHandler.SimpleCrashReporter;
-import com.kerchin.global.NormalUtils;
 import com.tencent.tinker.loader.app.ApplicationLike;
 import com.tinkerpatch.sdk.TinkerPatch;
 import com.tinkerpatch.sdk.loader.TinkerPatchApplicationLike;
 import com.uuzuche.lib_zxing.DisplayUtil;
+
+import zj.remote.baselibrary.util.NormalUtils;
 
 /**
  * Created by hkq325800 on 2017/2/18.
@@ -64,7 +66,8 @@ public class MyApplication extends Application {
 //        }
         context = this;
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
-
+        ARouter.init(this);
+        ARouter.openDebug();
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(this
                 , getResources().getString(com.kerchin.global.R.string.APP_ID)

@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.ui.activity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
@@ -11,32 +10,34 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.data.event.GetPatternEvent;
-import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.global.NormalUtils;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
-import zj.remote.baselibrary.util.Trace;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.NormalUtils;
+import zj.remote.baselibrary.util.PreferenceUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * 密码相关
  * Created by Kerchin on 2016/6/6 0006.
  */
+@Route(path = "/yellow/secret_menu")
 public class SecretMenuActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
@@ -141,12 +142,6 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
 //        mSVProgressHUD.showWithStatus("获取最新密码信息...", SVProgressHUD.SVProgressHUDMaskType.Clear);
     }
 
-    public static void startMe(Context context) {
-        Intent intent = new Intent(context, SecretMenuActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
     @Override
     protected void onDestroy() {
         NormalUtils.clearTextLineCache();
@@ -163,7 +158,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
      */
     @OnClick(R.id.mSecretMenuLoginLiL)
     public void gotoSecret() {
-        SecretActivity.startMe(getApplicationContext());
+        ARouter.getInstance().build("/yellow/secret").navigation();
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);
     }
@@ -182,9 +177,12 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                     final String str = SecretService.getPatternStr(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
                     if (hasPattern == !TextUtils.isEmpty(str)) {//与网络相同
                         mSecretMenuPatternToggleLiL.setClickable(true);
-                        Intent intent = new Intent(SecretMenuActivity.this
-                                , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
-                        startActivityForResult(intent, requestForPattern);
+                        ARouter.getInstance()
+                                .build(hasPattern ? "/yellow/confirm" : "/yellow/set_pattern")
+                                .navigation(SecretMenuActivity.this, requestForPattern);
+//                        Intent intent = new Intent(SecretMenuActivity.this
+//                                , hasPattern ? ConfirmPatternActivity.class : SetPatternActivity.class);
+//                        startActivityForResult(intent, requestForPattern);
                     } else {//与网络不同
                         hasPattern = !TextUtils.isEmpty(str);
                         runOnUiThread(new Runnable() {
@@ -229,8 +227,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                         Trace.show(getApplicationContext(), "密码在别处被改动,请注意数据安全!");
                     } else {//与网络相同
                         mSecretMenuPatternEditLiL.setClickable(true);
-                        Intent intent = new Intent(SecretMenuActivity.this, ConfirmPatternActivity.class);
-                        startActivityForResult(intent, requestForConfirmPattern);
+                        ARouter.getInstance().build("/yellow/confirm").navigation(SecretMenuActivity.this, requestForConfirmPattern);
                     }
                 } catch (AVException e) {
                     e.printStackTrace();
@@ -287,9 +284,10 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
 //            mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
         } else if (resultCode == ConfirmPatternActivity.RESULT_FORGOT_PASSWORD) {
             //忘记密码跳转验证
-            Intent intent = new Intent(SecretMenuActivity.this, SecretActivity.class);
-            intent.putExtra("isForget", true);
-            startActivityForResult(intent, requestForForget);
+            ARouter.getInstance().build("/yellow/secret").withBoolean("isForget", true).navigation(SecretMenuActivity.this, requestForForget);
+//            Intent intent = new Intent(SecretMenuActivity.this, SecretActivity.class);
+//            intent.putExtra("isForget", true);
+//            startActivityForResult(intent, requestForForget);
         } else if (requestCode == requestForForget && resultCode == RESULT_OK) {
             //忘记密码验证成功清除密码
 //            mSecretMenuPatternToggle.setChecked(false);
@@ -312,8 +310,9 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
             });
         } else if (requestCode == requestForConfirmPattern && resultCode == RESULT_OK) {
             //修改手势密码验证成功跳转设置
-            Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
-            startActivityForResult(intent, requestForEditPattern);
+            ARouter.getInstance().build("/yellow/set_pattern").navigation(SecretMenuActivity.this, requestForEditPattern);
+//            Intent intent = new Intent(SecretMenuActivity.this, SetPatternActivity.class);
+//            startActivityForResult(intent, requestForEditPattern);
         } else if (requestCode == requestForEditPattern && resultCode == RESULT_OK) {
             //修改手势密码成功
             ThreadPool.getInstance().execute(new Runnable() {

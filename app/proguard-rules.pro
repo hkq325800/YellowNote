@@ -144,3 +144,5 @@
   **[] $VALUES;
   public *;
 }
+#aRouter
+-keep public class com.alibaba.android.arouter.routes.**{*;}

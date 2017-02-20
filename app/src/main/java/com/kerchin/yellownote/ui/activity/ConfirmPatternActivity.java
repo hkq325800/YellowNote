@@ -11,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.alibaba.android.arouter.facade.annotation.Param;
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
@@ -26,7 +29,9 @@ import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
  * 确认密码界面
  * 需要重写方法isStealthModeEnabled isPatternCorrect onForgotPassword
  */
+@Route(path = "/yellow/confirm")
 public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.ConfirmPatternActivity {
+    @Param
     boolean isFromLaunch;
 
     @BindView(R.id.mNavigationLeftBtn)
@@ -71,7 +76,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             @Override
             public void run() {
                 if (isFromLaunch) {
-                    MainActivity.startMe(ConfirmPatternActivity.this);
+                    ARouter.getInstance().build("yellow/main").navigation();
                 } else {
                     setResult(RESULT_OK);
                 }
@@ -105,9 +110,10 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
     protected void onForgotPassword() {
         if (isFromLaunch) {
             //忘记密码跳转验证
-            Intent intent = new Intent(ConfirmPatternActivity.this, SecretActivity.class);
-            intent.putExtra("isForget", true);
-            startActivityForResult(intent, requestForForget);
+            ARouter.getInstance().build("/yellow/secret").withBoolean("isForget", true).navigation(this, requestForForget);
+//            Intent intent = new Intent(ConfirmPatternActivity.this, SecretActivity.class);
+//            intent.putExtra("isForget", true);
+//            startActivityForResult(intent, requestForForget);
             overridePendingTransition(R.anim.push_left_in,
                     R.anim.not_move);
         } else
@@ -132,7 +138,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == requestForForget && resultCode == RESULT_OK) {
-            MainActivity.startMe(ConfirmPatternActivity.this);
+            ARouter.getInstance().build("yellow/main").navigation();
             finish();
             overridePendingTransition(R.anim.push_left_in,
                     R.anim.push_left_out);

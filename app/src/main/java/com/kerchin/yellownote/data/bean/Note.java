@@ -7,8 +7,7 @@ import com.avos.avoscloud.AVObject;
 import com.j256.ormlite.dao.RuntimeExceptionDao;
 import com.j256.ormlite.field.DatabaseField;
 import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.global.NormalUtils;
+import com.kerchin.global.DateUtil;
 import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
 import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
@@ -18,6 +17,7 @@ import com.kerchin.yellownote.data.event.NoteDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.NoteDeleteEvent;
 import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
 import com.kerchin.yellownote.data.proxy.NoteService;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.activity.EditActivity;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
@@ -68,25 +68,6 @@ public class Note implements Serializable {
     }
 
     /**
-     * 从本地获取
-     */
-//    public Note(String objectId, String title, Date date, String contentCode
-//            , String folder, String folderId, String type) {
-//        user_tel = MyApplication.user;
-//        this.objectId = objectId;
-//        this.title = title;
-//        this.date = date;
-//        this.folder = folder;
-//        this.folderId = folderId;
-//        this.content = NormalUtils.sha1StringToString(contentCode);
-//        if (content.length() > 70)
-//            preview = content.substring(0, 70).replace("\n", " ");
-//        else
-//            preview = content.replace("\n", " ");
-//        this.type = type;
-//    }
-
-    /**
      * 从网络获取
      */
     public Note(String objectId, String title, Long date, String contentCode
@@ -112,8 +93,6 @@ public class Note implements Serializable {
                 + "【title " + title + "】 content " + content.length() + " preview " + preview.length() + "\n"
                 + "【hasEdited " + hasEdited + "】"
                 + " 【isOfflineAdd " + isOfflineAdd + "】";
-        //+ " folder " + folder + " folderId " + folderId
-        //+ " type " + type;
     }
 
     public boolean equals(Note n) {
@@ -190,11 +169,11 @@ public class Note implements Serializable {
     }
 
     public String getShowDate() {
-        return NormalUtils.getDateString(date);
+        return DateUtil.getDateString(date);
     }
 
     public String getTrueDate() {
-        return NormalUtils.getDateStr(date, "yyyy年MM月dd日 HH时mm分ss秒");
+        return DateUtil.getDateStr(date, "yyyy年MM月dd日 HH时mm分ss秒");
     }
 
     public String getPreview() {

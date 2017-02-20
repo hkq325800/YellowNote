@@ -19,29 +19,31 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.LoginAbstract;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
 import com.kerchin.yellownote.data.proxy.SecretService;
-import com.kerchin.global.Config;
-import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
-
-import zj.remote.baselibrary.util.PreferenceUtils;
-import zj.remote.baselibrary.util.Trace;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.NormalUtils;
+import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
+import zj.remote.baselibrary.util.Trace;
 
 /**
  * Created by Kerchin on 2015/8/1 0005.
  */
+@Route(path = "/yellow/login")
 public class LoginActivity extends LoginAbstract {
     @BindView(R.id.mLoginScV)
     ScrollView mLoginScV;
@@ -646,15 +648,10 @@ public class LoginActivity extends LoginAbstract {
     //通过正常登陆、注册、找回密码登录 缓存状态并跳转主页面
     @Override
     protected void goToMain() {
-        ThreadPool.getInstance().execute(new Runnable() {
+        PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
             @Override
-            public void run() {
-                PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
-                    @Override
-                    public void justNowWithEx(Exception e) {
-                        dismissDialog();
-                    }
-                });
+            public void justNowWithEx(Exception e) {
+                dismissDialog();
             }
         });
         //存入shared
@@ -674,8 +671,7 @@ public class LoginActivity extends LoginAbstract {
                     && PrimaryData.status.isNoteReady) {
                 Trace.d("runnableForData done Login");
                 dismissDialog();
-                MainActivity.startMe(LoginActivity.this);
-//                NormalUtils.goToActivity(LoginActivity.this, MainActivity.class);
+                ARouter.getInstance().build("/yellow/main").navigation();
                 finish();
             } else {
                 if (repeatCount * Config.period_runnable <= Config.timeout_runnable) {

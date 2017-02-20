@@ -20,9 +20,6 @@ import android.widget.ProgressBar;
 
 import com.kerchin.yellownote.R;
 
-import static com.kerchin.global.NormalUtils.mapValueFromRangeToRange;
-
-
 public class WaterDropListViewHeader extends FrameLayout {
     private LinearLayout mContainer;
     private ProgressBar mProgressBar;
@@ -184,6 +181,29 @@ public class WaterDropListViewHeader extends FrameLayout {
             }
         }
 
+    }
+
+    /**
+     * WaterDropListViewHeader——
+     * Map a value within a given range to another range.
+     *
+     * @param value    the value to map
+     * @param fromLow  the low end of the range the value is within
+     * @param fromHigh the high end of the range the value is within
+     * @param toLow    the low end of the range to map to
+     * @param toHigh   the high end of the range to map to
+     * @return the mapped value
+     */
+    public static double mapValueFromRangeToRange(
+            double value,
+            double fromLow,
+            double fromHigh,
+            double toLow,
+            double toHigh) {
+        double fromRangeSize = fromHigh - fromLow;//250
+        double toRangeSize = toHigh - toLow;//1
+        double valueScale = (value - fromLow) / fromRangeSize;//0.02
+        return toLow + (valueScale * toRangeSize);
     }
 
 

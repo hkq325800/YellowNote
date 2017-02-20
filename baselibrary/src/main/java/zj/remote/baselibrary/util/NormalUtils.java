@@ -5,20 +5,26 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresPermission;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.security.MessageDigest;
 
 import zj.remote.baselibrary.R;
@@ -28,6 +34,136 @@ import zj.remote.baselibrary.R;
  */
 
 public class NormalUtils {
+
+    private NormalUtils() {
+    }
+
+    public static String result;
+    public static void onlyGetTitleFromUrl(Context context, String url) {
+        WebView webView = new WebView(context);
+        WebChromeClient wvcc = new WebChromeClient() {
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+                super.onReceivedTitle(view, title);
+                result = title;
+//                Log.d("ANDROID_LAB", "TITLE="+title);
+                //title 就是网页的title
+            }
+        };
+        webView.setWebChromeClient(wvcc);
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                view.loadUrl(url);
+                return true;
+            }
+        });
+        webView.loadUrl(url);
+    }
+
+    public static String getVersionName(Context context) throws Exception {
+        // 获取packageManager的实例
+        PackageManager packageManager = context.getPackageManager();
+        // getPackageName()是你当前类的包名，0代表是获取版本信息
+        PackageInfo packInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+        return packInfo.versionName;
+    }
+
+    public static boolean isNetworkAvailable(Context context) {
+        if (context != null) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo info = cm.getActiveNetworkInfo();
+            if (info != null) {
+                return info.isAvailable();
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 浏览器下载
+     *
+     * @param context
+     * @param versionCode
+     * @param serviceClass
+     * @param uriStr
+     * @param fileName
+     */
+    public static void downloadByWeb(Context context, String versionCode, Class<?> serviceClass, String uriStr, String fileName) {
+        Intent intent = new Intent(context, serviceClass);
+        intent.putExtra("uriStr", uriStr);//context.getString(R.string.uri_download)
+        intent.putExtra("fileName", fileName);//context.getResources().getString(R.string.app_name) + versionCode + ".apk"
+        context.startService(intent);
+    }
+
+    /**
+     * 内部下载
+     *
+     * @param context
+     * @param uriStr
+     */
+    public static void downloadByUri(Context context, String uriStr) {
+        Uri uri = Uri.parse(uriStr);//指定网址
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);//指定Action
+        intent.setData(uri);//设置Uri
+        context.startActivity(intent);//启动Activity
+    }
+
+    /**
+     * reference http://www.jianshu.com/p/b4a8b3d4f587
+     * 用easyPermission 代替
+     *
+     * @param context
+     * @param requestCode
+     */
+    public static boolean requestPermission(Activity context, int requestCode, @RequiresPermission String permission) {
+        if (ContextCompat.checkSelfPermission(context, permission)
+                != PackageManager.PERMISSION_GRANTED) {
+            //申请WRITE_EXTERNAL_STORAGE权限
+            ActivityCompat.requestPermissions(context, new String[]{permission},
+                    requestCode);
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * in order to avoid leak in TextLine.sCached
+     * http://stackoverflow.com/questions/30397356/android-memory-leak-on-textview-leakcanary-leak-can-be-ignored
+     */
+    /*start*/
+    private static final Field TEXT_LINE_CACHED;
+
+    static {
+        Field textLineCached = null;
+        try {
+            textLineCached = Class.forName("android.text.TextLine").getDeclaredField("sCached");
+            textLineCached.setAccessible(true);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        TEXT_LINE_CACHED = textLineCached;
+    }
+    public static void clearTextLineCache() {
+        // If the field was not found for whatever reason just return.
+        if (TEXT_LINE_CACHED == null) return;
+
+        Object cached = null;
+        try {
+            // Get reference to the TextLine sCached array.
+            cached = TEXT_LINE_CACHED.get(null);
+        } catch (Exception ex) {
+            //
+        }
+        if (cached != null) {
+            // Clear the array.
+            for (int i = 0, size = Array.getLength(cached); i < size; i++) {
+                Array.set(cached, i, null);
+            }
+        }
+    }
+    /*end*/
 
     /**
      * 快捷发送通知
@@ -132,45 +268,12 @@ public class NormalUtils {
             time = 0;
         }
         long now = System.currentTimeMillis();
-        view.setTag(R.id.tag_avoid, now);
+        if(now - time >= minClickTime)
+            view.setTag(R.id.tag_avoid, now);
         return now - time < minClickTime;
     }
 
     public static void killSelf() {
         android.os.Process.killProcess(android.os.Process.myPid());
-    }
-
-    /**
-     * 判断网络是否可用
-     *
-     * @param context
-     * @return
-     */
-    public static boolean isNetworkAvailable(Context context) {
-        if (context != null) {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo info = cm.getActiveNetworkInfo();
-            if (info != null) {
-                return info.isAvailable();
-            }
-        }
-        return false;
-    }
-
-    /**
-     * 加载本地图片
-     * http://bbs.3gstdy.com
-     *
-     * @param url 路径
-     * @return Bitmap
-     */
-    public static Bitmap getLocalBitmap(String url) {
-        try {
-            FileInputStream fis = new FileInputStream(url);
-            return BitmapFactory.decodeStream(fis);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

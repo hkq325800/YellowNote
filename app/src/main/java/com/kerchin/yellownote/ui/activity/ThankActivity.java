@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.ui.activity;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.text.SpannableString;
@@ -13,21 +11,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
-
-import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 
 /**
  * Created by Kerchin on 2016/7/6 0006.
  */
+@Route(path = "/yellow/thank")
 public class ThankActivity extends BaseSwipeBackActivity {
     @BindView(R.id.mNavigationTitleEdt)
     EditText mNavigationTitleEdt;
@@ -140,12 +139,6 @@ public class ThankActivity extends BaseSwipeBackActivity {
         mNavigationTitleEdt.clearFocus();
         mNavigationTitleEdt.setFocusableInTouchMode(false);
         mThankTopTxt.setTextColor(mDayNightHelper.getColorRes(ThankActivity.this, DayNightHelper.COLOR_TEXT));
-    }
-
-    public static void startMe(Context context) {
-        Intent intent = new Intent(context, ThankActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
     }
 
     @OnClick(R.id.mNavigationLeftBtn)

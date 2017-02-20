@@ -76,6 +76,14 @@ dependencies {
     compile project(':global')
     //无需引入tinker的任何库,使用tinkerpatch sdk即可
     compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
+    compile 'com.alibaba:arouter-api:1.0.4'
+    apt 'com.alibaba:arouter-compiler:1.0.1'
+}
+
+apt {
+    arguments {
+        moduleName project.getName();
+    }
 }
 
 android {
@@ -114,8 +122,8 @@ android {
         applicationId "com.kerchin.yellownote"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 7
-        versionName "1.07"
+        versionCode 8
+        versionName "1.08"
         /**
          * you can use multiDex and install it in your ApplicationLifeCycle implement
          */
@@ -123,7 +131,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled true//false aRouter
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

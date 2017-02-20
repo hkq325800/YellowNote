@@ -2,6 +2,7 @@ package zj.remote.baselibrary.util;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by ucmed on 2016/9/19.
@@ -38,6 +39,12 @@ public class DisplayUtil {
         return dm.widthPixels;
     }
 
+    public static int anotherGetScreenWidth(Context context) {
+        WindowManager wm = (WindowManager) context
+                .getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getWidth();
+    }
+
     public static int getScreenHeight(Context context) {
 
         DisplayMetrics dm = context.getResources().getDisplayMetrics();
@@ -50,5 +57,14 @@ public class DisplayUtil {
             return -1;
         }
         return context.getResources().getDisplayMetrics().density;
+    }
+
+    public static int getStatusBarHeight(Context context) {
+        int result = 0;
+        int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = context.getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
     }
 }

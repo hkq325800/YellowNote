@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.data.event.GetPatternEvent;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
@@ -27,6 +28,7 @@ import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 /**
  * 设置密码界面
  */
+@Route(path = "/yellow/set_pattern")
 public class SetPatternActivity extends me.zhanghai.android.patternlock.SetPatternActivity {
     @BindView(R.id.mNavigationLeftBtn)
     Button mNavigationLeftBtn;

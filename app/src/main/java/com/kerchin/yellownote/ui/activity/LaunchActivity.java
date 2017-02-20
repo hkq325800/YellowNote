@@ -1,6 +1,5 @@
 package com.kerchin.yellownote.ui.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -9,15 +8,15 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.data.proxy.LoginService;
-import com.kerchin.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
@@ -92,29 +91,24 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //        str.toCharArray();
         //只为有缓存登录的用户初始化数据
         if (PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, this)) {
-            ThreadPool.getInstance().execute(new Runnable() {
+            Trace.d("PrimaryData" + Thread.currentThread().getId());
+            getDataStart = System.currentTimeMillis();
+            //一般而言登陆过的用户都有数据本地缓存
+            PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
                 @Override
-                public void run() {
-                    Trace.d("PrimaryData" + Thread.currentThread().getId());
-                    getDataStart = System.currentTimeMillis();
-                    //一般而言登陆过的用户都有数据本地缓存
-                    PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
-                        @Override
-                        public void justNowWithEx(Exception e) {
-                            if (!PreferenceUtils.getBoolean(Config.KEY_CAN_OFFLINE, true, LaunchActivity.this)) {
-                                isNeedToRefresh = true;
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mWelcomeTxt.setText("请检查网络后点击屏幕重试");
-                                    }
-                                });
-                                Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), false);
+                public void justNowWithEx(Exception e) {
+                    if (!PreferenceUtils.getBoolean(Config.KEY_CAN_OFFLINE, true, LaunchActivity.this)) {
+                        isNeedToRefresh = true;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mWelcomeTxt.setText("请检查网络后点击屏幕重试");
                             }
-                        }
-                    });//isNeedToRefresh
+                        });
+                        Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), false);
+                    }
                 }
-            });
+            });//isNeedToRefresh
         }
         loginVerify(PreferenceUtils.getString(Config.KEY_USER, "", LaunchActivity.this));
     }
@@ -129,29 +123,29 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case wel://首次登陆
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    ARouter.getInstance().build("/yellow/login").navigation();
                     finish();
                     break;
                 case reLog://由于密码错误重新登陆
                     Trace.show(LaunchActivity.this, "你的密码已被修改,请重新登录", false);
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    ARouter.getInstance().build("/yellow/login").navigation();
                     finish();
                     break;
                 case reLogForFrozen://账户冻结
                     Trace.show(LaunchActivity.this, "您的账号已被冻结,请联系 hkq325800@163.com", false);
-                    NormalUtils.goToActivity(LaunchActivity.this, LoginActivity.class);
+                    ARouter.getInstance().build("/yellow/login").navigation();
                     finish();
                     break;
                 case next://缓存正确 直接进入
-                    if(PrimaryData.getInstance().isOffline)
+                    if (PrimaryData.getInstance().isOffline)
                         Trace.show(LaunchActivity.this, "当前数据处于离线状态");
                     if (PatternLockUtils.hasPattern(getApplicationContext())) {
-                        Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class);
-                        intent.putExtra("isFromLaunch", true);
-                        startActivity(intent);
+//                        Intent intent = new Intent(LaunchActivity.this, ConfirmPatternActivity.class);
+//                        intent.putExtra("isFromLaunch", true);
+//                        startActivity(intent);
+                        ARouter.getInstance().build("/yellow/confirm").withBoolean("isFromLaunch", true).navigation();
                     } else
-                        MainActivity.startMe(LaunchActivity.this);
-//                    NormalUtils.goToActivity(LaunchActivity.this, MainActivity.class);
+                        ARouter.getInstance().build("yellow/main").navigation();
                     handler.sendEmptyMessageDelayed(just, 800);//为解决闪屏问题
 //                    finish();
                     break;
@@ -164,7 +158,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     };
 
     @Override
-    public void finish(){
+    public void finish() {
         super.finish();
         overridePendingTransition(R.anim.push_left_in,
                 R.anim.push_left_out);

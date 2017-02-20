@@ -2,10 +2,8 @@ package com.kerchin.yellownote.ui.activity;
 
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -29,13 +27,13 @@ import android.widget.ScrollView;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.alibaba.android.arouter.facade.annotation.Param;
+import com.alibaba.android.arouter.facade.annotation.Route;
 import com.avos.avoscloud.AVException;
 import com.bigkoo.snappingstepper.SnappingStepper;
 import com.bigkoo.snappingstepper.listener.SnappingStepperValueChangeListener;
 import com.cjj.sva.widget.CircleSearchView;
 import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
-import com.kerchin.global.NormalUtils;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.Folder;
@@ -45,6 +43,7 @@ import com.kerchin.yellownote.data.event.EditDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.EditDeleteFinishEvent;
 import com.kerchin.yellownote.data.event.NoteSaveChangeEvent;
 import com.kerchin.yellownote.data.proxy.FolderService;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
@@ -61,6 +60,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
@@ -69,6 +69,7 @@ import zj.remote.baselibrary.util.Trace;
 /**
  * Created by Kerchin on 2015/9/30 0030.
  */
+@Route(path = "/yellow/edit")
 public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     @BindView(R.id.mNavigationTitleLinear)
     LinearLayout mNavigationTitleLinear;
@@ -113,6 +114,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private String[] mFolderId;
     private List<String> textOrder = new ArrayList<>();//记录输入的顺序
     private List<Integer> textSelection = new ArrayList<>();//记录目标步数时的selection
+    @Param(name = "mNote")
     private Note mNote;//当前编辑的note
     private Folder thisFolder;//记录目前处在哪个笔记本 尚未实际保存
     private PrimaryData primaryData;
@@ -133,15 +135,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     DayNightHelper mDayNightHelper;
     @SuppressWarnings("FieldCanBeLocal")
     private ValueAnimator animHide, animShow;//用于显示隐藏上下两栏
-
-    public static void startMe(Activity context, Note note) {
-        Intent intent = new Intent(context, EditActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra("mNote", note);
-        context.startActivity(intent);
-        context.overridePendingTransition(R.anim.push_left_in,
-                R.anim.push_left_out);
-    }
 
     @Override
     protected void onDestroy() {
