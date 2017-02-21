@@ -38,7 +38,7 @@
         <activity
             android:name=".ui.activity.LaunchActivity"
             android:label="@string/app_name"
-            android:theme="@style/TransparentThemeDay" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ui.activity.LoginActivity"
             android:screenOrientation="portrait"

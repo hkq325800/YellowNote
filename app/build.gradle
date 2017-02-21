@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.getkeepsafe.dexcount'
-apply plugin: 'com.antfortune.freeline'
+//apply plugin: 'com.antfortune.freeline'
 apply from: 'tinkerpatch.gradle'
 //apply plugin: 'realm-android'
 def javaVersion = JavaVersion.VERSION_1_7

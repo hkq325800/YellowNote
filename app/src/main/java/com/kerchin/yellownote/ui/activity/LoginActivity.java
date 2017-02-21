@@ -581,8 +581,8 @@ public class LoginActivity extends LoginAbstract {
             public void run() {
                 try {
                     LoginService.forgetSave(txtUser, txtPass);
-                    Trace.show(LoginActivity.this, "修改成功");
-                    goToMain();//找回密码登录
+                    Trace.show(LoginActivity.this, "修改成功 请重新登陆");
+//                    goToMain();//找回密码登录
                 } catch (AVException e) {
                     Trace.e("忘记密码操作失败" + Trace.getErrorMsg(e));
                     e.printStackTrace();

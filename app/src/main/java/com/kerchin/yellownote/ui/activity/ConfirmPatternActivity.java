@@ -76,7 +76,7 @@ public class ConfirmPatternActivity extends me.zhanghai.android.patternlock.Conf
             @Override
             public void run() {
                 if (isFromLaunch) {
-                    ARouter.getInstance().build("yellow/main").navigation();
+                    ARouter.getInstance().build("/yellow/main").navigation();
                 } else {
                     setResult(RESULT_OK);
                 }

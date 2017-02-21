@@ -145,7 +145,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 //                        startActivity(intent);
                         ARouter.getInstance().build("/yellow/confirm").withBoolean("isFromLaunch", true).navigation();
                     } else
-                        ARouter.getInstance().build("yellow/main").navigation();
+                        ARouter.getInstance().build("/yellow/main").navigation();
                     handler.sendEmptyMessageDelayed(just, 800);//为解决闪屏问题
 //                    finish();
                     break;

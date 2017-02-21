@@ -214,69 +214,69 @@ public class PrimaryData {
      *
      * @param helper ormLite帮助类
      */
-    public void initData(final OrmLiteHelper helper, DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
+    public void initData(final OrmLiteHelper helper, final DoAfter doAfter, final DoAfterWithEx doAfterWithEx) {
         final boolean canOffline = PreferenceUtils
                 .getBoolean(Config.KEY_CAN_OFFLINE, true, MyApplication.context);
         Trace.d("loadData");
         status.clear();
         //TODO getNote和getFolder在同一个线程下
-        boolean isOffline = false;
-//        ThreadPool.getInstance().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//            }
-//        });
-        try {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                boolean isOffline = false;
+                try {
 //        if (getNoteFromData())
-            final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
-            //skip += avObjects.size();
-            Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
-            getNotes(avObjects, helper);//initData
-        } catch (AVException e) {
-            e.printStackTrace();
-            PrimaryData.status.restore();
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline note");
-                getNoteFromData(helper);
-            }
-            if (doAfterWithEx != null)
-                doAfterWithEx.justNowWithEx(e);
-        }
+                    final List<AVObject> avObjects = NoteService.getUserNote(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
+                    //skip += avObjects.size();
+                    Trace.d("getData4Note成功 查询到" + avObjects.size() + " 条符合条件的数据");
+                    getNotes(avObjects, helper);//initData
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    PrimaryData.status.restore();
+                    isOffline = true;
+                    if (canOffline) {
+                        Trace.d("offline note");
+                        getNoteFromData(helper);
+                    }
+                    if (doAfterWithEx != null)
+                        doAfterWithEx.justNowWithEx(e);
+                }
 //        ThreadPool.getInstance().execute(new Runnable() {
 //            @Override
 //            public void run() {
 //            }
 //        });
-        try {
+                try {
 //        if (getFolderFromData())
-            getFolderFromCloud();//initData
-        } catch (AVException e) {
-            e.printStackTrace();
-            isOffline = true;
-            if (canOffline) {
-                Trace.d("offline folder");
-                getFolderFromData(helper);
-            }
+                    getFolderFromCloud();//initData
+                } catch (AVException e) {
+                    e.printStackTrace();
+                    isOffline = true;
+                    if (canOffline) {
+                        Trace.d("offline folder");
+                        getFolderFromData(helper);
+                    }
 //            if (doAfterWithEx != null)
 //                doAfterWithEx.justNowWithEx(e);
-        }
-        if (!isOffline)//若不是离线则保存数据至数据库
-            waitToSaveData(helper, doAfter);//initData login
-        else {
-            if (doAfter == null)
-                getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context));
-            else {
-                Trace.d("has sort");
-                Collections.sort(listNote, new Comparator<Note>() {
-                    @Override
-                    public int compare(Note n1, Note n2) {
-                        return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+                }
+                if (!isOffline)//若不是离线则保存数据至数据库
+                    waitToSaveData(helper, doAfter);//initData login
+                else {
+                    if (doAfter == null)
+                        getSimpleEntityFromList(PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", MyApplication.context));
+                    else {
+                        Trace.d("has sort");
+                        Collections.sort(listNote, new Comparator<Note>() {
+                            @Override
+                            public int compare(Note n1, Note n2) {
+                                return n2.getTrueDate().toUpperCase().compareTo(n1.getTrueDate());
+                            }
+                        });
+                        doAfter.justNow();
                     }
-                });
-                doAfter.justNow();
+                }
             }
-        }
+        });
         //waitForFlag();
     }
 

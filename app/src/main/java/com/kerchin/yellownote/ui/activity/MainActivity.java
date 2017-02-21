@@ -50,7 +50,6 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.GetDataCallback;
-import zj.remote.baselibrary.util.BitmapUtil;
 import com.kerchin.global.Config;
 import com.kerchin.global.DateUtil;
 import com.kerchin.yellownote.BuildConfig;
@@ -89,6 +88,7 @@ import pub.devrel.easypermissions.EasyPermissions;
 import zhy.com.highlight.HighLight;
 import zhy.com.highlight.position.OnRightPosCallback;
 import zhy.com.highlight.shape.RectLightShape;
+import zj.remote.baselibrary.util.BitmapUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
@@ -164,9 +164,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         msgFolder = (TextView) galleryFolder.findViewById(R.id.msg);
         setSupportActionBar(mMainToolbar);
         if (BuildConfig.BUILD_TYPE.equals("debug")) {
-            //TODO
-//            String str = mNavHeaderMainTipTxt.getText() + " Dev"/* + (Config.isDebugMode ? "Mode" : "")*/;
-            mNavHeaderMainTipTxt.setText("Yellow Note Dev");
+            String str = "Yellow Note Dev";
+            mNavHeaderMainTipTxt.setText(str);
         }
         toggle = new ActionBarDrawerToggle(
                 this, mMainDrawer, mMainToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
