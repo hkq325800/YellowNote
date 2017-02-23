@@ -90,6 +90,10 @@
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity android:name=".mvp.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.LoginNoActionBar"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
 
         <service android:name="com.kerchin.yellownote.data.service.DownloadService">
             <intent-filter android:priority="1000">

@@ -1,5 +1,7 @@
 package com.kerchin.yellownote.base;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.KeyEvent;
@@ -21,7 +23,8 @@ import static com.kerchin.yellownote.R.drawable.slide_shadow;
  */
 public abstract class BaseSwipeBackActivity extends BaseActivity
         implements SlidingMenu.OnOpenedListener {
-
+    protected Context mContext;
+    protected Activity mActivity;
     private SlidingActivityHelper mHelper;
     //SlidingMenu
     private SlidingMenu mSlidingMenu;
@@ -42,6 +45,8 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
     @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
+        mContext = this;
+        mActivity = this;
         immergeColor = R.color.colorPrimary;
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);

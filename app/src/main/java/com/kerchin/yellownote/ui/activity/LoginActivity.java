@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
@@ -45,7 +44,7 @@ import zj.remote.baselibrary.util.Trace;
 /**
  * Created by Kerchin on 2015/8/1 0005.
  */
-@Route(path = "/yellow/login")
+//@Route(path = "/yellow/login")
 public class LoginActivity extends LoginAbstract {
     @BindView(R.id.mLoginScV)
     ScrollView mLoginScV;

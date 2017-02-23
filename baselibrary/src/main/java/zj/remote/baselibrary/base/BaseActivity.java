@@ -88,8 +88,14 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void initEvent(Bundle savedInstanceState);
 
     protected void dismissDialog() {
-        if (dialog != null && dialog.isShowing())
-            dialog.dismiss();
+        if (dialog != null && dialog.isShowing()) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.dismiss();
+                }
+            });
+        }
     }
 
 //    public static class MyHandler extends Handler {
