@@ -34,9 +34,11 @@ import com.kerchin.yellownote.utilities.PatternLockUtils;
 import butterknife.BindView;
 import butterknife.OnClick;
 import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.KeyboardUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
+import zj.remote.baselibrary.util.SupportSoftKeyboardUtil;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -99,17 +101,18 @@ public class LoginActivity extends LoginAbstract {
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
+        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconImg, mLoginMineTxt);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", LoginActivity.this);
         if (!TextUtils.isEmpty(user)) {
             mLoginUserEdt.setText(user);
             mLoginUserEdt.setSelection(user.length());
             mLoginPassEdt.requestFocus();
-//            mLoginPassTextInput.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginPassTextInput);
-//                }
-//            }, 1000);
+            mLoginPassTextInput.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KeyboardUtil.showKeyboard(LoginActivity.this, mLoginPassTextInput);
+                }
+            }, 800);
             //干脆地使用初始设置 键盘自动弹出
         }
 //        else {

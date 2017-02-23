@@ -1,7 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:fitsSystemWindows="true"
     android:background="@color/lightSkyBlue">
 
     <ScrollView
@@ -17,30 +18,30 @@
             android:orientation="vertical"
             android:paddingLeft="@dimen/activity_horizontal_margin"
             android:paddingRight="@dimen/activity_horizontal_margin"
+            android:gravity="center_horizontal"
             android:paddingTop="36dp">
 
 
             <ImageView
                 android:id="@+id/mLoginIconImg"
-                android:layout_width="wrap_content"
+                android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:layout_gravity="center_horizontal"
                 android:src="@mipmap/icon" />
 
             <TextView
                 android:id="@+id/mLoginMineTxt"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5dp"
-                android:gravity="center_horizontal"
-                tools:text="@string/declare"
+                android:layout_marginBottom="30dp"
+                android:text="@string/app_name"
                 android:textColor="@color/textColor" />
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/mLoginUserTextInput"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp">
+                android:layout_marginTop="30dp"
+                android:layout_height="wrap_content">
 
                 <EditText
                     android:id="@+id/mLoginUserEdt"
@@ -48,6 +49,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
                     android:background="@null"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:hint="请输入手机号码"
                     android:inputType="number"
                     android:paddingBottom="10dp"
@@ -79,6 +82,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="30dp"
                     android:background="@null"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:hint="请输入密码"
                     android:inputType="textPassword"
                     android:paddingBottom="10dp"
@@ -196,4 +201,4 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>

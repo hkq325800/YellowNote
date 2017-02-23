@@ -8,6 +8,8 @@ import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 /**
@@ -25,6 +27,35 @@ public class SupportSoftKeyboardUtil {
 
     private SupportSoftKeyboardUtil() {
         //  private
+    }
+
+    /**
+     * 监听键盘弹出 副产物是键盘高度
+     *
+     * @param activity   目标
+     * @param view       任意一个控件
+     * @param changeView 需要改变的控件id
+     */
+    public static void addSoftKeyboardListener(final Activity activity, View view, final View... changeView) {
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            //当键盘弹出隐藏的时候会 调用此方法。
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                //获取当前界面可视部分
+                activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+                //获取屏幕的高度
+                int screenHeight = activity.getWindow().getDecorView().getRootView().getHeight();
+                //此处就是用来获取键盘的高度的， 在键盘没有弹出的时候 此高度为0 键盘弹出的时候为一个正数
+                int heightDifference = screenHeight - r.bottom;
+//                Log.e("Keyboard Size", "Size: " + heightDifference);
+                //小于500可见
+                for (View view : changeView) {
+                    view.setVisibility(heightDifference < 500 ? View.VISIBLE : View.GONE);
+                }
+            }
+
+        });
     }
 
     /**
@@ -97,7 +128,8 @@ public class SupportSoftKeyboardUtil {
      *
      * @return 虚拟按键的高度
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1) private static int getNavigationBarHeight(
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    private static int getNavigationBarHeight(
             Context context) {
 
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
