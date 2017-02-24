@@ -11,11 +11,7 @@ import com.avos.avoscloud.AVException;
 public interface ILoginView {
     void loginSuccess(String txtUser, String user_default_folderId, String user_icon, String user_read_pass);
 
-    void loginFailed();
-
     void exception(String s, AVException e);
-
-    void isFrozen();
 
     void saySth(String s);
 

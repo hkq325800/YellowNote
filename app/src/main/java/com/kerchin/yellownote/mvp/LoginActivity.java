@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -29,6 +30,7 @@ import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.AnimeUtil;
 import zj.remote.baselibrary.util.DialogUtils;
 import zj.remote.baselibrary.util.KeyboardUtil;
 import zj.remote.baselibrary.util.NormalUtils;
@@ -41,7 +43,7 @@ import zj.remote.baselibrary.util.Trace;
  * Created by hkq325800 on 2017/2/23.
  */
 @Route(path = "/yellow/login")
-public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView {
+public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView, UiCallback {
     @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
     @BindView(R.id.mLoginPassTextInput)
@@ -66,10 +68,13 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     ImageView mLoginIconImg;
     @BindView(R.id.mLoginMineTxt)
     TextView mLoginMineTxt;
+    @BindView(R.id.mLoginIconLiL)
+    LinearLayout mLoginIconLiL;
     private static Long mExitTime = (long) 0;//退出时间
     private boolean isEnter = false;
     private int repeatCount = 0;
     private LoginPresenter mPresenter;
+    private int height;
 
     public boolean onKeyDown(int keyCode, @NonNull KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -103,6 +108,13 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        mSignUpRelative.post(new Runnable() {
+            @Override
+            public void run() {
+                height = mSignUpRelative.getHeight();
+                mSignUpRelative.setVisibility(View.GONE);
+            }
+        });
         String str = mLoginMineTxt.getText().toString();
         try {
             str = str + "V" + NormalUtils.getVersionName(this);
@@ -110,7 +122,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
-        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconImg, mLoginMineTxt);
+        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconLiL);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", mContext);
         if (!TextUtils.isEmpty(user)) {
             mLoginUserEdt.setText(user);
@@ -200,7 +212,8 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         mLoginPassTextInput.setHint("请输入密码");
         //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
-            mSignUpRelative.setVisibility(View.GONE);
+            AnimeUtil.runAnimator(false, mSignUpRelative, height, 200);//loginClick
+//            mSignUpRelative.setVisibility(View.GONE);
             mLoginForgetBtn.setVisibility(View.VISIBLE);
             mLoginForgetBtn.setText("忘记密码");
             mLoginBtn.setText("登录");
@@ -232,9 +245,11 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         if (mLoginSignUpBtn.getText().toString().equals("注册")) {
             mLoginBtn.setText("返回登录");
             mLoginForgetBtn.setText("忘记密码");
-            mLoginForgetBtn.setVisibility(View.GONE);
             mLoginSignUpBtn.setText("注册确认");
-            mSignUpRelative.setVisibility(View.VISIBLE);
+            if (mSignUpRelative.getVisibility() == View.INVISIBLE
+                    || mSignUpRelative.getVisibility() == View.GONE)
+                AnimeUtil.runAnimator(true, mSignUpRelative, height, 200);//signUpClick
+//            mSignUpRelative.setVisibility(View.VISIBLE);
         } else {
             String txtUser = mLoginUserEdt.getText().toString();
             String txtPass = mLoginPassEdt.getText().toString();
@@ -254,9 +269,13 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     public void forgetSecretClick() {
         if (mLoginForgetBtn.getText().toString().equals("忘记密码")) {
             mLoginBtn.setText("返回登录");
-            mLoginForgetBtn.setText("找回密码");//TODO
+            mLoginForgetBtn.setText("找回密码");
+            mLoginSignUpBtn.setText("注册");
             mLoginPassTextInput.setHint("请输入新密码(长度需大于6位)");
-            mSignUpRelative.setVisibility(View.VISIBLE);
+            if (mSignUpRelative.getVisibility() == View.INVISIBLE
+                    || mSignUpRelative.getVisibility() == View.GONE)
+                AnimeUtil.runAnimator(true, mSignUpRelative, height, 200);//forgetSecretClick
+//            mSignUpRelative.setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(), "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
         } else if (mLoginForgetBtn.getText().toString().equals("找回密码")) {
             String txtUser = mLoginUserEdt.getText().toString();
@@ -281,8 +300,8 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             Trace.show(getApplicationContext(), "请先填写11位手机号");
         } else {
             if (txtForget.equals("找回密码")) {//忘记密码
-                mPresenter.sendProv(txtUser, false, Config.timeout_prov);
-            } else if (txtForget.equals("忘记密码")) {//注册 TODO
+                mPresenter.forgetSendProv(txtUser, false, Config.timeout_prov);
+            } else if (txtForget.equals("忘记密码")) {//注册
                 mPresenter.signUpSendProv(txtUser, true, Config.timeout_prov);
             }
         }
@@ -337,23 +356,11 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     }
 
     @Override
-    public void loginFailed() {
-        dismissDialog();
-        Trace.show(mActivity, "密码错误,请重试");
-    }
-
-    @Override
     public void exception(String s, AVException e) {
         Trace.e(s + Trace.getErrorMsg(e));
         e.printStackTrace();
         dismissDialog();
         Trace.show(mActivity, s + Trace.getErrorMsg(e));
-    }
-
-    @Override
-    public void isFrozen() {
-        dismissDialog();
-        Trace.show(mActivity, "您的账号已被冻结，请联系hkq325800@163.com", false);
     }
 
     @Override
@@ -402,5 +409,10 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     @Override
     public void changeEnter() {
         isEnter = false;
+    }
+
+    @Override
+    public void doThisOnUiThread(Runnable runnable) {
+        runOnUiThread(runnable);
     }
 }

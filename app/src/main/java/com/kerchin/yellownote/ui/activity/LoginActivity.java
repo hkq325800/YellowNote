@@ -42,6 +42,7 @@ import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
 /**
+ * @deprecated
  * Created by Kerchin on 2015/8/1 0005.
  */
 //@Route(path = "/yellow/login")

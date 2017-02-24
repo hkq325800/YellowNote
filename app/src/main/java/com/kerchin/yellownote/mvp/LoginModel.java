@@ -15,22 +15,31 @@ import zj.remote.baselibrary.util.Trace;
  */
 
 public class LoginModel {
+    private UiCallback mainCallback;
 
-    public void isAbleToSignUp(final BooleanCallback booleanCallback) {
+    public LoginModel(UiCallback mainCallback) {
+        this.mainCallback = mainCallback;
+    }
+
+    public void isAbleToSignUp(final Callback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
-                boolean isAbleToSignIn;
                 try {
-                    isAbleToSignIn = LoginService.isAbleToSignIn();
-                    if (!isAbleToSignIn) {
-                        booleanCallback.isFalse();
-                    } else {
-                        booleanCallback.isTrue();
-                    }
+                    final boolean isAbleToSignIn = LoginService.isAbleToSignIn();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isAbleToSignIn) {
+                                callback.isFalse();
+                            } else {
+                                callback.isTrue();
+                            }
+                        }
+                    });
                 } catch (AVException e) {
                     e.printStackTrace();
-                    booleanCallback.isFalse();
+                    callback.isException(e);
                 }
             }
         });
@@ -41,17 +50,22 @@ public class LoginModel {
             @Override
             public void run() {
                 try {
-                    AVObject user = LoginService.loginVerify(txtUser, txtPass);
-                    if (user != null) {
-                        if (user.getBoolean("isFrozen")) {
-                            callback.isFrozen();//账号冻结无法登陆
-                        } else {
-                            callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon"), user.getString("user_read_pass"));//正常登陆
+                    final AVObject user = LoginService.loginVerify(txtUser, txtPass);
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (user != null) {
+                                if (user.getBoolean("isFrozen")) {
+                                    callback.isFrozen();//账号冻结无法登陆
+                                } else {
+                                    callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon"), user.getString("user_read_pass"));//正常登陆
+                                }
+                            } else {
+                                //密码错误重新登录
+                                callback.loginFailed();
+                            }
                         }
-                    } else {
-                        //密码错误重新登录
-                        callback.loginFailed();
-                    }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }
@@ -59,15 +73,21 @@ public class LoginModel {
         });
     }
 
-    public void isReg(final String txtUser, final RegCallback callback) {
+    public void isReg(final String txtUser, final Callback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    if (LoginService.isRegistered(txtUser)) {
-                        callback.isTrue();
-                    } else
-                        callback.isFalse();
+                    final boolean isReg = LoginService.isRegistered(txtUser);
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isReg) {
+                                callback.isTrue();
+                            } else
+                                callback.isFalse();
+                        }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }
@@ -96,76 +116,114 @@ public class LoginModel {
         }
     }
 
-    public void smsVerify(final String txtProv, final String txtUser, final RegCallback regCallback) {
+    public void smsVerify(final String txtProv, final String txtUser, final NonCallback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     LoginService.smsVerify(txtProv, txtUser);
-                    regCallback.isTrue();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
                 } catch (AVException e) {
-                    regCallback.isException(e);
-                }
-            }
-        });
-    }
-
-    public void forget(final String txtUser, final String txtPass, final RegCallback regCallback) {
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LoginService.forgetSave(txtUser, txtPass);
-                    regCallback.isTrue();
-                } catch (AVException e) {
-                    regCallback.isFalse();
-                    regCallback.isException(e);
-                }
-            }
-        });
-    }
-
-    public void sendProv(final String txtUser, final boolean isSignUp, final int validPeriod, final RegCallback callback) {
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LoginService.sendProv(txtUser, isSignUp, validPeriod);
-                    callback.isTrue();
-                } catch (AVException e) {
-                    callback.isFalse();
+//                    callback.isFalse();
                     callback.isException(e);
                 }
             }
         });
     }
 
-    public void signUp(final String txtUser, final String txtPass, final RegCallback regCallback) {
+    public void forget(final String txtUser, final String txtPass, final NonCallback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    String userDefaultFolderId = createDefaultFolder(txtUser);
-                    if (!TextUtils.isEmpty(userDefaultFolderId)) {
-                        LoginService.userSignUp(txtUser, txtPass, userDefaultFolderId);
-                        regCallback.isTrue();
-                    } else {
-                        regCallback.isFalse();
-                    }
+                    LoginService.forgetSave(txtUser, txtPass);
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
                 } catch (AVException e) {
-                    regCallback.isException(e);
+//                    callback.isFalse();
+                    callback.isException(e);
                 }
             }
         });
     }
 
-    public String createDefaultFolder(String txtUser) {
-        try {
-            return LoginService.createDefaultFolder(txtUser);
-        } catch (AVException e) {
-            e.printStackTrace();
-            return "";
-        }
+    /**
+     * 未调用callback.isTrue()
+     *
+     * @param txtUser
+     * @param isSignUp
+     * @param validPeriod
+     * @param callback
+     */
+    public void sendProv(final String txtUser, final boolean isSignUp, final int validPeriod, final Callback callback) {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    LoginService.sendProv(txtUser, isSignUp, validPeriod);
+                } catch (AVException e) {
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isFalse();
+                        }
+                    });
+//                    callback.isException(e);
+                }
+            }
+        });
+    }
+
+    public void createDefaultFolder(final String txtUser, final CreateCallback callback) {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
+                    if (!TextUtils.isEmpty(userDefaultFolderId)) {
+                        callback.isTrue(userDefaultFolderId);
+                    } else {
+                        callback.isFalse();
+                    }
+                } catch (AVException e) {
+                    callback.isException(e);
+                }
+            }
+        });
+    }
+
+    public void signUp(final String userDefaultFolderId, final String txtUser, final String txtPass, final NonCallback callback) {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    LoginService.userSignUp(txtUser, txtPass, userDefaultFolderId);
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
+                } catch (AVException e) {
+//                    callback.isFalse();
+                    callback.isException(e);
+                }
+            }
+        });
+    }
+
+    private void doThisOnUiThread(Runnable runnable) {
+        if (mainCallback == null) return;
+        mainCallback.doThisOnUiThread(runnable);
     }
 
     public interface LoginCallback {
@@ -178,29 +236,25 @@ public class LoginModel {
         void loginFailed();
     }
 
-    public interface ReCallback {
+    public interface NonCallback {
         void isTrue();
 
         void isException(AVException e);
-    }
-
-    public interface RegCallback {
-        void isTrue();
-
-        void isFalse();
-
-        void isException(AVException e);
-    }
-
-    public interface BooleanCallback {
-        void isTrue();
-
-        void isFalse();
     }
 
     public interface Callback {
-        void success();
+        void isTrue();
 
-        void failed(String error);
+        void isFalse();
+
+        void isException(AVException e);
+    }
+
+    public interface CreateCallback {
+        void isTrue(String folderName);
+
+        void isFalse();
+
+        void isException(AVException e);
     }
 }
