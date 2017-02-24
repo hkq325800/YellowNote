@@ -522,11 +522,11 @@ public class NoteFragment extends MyBaseFragment
         if (actionMenuView == null)
             return;
         FlipShareView share = new FlipShareView.Builder(getActivity(), actionMenuView)
-                .addItem(new ShareItem("按日期降序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
-                .addItem(new ShareItem("按日期升序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
-                .addItem(new ShareItem("按目录排序", Color.WHITE, getResources().getColor(R.color.colorPrimaryDark)))
+                .addItem(new ShareItem("按日期降序", getResources().getColor(R.color.textContentColor), Color.WHITE))
+                .addItem(new ShareItem("按日期升序", getResources().getColor(R.color.textContentColor), Color.WHITE))
+                .addItem(new ShareItem("按目录排序", getResources().getColor(R.color.textContentColor), Color.WHITE))
 //                .setBackgroundColor(0x60000000)
-                .setItemDuration(150)
+                .setItemDuration(100)
                 .setSeparateLineColor(0x30000000)
                 .setAnimType(FlipShareView.TYPE_HORIZONTAL)
                 .create();

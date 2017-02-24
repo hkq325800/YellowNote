@@ -4,7 +4,7 @@ apply plugin: 'tinkerpatch-support'
  * TODO: 请按自己的需求修改为适应自己工程的参数
  */
 def bakPath = file("${buildDir}/bakApk/")
-def baseInfo = "app-1.07-0218-15-22-29"
+def baseInfo = "app-1.07-0224-14-27-13"
 def variantName = "debug"
 
 /**
@@ -13,13 +13,13 @@ def variantName = "debug"
  */
 tinkerpatchSupport {
     /** 可以在debug的时候关闭 tinkerPatch **/
-    tinkerEnable = true
+    tinkerEnable = true//TinkerPatch.init也要注释
     reflectApplication = true
 
     autoBackupApkPath = "${bakPath}"
 
     appKey = "b8bead814525c2e3"
-    appVersion = "1.07"
+    appVersion = "1.08"
 
     def pathPrefix = "${bakPath}/${baseInfo}/${variantName}/"
     def name = "${project.name}-${variantName}"

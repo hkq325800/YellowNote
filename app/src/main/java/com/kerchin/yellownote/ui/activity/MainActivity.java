@@ -86,8 +86,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import zhy.com.highlight.HighLight;
-import zhy.com.highlight.position.OnRightPosCallback;
-import zhy.com.highlight.shape.RectLightShape;
 import zj.remote.baselibrary.util.BitmapUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
@@ -424,18 +422,18 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 btnDelete.setVisible(false);
                 if(PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)){
                     PreferenceUtils.putBoolean(Config.HIGHLIGHT_NAV, false, MainActivity.this);
-                    highLight = new HighLight(MainActivity.this)
-                            .addHighLight(R.id.mNavHeaderMainImg, R.layout.info_nav_first, new OnRightPosCallback(55), new RectLightShape())
-                            .autoRemove(false)
-                            .enableNext()
-                            .setClickCallback(new HighLight.OnClickCallback() {
-                                @Override
-                                public void onClick() {
-                                    Toast.makeText(MainActivity.this, "clicked and show next tip view by yourself", Toast.LENGTH_SHORT).show();
-                                    highLight.next();
-                                }
-                            })
-                            .show();
+//                    highLight = new HighLight(MainActivity.this)
+//                            .addHighLight(R.id.mNavHeaderMainImg, R.layout.info_nav_first, new OnRightPosCallback(55), new RectLightShape())
+//                            .autoRemove(false)
+//                            .enableNext()
+//                            .setClickCallback(new HighLight.OnClickCallback() {
+//                                @Override
+//                                public void onClick() {
+//                                    Toast.makeText(MainActivity.this, "clicked and show next tip view by yourself", Toast.LENGTH_SHORT).show();
+//                                    highLight.next();
+//                                }
+//                            })
+//                            .show();
                 }
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager.isActive()) {

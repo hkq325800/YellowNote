@@ -46,6 +46,8 @@ import zj.remote.baselibrary.util.Trace;
 public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView, UiCallback {
     @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
+    @BindView(R.id.mLoginUserTextInput)
+    TextInputLayout mLoginUserTextInput;
     @BindView(R.id.mLoginPassTextInput)
     TextInputLayout mLoginPassTextInput;
     @BindView(R.id.mLoginPassEdt)
@@ -135,6 +137,13 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
                 }
             }, 800);
             //干脆地使用初始设置 键盘自动弹出
+        } else {
+            mLoginUserTextInput.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KeyboardUtil.showKeyboard(mActivity, mLoginUserTextInput);
+                }
+            }, 800);
         }
     }
 
@@ -308,16 +317,16 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     }
 
     protected void goToMain() {
+        //存入shared
+        PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
+        PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);
+        PreferenceUtils.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString(), this);
         PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
             @Override
             public void justNowWithEx(Exception e) {
                 dismissDialog();
             }
         });
-        //存入shared
-        PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
-        PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);
-        PreferenceUtils.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString(), this);
         handler.post(runnableForData);//goToMain
     }
 

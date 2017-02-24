@@ -37,7 +37,7 @@ import zj.remote.baselibrary.util.Trace;
 /**
  * Created by Kerchin on 2016/3/5 0005.
  */
-@Route(path = "share_suggest")
+@Route(path = "/yellow/share_suggest")
 public class ShareSuggestActivity extends BaseSwipeBackActivity {
     private final static int hideSaveBtn = 0;
     @BindView(R.id.mShareSuggestVersionTxt)

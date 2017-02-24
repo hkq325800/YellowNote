@@ -245,8 +245,8 @@ public class NormalUtils {
                 str[k++] = hexDigits[byte0 >>> 4 & 0xf];
                 str[k++] = hexDigits[byte0 & 0xf];
             }
-            String result = new String(str);
-            return result.substring(8, result.length() - 8).toLowerCase();
+            return new String(str);
+//            return result.substring(8, result.length() - 8).toLowerCase();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
