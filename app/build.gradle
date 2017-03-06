@@ -78,6 +78,8 @@ dependencies {
     compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
     compile 'com.alibaba:arouter-api:1.0.4'
     apt 'com.alibaba:arouter-compiler:1.0.1'
+    //微软计算机视觉api
+    compile 'com.microsoft.projectoxford:vision:1.0.374'
 }
 
 apt {
@@ -120,7 +122,7 @@ android {
     }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 25
         versionCode 8
         versionName "1.08"

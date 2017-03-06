@@ -533,6 +533,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 startActivityForResult(intent, REQUEST_QRCODE);
                 overridePendingTransition(R.anim.head_in, R.anim.head_out);
                 break;
+            case gotoRecognize:
+                hideBtnAdd();
+                ARouter.getInstance().build("/yellow/recognize").navigation();
+                overridePendingTransition(R.anim.push_left_in,
+                        R.anim.push_left_out);
+                break;
             default:
                 break;
         }
@@ -812,6 +818,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             changeThemeByZhiHu();
         } else if (id == R.id.nav_qrcode) {
             gotoQRCode();
+        } else if (id == R.id.nav_recognize) {
+            handler.sendEmptyMessage(gotoRecognize);
+            return false;
         }
         mMainDrawer.closeDrawers();
         return true;
@@ -921,6 +930,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public static final int gotoThank = 4;
     public static final int checkUpdate = 5;
     public static final int gotoQRCode = 6;
+    public static final int gotoRecognize = 7;
 
     public void showBtnAdd() {
 //        Trace.d("showBtnAddDelay");

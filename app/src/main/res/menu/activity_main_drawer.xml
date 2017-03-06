@@ -41,6 +41,10 @@
             android:id="@+id/nav_thank"
             android:icon="@android:drawable/ic_menu_compass"
             android:title="致谢" />
+        <item
+            android:id="@+id/nav_recognize"
+            android:icon="@android:drawable/ic_menu_zoom"
+            android:title="识别" />
     </group>
 
     <!--<item android:title="用户操作">-->

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!--<ListView
+        android:id="@+id/list_note"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:cacheColorHint="@color/light_purple"
+        android:listSelector="@color/light_purple"
+        android:dividerHeight="0.6px"/>-->
+
+    <com.kerchin.yellownote.widget.waterdrop.WaterDropListView
+        android:id="@+id/mNoteWDList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/transparent"
+        android:headerDividersEnabled="false"
+        android:footerDividersEnabled="false" />
+
+    <com.kerchin.widget.progresslayout.ProgressLayout
+        android:id="@+id/mProgress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true" >
+    </com.kerchin.widget.progresslayout.ProgressLayout>
+</RelativeLayout>

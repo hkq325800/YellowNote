@@ -3,4 +3,5 @@
 
     <string name="APP_ID">yourAPPID</string>
     <string name="APP_KEY">yourAPPKey</string>
+    <string name="subscription_key">your_subscription_key</string>
 </resources>
