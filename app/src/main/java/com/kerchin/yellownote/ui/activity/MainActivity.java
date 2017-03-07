@@ -729,6 +729,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     public void createNew() {
         if (thisPosition == 0) {
             noteFragment.addClick();
+            //TODO more add
 //            mBottomSheetDialog = new BottomSheetBuilder(this, R.style.AppTheme_BottomSheetDialog)
 //                    .setMode(BottomSheetBuilder.MODE_GRID)
 //                    .setAppBarLayout(mMainAbl)

@@ -20,6 +20,7 @@ import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
+import com.kerchin.yellownote.data.service.DownloadService;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
@@ -77,15 +78,21 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
         }
     }
 
-    @OnClick(R.id.mShareSuggestCodeImg)
+    @OnClick(R.id.mShareSuggestCodeImg)//TODO 分享
+    public void share() {
+        
+    }
+
     public void download() {
-        mShareSuggestCodeImg.setOnClickListener(null);
-        if (!isLatest) {
-            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, ShareSuggestService.class, getString(R.string.uri_download), getResources().getString(R.string.app_name) + versionCode + ".apk");
-        } else {
-            NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
-//            Trace.show(ShareSuggestActivity.this, "后台下载中...");
-        }
+        NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, DownloadService.class, getString(R.string.uri_download)
+                , getResources().getString(R.string.app_name) + versionCode + ".apk");
+        Trace.show(ShareSuggestActivity.this, "后台下载中...");
+//        if (!isLatest) {
+//            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, ShareSuggestService.class, getString(R.string.uri_download), getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        } else {
+//            NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
+////            Trace.show(ShareSuggestActivity.this, "后台下载中...");
+//        }
     }
 
     @OnClick(R.id.mNavigationRightBtn)

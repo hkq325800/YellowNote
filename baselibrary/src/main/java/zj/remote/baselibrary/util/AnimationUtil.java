@@ -8,7 +8,7 @@ import android.view.View;
  * Created by hkq325800 on 2017/2/24.
  */
 
-public class AnimeUtil{
+public class AnimationUtil {
 
         /**
          * @param isExpand

@@ -30,7 +30,7 @@ import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import zj.remote.baselibrary.util.AnimeUtil;
+import zj.remote.baselibrary.util.AnimationUtil;
 import zj.remote.baselibrary.util.DialogUtils;
 import zj.remote.baselibrary.util.KeyboardUtil;
 import zj.remote.baselibrary.util.NormalUtils;
@@ -221,7 +221,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         mLoginPassTextInput.setHint("请输入密码");
         //Log.d("md5",NormalUtils.md5(mLoginPassEdt.getText().toString() + MyApplication.SaltKey));
         if (mLoginBtn.getText().toString().equals("返回登录")) {
-            AnimeUtil.runAnimator(false, mSignUpRelative, height, 200);//loginClick
+            AnimationUtil.runAnimator(false, mSignUpRelative, height, 200);//loginClick
 //            mSignUpRelative.setVisibility(View.GONE);
             mLoginForgetBtn.setVisibility(View.VISIBLE);
             mLoginForgetBtn.setText("忘记密码");
@@ -257,7 +257,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             mLoginSignUpBtn.setText("注册确认");
             if (mSignUpRelative.getVisibility() == View.INVISIBLE
                     || mSignUpRelative.getVisibility() == View.GONE)
-                AnimeUtil.runAnimator(true, mSignUpRelative, height, 200);//signUpClick
+                AnimationUtil.runAnimator(true, mSignUpRelative, height, 200);//signUpClick
 //            mSignUpRelative.setVisibility(View.VISIBLE);
         } else {
             String txtUser = mLoginUserEdt.getText().toString();
@@ -283,7 +283,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             mLoginPassTextInput.setHint("请输入新密码(长度需大于6位)");
             if (mSignUpRelative.getVisibility() == View.INVISIBLE
                     || mSignUpRelative.getVisibility() == View.GONE)
-                AnimeUtil.runAnimator(true, mSignUpRelative, height, 200);//forgetSecretClick
+                AnimationUtil.runAnimator(true, mSignUpRelative, height, 200);//forgetSecretClick
 //            mSignUpRelative.setVisibility(View.VISIBLE);
             //Toast.makeText(getApplicationContext(), "请输入曾注册的手机号", Toast.LENGTH_SHORT).show();
         } else if (mLoginForgetBtn.getText().toString().equals("找回密码")) {
