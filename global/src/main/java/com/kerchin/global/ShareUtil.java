@@ -20,7 +20,7 @@ public class ShareUtil {
     private static String pkgName;
     private static String className;
 
-    private void getThings(Activity activity, ImageView imageView) {
+    private static void getThings(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_SEND, null);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.setType("image/*");
@@ -29,7 +29,6 @@ public class ShareUtil {
 
         for (ResolveInfo info : mApps) {
             if ("com.tencent.mm.ui.tools.ShareToTimeLineUI".equals(info.activityInfo.name)) {
-                imageView.setImageDrawable(info.loadIcon(packageManager));
                 pkgName = info.activityInfo.packageName;
                 className = info.activityInfo.name;
 //                Log.e("log", System.currentTimeMillis()+"");
@@ -38,13 +37,11 @@ public class ShareUtil {
         }
     }
 
-    public void share(Activity activity, String pkgName, String classname, Uri uri) {
-        if (TextUtils.isEmpty(pkgName) || TextUtils.isEmpty(className))
-            return;
+    public static void friendsShare(Activity activity, Uri uri) {
+        getThings(activity);
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setComponent(new ComponentName(pkgName, classname));
+        shareIntent.setComponent(new ComponentName(pkgName, className));
         shareIntent.setType("image/*");
-        shareIntent.putExtra(Intent.EXTRA_TEXT, "hhh");
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         activity.startActivity(shareIntent);
     }

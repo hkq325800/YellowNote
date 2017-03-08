@@ -708,7 +708,6 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     public void noteMove() {
         MaterialDialog.Builder builder = new MaterialDialog.Builder(this);
-//        AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
         if (primaryData.getFolderSize() == 1) {
             builder.title("没有别的笔记本可以选择\n是否新建？")
                     .positiveText(R.string.positive_text)

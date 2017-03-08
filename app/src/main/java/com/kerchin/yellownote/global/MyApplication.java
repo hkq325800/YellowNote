@@ -18,6 +18,7 @@ import com.uuzuche.lib_zxing.DisplayUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 
 /**
+ * Tinker要求Application必须在app中
  * Created by hkq325800 on 2017/2/18.
  */
 

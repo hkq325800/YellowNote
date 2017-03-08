@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
 
@@ -38,7 +39,7 @@ import zj.remote.baselibrary.util.SystemUtils;
 public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMddHHmm");
-    public static final  int    MAX_CRASH_COUNT     = 3;
+    public static final int MAX_CRASH_COUNT = 3;
     /**
      * 默认存放闪退信息的文件夹名称
      */
@@ -97,8 +98,8 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
             e.printStackTrace();
         }
         //杀死进程
-        if (!Config.isDebugMode)
-            android.os.Process.killProcess(android.os.Process.myPid());
+        NormalUtils.rebot(mApplicationContext);
+        NormalUtils.killSelf();
     }
 
     /**

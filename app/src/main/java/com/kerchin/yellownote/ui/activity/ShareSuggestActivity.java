@@ -1,6 +1,9 @@
 package com.kerchin.yellownote.ui.activity;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -24,6 +27,8 @@ import com.kerchin.yellownote.data.service.DownloadService;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Date;
 
 import butterknife.BindView;
@@ -78,9 +83,43 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
         }
     }
 
-    @OnClick(R.id.mShareSuggestCodeImg)//TODO 分享
+    String SHARED_FILE_NAME;
+
+    /**
+     * 初始化分享的图片
+     */
+    private File initImagePath() {
+        try {//判断SD卡中是否存在此文件夹
+            if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())
+                    && Environment.getExternalStorageDirectory().exists()) {
+                SHARED_FILE_NAME = Environment.getExternalStorageDirectory().getAbsolutePath() + "/YellowNote" + "/ic_code.png";
+            } else {
+                SHARED_FILE_NAME = getApplication().getFilesDir().getAbsolutePath() + "/YellowNote" + "/ic_code.png";
+            }
+            File file = new File(SHARED_FILE_NAME);
+            //判断图片是否存此文件夹中
+            if (!file.exists()) {
+                file.createNewFile();
+                Bitmap pic = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_code);
+                FileOutputStream fos = new FileOutputStream(file);
+                pic.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                fos.flush();
+                fos.close();
+            }
+            return file;
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        return null;
+    }
+
+    @OnClick(R.id.mShareSuggestCodeImg)
     public void share() {
-        
+        initImagePath();
+        Trace.show(this, "已保存至本地" + SHARED_FILE_NAME);
+//        File file = initImagePath();
+//        Uri uri = Uri.parse(SHARED_FILE_NAME);//.fromFile(file);
+//        ShareUtil.friendsShare(this, uri);
     }
 
     public void download() {
@@ -225,17 +264,6 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                                         download();
                                                     }
                                                 }).show();
-//                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
-//                                                .setTitle("版本:" + versionCode)
-//                                                .setMessage(version.getString("version_content"))
-//                                                .setPositiveButton("下载", new DialogInterface.OnClickListener() {
-//                                                    @Override
-//                                                    public void onClick(DialogInterface dialog, int which) {
-//                                                        download();
-//                                                    }
-//                                                })
-//                                                .create();
-//                                        alertDialog.show();
                                     }
                                 });
                                 isLatest = false;
@@ -253,11 +281,6 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .content(version.getString("version_content")).show();
-//                                        AlertDialog alertDialog = new AlertDialog.Builder(ShareSuggestActivity.this)
-//                                                .setTitle("版本:" + versionCode)
-//                                                .setMessage(version.getString("version_content"))
-//                                                .create();
-//                                        alertDialog.show();
                                     }
                                 });
                                 isLatest = true;
