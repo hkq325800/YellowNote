@@ -33,30 +33,44 @@ public class SupportSoftKeyboardUtil {
      * 监听键盘弹出 副产物是键盘高度
      *
      * @param activity   目标
-     * @param view       任意一个控件
      * @param changeView 需要改变的控件id
      */
-    public static void addSoftKeyboardListener(final Activity activity, View view, final View... changeView) {
-        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+    public static void addSoftKeyboardListener(final Activity activity, final View changeView) {
+        final View decorView = activity.getWindow().getDecorView();
+        decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             //当键盘弹出隐藏的时候会 调用此方法。
             @Override
             public void onGlobalLayout() {
                 Rect r = new Rect();
                 //获取当前界面可视部分
-                activity.getWindow().getDecorView().getWindowVisibleDisplayFrame(r);
+                decorView.getWindowVisibleDisplayFrame(r);
                 //获取屏幕的高度
-                int screenHeight = activity.getWindow().getDecorView().getRootView().getHeight();
+                int screenHeight = decorView.getRootView().getHeight();
                 //此处就是用来获取键盘的高度的， 在键盘没有弹出的时候 此高度为0 键盘弹出的时候为一个正数
-                int heightDifference = screenHeight - r.bottom;
+                final int heightDifference = screenHeight - r.bottom;
 //                Log.e("Keyboard Size", "Size: " + heightDifference);
-                //小于500可见
-                for (View view : changeView) {
-                    view.setVisibility(heightDifference < 500 ? View.VISIBLE : View.GONE);
+                if (changeView.getTag() == null)
+                    changeView.setTag(System.currentTimeMillis());
+//                Trace.e(heightDifference + "/" + (System.currentTimeMillis() - (long) changeView.getTag())
+//                        + (System.currentTimeMillis() - (long) changeView.getTag() < 200));
+                if (System.currentTimeMillis() - (long) changeView.getTag() < 200) {
+                    changeView.removeCallbacks(run);
+                    return;
                 }
+                run = new Runnable() {
+                    @Override
+                    public void run() {
+                        changeView.setVisibility(heightDifference < 500 ? View.VISIBLE : View.GONE);
+                    }
+                };
+                changeView.setTag(System.currentTimeMillis());
+                changeView.postDelayed(run, 100);
             }
 
         });
     }
+
+    private static Runnable run;
 
     /**
      * 软键盘是否显示

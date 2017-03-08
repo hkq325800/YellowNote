@@ -37,7 +37,6 @@ import zj.remote.baselibrary.util.KeyboardUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SoftKeyboardUtils;
-import zj.remote.baselibrary.util.SupportSoftKeyboardUtil;
 import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
@@ -101,7 +100,7 @@ public class LoginActivity extends LoginAbstract {
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
-        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconImg, mLoginMineTxt);
+//        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconImg, mLoginMineTxt);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", LoginActivity.this);
         if (!TextUtils.isEmpty(user)) {
             mLoginUserEdt.setText(user);

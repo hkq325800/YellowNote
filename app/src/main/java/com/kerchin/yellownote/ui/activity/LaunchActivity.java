@@ -167,7 +167,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
-            Trace.d("runnableForData" + Thread.currentThread().getId());
+            if (isFinishing()) return;
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (PrimaryData.status == null) {
                 handler.postDelayed(runnableForData, Config.period_runnable);

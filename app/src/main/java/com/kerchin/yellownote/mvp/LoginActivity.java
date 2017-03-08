@@ -124,7 +124,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
-        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginUserEdt, mLoginIconLiL);
+        SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginIconLiL);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", mContext);
         if (!TextUtils.isEmpty(user)) {
             mLoginUserEdt.setText(user);
@@ -333,6 +333,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     private Runnable runnableForData = new Runnable() {
         @Override
         public void run() {
+            if (isFinishing()) return;
             if (PrimaryData.status != null
                     && PrimaryData.status.isFolderReady
                     && PrimaryData.status.isItemReady

@@ -432,6 +432,7 @@ public class NoteFragment extends MyBaseFragment
     private Runnable runnableForDataAfterDelete = new Runnable() {
         @Override
         public void run() {
+            if (getActivity().isFinishing()) return;
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
             if (noteAdapter.getDeleteNum() == 0) {
                 handler.sendEmptyMessage(handle4dismiss);//int android.view.View.mViewFlags NullPointerException
