@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
@@ -277,10 +278,22 @@ public class NormalUtils {
         android.os.Process.killProcess(android.os.Process.myPid());
     }
 
-    public static void rebot(Context context){
+    public static void reboot(Context context){
         Intent i = context.getPackageManager()
                 .getLaunchIntentForPackage(context.getPackageName());
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(i);
+    }
+
+    private static final String PACKAGE_URL_SCHEME = "package:";
+
+    /**
+     * 跳转至应用的系统权限设置页
+     * @param activity
+     */
+    public static void startAppSettings(Activity activity) {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse(PACKAGE_URL_SCHEME + activity.getPackageName()));
+        activity.startActivity(intent);
     }
 }

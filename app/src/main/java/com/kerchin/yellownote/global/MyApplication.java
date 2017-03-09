@@ -53,22 +53,24 @@ public class MyApplication extends Application {
     public void onCreate() {
         super.onCreate();
         // 我们可以从这里获得Tinker加载过程的信息
-//        if (BuildConfig.TINKER_ENABLE) {
-            tinkerApplicationLike = TinkerPatchApplicationLike.getTinkerPatchApplicationLike();
+//        if (BuildConfig.TINKER_ENABLE) {//TODO 有问题
+        tinkerApplicationLike = TinkerPatchApplicationLike.getTinkerPatchApplicationLike();
 
-            // 初始化TinkerPatch SDK
-            TinkerPatch.init(tinkerApplicationLike)
-                    .reflectPatchLibrary()
-                    .setPatchRollbackOnScreenOff(true)
-                    .setPatchRestartOnSrceenOff(true);
+        // 初始化TinkerPatch SDK
+        TinkerPatch.init(tinkerApplicationLike)
+                .reflectPatchLibrary()
+                .setPatchRollbackOnScreenOff(true)
+                .setPatchRestartOnSrceenOff(true);
 
-            // 每隔3个小时去访问后台时候有更新,通过handler实现轮训的效果
-            new FetchPatchHandler().fetchPatchWithInterval(3);
+        // 每隔3个小时去访问后台时候有更新,通过handler实现轮训的效果
+        new FetchPatchHandler().fetchPatchWithInterval(3);
 //        }
         context = this;
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
         ARouter.init(this);
-        ARouter.openDebug();
+        if (Config.isDebugMode) {
+            ARouter.openDebug();
+        }
 //        Realm realm = Realm.getInstance(context);
         AVOSCloud.initialize(this
                 , getResources().getString(com.kerchin.global.R.string.APP_ID)

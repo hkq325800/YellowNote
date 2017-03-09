@@ -98,7 +98,7 @@ public class CrashExceptionHandler implements Thread.UncaughtExceptionHandler {
             e.printStackTrace();
         }
         //杀死进程
-        NormalUtils.rebot(mApplicationContext);
+        NormalUtils.reboot(mApplicationContext);
         NormalUtils.killSelf();
     }
 
