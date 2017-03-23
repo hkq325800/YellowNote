@@ -30,6 +30,7 @@ import com.kerchin.yellownote.data.event.NoteDeleteEvent;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
+import com.wuxiaolong.pullloadmorerecyclerview.PullLoadMoreRecyclerView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -55,10 +56,8 @@ import zj.remote.baselibrary.util.Trace;
 public class NoteFragment extends MyBaseFragment
         implements WaterDropListView.IWaterDropListViewListener
         , View.OnCreateContextMenuListener/*, PopupMenu.OnMenuItemClickListener*/ {
-    @BindView(R.id.mNoteWDList)
-    WaterDropListView mNoteWDList;
-    @BindView(R.id.mProgress)
-    ProgressLayout mProgress;
+    @BindView(R.id.mNoteList)
+    PullLoadMoreRecyclerView mNoteList;
     public static boolean isChanged4note = false;
     //    private SVProgressHUD mSVProgressHUD;
     private SearchView.OnQueryTextListener queryTextListener;

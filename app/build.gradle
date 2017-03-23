@@ -10,9 +10,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     //android
-    compile 'com.android.support:appcompat-v7:24.+'
-    compile 'com.android.support:recyclerview-v7:24.+'
-    compile 'com.android.support:design:24.+'
+    compile 'com.android.support:appcompat-v7:25.+'
+    compile 'com.android.support:recyclerview-v7:25.+'
+    compile 'com.android.support:design:25.+'
     //    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
     compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'
@@ -23,6 +23,8 @@ dependencies {
     //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //weakHandler
     compile 'com.badoo.mobile:android-weak-handler:1.1'
+    //pullToRefresh
+    compile 'com.wuxiaolong.pullloadmorerecyclerview:library:1.1.1'
     //疯狂更新的高star对话框
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     //权限获取 未应用
