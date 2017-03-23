@@ -138,6 +138,13 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private String versionContent, versionCode;
 
     @Override
+    protected void onSaveInstanceState(final Bundle outState) {
+        Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
+        if (highLight != null && highLight.isShowing()) highLight.remove();
+//        super.onSaveInstanceState(outState);//解决getActivity()为null
+    }
+
+    @Override
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
@@ -171,50 +178,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         if (navigationMenuView != null) {
             navigationMenuView.setVerticalScrollBarEnabled(false);
         }
-    }
-
-    private void setUserIconByNet() {
-        Trace.d("setUserIconByNet");
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
-                    file.getDataInBackground(new GetDataCallback() {
-                        @Override
-                        public void done(final byte[] bytes, AVException e) {
-                            if (e != null) {
-                                mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-                                e.printStackTrace();
-                                return;
-                            }
-                            final Bitmap b = BitmapUtil.bytes2Bitmap(bytes);
-                            try {
-                                BitmapUtil.saveBitmap(b, userIconFile);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mNavHeaderMainImg.setImageBitmap(b);
-                                }
-                            });
-//                            PreferenceUtils.putString(Config.KEY_USERICON, MyApplication.userIcon, MainActivity.this);
-                        }
-                    });
-                } catch (AVException | FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    @Override
-    protected void onSaveInstanceState(final Bundle outState) {
-        Trace.d("onSaveInstanceState" + MainActivity.class.getSimpleName());
-        if (highLight != null && highLight.isShowing()) highLight.remove();
-//        super.onSaveInstanceState(outState);//解决getActivity()为null
     }
 
     @Override
@@ -311,57 +274,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         });
     }
 
-    private void setUserIcon() {
-        if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {//使用默认头像
-            Trace.d("getLocalMipmap");
-            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
-            Trace.d("getLocalBitmap");
-            mNavHeaderMainImg.setImageBitmap(BitmapUtil.getLocalBitmap(userIconPath));
-//            if (!MyApplication.userIcon.equals(
-//                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
-                setUserIconByNet();
-        } else//userIcon存在但是本地文件不存在 下载并保存、设置
-            setUserIconByNet();
-    }
-
-    private void checkForUpdate() {
-        String nowDateStr = DateUtil.getDateStr(new Date(), "yyyy-MM-dd");
-        String lastCheck = PreferenceUtils.getString(Config.KEY_WHEN_CHECK_UPDATE
-                , "", MainActivity.this);
-        if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
-            return;
-        }
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final AVObject version = ShareSuggestService.getVersionInfo();
-                    String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
-                    versionCode = version.getString("version_name");
-                    versionContent = version.getString("version_content");
-                    if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
-                        //需要更新
-                        handler.sendEmptyMessageDelayed(checkUpdate, 2000);
-                    }
-                } catch (AVException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr, MainActivity.this);
-    }
-
-    private void download() {
-//        Intent intent = new Intent(MainActivity.this,
-//                DownloadService.class);
-//        intent.putExtra("uriStr", getString(R.string.uri_download));
-//        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
-//        startService(intent);
-        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
-        Trace.show(MainActivity.this, "后台下载中...");
-    }
-
     @Override
     protected void initEvent(Bundle savedInstanceState) {
         super.initEvent(savedInstanceState);
@@ -369,32 +281,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO 调用系统自带 会导致不同系统有不同表现
                 zj.remote.baselibrary.util.NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
 //                Intent i = new Intent(
 //                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, REQUEST_LOAD_IMAGE);
-            }
-        });
-        //若新增按钮位置下移 说明软键盘收起 还有可能是虚拟键盘问题
-        mMainFab.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-//                Trace.d("onLayoutChange", "left" + left + " top" + top + " right" + right + " bottom" + bottom);
-//                Trace.d("onLayoutChangeOld", "left" + oldLeft + " top" + oldTop + " right" + oldRight + " bottom" + oldBottom);
-//                if (getFragmentStatus() != null) {
-//                    if (top > oldTop) {
-//                        getFragmentStatus().setIsSoftKeyboardUp(false);
-////                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
-////                    mSearchView.onActionViewCollapsed();
-////                    noteFragment.restore();
-//                    } else if (top < oldTop) {
-//                        getFragmentStatus().setIsSoftKeyboardUp(true);
-////                        Trace.d("isSoftKeyboardUp", getFragmentStatus().isSoftKeyboardUp() + "");
-//                    }
-//                } else {
-//                    Trace.show(getApplicationContext(), "过久未使用 资源被回收");
-//                }
             }
         });
         mMainDrawer.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
@@ -406,7 +296,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onDrawerOpened(View drawerView) {
                 //TODO Tinker的生效就以下一句
-//                TinkerInstaller.onReceiveUpgradePatch(getApplicationContext(), Environment.getExternalStorageDirectory().getAbsolutePath() + "/patch_signed_7zip.apk");
                 TinkerPatch.with().fetchPatchUpdate(true);
 //                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
 //                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
@@ -420,8 +309,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 btnSearch.setVisible(false);
                 btnSort.setVisible(false);
                 btnDelete.setVisible(false);
-                if(PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)){
+                if (PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)) {
                     PreferenceUtils.putBoolean(Config.HIGHLIGHT_NAV, false, MainActivity.this);
+                    //用户操作引导库
 //                    highLight = new HighLight(MainActivity.this)
 //                            .addHighLight(R.id.mNavHeaderMainImg, R.layout.info_nav_first, new OnRightPosCallback(55), new RectLightShape())
 //                            .autoRemove(false)
@@ -437,8 +327,11 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 }
                 InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager.isActive()) {
-                    //noinspection ConstantConditions
-                    inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    try {
+                        inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                    }
                 }
 //                mSearchView.onActionViewCollapsed();
 //                noteFragment.restore();
@@ -481,64 +374,64 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             }
                         }).show();
                 break;
-            case gotoThank:
-                ARouter.getInstance().build("/yellow/thank").navigation();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
-                break;
-            case gotoSecret:
-                hideBtnAdd();//使进入
-                ARouter.getInstance().build("/yellow/secret_menu").navigation();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
-                break;
-            case gotoSetting:
-                hideBtnAdd();
-                ARouter.getInstance().build("/yellow/share_suggest").navigation();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
-                break;
-            case showBtnAdd:
-                mMainFab.animate()
-                        .alpha(1)
-                        .scaleX(1)
-                        .scaleY(1)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationStart(Animator animation) {
-                                super.onAnimationStart(animation);
-//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
-                                mMainFab.setVisibility(View.VISIBLE);
-                            }
-                        })
-                        .setDuration(300).start();
-                break;
-            case hideBtnAdd://必须使用animate直接设置会丢失十字
-                mMainFab.animate()
-                        .scaleX(0)
-                        .scaleY(0)
-                        .alpha(0)
-                        .setListener(new AnimatorListenerAdapter() {
-                            @Override
-                            public void onAnimationEnd(Animator animation) {
-                                super.onAnimationEnd(animation);
-//                                    if (mMainFab.getVisibility() == View.VISIBLE)
-                                mMainFab.setVisibility(View.INVISIBLE);
-                            }
-                        })
-                        .setDuration(50).start();
-                break;
+//            case gotoThank:
+//                ARouter.getInstance().build("/yellow/thank").navigation();
+//                overridePendingTransition(R.anim.push_left_in,
+//                        R.anim.push_left_out);
+//                break;
+//            case gotoSecret:
+//                hideBtnAdd();//使进入
+//                ARouter.getInstance().build("/yellow/secret_menu").navigation();
+//                overridePendingTransition(R.anim.push_left_in,
+//                        R.anim.push_left_out);
+//                break;
+//            case gotoSetting:
+//                hideBtnAdd();
+//                ARouter.getInstance().build("/yellow/share_suggest").navigation();
+//                overridePendingTransition(R.anim.push_left_in,
+//                        R.anim.push_left_out);
+//                break;
+//            case showBtnAdd:
+//                mMainFab.animate()
+//                        .alpha(1)
+//                        .scaleX(1)
+//                        .scaleY(1)
+//                        .setListener(new AnimatorListenerAdapter() {
+//                            @Override
+//                            public void onAnimationStart(Animator animation) {
+//                                super.onAnimationStart(animation);
+////                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+//                                mMainFab.setVisibility(View.VISIBLE);
+//                            }
+//                        })
+//                        .setDuration(300).start();
+//                break;
+//            case hideBtnAdd://必须使用animate直接设置会丢失十字
+//                mMainFab.animate()
+//                        .scaleX(0)
+//                        .scaleY(0)
+//                        .alpha(0)
+//                        .setListener(new AnimatorListenerAdapter() {
+//                            @Override
+//                            public void onAnimationEnd(Animator animation) {
+//                                super.onAnimationEnd(animation);
+////                                    if (mMainFab.getVisibility() == View.VISIBLE)
+//                                mMainFab.setVisibility(View.INVISIBLE);
+//                            }
+//                        })
+//                        .setDuration(50).start();
+//                break;
             case gotoQRCode:
                 Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
                 startActivityForResult(intent, REQUEST_QRCODE);
                 overridePendingTransition(R.anim.head_in, R.anim.head_out);
                 break;
-            case gotoRecognize:
-                hideBtnAdd();
-                ARouter.getInstance().build("/yellow/recognize").navigation();
-                overridePendingTransition(R.anim.push_left_in,
-                        R.anim.push_left_out);
-                break;
+//            case gotoRecognize:
+//                hideBtnAdd();
+//                ARouter.getInstance().build("/yellow/recognize").navigation();
+//                overridePendingTransition(R.anim.push_left_in,
+//                        R.anim.push_left_out);
+//                break;
             default:
                 break;
         }
@@ -571,6 +464,109 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             handleCropError(data);
         }
 //        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
+        mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
+        if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
+            showBtnAdd();
+//        if (!PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, MainActivity.this)) {
+//            Intent intent = new Intent(this, LoginActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivity(intent);
+//            finish();
+//        }
+    }
+
+    private void setUserIconByNet() {
+        Trace.d("setUserIconByNet");
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
+                    file.getDataInBackground(new GetDataCallback() {
+                        @Override
+                        public void done(final byte[] bytes, AVException e) {
+                            if (e != null) {
+                                mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+                                e.printStackTrace();
+                                return;
+                            }
+                            final Bitmap b = BitmapUtil.bytes2Bitmap(bytes);
+                            try {
+                                BitmapUtil.saveBitmap(b, userIconFile);
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            }
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mNavHeaderMainImg.setImageBitmap(b);
+                                }
+                            });
+//                            PreferenceUtils.putString(Config.KEY_USERICON, MyApplication.userIcon, MainActivity.this);
+                        }
+                    });
+                } catch (AVException | FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void setUserIcon() {
+        if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {//使用默认头像
+            Trace.d("getLocalMipmap");
+            mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
+        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
+            Trace.d("getLocalBitmap");
+            mNavHeaderMainImg.setImageBitmap(BitmapUtil.getLocalBitmap(userIconPath));
+//            if (!MyApplication.userIcon.equals(
+//                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
+            setUserIconByNet();
+        } else//userIcon存在但是本地文件不存在 下载并保存、设置
+            setUserIconByNet();
+    }
+
+    private void checkForUpdate() {
+        String nowDateStr = DateUtil.getDateStr(new Date(), "yyyy-MM-dd");
+        String lastCheck = PreferenceUtils.getString(Config.KEY_WHEN_CHECK_UPDATE
+                , "", MainActivity.this);
+        if (nowDateStr.compareTo(lastCheck) <= 0) {//隔天检查一次
+            return;
+        }
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final AVObject version = ShareSuggestService.getVersionInfo();
+                    String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
+                    versionCode = version.getString("version_name");
+                    versionContent = version.getString("version_content");
+                    if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
+                        //需要更新
+                        handler.sendEmptyMessageDelayed(checkUpdate, 2000);
+                    }
+                } catch (AVException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, nowDateStr, MainActivity.this);
+    }
+
+    private void download() {
+//        Intent intent = new Intent(MainActivity.this,
+//                DownloadService.class);
+//        intent.putExtra("uriStr", getString(R.string.uri_download));
+//        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        startService(intent);
+        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
+        Trace.show(MainActivity.this, "后台下载中...");
     }
 
     private void handleCropError(@NonNull Intent result) {
@@ -663,30 +659,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         return new ToolbarStatus();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
-        mMainToolbar.setTitleTextColor(getResources().getColor(R.color.white));
-        if (mMainFab != null && isHide && !getFragmentStatus().isSearchMode())
-            showBtnAdd();
-//        if (!PreferenceUtils.getBoolean(Config.KEY_ISLOGIN, false, MainActivity.this)) {
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
-//            finish();
-//        }
-    }
-
     public Toolbar getToolbar() {
         return mMainToolbar;
     }
-
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        mMainToolbar.setTitle(thisPosition == 0 ? "笔记" : "笔记本");
-//        return super.onPrepareOptionsMenu(menu);
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -760,7 +735,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.nav_note) {
             mMainPager.setCurrentItem(0);
@@ -805,22 +780,32 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .show();
             return false;
         } else if (id == R.id.nav_share) {
-            handler.sendEmptyMessage(gotoSetting);
+            hideBtnAdd();
+            ARouter.getInstance().build("/yellow/share_suggest").navigation();
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.push_left_out);
             return false;
         } else if (id == R.id.nav_resetSecret) {
-//            startActivity(new Intent(getApplicationContext(), SetPatternActivity.class));//for test pattern
 //            startActivity(new Intent(getApplicationContext(), OrmLiteConsoleActivity.class));//for test ormLite
-            handler.sendEmptyMessage(gotoSecret);
+            hideBtnAdd();//使进入
+            ARouter.getInstance().build("/yellow/secret_menu").navigation();
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.push_left_out);
             return false;
         } else if (id == R.id.nav_thank) {
-            handler.sendEmptyMessage(gotoThank);
+            ARouter.getInstance().build("/yellow/thank").navigation();
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.push_left_out);
             return false;
         } else if (id == R.id.nav_night) {
             changeThemeByZhiHu();
         } else if (id == R.id.nav_qrcode) {
             gotoQRCode();
         } else if (id == R.id.nav_recognize) {
-            handler.sendEmptyMessage(gotoRecognize);
+            hideBtnAdd();
+            ARouter.getInstance().build("/yellow/recognize").navigation();
+            overridePendingTransition(R.anim.push_left_in,
+                    R.anim.push_left_out);
             return false;
         }
         mMainDrawer.closeDrawers();
@@ -924,25 +909,49 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     /*夜间模式*/
 
-    public static final int gotoSetting = 0;
-    public static final int showBtnAdd = 1;
-    public static final int hideBtnAdd = 2;
-    public static final int gotoSecret = 3;
-    public static final int gotoThank = 4;
+//    public static final int gotoSetting = 0;
+//    public static final int showBtnAdd = 1;
+//    public static final int hideBtnAdd = 2;
+//    public static final int gotoSecret = 3;
+//    public static final int gotoThank = 4;
     public static final int checkUpdate = 5;
     public static final int gotoQRCode = 6;
-    public static final int gotoRecognize = 7;
+//    public static final int gotoRecognize = 7;
 
     public void showBtnAdd() {
 //        Trace.d("showBtnAddDelay");
         isHide = false;
-        handler.sendEmptyMessage(showBtnAdd);
+        mMainFab.animate()
+                .alpha(1)
+                .scaleX(1)
+                .scaleY(1)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+//                                    if (mMainFab.getVisibility() == View.INVISIBLE)
+                        mMainFab.setVisibility(View.VISIBLE);
+                    }
+                })
+                .setDuration(300).start();
     }
 
     public void hideBtnAdd() {
 //        Trace.d("hideBtnAdd");
         isHide = true;
-        handler.sendEmptyMessage(hideBtnAdd);
+        mMainFab.animate()
+                .scaleX(0)
+                .scaleY(0)
+                .alpha(0)
+                .setListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+//                                    if (mMainFab.getVisibility() == View.VISIBLE)
+                        mMainFab.setVisibility(View.INVISIBLE);
+                    }
+                })
+                .setDuration(50).start();
     }
 
     @Override
