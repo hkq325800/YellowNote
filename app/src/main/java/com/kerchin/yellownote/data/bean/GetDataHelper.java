@@ -4,7 +4,7 @@ package com.kerchin.yellownote.data.bean;
  * Created by Kerchin on 2016/4/12 0012.
  */
 public class GetDataHelper {
-    public final static byte statusNone = -1;//整体获取
+    public final static byte statusNone = 22;//整体获取
     public final static byte statusFirstGet = 0;//整体获取
 //    public final static byte statusZero = 1;//数据为空
     public final static byte statusRespond = 2;//数据反馈

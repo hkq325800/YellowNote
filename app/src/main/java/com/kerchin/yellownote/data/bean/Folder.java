@@ -4,9 +4,9 @@ import android.app.Activity;
 
 import com.avos.avoscloud.AVException;
 import com.j256.ormlite.field.DatabaseField;
+import com.kerchin.global.Config;
 import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.data.proxy.FolderService;
-import com.kerchin.global.Config;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 
