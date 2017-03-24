@@ -5,12 +5,15 @@ import android.os.Bundle;
 import android.os.Message;
 import android.os.Process;
 import android.support.v7.widget.ActionMenuView;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -33,6 +36,9 @@ import org.byteam.superadapter.OnItemLongClickListener;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -275,9 +281,9 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     public void stopRefresh() {
 //        hasClick = false;
 //        if (mNoteList.isRefresh()) {
-            getDataHelper.none();
-            Trace.d("emptyClickCount" + emptyClickCount);
-            mNoteList.setPullLoadMoreCompleted();
+        getDataHelper.none();
+        Trace.d("emptyClickCount" + emptyClickCount);
+        mNoteList.setPullLoadMoreCompleted();
 //        }
     }
 
@@ -613,5 +619,74 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     public void onEvent(NoteDeleteErrorEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
         Trace.show(getActivity().getApplicationContext(), event.getStr());
+    }
+
+    /**
+     * 刷新UI界面
+     *
+     * @param mDayNightHelper
+     */
+    public void refreshUI(DayNightHelper mDayNightHelper) {
+        int childCount = mNoteList.getChildCount();
+        for (int childIndex = 0; childIndex < childCount; childIndex++) {
+            ViewGroup childView = (ViewGroup) mNoteList.getChildAt(childIndex);
+            childView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+            View mNoteItemView = childView.findViewById(R.id.mNoteItemView);
+            mNoteItemView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
+            mNoteBlankReL.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+
+//            TextView mNoteItemTitleTxt = (TextView) childView.findViewById(R.id.mNoteItemTitleTxt);
+//            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            TextView mNoteItemDateTxt = (TextView) childView.findViewById(R.id.mNoteItemDateTxt);
+//            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
+//            mNoteItemFolderTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+        }
+
+        //让 RecyclerView 缓存在 Pool 中的 Item 失效
+        //那么，如果是ListView，要怎么做呢？这里的思路是通过反射拿到 AbsListView 类中的 RecycleBin 对象，然后同样再用反射去调用 clear 方法
+        Class<RecyclerView> absListViewClass = RecyclerView.class;
+        try {
+            Field declaredField = absListViewClass.getDeclaredField("mRecycler");
+            declaredField.setAccessible(true);
+            Method declaredMethod = Class.forName(RecyclerView.Recycler.class.getName()).getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
+            declaredMethod.setAccessible(true);
+            declaredMethod.invoke(declaredField.get(mNoteList.getRecyclerView()), new Object[0]);
+            RecyclerView.RecycledViewPool recycledViewPool = mNoteList.getRecyclerView().getRecycledViewPool();
+            recycledViewPool.clear();
+
+
+//            Field declaredField = absListViewClass.getDeclaredField("mRecycler");
+//            declaredField.setAccessible(true);
+//            Method declaredMethod = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
+//            declaredMethod.setAccessible(true);
+//            declaredMethod.invoke(declaredField.get(mNoteList), new Object[0]);
+//            Method declaredMethod1 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("clearTransientStateViews", (Class<?>[]) new Class[0]);
+//            declaredMethod1.setAccessible(true);
+//            declaredMethod1.invoke(declaredField.get(mNoteList), new Object[0]);//scrapActiveViews pruneScrapViews
+//            Method declaredMethod2 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("scrapActiveViews", (Class<?>[]) new Class[0]);
+//            declaredMethod2.setAccessible(true);
+//            declaredMethod2.invoke(declaredField.get(mNoteList), new Object[0]);
+//            Method declaredMethod3 = Class.forName("android.widget.AbsListView$RecycleBin").getDeclaredMethod("pruneScrapViews", (Class<?>[]) new Class[0]);
+//            declaredMethod3.setAccessible(true);
+//            declaredMethod3.invoke(declaredField.get(mNoteList), new Object[0]);
+//            mNoteList.destroyDrawingCache();
+//
+//            RecyclerView.RecycledViewPool recycledViewPool = mNoteList.getRecyclerView().getRecycledViewPool();
+//            recycledViewPool.clear();
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
     }
 }

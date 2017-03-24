@@ -830,7 +830,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private void changeThemeByZhiHu() {
         showAnimation();
         toggleThemeSetting();
-//        noteFragment.refreshUI(mDayNightHelper);
+        noteFragment.refreshUI(mDayNightHelper);
         folderFragment.refreshUI(mDayNightHelper);
 //        refreshStatusBar();//目前没用到
     }

@@ -14,7 +14,6 @@
 //import android.widget.AbsListView;
 //import android.widget.AdapterView;
 //import android.widget.ImageView;
-//import android.widget.TextView;
 //
 //import com.alibaba.android.arouter.launcher.ARouter;
 //import com.kerchin.global.Config;
@@ -31,7 +30,6 @@
 //import com.kerchin.yellownote.ui.activity.MainActivity;
 //import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 //import com.kerchin.yellownote.widget.waterdrop.WaterDropListView;
-//import com.wuxiaolong.pullloadmorerecyclerview.PullLoadMoreRecyclerView;
 //
 //import org.greenrobot.eventbus.EventBus;
 //import org.greenrobot.eventbus.Subscribe;
@@ -55,13 +53,12 @@
 //import zj.remote.baselibrary.util.Trace;
 //
 //public class NoteFragment extends MyBaseFragment
-//        implements /*WaterDropListView.IWaterDropListViewListener
-//        ,*/ View.OnCreateContextMenuListener, PullLoadMoreRecyclerView.PullLoadMoreListener/*, PopupMenu.OnMenuItemClickListener*/ {
-//    @BindView(R.id.mNoteList)
-//    PullLoadMoreRecyclerView mNoteList;
-//    TextView mEmptyTxt;
-//    private int currentPage;
-//    private int maxPage;
+//        implements WaterDropListView.IWaterDropListViewListener
+//        , View.OnCreateContextMenuListener/*, PopupMenu.OnMenuItemClickListener*/ {
+//    @BindView(R.id.mNoteWDList)
+//    WaterDropListView mNoteWDList;
+//    @BindView(R.id.mProgress)
+//    ProgressLayout mProgress;
 //    public static boolean isChanged4note = false;
 //    //    private SVProgressHUD mSVProgressHUD;
 //    private SearchView.OnQueryTextListener queryTextListener;
@@ -83,6 +80,55 @@
 //    private final byte handle4dismiss = 5;
 //    private final byte handle4explosion = 6;
 //    //    private final byte handle4AVException = 40;
+//
+//    /*data part*/
+//
+////    private void getData(int delay) {
+////
+////        sendMessage(delay);//getData
+//////        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
+//////            getDataListFromNote(primaryData.listNote);
+//////            handler.sendEmptyMessage(GetDataHelper.handle4loadMore);
+//////        }
+////    }
+//
+//    /**
+//     * list的获取
+//     */
+//    private void getDataListFromNote(List<Note> order) {
+//        list.clear();//getDataListFromNote
+//        for (int i = 0; i < order.size(); i++) {
+//            list.add(order.get(i));
+////            if(i==0)
+////                list.add(order.get(0));
+//        }
+//    }
+//
+//    private void getData(long delay) {
+//        Trace.d("getData status " + getDataHelper.statusName);
+//        if (mNoteWDList != null) {
+////        if (primaryData.listNote.size() == 0) {
+////            getDataHelper.zero();
+////            handler.sendEmptyMessage(GetDataHelper.handle4zero);
+////        } else {
+//            switch (getDataHelper.status) {
+//                case GetDataHelper.statusFirstGet:
+//                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
+//                    break;
+//                case GetDataHelper.statusRespond:
+//                    if (primaryData.listNote.size() == 0)
+//                        handler.sendEmptyMessageDelayed(
+//                                GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
+//                    else
+//                        handler.sendEmptyMessageDelayed(
+//                                GetDataHelper.handle4respond, delay);
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+////        }
+//    }
 //
 //    /*create part*/
 //
@@ -117,16 +163,7 @@
 //
 //    @Override
 //    protected void initView(View rootView) {
-//        mNoteList.setRefreshing(true);
-//        mNoteList.setFooterViewText("加载中");
-//        mNoteList.setFooterViewTextColor(R.color.white);
-//        mNoteList.setFooterViewBackgroundColor(R.color.trans_black);
-//        mNoteList.setColorSchemeResources(R.color.light_green, R.color.darkorange, R.color.mediumaquamarine, R.color.darkgray, R.color.red_500);
-//        View view = getActivity().getLayoutInflater().inflate(R.layout.layout_empty, null);
-//        mEmptyTxt = (TextView) view.findViewById(R.id.mEmptyTxt);
-//        mNoteList.setEmptyView(view);
-//        mNoteList.setLinearLayout();//setGridLayout(int spanCount)/setStaggeredGridLayout(int spanCount)
-//        mNoteList.setOnPullLoadMoreListener(this);
+//
 //    }
 //
 //    @Override
@@ -315,55 +352,6 @@
 //            getData(0);//statusRespond onResume
 //            isChanged4note = false;//respondForChange
 //        }
-//    }
-//
-//    /*data part*/
-//
-////    private void getData(int delay) {
-////
-////        sendMessage(delay);//getData
-//////        else if (getDataHelper.status == GetDataHelper.statusLoadMore) {
-//////            getDataListFromNote(primaryData.listNote);
-//////            handler.sendEmptyMessage(GetDataHelper.handle4loadMore);
-//////        }
-////    }
-//
-//    /**
-//     * list的获取
-//     */
-//    private void getDataListFromNote(List<Note> order) {
-//        list.clear();//getDataListFromNote
-//        for (int i = 0; i < order.size(); i++) {
-//            list.add(order.get(i));
-////            if(i==0)
-////                list.add(order.get(0));
-//        }
-//    }
-//
-//    private void getData(long delay) {
-//        Trace.d("getData status " + getDataHelper.statusName);
-//        if (mNoteWDList != null) {
-////        if (primaryData.listNote.size() == 0) {
-////            getDataHelper.zero();
-////            handler.sendEmptyMessage(GetDataHelper.handle4zero);
-////        } else {
-//            switch (getDataHelper.status) {
-//                case GetDataHelper.statusFirstGet:
-//                    handler.sendEmptyMessageDelayed(GetDataHelper.handle4firstGet, delay);//sendMessage firstGet
-//                    break;
-//                case GetDataHelper.statusRespond:
-//                    if (primaryData.listNote.size() == 0)
-//                        handler.sendEmptyMessageDelayed(
-//                                GetDataHelper.handle4firstGet, delay);//sendMessage respond firstGet
-//                    else
-//                        handler.sendEmptyMessageDelayed(
-//                                GetDataHelper.handle4respond, delay);
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-////        }
 //    }
 //
 //    /*menu*/
