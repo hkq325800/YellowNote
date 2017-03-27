@@ -49,6 +49,7 @@ import me.wangyuwei.flipshare.FlipShareView;
 import me.wangyuwei.flipshare.ShareItem;
 import tyrantgit.explosionfield.ExplosionField;
 import zj.remote.baselibrary.util.DialogUtils;
+import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
 /**
@@ -118,15 +119,6 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                     noteAdapter.replaceAll(list);
                 }
                 if (primaryData.listNote.size() == 0) {
-//                    mProgress.showNoData("新建一个笔记吧！", new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            if (!hasClick) {
-//                                hasClick = true;
-//                                emptyClick();
-//                            }
-//                        }
-//                    });
                     Trace.d("handlerInNote handle4zero");
                     mNoteList.showEmptyView();
                 } else
@@ -143,6 +135,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 getDataListFromNote(primaryData.listNote);//handle4refresh
                 if (noteAdapter != null) {
                     noteAdapter.setList(list);
+                    mNoteList.setAdapter(noteAdapter);
                 }
                 //借emptyClickCount做一个标志
                 if (emptyClickCount >= 3) {
@@ -207,9 +200,54 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
         mNoteList.setColorSchemeResources(R.color.light_green, R.color.darkorange, R.color.mediumaquamarine, R.color.darkgray, R.color.red_500);
         View view = getActivity().getLayoutInflater().inflate(R.layout.layout_empty, null);
         mEmptyTxt = (TextView) view.findViewById(R.id.mEmptyTxt);
+        mEmptyTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                emptyClick();
+            }
+        });
         mNoteList.setEmptyView(view);
         mNoteList.setLinearLayout();//setGridLayout(int spanCount)/setStaggeredGridLayout(int spanCount)
         mNoteList.setOnPullLoadMoreListener(this);
+    }
+
+    public void emptyClick() {
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                //刷新界面
+                if (emptyClickCount < 3) {
+                    Trace.d("emptyClickCount" + emptyClickCount);
+                    emptyClickCount++;
+                    getDataHelper.respond();
+//                    mProgress.startProgress();//emptyClick
+                    getData();//statusRespond empty
+                    FolderFragment.isChanged4folder = true;//emptyClick
+                } else {
+//                    mProgress.startProgress();//refresh
+                    ThreadPool.getInstance().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            //重新获取mHeaders listNote和mItems
+                            FolderFragment.isChanged4folder = true;//emptyClick
+                            MainActivity a = (MainActivity) getActivity();
+                            primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
+                                @Override
+                                public void justNow() {
+                                    if (primaryData.getNoteSize() == 0)
+                                        getDataHelper.firstGet();
+                                    else
+                                        getDataHelper.refresh();//MainActivity dataGot
+                                    handler.sendEmptyMessage(primaryData.listNote.size() == 0
+                                            ? GetDataHelper.handle4firstGet
+                                            : GetDataHelper.handle4refresh);
+                                }
+                            }, null);
+                        }
+                    });
+                }
+            }
+        }/*, 600*/);
     }
 
     @Override
@@ -251,8 +289,36 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     @Override
     public void onRefresh() {
         currentPage = 1;
-        getDataHelper.firstGet();
-        getData();
+                Trace.d("onRefresh");
+        //单例服务
+        ThreadPool.getInstance().execute(new Runnable() {
+            @Override
+            public void run() {
+                getDataHelper.refresh();//MainActivity dataGot
+                //重新获取mHeaders listNote和mItems
+                MainActivity a = (MainActivity) getActivity();
+                primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh
+                    @Override
+                    public void justNow() {
+                        handler.sendEmptyMessage(GetDataHelper.handle4refresh);
+                        isChanged4note = false;//onRefresh
+                        FolderFragment.hasRefresh = true;//onRefresh
+                        FolderFragment.isChanged4folder = true;//onRefresh
+                    }
+                }, new PrimaryData.DoAfterWithEx() {
+                    @Override
+                    public void justNowWithEx(Exception e) {
+                        Message msg = Message.obtain();
+                        msg.obj = e;
+                        msg.what = GetDataHelper.handle4empty;
+                        handler.sendMessage(msg);
+                        isChanged4note = false;//onRefresh
+                        FolderFragment.hasRefresh = true;//onRefresh
+                        FolderFragment.isChanged4folder = true;//onRefresh
+                    }
+                });
+            }
+        });
         mNoteList.setHasMore(true);
     }
 
@@ -422,8 +488,10 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
             }
         });
         getDataListFromNote(temp);//doSort
-        if (noteAdapter != null)
+        if (noteAdapter != null) {
             noteAdapter.setList(list);
+            mNoteList.setAdapter(noteAdapter);
+        }
     }
 
     /*search part*/
@@ -431,9 +499,10 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     private void doSearch() {
         list.clear();//doSearch
         list = primaryData.getSearchList(mSearchText);
-        if (noteAdapter != null)
-//            if (!isChanged4note)//doSearch
+        if (noteAdapter != null) {
             noteAdapter.setList(list);
+            mNoteList.setAdapter(noteAdapter);
+        }
     }
 
     public void closeClick() {
@@ -544,7 +613,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 @Override
                 public void onItemClick(View itemView, int viewType, int position) {
                     final ImageView delete = (ImageView) itemView.findViewById(R.id.mNoteItemDeleteImg);
-                    final Note note = primaryData.getNote(list.get(position - 1).getObjectId());
+                    final Note note = primaryData.getNote(list.get(position).getObjectId());
                     if (noteAdapter.getListDelete().contains(note)) {
                         delete.setImageResource(R.mipmap.delete);
                         noteAdapter.getListDelete().remove(note);
@@ -560,6 +629,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
             if (noteAdapter != null) {
                 noteAdapter.isDelete = true;
                 noteAdapter.notifyDataSetHasChanged();//列表项目未变更可以直接调用
+                mNoteList.setAdapter(noteAdapter);
             }
         }
     }
@@ -579,6 +649,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
             if (noteAdapter != null) {
                 noteAdapter.isDelete = false;
                 noteAdapter.notifyDataSetHasChanged();//列表项目未变更可以直接调用
+                mNoteList.setAdapter(noteAdapter);
             }
         } else {
             Trace.d("deleteViewHideNote error");
@@ -590,7 +661,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     public void listItemClick(int position) {
         MainActivity m = (MainActivity) getActivity();
         m.hideBtnAdd();
-        ARouter.getInstance().build("/yellow/edit").withSerializable("mNote", primaryData.getNote(noteAdapter.getItem(position - 1).getObjectId()))
+        ARouter.getInstance().build("/yellow/edit").withSerializable("mNote", primaryData.getNote(noteAdapter.getItem(position).getObjectId()))
                 .navigation();
     }
 
