@@ -283,7 +283,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                zj.remote.baselibrary.util.NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
+                NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
 //                Intent i = new Intent(
 //                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, REQUEST_LOAD_IMAGE);
@@ -308,9 +308,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 msgNote.setText(note);
                 msgFolder.setText(folder);
                 isDrawerOpen = true;
-                btnSearch.setVisible(false);
-                btnSort.setVisible(false);
-                btnDelete.setVisible(false);
+//                btnSearch.setVisible(false);
+//                btnSort.setVisible(false);
+//                btnDelete.setVisible(false);
                 if (PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)) {
                     PreferenceUtils.putBoolean(Config.HIGHLIGHT_NAV, false, MainActivity.this);
                     //用户操作引导库
@@ -343,10 +343,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onDrawerClosed(View drawerView) {
                 isDrawerOpen = false;
-                boolean isVisible = thisPosition == 0;
-                btnSearch.setVisible(isVisible);
-                btnDelete.setVisible(isVisible);
-                btnSort.setVisible(isVisible);
+//                boolean isVisible = thisPosition == 0;
+//                btnSearch.setVisible(isVisible);
+//                btnDelete.setVisible(isVisible);
+//                btnSort.setVisible(isVisible);
                 toggle.onDrawerClosed(drawerView);
             }
 
@@ -843,7 +843,8 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
         mNavHeaderLiL.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
         mMainToolbar.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
-
+        msgNote.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
+        msgFolder.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));
 //        msgFolder.setTextColor(getResources().getColor(background.resourceId));
     }
