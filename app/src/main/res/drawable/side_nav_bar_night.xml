@@ -7,9 +7,9 @@
         android:type="linear"
         android:angle="135"/>-->
     <gradient
-        android:startColor="@color/colorPrimary"
-        android:centerColor="@color/colorPrimary"
-        android:endColor="@color/colorPrimary"
+        android:startColor="@color/tip"
+        android:centerColor="@color/dark_gray"
+        android:endColor="@color/dark_gray"
         android:type="linear"
         android:angle="135"/>
 </shape>

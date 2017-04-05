@@ -13,6 +13,9 @@ buildscript {
             url 'https://dl.bintray.com/wangyuwei/maven'
         }
         maven {
+            url  "http://dl.bintray.com/piasy/maven"
+        }
+        maven {
             repositories {
                 url 'https://oss.sonatype.org/content/repositories/releases/'//weakHandler
             }
@@ -40,6 +43,9 @@ allprojects {
         jcenter()
         maven {
             url "http://mvn.leancloud.cn/nexus/content/repositories/public"
+        }
+        maven {
+            url  "http://dl.bintray.com/piasy/maven"
         }
         maven {
             url "http://repo2.maven.org/maven2/"

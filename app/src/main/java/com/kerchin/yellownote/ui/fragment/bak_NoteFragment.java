@@ -405,7 +405,7 @@
 //                                            , false, "删除中...", "请稍候")
 //                                            .titleColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
 //                                            .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
-//                                            .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+//                                            .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
 //                                            .show();
 ////                                        mSVProgressHUD.showWithStatus("删除中...");
 //                                    final int num = noteAdapter.getDeleteNum();
@@ -783,11 +783,11 @@
 //////            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
 //////            mNoteBlankReL.setBackgroundResource(background.resourceId);
 ////            TextView mNoteItemTitleTxt = (TextView) childView.findViewById(R.id.mNoteItemTitleTxt);
-////            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+////            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 ////            TextView mNoteItemDateTxt = (TextView) childView.findViewById(R.id.mNoteItemDateTxt);
-////            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+////            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 ////            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
-////            mNoteItemFolderTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+////            mNoteItemFolderTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 ////        }
 ////
 ////        //让 RecyclerView 缓存在 Pool 中的 Item 失效

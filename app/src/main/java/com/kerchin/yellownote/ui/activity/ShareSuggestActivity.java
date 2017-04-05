@@ -254,7 +254,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("升级版本:" + versionCode)
                                                 .content(version.getString("version_content"))
-                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .positiveText("下载")
@@ -277,7 +277,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                     public void onClick(View v) {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("当前版本:" + versionCode)
-                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .content(version.getString("version_content")).show();

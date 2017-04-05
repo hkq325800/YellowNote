@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.launcher.ARouter;
@@ -577,7 +576,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                                             , false, "删除中...", "请稍候")
                                             .titleColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                                             .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
-                                            .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                                            .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
                                             .show();
 //                                        mSVProgressHUD.showWithStatus("删除中...");
                                     final int num = noteAdapter.getDeleteNum();
@@ -698,28 +697,29 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
      * @param mDayNightHelper
      */
     public void refreshUI(DayNightHelper mDayNightHelper) {
-        int childCount = mNoteList.getChildCount();
+        int childCount = mNoteList.getRecyclerView().getChildCount();
         for (int childIndex = 0; childIndex < childCount; childIndex++) {
-            ViewGroup childView = (ViewGroup) mNoteList.getChildAt(childIndex);
-            childView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
-            View mNoteItemView = childView.findViewById(R.id.mNoteItemView);
-            mNoteItemView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
-            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
-            mNoteBlankReL.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+            ViewGroup childView = (ViewGroup) mNoteList.getRecyclerView().getChildAt(childIndex);
+//            childView.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
+            View mNoteItem = childView.findViewById(R.id.relative_title);
+            mNoteItem.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_NAV_BACKGROUND));
+            //没必要 因为原本是透明的
+//            RelativeLayout mNoteBlankReL = (RelativeLayout) childView.findViewById(R.id.mNoteBlankReL);
+//            mNoteBlankReL.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 
 //            TextView mNoteItemTitleTxt = (TextView) childView.findViewById(R.id.mNoteItemTitleTxt);
-//            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            mNoteItemTitleTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 //            TextView mNoteItemDateTxt = (TextView) childView.findViewById(R.id.mNoteItemDateTxt);
-//            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
-//            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
-//            mNoteItemFolderTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
+            TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
+            mNoteItemFolderTxt.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_NAV_BACKGROUND));
         }
 
         //让 RecyclerView 缓存在 Pool 中的 Item 失效
         //那么，如果是ListView，要怎么做呢？这里的思路是通过反射拿到 AbsListView 类中的 RecycleBin 对象，然后同样再用反射去调用 clear 方法
-        Class<RecyclerView> absListViewClass = RecyclerView.class;
+        Class<RecyclerView> recyclerViewClass = RecyclerView.class;
         try {
-            Field declaredField = absListViewClass.getDeclaredField("mRecycler");
+            Field declaredField = recyclerViewClass.getDeclaredField("mRecycler");
             declaredField.setAccessible(true);
             Method declaredMethod = Class.forName(RecyclerView.Recycler.class.getName()).getDeclaredMethod("clear", (Class<?>[]) new Class[0]);
             declaredMethod.setAccessible(true);

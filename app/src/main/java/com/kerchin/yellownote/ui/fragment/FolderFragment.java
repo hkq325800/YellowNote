@@ -3,7 +3,6 @@ package com.kerchin.yellownote.ui.fragment;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -12,7 +11,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.text.InputType;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +21,6 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.avos.avoscloud.AVException;
 import com.kerchin.global.Config;
-import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.MyBaseFragment;
 import com.kerchin.yellownote.data.adapter.FolderShrinkAdapter;
@@ -37,6 +34,7 @@ import com.kerchin.yellownote.data.event.FolderDeleteErrorEvent;
 import com.kerchin.yellownote.data.event.FolderDeleteEvent;
 import com.kerchin.yellownote.data.event.FolderRespondEvent;
 import com.kerchin.yellownote.data.proxy.FolderService;
+import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.ui.activity.MainActivity;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
@@ -127,10 +125,10 @@ public class FolderFragment extends MyBaseFragment {
                             final TextView mDialogTitleTxt = (TextView) view.findViewById(R.id.mDialogTitleTxt);
                             mDialogContentEdt.setText(note.getContent());
                             mDialogTitleTxt.setText(note.getTitle());
-                            Resources.Theme theme = getActivity().getTheme();
-                            TypedValue background = new TypedValue();
-                            theme.resolveAttribute(R.attr.clockBackground, background, true);
-                            view.setBackgroundResource(background.resourceId);
+//                            Resources.Theme theme = getActivity().getTheme();
+//                            TypedValue background = new TypedValue();
+//                            theme.resolveAttribute(R.attr.clockBackground, background, true);
+//                            view.setBackgroundResource(background.resourceId);
                             singleEditTextDialogMaker(getActivity(), view, null);
                         } else if (note.getType().equals("audio")) {//音频
                             Trace.show(getActivity(), "audio模块正在开发中...");
@@ -571,7 +569,7 @@ public class FolderFragment extends MyBaseFragment {
             , MaterialDialog.SingleButtonCallback positiveListener) {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
-                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .title(title)
                 .content(content)
@@ -598,7 +596,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .items((CharSequence[]) items)
                 .itemsColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
@@ -626,7 +624,7 @@ public class FolderFragment extends MyBaseFragment {
         MainActivity main = (MainActivity) getActivity();
         dialog = new MaterialDialog.Builder(context)
                 .title(title)
-                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND))
+                .backgroundColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
                 .titleColor(main.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                 .cancelListener(new DialogInterface.OnCancelListener() {
                     @Override
@@ -655,14 +653,15 @@ public class FolderFragment extends MyBaseFragment {
         for (int childIndex = 0; childIndex < childCount; childIndex++) {
             ViewGroup childView = (ViewGroup) mRecyclerView.getChildAt(childIndex);
             if (childView.findViewById(R.id.mFolderItemTxt) != null) {//item
-                childView.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));//itemView
+                childView.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));//itemView
                 TextView mFolderItemTxt = (TextView) childView.findViewById(R.id.mFolderItemTxt);
-                mFolderItemTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));
+                mFolderItemTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));
             } else if (childView.findViewById(R.id.mFolderHeaderContainTxt) != null) {//header
-                TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);
-                mFolderHeaderContainTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_BACKGROUND));
+                childView.setBackgroundResource(mDayNightHelper.getColorResId(getContext(), DayNightHelper.COLOR_NAV_BACKGROUND));
+//                TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);
+//                mFolderHeaderContainTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));
 //                TextView mFolderHeaderNameTxt = (TextView) childView.findViewById(R.id.mFolderHeaderNameTxt);
-//                mFolderHeaderNameTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_BACKGROUND));
+//                mFolderHeaderNameTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
             }
         }
 

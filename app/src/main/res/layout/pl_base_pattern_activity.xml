@@ -10,7 +10,7 @@
     android:layout_height="match_parent"
     android:divider="?dividerHorizontal"
     android:fitsSystemWindows="true"
-    android:background="?attr/clockBackground"
+    android:background="?attr/clockSoftBackground"
     android:orientation="vertical"
     android:showDividers="middle">
 

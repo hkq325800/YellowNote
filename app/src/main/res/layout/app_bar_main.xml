@@ -20,7 +20,7 @@
                 android:id="@+id/mMainToolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:background="?attr/clockNavBackground"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="@style/AppTheme.AppBarOverlay" />
 
@@ -48,7 +48,7 @@
             android:layout_width="fill_parent"
             android:layout_marginTop="?attr/actionBarSize"
             android:layout_height="wrap_content"
-            android:background="?attr/clockBackground" />
+            android:background="?attr/clockSoftBackground" />
         <!--android:layout_marginTop="?attr/actionBarSize"-->
 
         <android.support.design.widget.FloatingActionButton
