@@ -711,7 +711,7 @@ public class FolderFragment extends MyBaseFragment {
     @Subscribe
     public void onEvent(FolderDeleteErrorEvent event){
         EventBus.getDefault().removeStickyEvent(event);
-        Trace.show(getActivity().getApplicationContext(), event.getStr());
+        Trace.show(getActivity(), event.getStr());
     }
 }
 //        mEditEdt.setOnFocusChangeListener(new View.OnFocusChangeListener() {

@@ -939,13 +939,13 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
 
     @Subscribe
     public void onEvent(EditDeleteFinishEvent event){
-        Trace.show(getApplicationContext(), "删除成功");
+        Trace.show(mActivity, "删除成功");
         finish();
     }
 
     @Subscribe
     public void onEvent(EditDeleteErrorEvent event){
         EventBus.getDefault().removeStickyEvent(event);
-        Trace.show(getApplicationContext(), event.getStr());
+        Trace.show(mActivity, event.getStr());
     }
 }

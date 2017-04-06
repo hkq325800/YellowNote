@@ -52,6 +52,7 @@
 -keep interface com.j256.**
 -keepclassmembers interface com.j256.** { *; }
 -dontwarn com.j256.ormlite.**
+-dontnote com.j256.ormlite.**
 -keep class com.j256.ormlite.** { *;}
 #保护注解
 -keepattributes *Annotation*
@@ -100,8 +101,8 @@
 -dontwarn sun.misc.**
 -keep class sun.misc.** { *;}
 
--dontwarn com.alibaba.fastjson.**
--keep class com.alibaba.fastjson.** { *;}
+#-dontwarn com.alibaba.fastjson.**
+#-keep class com.alibaba.fastjson.** { *;}
 
 -dontwarn sun.security.**
 -keep class sun.security.** { *; }
@@ -146,3 +147,15 @@
 }
 #aRouter
 -keep public class com.alibaba.android.arouter.routes.**{*;}
+
+-dontwarn com.alibaba.android.arouter.**
+-dontnote com.alibaba.android.arouter.**
+-dontwarn com.jeremyfeinstein.slidingmenu.lib.**
+-dontnote com.jeremyfeinstein.slidingmenu.lib.**
+-dontwarn com.cjj.sva.**
+#-dontwarn com.alibaba.fastjson.**
+-dontnote com.alibaba.fastjson.**
+-dontnote com.tinkerpatch.sdk.**
+-dontnote com.tencent.tinker.**
+-dontnote com.yalantis.ucrop.**
+-dontnote com.afollestad.materialdialogs.**

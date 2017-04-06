@@ -688,7 +688,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     @Subscribe
     public void onEvent(NoteDeleteErrorEvent event) {
         EventBus.getDefault().removeStickyEvent(event);
-        Trace.show(getActivity().getApplicationContext(), event.getStr());
+        Trace.show(getActivity(), event.getStr());
     }
 
     /**

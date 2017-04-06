@@ -15,9 +15,9 @@ dependencies {
     compile 'com.android.support:design:25.+'
     //    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
-    compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'
+//    compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'
     compile 'cn.leancloud.android:okio-parent:1.6.0-leancloud'
-    compile 'cn.leancloud.android:fastjson:1.1.40-leancloud'
+//    compile 'cn.leancloud.android:fastjson:1.1.39-leancloud'
     //检测内存泄漏
     //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
@@ -80,8 +80,8 @@ dependencies {
     compile project(':global')
     //无需引入tinker的任何库,使用tinkerpatch sdk即可
     compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
-    compile 'com.alibaba:arouter-api:1.0.4'
-    apt 'com.alibaba:arouter-compiler:1.0.1'
+    compile 'com.alibaba:arouter-api:1.2.0'
+    apt 'com.alibaba:arouter-compiler:1.1.1'
     //微软计算机视觉api
     compile 'com.microsoft.projectoxford:vision:1.0.374'
 }
@@ -137,7 +137,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false//false aRouter
+            minifyEnabled true//false aRouter
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

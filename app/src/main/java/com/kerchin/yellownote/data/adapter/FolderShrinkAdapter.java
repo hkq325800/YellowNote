@@ -19,7 +19,7 @@ import java.util.List;
  * More Code on hkq325800@163.com
  */
 public class FolderShrinkAdapter extends SuperAdapter<SimpleEntity> {
-    public static int animDuration = 450;
+    public static int animDuration = 300;
     private Context context;
     private final float childHeight;
 //    private List<SimpleEntity> mItems;
