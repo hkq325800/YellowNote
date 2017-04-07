@@ -150,12 +150,12 @@
 
 -dontwarn com.alibaba.android.arouter.**
 -dontnote com.alibaba.android.arouter.**
--dontwarn com.jeremyfeinstein.slidingmenu.lib.**
--dontnote com.jeremyfeinstein.slidingmenu.lib.**
--dontwarn com.cjj.sva.**
-#-dontwarn com.alibaba.fastjson.**
--dontnote com.alibaba.fastjson.**
--dontnote com.tinkerpatch.sdk.**
--dontnote com.tencent.tinker.**
--dontnote com.yalantis.ucrop.**
--dontnote com.afollestad.materialdialogs.**
+#-dontwarn com.jeremyfeinstein.slidingmenu.lib.**
+#-dontnote com.jeremyfeinstein.slidingmenu.lib.**
+#-dontwarn com.cjj.sva.**
+##-dontwarn com.alibaba.fastjson.**
+#-dontnote com.alibaba.fastjson.**
+#-dontnote com.tinkerpatch.sdk.**
+#-dontnote com.tencent.tinker.**
+#-dontnote com.yalantis.ucrop.**
+#-dontnote com.afollestad.materialdialogs.**

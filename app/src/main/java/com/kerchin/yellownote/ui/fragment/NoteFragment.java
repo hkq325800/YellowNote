@@ -713,6 +713,8 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
 //            mNoteItemDateTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND));
             TextView mNoteItemFolderTxt = (TextView) childView.findViewById(R.id.mNoteItemFolderTxt);
             mNoteItemFolderTxt.setBackgroundResource(mDayNightHelper.getColorResId(getActivity(), DayNightHelper.COLOR_NAV_BACKGROUND));
+            TextView mNoteItemPreviewTxt = (TextView) childView.findViewById(R.id.mNoteItemPreviewTxt);
+            mNoteItemPreviewTxt.setTextColor(mDayNightHelper.getColorRes(getActivity(), DayNightHelper.CLOCK_TEXT));
         }
 
         //让 RecyclerView 缓存在 Pool 中的 Item 失效

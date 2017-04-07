@@ -653,9 +653,9 @@ public class FolderFragment extends MyBaseFragment {
         for (int childIndex = 0; childIndex < childCount; childIndex++) {
             ViewGroup childView = (ViewGroup) mRecyclerView.getChildAt(childIndex);
             if (childView.findViewById(R.id.mFolderItemTxt) != null) {//item
-                childView.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));//itemView
+//                childView.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));//itemView
                 TextView mFolderItemTxt = (TextView) childView.findViewById(R.id.mFolderItemTxt);
-                mFolderItemTxt.setBackgroundColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND));
+                mFolderItemTxt.setTextColor(mDayNightHelper.getColorRes(getContext(), DayNightHelper.CLOCK_TEXT));
             } else if (childView.findViewById(R.id.mFolderHeaderContainTxt) != null) {//header
                 childView.setBackgroundResource(mDayNightHelper.getColorResId(getContext(), DayNightHelper.COLOR_NAV_BACKGROUND));
 //                TextView mFolderHeaderContainTxt = (TextView) childView.findViewById(R.id.mFolderHeaderContainTxt);

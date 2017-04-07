@@ -22,11 +22,11 @@ dependencies {
     //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4-beta2'
     //    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     //weakHandler
-    compile 'com.badoo.mobile:android-weak-handler:1.1'
+//    compile 'com.badoo.mobile:android-weak-handler:1.1'
     //pullToRefresh
     compile 'com.wuxiaolong.pullloadmorerecyclerview:library:1.1.1'
     //疯狂更新的高star对话框
-    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
+//    compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     //权限获取 未应用
     compile 'pub.devrel:easypermissions:0.2.0'
     //较好的圆形图像控件 持续修改中
@@ -67,11 +67,11 @@ dependencies {
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')
-    compile project(':baselibrary')
+//    compile project(':baselibrary')
     //    compile(name: 'baselibrary-release', ext: 'aar')
-    compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
+//    compile 'com.github.rubensousa:bottomsheetbuilder:1.5'
     //动画进入方式
-    compile 'me.immortalz:transitionhelper:1.0.6'
+//    compile 'me.immortalz:transitionhelper:1.0.6'
     //图片裁剪库
     compile 'com.yalantis:ucrop:2.2.0'
     compile 'org.greenrobot:eventbus:3.0.0'
@@ -80,7 +80,9 @@ dependencies {
     compile project(':global')
     //无需引入tinker的任何库,使用tinkerpatch sdk即可
     compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
-    compile 'com.alibaba:arouter-api:1.2.0'
+    compile ('com.alibaba:arouter-api:1.2.0', {
+        exclude group:'com.alibaba',module:'fastjson'
+    })
     apt 'com.alibaba:arouter-compiler:1.1.1'
     //微软计算机视觉api
     compile 'com.microsoft.projectoxford:vision:1.0.374'
@@ -108,22 +110,22 @@ android {
     lintOptions {
         abortOnError false
     }
-    signingConfigs {
-        release {
-            try {
-                storeFile file("./keystore/release.keystore")
-                storePassword "123456"
-                keyAlias "test"
-                keyPassword "123456"
-            } catch (ex) {
-                throw new InvalidUserDataException(ex.toString())
-            }
-        }
-
-        debug {
-            storeFile file("./keystore/debug.keystore")
-        }
-    }
+//    signingConfigs {
+//        release {
+//            try {
+//                storeFile file("./keystore/release.keystore")
+//                storePassword "123456"
+//                keyAlias "test"
+//                keyPassword "123456"
+//            } catch (ex) {
+//                throw new InvalidUserDataException(ex.toString())
+//            }
+//        }
+//
+//        debug {
+//            storeFile file("./keystore/debug.keystore")
+//        }
+//    }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
         minSdkVersion 16
@@ -138,13 +140,13 @@ android {
     buildTypes {
         release {
             minifyEnabled true//false aRouter
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
             debuggable true
             minifyEnabled false
-            signingConfig signingConfigs.debug
+//            signingConfig signingConfigs.debug
 //            zipAlignEnabled true
 //            shrinkResources true
 //            buildConfigField "String", "CHANNEL", "\"dev\""
@@ -162,22 +164,3 @@ android {
     }
     return void
 }
-
-//def getLoader(){
-//    return ["com.tencent.tinker.loader.*",
-//            "com.kerchin.yellownote.global.MyApplication",
-//            "com.avos.avoscloud.AVOSCloud",
-//            "com.kerchin.yellownote.R",
-//            "com.kerchin.yellownote.data.bean.PrimaryData",
-//            "CrashExceptionHandler",
-//            "SimpleCrashReporter",
-//            "com.kerchin.yellownote.utilities.NormalUtils",
-//            "com.kerchin.yellownote.utilities.PatternLockUtils",
-//            "TinkerManager",
-//            "MyLogImp",
-//            "com.securepreferences.SecurePreferences",
-//            "com.uuzuche.lib_zxing.DisplayUtil"
-//            //use sample, let BaseBuildInfo unchangeable with tinker
-////                      "tinker.sample.android.app.BaseBuildInfo"
-//    ]
-//}

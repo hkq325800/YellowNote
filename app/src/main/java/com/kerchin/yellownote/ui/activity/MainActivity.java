@@ -840,7 +840,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mMainPager.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));
         mMainNav.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
         mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
-        mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
         mNavHeaderLiL.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
         mMainToolbar.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
         msgNote.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));

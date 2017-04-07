@@ -6,7 +6,7 @@ package com.kerchin.global;
 public class Config {
 
     public static boolean isLeakCanary = false;
-    public static boolean isDebugMode = true;
+    public static boolean isDebugMode = false;
     /**
      * Settings
      */

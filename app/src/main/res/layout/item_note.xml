@@ -96,7 +96,7 @@
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:text=""
-            android:textColor="@color/colorPrimary"
+            android:textColor="?attr/clockText"
             android:textSize="18sp" />
         <!--android:textStyle="italic"-->
     </RelativeLayout>
