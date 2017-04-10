@@ -54,7 +54,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
         } else {
             setTheme(R.style.TransparentThemeNight);
         }
-        immergeColor = R.color.colorPrimary;
+        immergeColor = DayNightHelper.getInstance(this).isDay() ? R.color.colorPrimary : R.color.dark_gray;
     }
 
     @Override
