@@ -63,7 +63,7 @@ dependencies {
     //弹出菜单库 可靠的作者 minSDK = 15
     compile 'me.wangyuwei:FlipShare:1.0.1'
     //几行集成二维码
-    compile 'cn.yipianfengye.android:zxing-library:1.9'
+    compile 'cn.yipianfengye.android:zxing-library:2.1'
     //ormlite
     compile files('libs/ormlite-android-5.0.jar')
     compile files('libs/ormlite-core-5.0.jar')

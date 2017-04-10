@@ -200,7 +200,8 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                 userConfirm = true;
                                 EditActivity.this.dialog = DialogUtils.showIndeterminateProgressDialog(EditActivity.this
-                                        , false, "保存中", "请稍候").show();
+                                        , false, DayNightHelper.getInstance(mContext).getColorResId(mContext, DayNightHelper.COLOR_SOFT_BACKGROUND)
+                                        , "保存中", "请稍候").show();
 //                                mSVProgressHUD.showWithStatus("保存中...", SVProgressHUD.SVProgressHUDMaskType.Clear);
 //                                saveChangesClick();
                                 ExecutorService executorService = Executors.newSingleThreadExecutor();

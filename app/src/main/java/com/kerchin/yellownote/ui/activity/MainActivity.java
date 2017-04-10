@@ -65,6 +65,7 @@ import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.CropUtil;
+import com.kerchin.yellownote.utilities.ImageUtil;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
@@ -131,6 +132,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private static final int REQUEST_LOAD_IMAGE = 100;
     private static final int REQUEST_QRCODE = 101;
+    private static final int REQUEST_IMAGE = 102;
     private static final int REQUEST_WRITE_PERMISSION = 102;
     private static final int REQUEST_CAMERA_PERMISSION = 103;
 
@@ -424,6 +426,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                 Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
                 startActivityForResult(intent, REQUEST_QRCODE);
                 overridePendingTransition(R.anim.head_in, R.anim.head_out);
+//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+//                intent.addCategory(Intent.CATEGORY_OPENABLE);
+//                intent.setType("image/*");
+//                startActivityForResult(intent, REQUEST_IMAGE);
                 break;
 //            case gotoRecognize:
 //                hideBtnAdd();
@@ -448,14 +454,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             if (requestCode == REQUEST_LOAD_IMAGE && null != data) {
                 final Uri selectedImage = data.getData();
                 CropUtil.startCropActivity(MainActivity.this, selectedImage);
-//                ThreadPool.getInstance().execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        dealPicFromSelect(selectedImage);
-//                    }
-//                });
             } else if (requestCode == REQUEST_QRCODE && data != null) {
                 dealQRCode(data);
+            } else if (requestCode == REQUEST_IMAGE && data != null) {
+                dealQRImage(data);
             } else if (requestCode == UCrop.REQUEST_CROP) {
                 handleCropResult(data);
             }
@@ -463,6 +465,27 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             handleCropError(data);
         }
 //        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void dealQRImage(Intent data) {
+        if (data != null) {
+            Uri uri = data.getData();
+            try {
+                CodeUtils.analyzeBitmap(ImageUtil.getImageAbsolutePath(this, uri), new CodeUtils.AnalyzeCallback() {
+                    @Override
+                    public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
+                        Toast.makeText(MainActivity.this, "解析结果:" + result, Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onAnalyzeFailed() {
+                        Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override

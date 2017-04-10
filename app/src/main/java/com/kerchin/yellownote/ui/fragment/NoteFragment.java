@@ -539,7 +539,8 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                                 if (noteAdapter != null && noteAdapter.getDeleteNum() > 0) {
                                     MainActivity mainActivity = (MainActivity) getActivity();
                                     dialog = DialogUtils.showIndeterminateProgressDialog(getActivity()
-                                            , false, "删除中...", "请稍候")
+                                            , false, DayNightHelper.getInstance(getContext()).getColorResId(getContext(), DayNightHelper.COLOR_SOFT_BACKGROUND)
+                                            , "删除中...", "请稍候")
                                             .titleColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                                             .contentColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_TEXT))
                                             .backgroundColor(mainActivity.mDayNightHelper.getColorRes(getActivity(), DayNightHelper.COLOR_SOFT_BACKGROUND))
