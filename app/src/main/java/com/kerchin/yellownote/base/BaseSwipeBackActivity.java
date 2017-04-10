@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivityHelper;
 import com.kerchin.yellownote.R;
+import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -47,7 +48,7 @@ public abstract class BaseSwipeBackActivity extends BaseActivity
         super.doSthBeforeSetView(savedInstanceState);
         mContext = this;
         mActivity = this;
-        immergeColor = R.color.colorPrimary;
+        immergeColor = DayNightHelper.getInstance(this).isDay() ? R.color.colorPrimary : R.color.dark_gray;
         mHelper = new SlidingActivityHelper(this);
         mHelper.onCreate(savedInstanceState);
         setSlidingActionBarEnabled(false);

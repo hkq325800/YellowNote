@@ -110,22 +110,22 @@ android {
     lintOptions {
         abortOnError false
     }
-//    signingConfigs {
-//        release {
-//            try {
-//                storeFile file("./keystore/release.keystore")
-//                storePassword "123456"
-//                keyAlias "test"
-//                keyPassword "123456"
-//            } catch (ex) {
-//                throw new InvalidUserDataException(ex.toString())
-//            }
-//        }
-//
-//        debug {
-//            storeFile file("./keystore/debug.keystore")
-//        }
-//    }
+    signingConfigs {
+        release {
+            try {
+                storeFile file("./keystore/yellownote.jks")
+                storePassword ""
+                keyAlias "yellownote"
+                keyPassword ""
+            } catch (ex) {
+                throw new InvalidUserDataException(ex.toString())
+            }
+        }
+
+        debug {
+            storeFile file("./keystore/debug.keystore")
+        }
+    }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
         minSdkVersion 16
@@ -140,7 +140,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true//false aRouter
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {

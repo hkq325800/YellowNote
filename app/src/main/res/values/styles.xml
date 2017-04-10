@@ -120,6 +120,7 @@
         <item name="clockSoftBackground">@color/white</item>
         <item name="clockTextColor">@color/gray</item>
         <item name="clockText">@color/colorPrimary</item>
+        <item name="clockNavBackground">@drawable/side_nav_bar</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->
@@ -138,6 +139,7 @@
         <item name="clockSoftBackground">@color/tip</item><!--菜单的颜色-->
         <item name="clockTextColor">@color/textColor</item>
         <item name="clockText">@color/textColor</item>
+        <item name="clockNavBackground">@drawable/side_nav_bar_night</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsTranslucent">true</item>
         <!--<item name="android:windowAnimationStyle">@null</item>-->

@@ -87,6 +87,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import zhy.com.highlight.HighLight;
 import zj.remote.baselibrary.util.BitmapUtil;
+import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
@@ -202,6 +203,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             folderFragment = FolderFragment.newInstance(null);
 //            }
         }
+        TinkerPatch.with().fetchPatchUpdate(true);
         //userIcon
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 , MyApplication.APP_MAIN_FOLDER_NAME);
@@ -297,11 +299,6 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                //TODO Tinker的生效就以下一句
-                TinkerPatch.with().fetchPatchUpdate(true);
-//                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
-//                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
-//                }
                 //menu数字
                 String note = PrimaryData.getInstance().getNoteSize() + "";
                 String folder = PrimaryData.getInstance().getFolderSize() + "";
@@ -817,6 +814,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         toggleThemeSetting();
         noteFragment.refreshUI(mDayNightHelper);
         folderFragment.refreshUI(mDayNightHelper);
+        ImmergeUtils.immerge(this, DayNightHelper.getInstance(this).isDay() ? R.color.colorPrimary : R.color.dark_gray);
 //        refreshStatusBar();//目前没用到
     }
 

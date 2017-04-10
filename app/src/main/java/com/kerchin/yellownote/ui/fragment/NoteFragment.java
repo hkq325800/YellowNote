@@ -112,14 +112,18 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                         }
                     });
                     mNoteList.setAdapter(noteAdapter);
-//                    mNoteList.setWaterDropListViewListener(NewNoteFragment.this);
                 } else {
                     noteAdapter.initListDelete();
-                    noteAdapter.replaceAll(list);
+                    if (list.size() == 0) {
+                        noteAdapter.clear();
+                    } else {
+                        noteAdapter.replaceAll(list);
+                    }
                 }
                 if (primaryData.listNote.size() == 0) {
                     Trace.d("handlerInNote handle4zero");
                     mNoteList.showEmptyView();
+                    mNoteList.animate().alpha(1).setDuration(500).start();
                 } else
                     mNoteList.animate().alpha(1).setDuration(500).start();//handle4firstGet
                 //借emptyClickCount做一个标志
@@ -193,6 +197,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     @Override
     protected void initView(View rootView) {
         mNoteList.setRefreshing(true);//显示加载环
+        mNoteList.setHasMore(false);
         mNoteList.setFooterViewText("加载中");
         mNoteList.setFooterViewTextColor(R.color.white);
         mNoteList.setFooterViewBackgroundColor(R.color.trans_black);
@@ -208,45 +213,6 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
         mNoteList.setEmptyView(view);
         mNoteList.setLinearLayout();//setGridLayout(int spanCount)/setStaggeredGridLayout(int spanCount)
         mNoteList.setOnPullLoadMoreListener(this);
-    }
-
-    public void emptyClick() {
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                //刷新界面
-                if (emptyClickCount < 3) {
-                    Trace.d("emptyClickCount" + emptyClickCount);
-                    emptyClickCount++;
-                    getDataHelper.respond();
-//                    mProgress.startProgress();//emptyClick
-                    getData();//statusRespond empty
-                    FolderFragment.isChanged4folder = true;//emptyClick
-                } else {
-//                    mProgress.startProgress();//refresh
-                    ThreadPool.getInstance().execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            //重新获取mHeaders listNote和mItems
-                            FolderFragment.isChanged4folder = true;//emptyClick
-                            MainActivity a = (MainActivity) getActivity();
-                            primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//emptyClick
-                                @Override
-                                public void justNow() {
-                                    if (primaryData.getNoteSize() == 0)
-                                        getDataHelper.firstGet();
-                                    else
-                                        getDataHelper.refresh();//MainActivity dataGot
-                                    handler.sendEmptyMessage(primaryData.listNote.size() == 0
-                                            ? GetDataHelper.handle4firstGet
-                                            : GetDataHelper.handle4refresh);
-                                }
-                            }, null);
-                        }
-                    });
-                }
-            }
-        }/*, 600*/);
     }
 
     @Override
@@ -288,7 +254,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     @Override
     public void onRefresh() {
         currentPage = 1;
-                Trace.d("onRefresh");
+        Trace.d("onRefresh");
         //单例服务
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -318,7 +284,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 });
             }
         });
-        mNoteList.setHasMore(true);
+//        mNoteList.setHasMore(true);//TODO 目前没有加载更多 而是一次加载
     }
 
     @Override

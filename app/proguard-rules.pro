@@ -150,12 +150,18 @@
 
 -dontwarn com.alibaba.android.arouter.**
 -dontnote com.alibaba.android.arouter.**
-#-dontwarn com.jeremyfeinstein.slidingmenu.lib.**
-#-dontnote com.jeremyfeinstein.slidingmenu.lib.**
-#-dontwarn com.cjj.sva.**
-##-dontwarn com.alibaba.fastjson.**
-#-dontnote com.alibaba.fastjson.**
-#-dontnote com.tinkerpatch.sdk.**
-#-dontnote com.tencent.tinker.**
-#-dontnote com.yalantis.ucrop.**
-#-dontnote com.afollestad.materialdialogs.**
+#eventBus
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}
+
+# microsoft vision
+-keep class com.microsoft.projectoxford.vision.** { *; }
+-keepclassmembers class com.microsoft.projectoxford.vision.** {*;}

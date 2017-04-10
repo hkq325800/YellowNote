@@ -11,8 +11,10 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.FLASHLIGHT" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
@@ -47,7 +49,7 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/TransparentThemeDay"
+            android:theme="@style/DayTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.activity.SetPatternActivity"
@@ -89,12 +91,14 @@
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
-        <activity android:name=".mvp.LoginActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".mvp.LoginActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.LoginNoActionBar"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden" />
-        <activity android:name=".ui.activity.RecognizeActivity"
+        <activity
+            android:name=".ui.activity.RecognizeActivity"
             android:screenOrientation="portrait" />
 
         <service android:name="com.kerchin.yellownote.data.service.DownloadService">
