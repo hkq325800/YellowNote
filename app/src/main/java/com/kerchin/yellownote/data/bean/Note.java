@@ -304,7 +304,7 @@ public class Note implements Serializable {
             helper.getNoteDao().delete(Note.this);
             Trace.d("deleteNote 成功");
             FolderFragment.isChanged4folder = true;//delete Main
-            PrimaryData.getInstance().removeNoteById(note.objectId);
+            PrimaryData.getInstance().removeNote(note);
             EventBus.getDefault().postSticky(from ? new NoteDeleteEvent(note) : new FolderDeleteEvent(note));
 //            if (handler != null)
 //                handler.sendMessage(msg);
@@ -318,7 +318,7 @@ public class Note implements Serializable {
                         helper.getNoteDao().delete(Note.this);
                         Trace.d("deleteNote 成功");
                         FolderFragment.isChanged4folder = true;//delete Main
-                        PrimaryData.getInstance().removeNoteById(note.objectId);
+                        PrimaryData.getInstance().removeNote(note);
                         EventBus.getDefault().postSticky(from ? new NoteDeleteEvent(note) : new FolderDeleteEvent(note));
 //                        if (handler != null)
 //                            handler.sendMessage(msg);
