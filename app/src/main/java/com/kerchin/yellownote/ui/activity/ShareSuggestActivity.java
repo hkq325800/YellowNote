@@ -23,7 +23,6 @@ import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.data.service.DownloadService;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 
@@ -68,6 +67,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
+    String downloadUrl;
     boolean isLatest = false;
     DayNightHelper mDayNightHelper;
 
@@ -123,15 +123,10 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     public void download() {
-        NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, DownloadService.class, getString(R.string.uri_download)
-                , getResources().getString(R.string.app_name) + versionCode + ".apk");
-        Trace.show(ShareSuggestActivity.this, "后台下载中...");
-//        if (!isLatest) {
-//            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, ShareSuggestService.class, getString(R.string.uri_download), getResources().getString(R.string.app_name) + versionCode + ".apk");
-//        } else {
-//            NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
-////            Trace.show(ShareSuggestActivity.this, "后台下载中...");
-//        }
+        NormalUtils.downloadByUri(ShareSuggestActivity.this, downloadUrl);
+//        NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, DownloadService.class, downloadUrl
+//                , getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        Trace.show(ShareSuggestActivity.this, "后台下载中...");
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -244,6 +239,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                         @Override
                         public void run() {
                             versionCode = version.getString("version_name");
+                            downloadUrl = version.getString("download_url");
                             if (versionCode.compareTo(appVersionNow) > 0) {
                                 String str = "最新版本:" + versionCode + "[查看内容]";
                                 mShareSuggestVersionTxt.setText(str);

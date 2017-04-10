@@ -137,7 +137,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private File savePath;
     private File userIconFile;
     private String userIconPath;
-    private String versionContent, versionCode;
+    private String versionContent, versionCode, downloadUrl;
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
@@ -529,6 +529,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
                     versionCode = version.getString("version_name");
                     versionContent = version.getString("version_content");
+                    downloadUrl = version.getString("download_url");
                     if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
                         //需要更新
                         handler.sendEmptyMessageDelayed(checkUpdate, 2000);
@@ -547,8 +548,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //        intent.putExtra("uriStr", getString(R.string.uri_download));
 //        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
 //        startService(intent);
-        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
-        Trace.show(MainActivity.this, "后台下载中...");
+        NormalUtils.downloadByUri(MainActivity.this, downloadUrl);
     }
 
     private void handleCropError(@NonNull Intent result) {
