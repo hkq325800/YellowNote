@@ -286,11 +286,11 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             String txtRePass = mLoginRePassEdt.getText().toString();
             String txtProv = mLoginProveEdt.getText().toString().trim().toLowerCase();
             String code = mLoginCaptcha.getvCode().toLowerCase();
-            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)
-                    && code.equals(txtProv)) {
-                mPresenter.signUp(txtUser, txtPass, txtProv);
-            } else if (!code.equals(txtProv)) {
-                Trace.show(mContext, "验证码错误");
+            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)) {
+                if (!code.equals(txtProv))
+                    Trace.show(mContext, "验证码错误");
+                else
+                    mPresenter.signUp(txtUser, txtPass, txtProv);
             } else
                 isEnter = false;//signUp tableCheck false
         }
@@ -317,11 +317,11 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             String txtRePass = mLoginRePassEdt.getText().toString();
             String txtProv = mLoginProveEdt.getText().toString();
             String code = mLoginCaptcha.getvCode().toLowerCase();
-            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)
-                    && code.equals(txtProv)) {
-                mPresenter.forget(txtUser, txtPass, txtProv);
-            } else if (!code.equals(txtProv)) {
-                Trace.show(mContext, "验证码错误");
+            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)) {
+                if (!code.equals(txtProv))
+                    Trace.show(mContext, "验证码错误");
+                else
+                    mPresenter.forget(txtUser, txtPass, txtProv);
             } else
                 isEnter = false;//forgetSecret tableCheck false
         }
