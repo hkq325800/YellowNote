@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/clockSoftBackground"
+    android:clickable="true"
     android:orientation="vertical">
 
     <include
@@ -15,8 +16,8 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingTop="16dp"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
 
         <ImageView
             android:layout_width="90dp"
@@ -29,7 +30,7 @@
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
             android:text="@string/describeOfMe"
-            android:textColor="@color/textColor" />
+            android:textColor="?attr/clockTextColor" />
     </LinearLayout>
 
     <ScrollView

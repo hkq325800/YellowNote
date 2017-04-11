@@ -40,7 +40,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -375,68 +374,29 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             }
                         }).show();
                 break;
-//            case gotoThank:
-//                ARouter.getInstance().build("/yellow/thank").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case gotoSecret:
-//                hideBtnAdd();//使进入
-//                ARouter.getInstance().build("/yellow/secret_menu").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case gotoSetting:
-//                hideBtnAdd();
-//                ARouter.getInstance().build("/yellow/share_suggest").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case showBtnAdd:
-//                mMainFab.animate()
-//                        .alpha(1)
-//                        .scaleX(1)
-//                        .scaleY(1)
-//                        .setListener(new AnimatorListenerAdapter() {
-//                            @Override
-//                            public void onAnimationStart(Animator animation) {
-//                                super.onAnimationStart(animation);
-////                                    if (mMainFab.getVisibility() == View.INVISIBLE)
-//                                mMainFab.setVisibility(View.VISIBLE);
-//                            }
-//                        })
-//                        .setDuration(300).start();
-//                break;
-//            case hideBtnAdd://必须使用animate直接设置会丢失十字
-//                mMainFab.animate()
-//                        .scaleX(0)
-//                        .scaleY(0)
-//                        .alpha(0)
-//                        .setListener(new AnimatorListenerAdapter() {
-//                            @Override
-//                            public void onAnimationEnd(Animator animation) {
-//                                super.onAnimationEnd(animation);
-////                                    if (mMainFab.getVisibility() == View.VISIBLE)
-//                                mMainFab.setVisibility(View.INVISIBLE);
-//                            }
-//                        })
-//                        .setDuration(50).start();
-//                break;
             case gotoQRCode:
-                Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                startActivityForResult(intent, REQUEST_QRCODE);
-                overridePendingTransition(R.anim.head_in, R.anim.head_out);
-//                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-//                intent.addCategory(Intent.CATEGORY_OPENABLE);
-//                intent.setType("image/*");
-//                startActivityForResult(intent, REQUEST_IMAGE);
+                dialog = new MaterialDialog.Builder(mContext)
+                        .title("选择识别方式")
+                        .backgroundColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_SOFT_BACKGROUND))
+                        .titleColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_TEXT))
+                        .items("拍照识别", "图片识别")
+                        .itemsColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_TEXT))
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                if (position == 0) {
+                                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                                    startActivityForResult(intent, REQUEST_QRCODE);
+                                    overridePendingTransition(R.anim.head_in, R.anim.head_out);
+                                } else if (position == 1) {
+                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent, REQUEST_IMAGE);
+                                }
+                            }
+                        }).show();
                 break;
-//            case gotoRecognize:
-//                hideBtnAdd();
-//                ARouter.getInstance().build("/yellow/recognize").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
             default:
                 break;
         }
@@ -459,33 +419,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             } else if (requestCode == REQUEST_IMAGE && data != null) {
                 dealQRImage(data);
             } else if (requestCode == UCrop.REQUEST_CROP) {
-                handleCropResult(data);
+                dealCropResult(data);
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
             handleCropError(data);
         }
 //        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void dealQRImage(Intent data) {
-        if (data != null) {
-            Uri uri = data.getData();
-            try {
-                CodeUtils.analyzeBitmap(ImageUtil.getImageAbsolutePath(this, uri), new CodeUtils.AnalyzeCallback() {
-                    @Override
-                    public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
-                        Toast.makeText(MainActivity.this, "解析结果:" + result, Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onAnalyzeFailed() {
-                        Toast.makeText(MainActivity.this, "解析二维码失败", Toast.LENGTH_LONG).show();
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -584,7 +523,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
     }
 
-    private void handleCropResult(@NonNull Intent result) {
+    private void dealCropResult(@NonNull Intent result) {
         //得到结果的uri
         final Uri resultUri = UCrop.getOutput(result);
         if (resultUri != null) {
@@ -597,7 +536,38 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //传送到结果界面预览
 //            ResultActivity.startWithUri(MainActivity.this, resultUri);
         } else {
-            Toast.makeText(MainActivity.this, "Cannot retrieve cropped image", Toast.LENGTH_SHORT).show();
+            Trace.show(mContext, "无法取回剪切过的图片");
+        }
+    }
+
+    private void dealQRImage(Intent data) {
+        if (data != null) {
+            Uri uri = data.getData();
+            try {
+                CodeUtils.analyzeBitmap(ImageUtil.getImageAbsolutePath(this, uri), new CodeUtils.AnalyzeCallback() {
+                    @Override
+                    public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
+                        if (result != null && result.startsWith("www."))
+                            result = "http://" + result;
+                        //用浏览器打开
+                        try {
+                            NormalUtils.downloadByUri(MainActivity.this, result);
+                            Trace.show(mContext, "发现二维码中的网址，将用浏览器打开：\n" + result, false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ClipBoardUtils.copy(result, MainActivity.this);
+                            Trace.show(mContext, "已将二维码数据复制到剪贴板：\n" + result, false);
+                        }
+                    }
+
+                    @Override
+                    public void onAnalyzeFailed() {
+                        Trace.show(mContext, "解析二维码失败");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
