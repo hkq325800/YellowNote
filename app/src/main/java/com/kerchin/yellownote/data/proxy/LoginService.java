@@ -114,12 +114,26 @@ public class LoginService {
         AVOSCloud.verifySMSCode(txtProv, txtUser);
     }
 
-    //获取文件
+    /**
+     * 获取文件
+     *
+     * @param userIcon
+     * @return
+     * @throws AVException
+     * @throws FileNotFoundException
+     */
     public static AVFile getUserIcon(final String userIcon) throws AVException, FileNotFoundException {
         return AVFile.withObjectId(userIcon);
     }
 
-    //保存文件
+    /**
+     * 保存文件
+     *
+     * @param path
+     * @return
+     * @throws AVException
+     * @throws FileNotFoundException
+     */
     public static String saveUserIcon(String path) throws AVException, FileNotFoundException {
         String mUser = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
         AVFile file = AVFile.withAbsoluteLocalPath(mUser + ".jpg", path);
@@ -132,7 +146,14 @@ public class LoginService {
         return file.getObjectId();
     }
 
-    //保存文件
+    /**
+     * 通过id保存用户icon
+     *
+     * @param path
+     * @return
+     * @throws AVException
+     * @throws FileNotFoundException
+     */
     public static String saveUserIconById(String path) throws AVException, FileNotFoundException {
         String mUser = PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context);
         AVFile file = AVFile.withObjectId(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
@@ -147,6 +168,12 @@ public class LoginService {
         return newFile.getObjectId();
     }
 
+    /**
+     * 应用是否允许注册
+     *
+     * @return
+     * @throws AVException
+     */
     public static boolean isAbleToSignIn() throws AVException {
         AVQuery<AVObject> query = new AVQuery<>("App");
         return query.getFirst().getBoolean("app_ableToSignIn");
