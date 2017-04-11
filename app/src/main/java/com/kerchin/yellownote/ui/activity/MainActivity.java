@@ -466,13 +466,15 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         if (TextUtils.isEmpty(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context))) {//使用默认头像
             Trace.d("getLocalMipmap");
             mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-        } else if (userIconFile.exists()) {//本地缓存的头像文件存在
-            Trace.d("getLocalBitmap");
-            mNavHeaderMainImg.setImageBitmap(BitmapUtil.getLocalBitmap(userIconPath));
-//            if (!MyApplication.userIcon.equals(
-//                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
-            setUserIconByNet();
-        } else//userIcon存在但是本地文件不存在 下载并保存、设置
+        }
+//        else if (userIconFile.exists()) {//本地缓存的头像文件存在
+//            Trace.d("getLocalBitmap");
+//            mNavHeaderMainImg.setImageBitmap(BitmapUtil.getLocalBitmap(userIconPath));
+////            if (!MyApplication.userIcon.equals(
+////                    PreferenceUtils.getString(Config.KEY_USERICON, "", MainActivity.this)))
+//            setUserIconByNet();
+//        }
+        else//userIcon存在但是本地文件不存在 下载并保存、设置
             setUserIconByNet();
     }
 
