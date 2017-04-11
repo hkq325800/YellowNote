@@ -21,25 +21,25 @@ public abstract class LoginAbstract extends MyOrmLiteBaseActivity<OrmLiteHelper>
      */
     protected abstract void forgetSecret();
 
-    /**
-     * 发送验证码(请求)
-     * CountDownTimer显示倒计时
-     *
-     * @param isSignUp 判断是注册还是找回密码
-     * @param txtUser  用户名
-     * @param count    可用时限
-     */
-    protected abstract void sendProv(boolean isSignUp, String txtUser, int count);
+//    /**
+//     * 发送验证码(请求)
+//     * CountDownTimer显示倒计时
+//     *
+//     * @param isSignUp 判断是注册还是找回密码
+//     * @param txtUser  用户名
+//     * @param count    可用时限
+//     */
+//    protected abstract void sendProv(boolean isSignUp, String txtUser, int count);
 
-    /**
-     * 短信验证(验证)
-     * 以手机号和验证码检查验证码的正确性
-     * 由于多为子线程查询 查询的状态 smsStatus 为全局
-     *
-     * @param txtProv 验证码
-     * @param txtUser 用户名
-     */
-    protected abstract void smsVerify(String txtProv, String txtUser);
+//    /**
+//     * 短信验证(验证)
+//     * 以手机号和验证码检查验证码的正确性
+//     * 由于多为子线程查询 查询的状态 smsStatus 为全局
+//     *
+//     * @param txtProv 验证码
+//     * @param txtUser 用户名
+//     */
+//    protected abstract void smsVerify(String txtProv, String txtUser);
 
     /**
      * 登录操作确认(查询)

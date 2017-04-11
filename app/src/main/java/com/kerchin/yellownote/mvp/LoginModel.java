@@ -97,7 +97,7 @@ public class LoginModel {
 
     public boolean tableCheck(Context context, String txtUser, String txtPass, String txtRePass, String txtProv) {
         if (txtUser.equals("") || txtUser.length() != 11) {
-            Trace.show(context, "请输入11位手机号并接收验证码");
+            Trace.show(context, "请输入11位手机号");
             return false;
         } else if (txtRePass.equals("") | txtPass.equals("")) {
             Trace.show(context, "请输入密码并重复一次");
@@ -108,33 +108,33 @@ public class LoginModel {
         } else if (txtPass.length() < 6) {
             Trace.show(context, "密码长度需大于6位");
             return false;
-        } else if (txtProv.length() != 6) {
-            Trace.show(context, "请输入6位验证码");
+        } else if (txtProv.length() != 4) {
+            Trace.show(context, "请输入4位验证码");
             return false;
         } else {
             return true;
         }
     }
 
-    public void smsVerify(final String txtProv, final String txtUser, final NonCallback callback) {
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LoginService.smsVerify(txtProv, txtUser);
-                    doThisOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.isTrue();
-                        }
-                    });
-                } catch (AVException e) {
-//                    callback.isFalse();
-                    callback.isException(e);
-                }
-            }
-        });
-    }
+//    public void smsVerify(final String txtProv, final String txtUser, final NonCallback callback) {
+//        ThreadPool.getInstance().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    LoginService.smsVerify(txtProv, txtUser);
+//                    doThisOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            callback.isTrue();
+//                        }
+//                    });
+//                } catch (AVException e) {
+////                    callback.isFalse();
+//                    callback.isException(e);
+//                }
+//            }
+//        });
+//    }
 
     public void forget(final String txtUser, final String txtPass, final NonCallback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
@@ -156,32 +156,32 @@ public class LoginModel {
         });
     }
 
-    /**
-     * 未调用callback.isTrue()
-     *
-     * @param txtUser
-     * @param isSignUp
-     * @param validPeriod
-     * @param callback
-     */
-    public void sendProv(final String txtUser, final boolean isSignUp, final int validPeriod, final Callback callback) {
-        ThreadPool.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    LoginService.sendProv(txtUser, isSignUp, validPeriod);
-                } catch (AVException e) {
-                    doThisOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            callback.isFalse();
-                        }
-                    });
+//    /**
+//     * 未调用callback.isTrue()
+//     *
+//     * @param txtUser
+//     * @param isSignUp
+//     * @param validPeriod
+//     * @param callback
+//     */
+//    public void sendProv(final String txtUser, final boolean isSignUp, final int validPeriod, final Callback callback) {
+//        ThreadPool.getInstance().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    LoginService.sendProv(txtUser, isSignUp, validPeriod);
+//                } catch (AVException e) {
+//                    doThisOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            callback.isFalse();
+//                        }
+//                    });
 //                    callback.isException(e);
-                }
-            }
-        });
-    }
+//                }
+//            }
+//        });
+//    }
 
     public void createDefaultFolder(final String txtUser, final CreateCallback callback) {
         ThreadPool.getInstance().execute(new Runnable() {

@@ -742,6 +742,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             PreferenceUtils.putString(Config.KEY_DEFAULT_FOLDER, "", MainActivity.this);
                             PreferenceUtils.putBoolean(Config.KEY_CAN_OFFLINE, true, MainActivity.this);
                             PreferenceUtils.putString(Config.KEY_WHEN_CHECK_UPDATE, "", MainActivity.this);
+                            PreferenceUtils.putString(Config.KEY_USERICON, "", MainActivity.this);
                             ARouter.getInstance().build("/yellow/login").withBoolean("logoutFlag", true).navigation();
 //                            Intent intent = new Intent();
 //                            intent.setClass(MainActivity.this, LoginActivity.class);

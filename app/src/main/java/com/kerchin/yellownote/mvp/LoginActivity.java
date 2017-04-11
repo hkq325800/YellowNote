@@ -2,7 +2,6 @@ package com.kerchin.yellownote.mvp;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -18,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.alibaba.android.arouter.facade.annotation.Autowired;
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
@@ -27,6 +27,7 @@ import com.kerchin.yellownote.base.MyOrmLiteBaseActivity;
 import com.kerchin.yellownote.data.bean.PrimaryData;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
+import com.kerchin.yellownote.widget.VerificationCodeView;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -57,8 +58,10 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     EditText mLoginProveEdt;
     @BindView(R.id.mLoginRePassEdt)
     EditText mLoginRePassEdt;
-    @BindView(R.id.mLoginSendProvBtn)
-    Button mLoginSendProvBtn;
+    //    @BindView(R.id.mLoginSendProvBtn)
+//    Button mLoginSendProvBtn;
+    @BindView(R.id.mLoginCaptcha)
+    VerificationCodeView mLoginCaptcha;
     @BindView(R.id.mLoginBtn)
     Button mLoginBtn;
     @BindView(R.id.mLoginSignUpBtn)
@@ -73,6 +76,8 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     TextView mLoginMineTxt;
     @BindView(R.id.mLoginIconLiL)
     LinearLayout mLoginIconLiL;
+    @Autowired
+    boolean logoutFlag;
     private static Long mExitTime = (long) 0;//退出时间
     private boolean isEnter = false;
     private int repeatCount = 0;
@@ -97,6 +102,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     protected void doSthBeforeSetView(Bundle savedInstanceState) {
         super.doSthBeforeSetView(savedInstanceState);
         closeSliding();
+        logoutFlag = getIntent().getBooleanExtra("logoutFlag", false);
     }
 
     @Override
@@ -127,7 +133,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         mLoginMineTxt.setText(str);
         SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginIconLiL);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", mContext);
-        if (!TextUtils.isEmpty(user)) {
+        if (!TextUtils.isEmpty(user) && !logoutFlag) {
             mLoginUserEdt.setText(user);
             mLoginUserEdt.setSelection(user.length());
             mLoginPassEdt.requestFocus();
@@ -138,6 +144,15 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
                 }
             }, 800);
             //干脆地使用初始设置 键盘自动弹出
+        } else if (!TextUtils.isEmpty(user) && logoutFlag) {
+            mLoginUserEdt.setText(user);
+            mLoginUserEdt.setSelection(user.length());
+            mLoginUserTextInput.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    KeyboardUtil.showKeyboard(mActivity, mLoginUserTextInput);
+                }
+            }, 800);
         } else {
             mLoginUserTextInput.postDelayed(new Runnable() {
                 @Override
@@ -246,6 +261,11 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         }
     }
 
+    @OnClick(R.id.mLoginCaptcha)
+    public void changeCaptcha() {
+        mLoginCaptcha.refreshCode();
+    }
+
     /**
      * ok
      */
@@ -264,10 +284,14 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             String txtUser = mLoginUserEdt.getText().toString();
             String txtPass = mLoginPassEdt.getText().toString();
             String txtRePass = mLoginRePassEdt.getText().toString();
-            String txtProv = mLoginProveEdt.getText().toString();
-            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv))
+            String txtProv = mLoginProveEdt.getText().toString().trim().toLowerCase();
+            String code = mLoginCaptcha.getvCode().toLowerCase();
+            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)
+                    && code.equals(txtProv)) {
                 mPresenter.signUp(txtUser, txtPass, txtProv);
-            else
+            } else if (!code.equals(txtProv)) {
+                Trace.show(mContext, "验证码错误");
+            } else
                 isEnter = false;//signUp tableCheck false
         }
     }
@@ -292,9 +316,13 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             String txtPass = mLoginPassEdt.getText().toString();
             String txtRePass = mLoginRePassEdt.getText().toString();
             String txtProv = mLoginProveEdt.getText().toString();
-            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv))
+            String code = mLoginCaptcha.getvCode().toLowerCase();
+            if (mPresenter.tableCheck(mContext, txtUser, txtPass, txtRePass, txtProv)
+                    && code.equals(txtProv)) {
                 mPresenter.forget(txtUser, txtPass, txtProv);
-            else
+            } else if (!code.equals(txtProv)) {
+                Trace.show(mContext, "验证码错误");
+            } else
                 isEnter = false;//forgetSecret tableCheck false
         }
     }
@@ -302,20 +330,6 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     /**
      * ok
      */
-    @OnClick(R.id.mLoginSendProvBtn)
-    public void sendProvClick() {
-        String txtForget = mLoginForgetBtn.getText().toString();
-        final String txtUser = mLoginUserEdt.getText().toString();
-        if (txtUser.equals("") || txtUser.length() != 11) {
-            Trace.show(getApplicationContext(), "请先填写11位手机号");
-        } else {
-            if (txtForget.equals("找回密码")) {//忘记密码
-                mPresenter.forgetSendProv(txtUser, false, Config.timeout_prov);
-            } else if (txtForget.equals("忘记密码")) {//注册
-                mPresenter.signUpSendProv(txtUser, true, Config.timeout_prov);
-            }
-        }
-    }
 
     protected void goToMain() {
         //存入shared
@@ -381,40 +395,22 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     }
 
     @Override
-    public CountDownTimer startSendProv() {
-        mLoginSendProvBtn.setEnabled(false);
-        mLoginUserEdt.setEnabled(false);
-        return new CountDownTimer(Config.timeout_prov * 60 * 1000, 1000) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-                String str = "发送成功" + (millisUntilFinished / 1000);
-                mLoginSendProvBtn.setText(str);
-            }
-
-            @Override
-            public void onFinish() {
-                mLoginSendProvBtn.setEnabled(true);
-                mLoginUserEdt.setEnabled(true);
-                mLoginSendProvBtn.setText("发送验证码");
-            }
-        }.start();
-    }
-
-    @Override
-    public void sendProvFailed(CountDownTimer cdt) {
-        cdt.cancel();
-        mLoginSendProvBtn.setEnabled(true);
-        mLoginUserEdt.setEnabled(true);
-        mLoginSendProvBtn.setText("发送验证码");
-        Trace.show(mActivity, "验证码发送失败");
-    }
-
-    @Override
     public void signUpSuccess(String txtUser) {
         PreferenceUtils.getString(Config.KEY_DEFAULT_FOLDER, "", mActivity);
         Trace.e("signUpVerify 用户注册完成");
         Trace.show(mActivity, txtUser + "注册成功");
         goToMain();//注册登录
+    }
+
+    @Override
+    public void forgetSuccess() {
+        String txtUser = mLoginUserEdt.getText().toString();
+        String txtPass = mLoginPassEdt.getText().toString();
+        SoftKeyboardUtils.hideInputMode(mActivity
+                , (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE));
+        dialog = DialogUtils.showIndeterminateProgressDialog(mActivity, false
+                , "登录中", "请稍候").show();
+        mPresenter.login(txtUser, txtPass);
     }
 
     @Override
@@ -426,4 +422,48 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     public void doThisOnUiThread(Runnable runnable) {
         runOnUiThread(runnable);
     }
+
+//    @OnClick(R.id.mLoginSendProvBtn)
+//    public void sendProvClick() {
+//        String txtForget = mLoginForgetBtn.getText().toString();
+//        final String txtUser = mLoginUserEdt.getText().toString();
+//        if (txtUser.equals("") || txtUser.length() != 11) {
+//            Trace.show(getApplicationContext(), "请先填写11位手机号");
+//        } else {
+//            if (txtForget.equals("找回密码")) {//忘记密码
+//                mPresenter.forgetSendProv(txtUser, false, Config.timeout_prov);
+//            } else if (txtForget.equals("忘记密码")) {//注册
+//                mPresenter.signUpSendProv(txtUser, true, Config.timeout_prov);
+//            }
+//        }
+//    }
+
+//    @Override
+//    public CountDownTimer startSendProv() {
+//        mLoginSendProvBtn.setEnabled(false);
+//        mLoginUserEdt.setEnabled(false);
+//        return new CountDownTimer(Config.timeout_prov * 60 * 1000, 1000) {
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//                String str = "发送成功" + (millisUntilFinished / 1000);
+//                mLoginSendProvBtn.setText(str);
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                mLoginSendProvBtn.setEnabled(true);
+//                mLoginUserEdt.setEnabled(true);
+//                mLoginSendProvBtn.setText("发送验证码");
+//            }
+//        }.start();
+//    }
+
+//    @Override
+//    public void sendProvFailed(CountDownTimer cdt) {
+//        cdt.cancel();
+//        mLoginSendProvBtn.setEnabled(true);
+//        mLoginUserEdt.setEnabled(true);
+//        mLoginSendProvBtn.setText("发送验证码");
+//        Trace.show(mActivity, "验证码发送失败");
+//    }
 }

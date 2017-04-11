@@ -129,7 +129,14 @@
                         android:textCursorDrawable="@null" />
                 </android.support.design.widget.TextInputLayout>
 
-                <Button
+                <com.kerchin.yellownote.widget.VerificationCodeView
+                    android:id="@+id/mLoginCaptcha"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@id/mLoginRePassTextInput"
+                    android:layout_width="80dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_height="40dp" />
+                <!--<Button
                     android:id="@+id/mLoginSendProvBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -139,7 +146,7 @@
                     android:background="@drawable/selector_navigation_button"
                     android:minWidth="100dp"
                     android:text="获取验证码"
-                    android:textColor="@color/textColor" />
+                    android:textColor="@color/textColor" />-->
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/mLoginSendProvTextInput"
@@ -147,15 +154,15 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_below="@id/mLoginRePassTextInput"
-                    android:layout_toLeftOf="@id/mLoginSendProvBtn">
+                    android:layout_toLeftOf="@id/mLoginCaptcha">
 
                     <EditText
                         android:id="@+id/mLoginProveEdt"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:hint="请输入6位验证码"
-                        android:inputType="number"
+                        android:hint="请输入4位验证码"
+                        android:inputType="text"
                         android:paddingBottom="10dp"
                         android:paddingTop="10dp"
                         android:textColor="@color/textColor"

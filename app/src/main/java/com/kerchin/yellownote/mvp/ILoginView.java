@@ -1,7 +1,5 @@
 package com.kerchin.yellownote.mvp;
 
-import android.os.CountDownTimer;
-
 import com.avos.avoscloud.AVException;
 
 /**
@@ -15,11 +13,13 @@ public interface ILoginView {
 
     void saySth(String s);
 
-    CountDownTimer startSendProv();
+//    CountDownTimer startSendProv();
 
-    void sendProvFailed(CountDownTimer cdt);
+//    void sendProvFailed(CountDownTimer cdt);
 
     void signUpSuccess(String txtUser);
+
+    void forgetSuccess();
 
     void changeEnter();
 }

@@ -19,6 +19,9 @@
     <attr name="clockTextColor" format="color" />
     <attr name="clockText" format="color" />
     <attr name="clockNavBackground" format="reference" />
+    <declare-styleable name="VerificationCodeView">
+        <attr name="isNetCode" format="boolean"/>
+    </declare-styleable>
     <!--<declare-styleable name="SnappingStepper">
         <attr name="min" format="integer"/>
         <attr name="max" format="integer"/>
