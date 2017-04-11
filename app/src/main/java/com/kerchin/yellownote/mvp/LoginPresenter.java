@@ -10,9 +10,9 @@ import com.avos.avoscloud.AVException;
  * Created by hkq325800 on 2017/2/23.
  */
 
-public class LoginPresenter extends BasePresenter<LoginModel, ILoginView> {
-    public LoginPresenter(ILoginView view) {
-        setVM(new LoginModel(), view);
+public class LoginPresenter extends BasePresenter<LoginModel, LoginActivity> {
+    public LoginPresenter(LoginActivity activity) {
+        setVM(new LoginModel(activity), activity);
     }
 
     public void login(final String txtUser, final String txtPass) {
