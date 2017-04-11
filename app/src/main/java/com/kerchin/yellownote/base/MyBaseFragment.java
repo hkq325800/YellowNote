@@ -18,7 +18,7 @@ public abstract class MyBaseFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);//TODO 不该放这里
     }
 
     public void dismissDialog() {

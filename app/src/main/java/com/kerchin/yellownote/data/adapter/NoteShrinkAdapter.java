@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class NoteShrinkAdapter extends SuperAdapter<Note> {
     private SparseArray<View> mViews;
-    public volatile List<Note> listDelete;//用于记录此次删除行为的note
+    private volatile List<Note> listDelete;//用于记录此次删除行为的note
     public volatile boolean isDelete = false;
     private int colorA, colorB;
 
@@ -32,7 +32,7 @@ public class NoteShrinkAdapter extends SuperAdapter<Note> {
     @Override
     public void onBind(final SuperViewHolder holder, int viewType, final int position, Note note) {
 //        if (mViews.get(position) == null)
-        mViews.put(position, holder.itemView);
+            mViews.put(position, holder.itemView);
         holder.setText(R.id.mNoteItemTitleTxt, note.getTitle());
         holder.setText(R.id.mNoteItemDateTxt, note.getShowDate());
         holder.setText(R.id.mNoteItemPreviewTxt, note.getPreview());

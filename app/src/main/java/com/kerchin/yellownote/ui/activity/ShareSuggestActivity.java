@@ -23,9 +23,9 @@ import com.kerchin.global.Config;
 import com.kerchin.yellownote.R;
 import com.kerchin.yellownote.base.BaseSwipeBackActivity;
 import com.kerchin.yellownote.data.proxy.ShareSuggestService;
-import com.kerchin.yellownote.data.service.DownloadService;
 import com.kerchin.yellownote.global.MyApplication;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
+import com.uuzuche.lib_zxing.activity.CodeUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,6 +34,7 @@ import java.util.Date;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import zj.remote.baselibrary.util.DisplayUtil;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
@@ -68,6 +69,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     final static int deadLine = 30000;
     String appVersionNow;
     String versionCode;
+    String downloadUrl;
     boolean isLatest = false;
     DayNightHelper mDayNightHelper;
 
@@ -86,6 +88,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     String SHARED_FILE_NAME;
 
     /**
+     * 将资源文件保存至本地
      * 初始化分享的图片
      */
     private File initImagePath() {
@@ -98,14 +101,19 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
             }
             File file = new File(SHARED_FILE_NAME);
             //判断图片是否存此文件夹中
-            if (!file.exists()) {
-                file.createNewFile();
-                Bitmap pic = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_code);
-                FileOutputStream fos = new FileOutputStream(file);
-                pic.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.flush();
-                fos.close();
-            }
+//            if (!file.exists()) {
+            file.createNewFile();
+            //保存imageView图片到本地
+            mShareSuggestCodeImg.setDrawingCacheEnabled(true);//开启catch，开启之后才能获取ImageView中的bitmap
+            Bitmap bitmap = mShareSuggestCodeImg.getDrawingCache();//获取imageview中的图像
+            //保存资源文件到本地
+//            Bitmap pic = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_code);
+            FileOutputStream fos = new FileOutputStream(file);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.flush();
+            fos.close();
+            mShareSuggestCodeImg.setDrawingCacheEnabled(false);//关闭catch
+//            }
             return file;
         } catch (Throwable t) {
             t.printStackTrace();
@@ -123,15 +131,10 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
     }
 
     public void download() {
-        NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, DownloadService.class, getString(R.string.uri_download)
-                , getResources().getString(R.string.app_name) + versionCode + ".apk");
-        Trace.show(ShareSuggestActivity.this, "后台下载中...");
-//        if (!isLatest) {
-//            NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, ShareSuggestService.class, getString(R.string.uri_download), getResources().getString(R.string.app_name) + versionCode + ".apk");
-//        } else {
-//            NormalUtils.downloadByUri(ShareSuggestActivity.this, getString(R.string.uri_download));
-////            Trace.show(ShareSuggestActivity.this, "后台下载中...");
-//        }
+        NormalUtils.downloadByUri(ShareSuggestActivity.this, downloadUrl);
+//        NormalUtils.downloadByWeb(ShareSuggestActivity.this, versionCode, DownloadService.class, downloadUrl
+//                , getResources().getString(R.string.app_name) + versionCode + ".apk");
+//        Trace.show(ShareSuggestActivity.this, "后台下载中...");
     }
 
     @OnClick(R.id.mNavigationRightBtn)
@@ -244,6 +247,11 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                         @Override
                         public void run() {
                             versionCode = version.getString("version_name");
+                            downloadUrl = version.getString("download_url");
+//                            Bitmap mBitmap = CodeUtils.createImage(downloadUrl, DisplayUtil.dp2px(mContext, 150), DisplayUtil.dp2px(mContext, 150), null);
+                            Bitmap mBitmap = CodeUtils.createImage(downloadUrl, DisplayUtil.dp2px(mContext, 200), DisplayUtil.dp2px(mContext, 200)
+                                    , BitmapFactory.decodeResource(getResources(), R.mipmap.icon));
+                            mShareSuggestCodeImg.setImageBitmap(mBitmap);
                             if (versionCode.compareTo(appVersionNow) > 0) {
                                 String str = "最新版本:" + versionCode + "[查看内容]";
                                 mShareSuggestVersionTxt.setText(str);
@@ -254,7 +262,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("升级版本:" + versionCode)
                                                 .content(version.getString("version_content"))
-                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .positiveText("下载")
@@ -277,7 +285,7 @@ public class ShareSuggestActivity extends BaseSwipeBackActivity {
                                     public void onClick(View v) {
                                         dialog = new MaterialDialog.Builder(ShareSuggestActivity.this)
                                                 .title("当前版本:" + versionCode)
-                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_BACKGROUND))
+                                                .backgroundColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                                                 .titleColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .contentColor(mDayNightHelper.getColorRes(ShareSuggestActivity.this, DayNightHelper.COLOR_TEXT))
                                                 .content(version.getString("version_content")).show();

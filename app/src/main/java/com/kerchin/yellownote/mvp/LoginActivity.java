@@ -40,10 +40,11 @@ import zj.remote.baselibrary.util.SupportSoftKeyboardUtil;
 import zj.remote.baselibrary.util.Trace;
 
 /**
+ * activity作为view接口的实现，同事持有presenter的实例，在适当的时候调用presenter，通过逻辑处理后再由model进行具体实现
  * Created by hkq325800 on 2017/2/23.
  */
 @Route(path = "/yellow/login")
-public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView, UiCallback {
+public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView/*, UiCallback*/ {
     @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
     @BindView(R.id.mLoginUserTextInput)
@@ -421,8 +422,8 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         isEnter = false;
     }
 
-    @Override
-    public void doThisOnUiThread(Runnable runnable) {
-        runOnUiThread(runnable);
-    }
+//    @Override
+//    public void doThisOnUiThread(Runnable runnable) {
+//        runOnUiThread(runnable);
+//    }
 }

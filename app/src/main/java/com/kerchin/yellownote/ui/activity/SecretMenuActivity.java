@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -45,12 +44,8 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     Button mNavigationRightBtn;
     //    @BindView(R.id.mSecretMenuPatternToggle)
 //    ToggleButton mSecretMenuPatternToggle;
-    @BindView(R.id.mSecretMenuPatternEditLiL)
-    LinearLayout mSecretMenuPatternEditLiL;
     @BindView(R.id.mSecretMenuPatternEditTxt)
     TextView mSecretMenuPatternEditTxt;
-    @BindView(R.id.mSecretMenuPatternToggleLiL)
-    LinearLayout mSecretMenuPatternToggleLiL;
     @BindView(R.id.mSecretMenuPatternToggleTxt)
     TextView mSecretMenuPatternToggleTxt;
     private final static int requestForPattern = 1;//手势开关
@@ -106,7 +101,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mSecretMenuPatternToggleLiL.setClickable(false);
+                            mSecretMenuPatternToggleTxt.setClickable(false);
                             mSecretMenuPatternToggleTxt.setTextColor(getResources()
                                     .getColor(R.color.light_gray));
                             Trace.show(getApplicationContext(), "网络离线无法设置手势密码");
@@ -156,7 +151,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     /**
      * 登录密码
      */
-    @OnClick(R.id.mSecretMenuLoginLiL)
+    @OnClick(R.id.mSecretMenuLoginTxt)
     public void gotoSecret() {
         ARouter.getInstance().build("/yellow/secret").navigation();
         overridePendingTransition(R.anim.push_left_in,
@@ -166,9 +161,9 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     /**
      * 手势开关
      */
-    @OnClick(R.id.mSecretMenuPatternToggleLiL)
+    @OnClick(R.id.mSecretMenuPatternToggleTxt)
     public void gotoSecretSet() {
-        mSecretMenuPatternToggleLiL.setClickable(false);
+        mSecretMenuPatternToggleTxt.setClickable(false);
 //        mSecretMenuPatternToggle.setChecked(!mSecretMenuPatternToggle.isChecked());
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
@@ -176,7 +171,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                 try {
                     final String str = SecretService.getPatternStr(PreferenceUtils.getString(Config.KEY_USER, "", MyApplication.context));
                     if (hasPattern == !TextUtils.isEmpty(str)) {//与网络相同
-                        mSecretMenuPatternToggleLiL.setClickable(true);
+                        mSecretMenuPatternToggleTxt.setClickable(true);
                         ARouter.getInstance()
                                 .build(hasPattern ? "/yellow/confirm" : "/yellow/set_pattern")
                                 .navigation(SecretMenuActivity.this, requestForPattern);
@@ -190,14 +185,14 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                             public void run() {
                                 PatternLockUtils.setPattern(str, getApplicationContext());
                                 enablePattern(hasPattern);
-                                mSecretMenuPatternToggleLiL.setClickable(true);
+                                mSecretMenuPatternToggleTxt.setClickable(true);
                                 Trace.show(getApplicationContext(), "密码在别处被改动,请注意数据安全!");
                             }
                         });
                     }
                 } catch (AVException e) {
                     e.printStackTrace();
-                    mSecretMenuPatternToggleLiL.setClickable(true);
+                    mSecretMenuPatternToggleTxt.setClickable(true);
                 }
             }
         });
@@ -206,9 +201,9 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     /**
      * 手势修改
      */
-    @OnClick(R.id.mSecretMenuPatternEditLiL)
+    @OnClick(R.id.mSecretMenuPatternEditTxt)
     public void gotoSecretModify() {
-        mSecretMenuPatternEditLiL.setClickable(false);
+        mSecretMenuPatternEditTxt.setClickable(false);
         ThreadPool.getInstance().execute(new Runnable() {
             @Override
             public void run() {
@@ -223,10 +218,10 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
                             }
                         });
                         PatternLockUtils.clearLocalPattern(getApplicationContext());
-                        mSecretMenuPatternEditLiL.setClickable(true);
+                        mSecretMenuPatternEditTxt.setClickable(true);
                         Trace.show(getApplicationContext(), "密码在别处被改动,请注意数据安全!");
                     } else {//与网络相同
-                        mSecretMenuPatternEditLiL.setClickable(true);
+                        mSecretMenuPatternEditTxt.setClickable(true);
                         ARouter.getInstance().build("/yellow/confirm").navigation(SecretMenuActivity.this, requestForConfirmPattern);
                     }
                 } catch (AVException e) {
@@ -237,7 +232,7 @@ public class SecretMenuActivity extends BaseSwipeBackActivity {
     }
 
     private void enablePattern(boolean enable) {
-        mSecretMenuPatternEditLiL.setClickable(enable);
+        mSecretMenuPatternEditTxt.setClickable(enable);
         if (enable)
             mSecretMenuPatternEditTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
         else

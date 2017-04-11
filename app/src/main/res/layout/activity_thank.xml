@@ -2,6 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/clockSoftBackground"
+    android:clickable="true"
     android:orientation="vertical">
 
     <include
@@ -12,10 +14,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:paddingBottom="16dp">
+        android:paddingBottom="16dp"
+        android:paddingTop="16dp">
 
         <ImageView
             android:layout_width="90dp"
@@ -28,14 +30,13 @@
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
             android:text="@string/describeOfMe"
-            android:textColor="@color/textColor" />
+            android:textColor="?attr/clockTextColor" />
     </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="?attr/clockBackground">
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"

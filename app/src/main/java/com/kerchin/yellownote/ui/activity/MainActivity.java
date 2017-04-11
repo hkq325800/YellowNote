@@ -40,7 +40,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -49,7 +48,7 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.GetDataCallback;
+import com.bumptech.glide.Glide;
 import com.kerchin.global.Config;
 import com.kerchin.global.DateUtil;
 import com.kerchin.yellownote.BuildConfig;
@@ -65,6 +64,7 @@ import com.kerchin.yellownote.ui.fragment.FolderFragment;
 import com.kerchin.yellownote.ui.fragment.NoteFragment;
 import com.kerchin.yellownote.utilities.ClipBoardUtils;
 import com.kerchin.yellownote.utilities.CropUtil;
+import com.kerchin.yellownote.utilities.ImageUtil;
 import com.kerchin.yellownote.utilities.PatternLockUtils;
 import com.kerchin.yellownote.utilities.helper.DayNightHelper;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
@@ -87,6 +87,7 @@ import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import zhy.com.highlight.HighLight;
 import zj.remote.baselibrary.util.BitmapUtil;
+import zj.remote.baselibrary.util.Immerge.ImmergeUtils;
 import zj.remote.baselibrary.util.NormalUtils;
 import zj.remote.baselibrary.util.PreferenceUtils;
 import zj.remote.baselibrary.util.SystemUtils;
@@ -109,6 +110,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     Toolbar mMainToolbar;
     @BindView(R.id.mMainAbl)
     AppBarLayout mMainAbl;
+    LinearLayout mNavHeaderLiL;
     TextView mNavHeaderMainTipTxt;
     CircleImageView mNavHeaderMainImg;
     TextView msgNote, msgFolder;
@@ -129,13 +131,14 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     private static final int REQUEST_LOAD_IMAGE = 100;
     private static final int REQUEST_QRCODE = 101;
+    private static final int REQUEST_IMAGE = 102;
     private static final int REQUEST_WRITE_PERMISSION = 102;
     private static final int REQUEST_CAMERA_PERMISSION = 103;
 
     private File savePath;
     private File userIconFile;
     private String userIconPath;
-    private String versionContent, versionCode;
+    private String versionContent, versionCode, downloadUrl;
 
     @Override
     protected void onSaveInstanceState(final Bundle outState) {
@@ -161,6 +164,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         ButterKnife.bind(this);
 //        Trace.e("patch APK");
         Trace.e("base APK");
+        mNavHeaderLiL = (LinearLayout) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderLiL);
         mNavHeaderMainTipTxt = (TextView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainTipTxt);
         mNavHeaderMainImg = (CircleImageView) mMainNav.getHeaderView(0).findViewById(R.id.mNavHeaderMainImg);
         LinearLayout galleryNote = (LinearLayout) mMainNav.getMenu().findItem(R.id.nav_note).getActionView();
@@ -200,6 +204,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             folderFragment = FolderFragment.newInstance(null);
 //            }
         }
+        TinkerPatch.with().fetchPatchUpdate(true);
         //userIcon
         savePath = new File(Environment.getExternalStorageDirectory().getAbsolutePath()
                 , MyApplication.APP_MAIN_FOLDER_NAME);
@@ -281,7 +286,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         mNavHeaderMainImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                zj.remote.baselibrary.util.NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
+                NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
 //                Intent i = new Intent(
 //                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, REQUEST_LOAD_IMAGE);
@@ -295,20 +300,15 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                //TODO Tinker的生效就以下一句
-                TinkerPatch.with().fetchPatchUpdate(true);
-//                if (Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent() != null) {
-//                    Trace.show(MainActivity.this, Tinker.with(MainActivity.this).getTinkerLoadResultIfPresent().versionChanged + "");
-//                }
                 //menu数字
                 String note = PrimaryData.getInstance().getNoteSize() + "";
                 String folder = PrimaryData.getInstance().getFolderSize() + "";
                 msgNote.setText(note);
                 msgFolder.setText(folder);
                 isDrawerOpen = true;
-                btnSearch.setVisible(false);
-                btnSort.setVisible(false);
-                btnDelete.setVisible(false);
+//                btnSearch.setVisible(false);
+//                btnSort.setVisible(false);
+//                btnDelete.setVisible(false);
                 if (PreferenceUtils.getBoolean(Config.HIGHLIGHT_NAV, true, MainActivity.this)) {
                     PreferenceUtils.putBoolean(Config.HIGHLIGHT_NAV, false, MainActivity.this);
                     //用户操作引导库
@@ -341,10 +341,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onDrawerClosed(View drawerView) {
                 isDrawerOpen = false;
-                boolean isVisible = thisPosition == 0;
-                btnSearch.setVisible(isVisible);
-                btnDelete.setVisible(isVisible);
-                btnSort.setVisible(isVisible);
+//                boolean isVisible = thisPosition == 0;
+//                btnSearch.setVisible(isVisible);
+//                btnDelete.setVisible(isVisible);
+//                btnSort.setVisible(isVisible);
                 toggle.onDrawerClosed(drawerView);
             }
 
@@ -364,7 +364,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                         .title("升级版本:" + versionCode)
                         .content(versionContent)
                         .positiveText("下载")
-                        .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
+                        .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                         .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
@@ -374,64 +374,29 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                             }
                         }).show();
                 break;
-//            case gotoThank:
-//                ARouter.getInstance().build("/yellow/thank").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case gotoSecret:
-//                hideBtnAdd();//使进入
-//                ARouter.getInstance().build("/yellow/secret_menu").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case gotoSetting:
-//                hideBtnAdd();
-//                ARouter.getInstance().build("/yellow/share_suggest").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
-//            case showBtnAdd:
-//                mMainFab.animate()
-//                        .alpha(1)
-//                        .scaleX(1)
-//                        .scaleY(1)
-//                        .setListener(new AnimatorListenerAdapter() {
-//                            @Override
-//                            public void onAnimationStart(Animator animation) {
-//                                super.onAnimationStart(animation);
-////                                    if (mMainFab.getVisibility() == View.INVISIBLE)
-//                                mMainFab.setVisibility(View.VISIBLE);
-//                            }
-//                        })
-//                        .setDuration(300).start();
-//                break;
-//            case hideBtnAdd://必须使用animate直接设置会丢失十字
-//                mMainFab.animate()
-//                        .scaleX(0)
-//                        .scaleY(0)
-//                        .alpha(0)
-//                        .setListener(new AnimatorListenerAdapter() {
-//                            @Override
-//                            public void onAnimationEnd(Animator animation) {
-//                                super.onAnimationEnd(animation);
-////                                    if (mMainFab.getVisibility() == View.VISIBLE)
-//                                mMainFab.setVisibility(View.INVISIBLE);
-//                            }
-//                        })
-//                        .setDuration(50).start();
-//                break;
             case gotoQRCode:
-                Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
-                startActivityForResult(intent, REQUEST_QRCODE);
-                overridePendingTransition(R.anim.head_in, R.anim.head_out);
+                dialog = new MaterialDialog.Builder(mContext)
+                        .title("选择识别方式")
+                        .backgroundColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_SOFT_BACKGROUND))
+                        .titleColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_TEXT))
+                        .items("拍照识别", "图片识别")
+                        .itemsColor(mDayNightHelper.getColorRes(mContext, DayNightHelper.COLOR_TEXT))
+                        .itemsCallback(new MaterialDialog.ListCallback() {
+                            @Override
+                            public void onSelection(MaterialDialog dialog, View itemView, int position, CharSequence text) {
+                                if (position == 0) {
+                                    Intent intent = new Intent(MainActivity.this, CaptureActivity.class);
+                                    startActivityForResult(intent, REQUEST_QRCODE);
+                                    overridePendingTransition(R.anim.head_in, R.anim.head_out);
+                                } else if (position == 1) {
+                                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                                    intent.setType("image/*");
+                                    startActivityForResult(intent, REQUEST_IMAGE);
+                                }
+                            }
+                        }).show();
                 break;
-//            case gotoRecognize:
-//                hideBtnAdd();
-//                ARouter.getInstance().build("/yellow/recognize").navigation();
-//                overridePendingTransition(R.anim.push_left_in,
-//                        R.anim.push_left_out);
-//                break;
             default:
                 break;
         }
@@ -449,16 +414,12 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             if (requestCode == REQUEST_LOAD_IMAGE && null != data) {
                 final Uri selectedImage = data.getData();
                 CropUtil.startCropActivity(MainActivity.this, selectedImage);
-//                ThreadPool.getInstance().execute(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        dealPicFromSelect(selectedImage);
-//                    }
-//                });
             } else if (requestCode == REQUEST_QRCODE && data != null) {
                 dealQRCode(data);
+            } else if (requestCode == REQUEST_IMAGE && data != null) {
+                dealQRImage(data);
             } else if (requestCode == UCrop.REQUEST_CROP) {
-                handleCropResult(data);
+                dealCropResult(data);
             }
         } else if (resultCode == UCrop.RESULT_ERROR) {
             handleCropError(data);
@@ -488,27 +449,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             public void run() {
                 try {
                     final AVFile file = LoginService.getUserIcon(PreferenceUtils.getString(Config.KEY_USERICON, "", MyApplication.context));
-                    file.getDataInBackground(new GetDataCallback() {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void done(final byte[] bytes, AVException e) {
-                            if (e != null) {
-                                mNavHeaderMainImg.setImageResource(R.mipmap.ic_face);
-                                e.printStackTrace();
-                                return;
-                            }
-                            final Bitmap b = BitmapUtil.bytes2Bitmap(bytes);
-                            try {
-                                BitmapUtil.saveBitmap(b, userIconFile);
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            }
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mNavHeaderMainImg.setImageBitmap(b);
-                                }
-                            });
-//                            PreferenceUtils.putString(Config.KEY_USERICON, MyApplication.userIcon, MainActivity.this);
+                        public void run() {
+                            Glide.with(mContext).load(file.getUrl()).into(mNavHeaderMainImg);
                         }
                     });
                 } catch (AVException | FileNotFoundException e) {
@@ -547,6 +491,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     String appVersionNow = SystemUtils.getAppVersion(getApplicationContext());
                     versionCode = version.getString("version_name");
                     versionContent = version.getString("version_content");
+                    downloadUrl = version.getString("download_url");
                     if (appVersionNow != null && versionCode.compareTo(appVersionNow) > 0) {//调试时改为<=0
                         //需要更新
                         handler.sendEmptyMessageDelayed(checkUpdate, 2000);
@@ -565,8 +510,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 //        intent.putExtra("uriStr", getString(R.string.uri_download));
 //        intent.putExtra("fileName", getResources().getString(R.string.app_name) + versionCode + ".apk");
 //        startService(intent);
-        NormalUtils.downloadByUri(MainActivity.this, getString(R.string.uri_download));
-        Trace.show(MainActivity.this, "后台下载中...");
+        NormalUtils.downloadByUri(MainActivity.this, downloadUrl);
     }
 
     private void handleCropError(@NonNull Intent result) {
@@ -579,7 +523,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
         }
     }
 
-    private void handleCropResult(@NonNull Intent result) {
+    private void dealCropResult(@NonNull Intent result) {
         //得到结果的uri
         final Uri resultUri = UCrop.getOutput(result);
         if (resultUri != null) {
@@ -592,7 +536,38 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             //传送到结果界面预览
 //            ResultActivity.startWithUri(MainActivity.this, resultUri);
         } else {
-            Toast.makeText(MainActivity.this, "Cannot retrieve cropped image", Toast.LENGTH_SHORT).show();
+            Trace.show(mContext, "无法取回剪切过的图片");
+        }
+    }
+
+    private void dealQRImage(Intent data) {
+        if (data != null) {
+            Uri uri = data.getData();
+            try {
+                CodeUtils.analyzeBitmap(ImageUtil.getImageAbsolutePath(this, uri), new CodeUtils.AnalyzeCallback() {
+                    @Override
+                    public void onAnalyzeSuccess(Bitmap mBitmap, String result) {
+                        if (result != null && result.startsWith("www."))
+                            result = "http://" + result;
+                        //用浏览器打开
+                        try {
+                            NormalUtils.downloadByUri(MainActivity.this, result);
+                            Trace.show(mContext, "发现二维码中的网址，将用浏览器打开：\n" + result, false);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            ClipBoardUtils.copy(result, MainActivity.this);
+                            Trace.show(mContext, "已将二维码数据复制到剪贴板：\n" + result, false);
+                        }
+                    }
+
+                    @Override
+                    public void onAnalyzeFailed() {
+                        Trace.show(mContext, "解析二维码失败");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -747,7 +722,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
                     .content("退出当前账号？")
                     .positiveText(R.string.positive_text)
                     .negativeText(R.string.negative_text)
-                    .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND))
+                    .backgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND))
                     .titleColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .contentColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT))
                     .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -830,8 +805,9 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
     private void changeThemeByZhiHu() {
         showAnimation();
         toggleThemeSetting();
-//        noteFragment.refreshUI(mDayNightHelper);
+        noteFragment.refreshUI(mDayNightHelper);
         folderFragment.refreshUI(mDayNightHelper);
+        ImmergeUtils.immerge(this, DayNightHelper.getInstance(this).isDay() ? R.color.colorPrimary : R.color.dark_gray);
 //        refreshStatusBar();//目前没用到
     }
 
@@ -852,11 +828,13 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
      */
     private void toggleThemeSetting() {
         mDayNightHelper.toggleThemeSetting(MainActivity.this);
-        mMainPager.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_BACKGROUND));
+        mMainPager.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));
         mMainNav.setBackgroundColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_SOFT_BACKGROUND));//day soft night primary
         mMainNav.setItemTextColor(ColorStateList.valueOf(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT)));
-        mNavHeaderMainTipTxt.setTextColor(mDayNightHelper.getColorRes(this, DayNightHelper.COLOR_TEXT));
-
+        mNavHeaderLiL.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
+        mMainToolbar.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
+        msgNote.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
+        msgFolder.setBackgroundResource(mDayNightHelper.getColorResId(this, DayNightHelper.COLOR_NAV_BACKGROUND));
 //        msgNote.setTextColor(getResources().getColor(background.resourceId));
 //        msgFolder.setTextColor(getResources().getColor(background.resourceId));
     }
@@ -909,7 +887,7 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
 
     /*夜间模式*/
 
-//    public static final int gotoSetting = 0;
+    //    public static final int gotoSetting = 0;
 //    public static final int showBtnAdd = 1;
 //    public static final int hideBtnAdd = 2;
 //    public static final int gotoSecret = 3;

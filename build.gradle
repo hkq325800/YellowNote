@@ -1,6 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     repositories {
+        mavenLocal()
         jcenter()
         maven {
             url "http://mvn.leancloud.cn/nexus/content/repositories/public"
@@ -9,7 +10,10 @@ buildscript {
             url "http://repo2.maven.org/maven2/"
         }
         maven {
-            url 'https://dl.bintray.com/wangyuwei/maven'
+            url 'https://dl.bintray.com/wangyuwei/maven'//FlipShare
+        }
+        maven {
+            url  "http://dl.bintray.com/piasy/maven"//BigImageViewer
         }
         maven {
             repositories {
@@ -18,13 +22,13 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'//apt支持
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.4.0'//R2支持
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.6.1'//方法数检查
         classpath ("com.tinkerpatch.sdk:tinkerpatch-gradle-plugin:${TINKERPATCH_VERSION}") { changing = true }
         //from stepper
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+//        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
 //        classpath 'com.antfortune.freeline:gradle:0.8.5'
 //        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4'
 //        classpath "io.realm:realm-gradle-plugin:0.90.0"
@@ -35,16 +39,20 @@ buildscript {
 }
 allprojects {
     repositories {
+        mavenLocal()
         jcenter()
         maven {
             url "http://mvn.leancloud.cn/nexus/content/repositories/public"
+        }
+        maven {
+            url  "http://dl.bintray.com/piasy/maven"//BigImageViewer
         }
         maven {
             url "http://repo2.maven.org/maven2/"
         }
         maven { url "https://jitpack.io" }
         maven {
-            url 'https://dl.bintray.com/wangyuwei/maven'
+            url 'https://dl.bintray.com/wangyuwei/maven'//FlipShare
         }
         maven {
             repositories {

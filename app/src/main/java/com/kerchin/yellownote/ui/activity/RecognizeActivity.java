@@ -195,6 +195,7 @@ public class RecognizeActivity extends AppCompatActivity {
                 OCR r = gson.fromJson(data, OCR.class);
 
                 String result = "";
+                if (r == null || r.regions == null) return;
                 for (Region reg : r.regions) {
                     for (Line line : reg.lines) {
                         for (Word word : line.words) {

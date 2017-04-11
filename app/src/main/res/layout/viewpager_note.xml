@@ -12,7 +12,7 @@
         android:listSelector="@color/light_purple"
         android:dividerHeight="0.6px"/>-->
 
-    <com.kerchin.yellownote.widget.waterdrop.WaterDropListView
+    <!--<com.kerchin.yellownote.widget.waterdrop.WaterDropListView
         android:id="@+id/mNoteWDList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -25,5 +25,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true" >
-    </com.kerchin.widget.progresslayout.ProgressLayout>
+    </com.kerchin.widget.progresslayout.ProgressLayout>-->
+
+    <com.wuxiaolong.pullloadmorerecyclerview.PullLoadMoreRecyclerView
+        android:id="@+id/mNoteList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:background="@color/transparent" />
 </RelativeLayout>

@@ -6,12 +6,13 @@ import android.os.CountDownTimer;
 import com.avos.avoscloud.AVException;
 
 /**
+ * presenter直译任命者，连接model和activity中的view实现，负责每步操作的逻辑处理
  * Created by hkq325800 on 2017/2/23.
  */
 
 public class LoginPresenter extends BasePresenter<LoginModel, ILoginView> {
-    public LoginPresenter(LoginActivity view) {
-        setVM(new LoginModel(view), view);
+    public LoginPresenter(ILoginView view) {
+        setVM(new LoginModel(), view);
     }
 
     public void login(final String txtUser, final String txtPass) {

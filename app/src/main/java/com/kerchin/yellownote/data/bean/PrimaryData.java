@@ -766,6 +766,15 @@ public class PrimaryData {
     }
 
     /**
+     * 根据note从内存中删去Note
+     *
+     * @param note note自身
+     */
+    public void removeNote(Note note) {
+        listNote.remove(note);
+    }
+
+    /**
      * 根据folder位置从内存中删去Folder
      *
      * @param position folder位置

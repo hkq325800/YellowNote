@@ -27,10 +27,14 @@ public class DayNightHelper {
     public final static int COLOR_BACKGROUND = R.attr.clockBackground;
     public final static int COLOR_SOFT_BACKGROUND = R.attr.clockSoftBackground;
     public final static int COLOR_TEXT = R.attr.clockTextColor;
+    public final static int CLOCK_TEXT = R.attr.clockText;
+    public final static int COLOR_NAV_BACKGROUND = R.attr.clockNavBackground;
 
     private final static int COLOR_BACKGROUND_RES = -COLOR_BACKGROUND;
     private final static int COLOR_SOFT_BACKGROUND_RES = -COLOR_SOFT_BACKGROUND;
     private final static int COLOR_TEXT_RES = -COLOR_TEXT;
+    private final static int CLOCK_TEXT_RES = -CLOCK_TEXT;
+    public final static int COLOR_NAV_BACKGROUND_RES = -COLOR_NAV_BACKGROUND;
 
     private SharedPreferences mSharedPreferences;
     //缓存节省了resolveAttribute的时间
@@ -58,6 +62,8 @@ public class DayNightHelper {
         attrs.add(COLOR_BACKGROUND);
         attrs.add(COLOR_SOFT_BACKGROUND);
         attrs.add(COLOR_TEXT);
+        attrs.add(CLOCK_TEXT);
+        attrs.add(COLOR_NAV_BACKGROUND);
     }
 
     /**

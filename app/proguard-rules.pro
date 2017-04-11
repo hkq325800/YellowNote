@@ -52,6 +52,7 @@
 -keep interface com.j256.**
 -keepclassmembers interface com.j256.** { *; }
 -dontwarn com.j256.ormlite.**
+-dontnote com.j256.ormlite.**
 -keep class com.j256.ormlite.** { *;}
 #保护注解
 -keepattributes *Annotation*
@@ -100,8 +101,8 @@
 -dontwarn sun.misc.**
 -keep class sun.misc.** { *;}
 
--dontwarn com.alibaba.fastjson.**
--keep class com.alibaba.fastjson.** { *;}
+#-dontwarn com.alibaba.fastjson.**
+#-keep class com.alibaba.fastjson.** { *;}
 
 -dontwarn sun.security.**
 -keep class sun.security.** { *; }
@@ -146,3 +147,21 @@
 }
 #aRouter
 -keep public class com.alibaba.android.arouter.routes.**{*;}
+
+-dontwarn com.alibaba.android.arouter.**
+-dontnote com.alibaba.android.arouter.**
+#eventBus
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}
+
+# microsoft vision
+-keep class com.microsoft.projectoxford.vision.** { *; }
+-keepclassmembers class com.microsoft.projectoxford.vision.** {*;}

@@ -4,8 +4,8 @@ apply plugin: 'tinkerpatch-support'
  * TODO: 请按自己的需求修改为适应自己工程的参数
  */
 def bakPath = file("${buildDir}/bakApk/")
-def baseInfo = "app-1.07-0224-14-27-13"
-def variantName = "debug"
+def baseInfo = "app-1.08-0410-11-13-13"
+def variantName = "release"
 
 /**
  * 对于插件各参数的详细解析请参考

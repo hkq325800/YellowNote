@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/mNoteItemView"
-        android:background="?attr/colorPrimary">
+        android:background="?attr/clockNavBackground">
 
         <TextView
             android:id="@+id/mNoteItemDateTxt"
@@ -63,8 +63,8 @@
         android:id="@+id/mNoteBlankReL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/transparent"
-        android:layout_below="@id/relative_title">
+        android:layout_below="@id/relative_title"
+        android:background="@color/transparent">
 
         <TextView
             android:id="@+id/mNoteItemFolderTxt"
@@ -74,7 +74,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="7dp"
-            android:background="@color/colorPrimary"
+            android:background="?attr/clockNavBackground"
             android:ellipsize="end"
             android:maxLines="3"
             android:maxWidth="80dp"
@@ -96,7 +96,7 @@
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:text=""
-            android:textColor="@color/colorPrimary"
+            android:textColor="?attr/clockText"
             android:textSize="18sp" />
         <!--android:textStyle="italic"-->
     </RelativeLayout>
