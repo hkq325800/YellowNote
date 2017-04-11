@@ -1,7 +1,6 @@
 package com.kerchin.yellownote.mvp;
 
 import android.content.Context;
-import android.support.annotation.UiThread;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.AVException;
@@ -17,6 +16,11 @@ import zj.remote.baselibrary.util.Trace;
  */
 
 public class LoginModel {
+    private UiCallback mainCallback;
+
+    public LoginModel(UiCallback mainCallback) {
+        this.mainCallback = mainCallback;
+    }
 
     public void isAbleToSignUp(final Callback callback) {
         ThreadPool.getInstance().execute(new Runnable() {
@@ -24,11 +28,16 @@ public class LoginModel {
             public void run() {
                 try {
                     final boolean isAbleToSignIn = LoginService.isAbleToSignIn();
-                    if (!isAbleToSignIn) {
-                        callback.isFalse();
-                    } else {
-                        callback.isTrue();
-                    }
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!isAbleToSignIn) {
+                                callback.isFalse();
+                            } else {
+                                callback.isTrue();
+                            }
+                        }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }
@@ -42,17 +51,21 @@ public class LoginModel {
             public void run() {
                 try {
                     final AVObject user = LoginService.loginVerify(txtUser, txtPass);
-                    if (user != null) {
-                        if (user.getBoolean("isFrozen")) {
-                            callback.isFrozen();//账号冻结无法登陆
-                        } else {
-                            callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon")
-                                    , user.getString("user_read_pass"));//正常登陆
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (user != null) {
+                                if (user.getBoolean("isFrozen")) {
+                                    callback.isFrozen();//账号冻结无法登陆
+                                } else {
+                                    callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon"), user.getString("user_read_pass"));//正常登陆
+                                }
+                            } else {
+                                //密码错误重新登录
+                                callback.loginFailed();
+                            }
                         }
-                    } else {
-                        //密码错误重新登录
-                        callback.loginFailed();
-                    }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }
@@ -66,11 +79,15 @@ public class LoginModel {
             public void run() {
                 try {
                     final boolean isReg = LoginService.isRegistered(txtUser);
-                    if (isReg) {
-                        callback.isTrue();
-                    } else {
-                        callback.isFalse();
-                    }
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isReg) {
+                                callback.isTrue();
+                            } else
+                                callback.isFalse();
+                        }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }
@@ -105,7 +122,12 @@ public class LoginModel {
             public void run() {
                 try {
                     LoginService.smsVerify(txtProv, txtUser);
-                    callback.isTrue();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
                 } catch (AVException e) {
 //                    callback.isFalse();
                     callback.isException(e);
@@ -120,7 +142,12 @@ public class LoginModel {
             public void run() {
                 try {
                     LoginService.forgetSave(txtUser, txtPass);
-                    callback.isTrue();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
                 } catch (AVException e) {
 //                    callback.isFalse();
                     callback.isException(e);
@@ -144,7 +171,12 @@ public class LoginModel {
                 try {
                     LoginService.sendProv(txtUser, isSignUp, validPeriod);
                 } catch (AVException e) {
-                    callback.isFalse();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isFalse();
+                        }
+                    });
 //                    callback.isException(e);
                 }
             }
@@ -175,7 +207,12 @@ public class LoginModel {
             public void run() {
                 try {
                     LoginService.userSignUp(txtUser, txtPass, userDefaultFolderId);
-                    callback.isTrue();
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.isTrue();
+                        }
+                    });
                 } catch (AVException e) {
 //                    callback.isFalse();
                     callback.isException(e);
@@ -184,52 +221,40 @@ public class LoginModel {
         });
     }
 
-//    private void doThisOnUiThread(Runnable runnable) {
-//        if (mainCallback == null) return;
-//        mainCallback.doThisOnUiThread(runnable);
-//    }
+    private void doThisOnUiThread(Runnable runnable) {
+        if (mainCallback == null) return;
+        mainCallback.doThisOnUiThread(runnable);
+    }
 
     public interface LoginCallback {
-        @UiThread
         void isFrozen();
 
-        @UiThread
         void isException(AVException e);
 
-        @UiThread
         void loginSuccess(String txtUser, String user_default_folderId, String user_icon, String user_read_pass);
 
-        @UiThread
         void loginFailed();
     }
 
     public interface NonCallback {
-        @UiThread
         void isTrue();
 
-        @UiThread
         void isException(AVException e);
     }
 
     public interface Callback {
-        @UiThread
         void isTrue();
 
-        @UiThread
         void isFalse();
 
-        @UiThread
         void isException(AVException e);
     }
 
     public interface CreateCallback {
-        @UiThread
         void isTrue(String folderName);
 
-        @UiThread
         void isFalse();
 
-        @UiThread
         void isException(AVException e);
     }
 }
