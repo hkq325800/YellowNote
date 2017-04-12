@@ -287,6 +287,10 @@ public class MainActivity extends MyOrmLiteBaseActivity<OrmLiteHelper>
             @Override
             public void onClick(View v) {
                 NormalUtils.yellowPicPicker(MainActivity.this, REQUEST_LOAD_IMAGE);
+//                ARouter.getInstance().build("/yellow/glide_loader").navigation();
+//                overridePendingTransition(R.anim.push_left_in,
+//                        R.anim.push_left_out);
+
 //                Intent i = new Intent(
 //                        Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 //                startActivityForResult(i, REQUEST_LOAD_IMAGE);
