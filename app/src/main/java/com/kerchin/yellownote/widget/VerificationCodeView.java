@@ -120,6 +120,7 @@ public class VerificationCodeView extends View {
         }
         horizontalOffset=(mWidth-dWidth)/2;
         isInited=true;
+        if(mWidth <= 0 || mHeight <= 0) return;
         createCodeBitmap();
     }
 

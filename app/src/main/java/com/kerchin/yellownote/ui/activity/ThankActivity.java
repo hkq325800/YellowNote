@@ -134,6 +134,7 @@ public class ThankActivity extends BaseSwipeBackActivity {
         ButterKnife.bind(this);
         mNavigationRightBtn.setVisibility(View.INVISIBLE);
         mNavigationTitleEdt.setEnabled(false);
+        mNavigationTitleEdt.setText("致谢");
         mNavigationTitleEdt.setHint("");
         mNavigationTitleEdt.setFocusable(false);
         mNavigationTitleEdt.clearFocus();

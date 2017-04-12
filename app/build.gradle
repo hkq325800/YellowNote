@@ -10,9 +10,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     //android
-    compile 'com.android.support:appcompat-v7:25.+'
-    compile 'com.android.support:recyclerview-v7:25.+'
-    compile 'com.android.support:design:25.+'
+    compile ('com.android.support:appcompat-v7:${SUPPORT_VERSION}')
+    compile ('com.android.support:recyclerview-v7:${SUPPORT_VERSION}')
+    compile ('com.android.support:design:${SUPPORT_VERSION}')
     //    compile 'com.android.support:support-v4:24.+'
     //leancloud服务器上jar包
 //    compile 'cn.leancloud.android:avoscloud-sdk:v3.14.5'
@@ -95,8 +95,8 @@ apt {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    compileSdkVersion COMPILE_SDK_VERSION as int
+    buildToolsVersion BUILD_TOOLS_VERSION
 
     compileOptions {
         sourceCompatibility javaVersion
@@ -114,9 +114,9 @@ android {
         release {
             try {
                 storeFile file("./keystore/yellownote.jks")
-                storePassword ""
-                keyAlias "yellownote"
-                keyPassword ""
+                storePassword STORE_PASSWORD
+                keyAlias KEY_ALIAS
+                keyPassword KEY_PASSWORD
             } catch (ex) {
                 throw new InvalidUserDataException(ex.toString())
             }
@@ -128,10 +128,10 @@ android {
     }
     defaultConfig {
         applicationId "com.kerchin.yellownote"
-        minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 8
-        versionName "1.08"
+        minSdkVersion MIN_SDK_VERSION as int
+        targetSdkVersion TARGET_SDK_VERSION as int
+        versionCode VERSION_CODE as int
+        versionName VERSION_NAME
         /**
          * you can use multiDex and install it in your ApplicationLifeCycle implement
          */
@@ -140,6 +140,10 @@ android {
     buildTypes {
         release {
             minifyEnabled true//false aRouter
+            //移除无用的Resource
+            shrinkResources true
+            //资源文件对齐
+            zipAlignEnabled true
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -150,6 +154,30 @@ android {
 //            zipAlignEnabled true
 //            shrinkResources true
 //            buildConfigField "String", "CHANNEL", "\"dev\""
+        }
+    }
+    productFlavors {//多渠道打包
+        dev {
+            // applicationId不同，认为是两个不同的app，可以同时安装在一台设备上，
+            // 因此为便于调试，通过修改applicationId或者后缀可以同时安装线上包和开发包
+            applicationIdSuffix ".debug"
+        }
+        wandoujia {}
+        googlepay {}
+        baidu {}
+        qihoo360 {}
+        xiaomi {}
+        tencent {}
+        anzhi {}
+        huawei {}
+    }
+
+    // 指定apk名字输出格式
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    "techexplore-${variant.buildType.name}-${variant.versionName}-${variant.productFlavors[0].name}.apk".toLowerCase())
         }
     }
     sourceSets {
