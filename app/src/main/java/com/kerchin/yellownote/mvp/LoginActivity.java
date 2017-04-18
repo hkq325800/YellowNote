@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -45,7 +44,7 @@ import zj.remote.baselibrary.util.Trace;
  * Created by hkq325800 on 2017/2/23.
  */
 @Route(path = "/yellow/login")
-public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView, UiCallback {
+public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implements ILoginView {
     @BindView(R.id.mLoginUserEdt)
     EditText mLoginUserEdt;
     @BindView(R.id.mLoginUserTextInput)
@@ -70,8 +69,6 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
     Button mLoginForgetBtn;
     @BindView(R.id.mSignUpRelative)
     RelativeLayout mSignUpRelative;
-    @BindView(R.id.mLoginIconImg)
-    ImageView mLoginIconImg;
     @BindView(R.id.mLoginMineTxt)
     TextView mLoginMineTxt;
     @BindView(R.id.mLoginIconLiL)
@@ -121,6 +118,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             @Override
             public void run() {
                 height = mSignUpRelative.getHeight();
+                //先以invisible初始化获取height再用gone隐藏
                 mSignUpRelative.setVisibility(View.GONE);
             }
         });
@@ -131,6 +129,7 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
             e.printStackTrace();
         }
         mLoginMineTxt.setText(str);
+        //添加软键盘监听用来隐藏/显示icon
         SupportSoftKeyboardUtil.addSoftKeyboardListener(this, mLoginIconLiL);
         String user = PreferenceUtils.getString(Config.KEY_USER, "", mContext);
         if (!TextUtils.isEmpty(user) && !logoutFlag) {
@@ -336,9 +335,9 @@ public class LoginActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> implemen
         PreferenceUtils.putString(Config.KEY_USER, mLoginUserEdt.getText().toString(), this);
         PreferenceUtils.putBoolean(Config.KEY_ISLOGIN, true, this);
         PreferenceUtils.putString(Config.KEY_PASS, mLoginPassEdt.getText().toString(), this);
-        PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
+        PrimaryData.getInstance(PrimaryData.TYPE_LAUNCH, getHelper(), new PrimaryData.DoAfter() {
             @Override
-            public void justNowWithEx(Exception e) {
+            public void justNow() {
                 dismissDialog();
             }
         });

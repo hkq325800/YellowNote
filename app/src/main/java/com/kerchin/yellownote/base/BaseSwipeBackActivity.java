@@ -20,6 +20,7 @@ import zj.remote.baselibrary.base.BaseActivity;
 import static com.kerchin.yellownote.R.drawable.slide_shadow;
 
 /**
+ * 给只需要滑动退出的activity用的
  * Created by Kerchin Huang on 15/6/11.
  */
 public abstract class BaseSwipeBackActivity extends BaseActivity

@@ -94,9 +94,9 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
             Trace.d("PrimaryData" + Thread.currentThread().getId());
             getDataStart = System.currentTimeMillis();
             //一般而言登陆过的用户都有数据本地缓存
-            PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfterWithEx() {
+            PrimaryData.getInstance(PrimaryData.TYPE_LAUNCH ,getHelper(), new PrimaryData.DoAfter() {
                 @Override
-                public void justNowWithEx(Exception e) {
+                public void justNow() {
                     if (!PreferenceUtils.getBoolean(Config.KEY_CAN_OFFLINE, true, LaunchActivity.this)) {
                         isNeedToRefresh = true;
                         runOnUiThread(new Runnable() {
@@ -105,7 +105,7 @@ public class LaunchActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
                                 mWelcomeTxt.setText("请检查网络后点击屏幕重试");
                             }
                         });
-                        Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试" + Trace.getErrorMsg(e), false);
+                        Trace.show(LaunchActivity.this, "请检查网络后点击屏幕重试", false);
                     }
                 }
             });//isNeedToRefresh

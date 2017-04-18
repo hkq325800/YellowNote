@@ -9,8 +9,8 @@ import com.avos.avoscloud.AVException;
  * Created by hkq325800 on 2017/2/23.
  */
 
-public class LoginPresenter extends BasePresenter<LoginModel, LoginActivity> {
-    public LoginPresenter(LoginActivity activity) {
+public class LoginPresenter extends BasePresenter<LoginModel, ILoginView> {
+    public LoginPresenter(ILoginView activity) {
         setVM(new LoginModel(activity), activity);
     }
 
@@ -217,6 +217,15 @@ public class LoginPresenter extends BasePresenter<LoginModel, LoginActivity> {
 
     }
 
+    /**
+     * 主线程上运行
+     * @param context
+     * @param txtUser
+     * @param txtPass
+     * @param txtRePass
+     * @param txtProv
+     * @return
+     */
     public boolean tableCheck(Context context, String txtUser, String txtPass, String txtRePass, String txtProv) {
         return mModel.tableCheck(context, txtUser, txtPass, txtRePass, txtProv);
     }

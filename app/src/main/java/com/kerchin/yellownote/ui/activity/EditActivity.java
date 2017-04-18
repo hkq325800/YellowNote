@@ -287,7 +287,7 @@ public class EditActivity extends MyOrmLiteBaseActivity<OrmLiteHelper> {
         if (savedInstanceState != null) {
             Trace.d("EditActivity initDataFromBundle");
             //恢复primaryData
-            PrimaryData.getInstance(getHelper(), new PrimaryData.DoAfter() {
+            PrimaryData.getInstance(PrimaryData.TYPE_EDIT, getHelper(), new PrimaryData.DoAfter() {
                 @Override
                 public void justNow() {
                     handler.sendEmptyMessage(handle4reGet);

@@ -146,6 +146,10 @@ compile 'com.github.traex.rippleeffect:library:1.3'
 compile 'com.isanwenyu.highlight:highlight:1.7.3'
 - statebutton
 单文件
+- bottomdialog 底部对话框
+compile 'me.shaohui:bottomdialog:1.1.9'
+- 跨进程通信 HermesEventBus
+compile 'xiaofei.library:hermes-eventbus:0.3.0'
 
 compile('com.yalantis:ucrop:2.2.0') {
         exclude group: 'com.android.support'

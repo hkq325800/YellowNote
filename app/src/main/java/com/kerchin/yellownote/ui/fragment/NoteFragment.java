@@ -234,7 +234,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
             public void run() {
 //                mProgress.startProgress();//first get
                 MainActivity a = (MainActivity) getActivity();
-                primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
+                primaryData = PrimaryData.getInstance(PrimaryData.TYPE_EDIT, a.getHelper(), new PrimaryData.DoAfter() {
                     @Override
                     public void justNow() {
                         getDataHelper.firstGet();//first get
@@ -270,13 +270,14 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                         FolderFragment.hasRefresh = true;//onRefresh
                         FolderFragment.isChanged4folder = true;//onRefresh
                     }
-                }, new PrimaryData.DoAfterWithEx() {
+                }, new PrimaryData.DoAfter() {
                     @Override
-                    public void justNowWithEx(Exception e) {
-                        Message msg = Message.obtain();
-                        msg.obj = e;
-                        msg.what = GetDataHelper.handle4empty;
-                        handler.sendMessage(msg);
+                    public void justNow() {
+//                        Message msg = Message.obtain();
+//                        msg.obj = e;
+//                        msg.what = GetDataHelper.handle4empty;
+//                        handler.sendMessage(msg);
+                        //TODO 消息并未接收处理
                         isChanged4note = false;//onRefresh
                         FolderFragment.hasRefresh = true;//onRefresh
                         FolderFragment.isChanged4folder = true;//onRefresh

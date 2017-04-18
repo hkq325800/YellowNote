@@ -6,7 +6,7 @@ import com.avos.avoscloud.AVException;
  * Created by hkq325800 on 2017/2/23.
  */
 
-public interface ILoginView {
+public interface ILoginView extends UiCallback {
     void loginSuccess(String txtUser, String user_default_folderId, String user_icon, String user_read_pass);
 
     void exception(String s, AVException e);

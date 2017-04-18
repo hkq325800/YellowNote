@@ -11,6 +11,7 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.kerchin.yellownote.utilities.helper.sql.OrmLiteHelper;
 
 /**
+ * 给既需要滑动退出又需要数据库存储的activity
  * Created by Kerchin on 2016/6/23 0023.
  */
 public abstract class MyOrmLiteBaseActivity<H extends OrmLiteHelper> extends BaseSwipeBackActivity {

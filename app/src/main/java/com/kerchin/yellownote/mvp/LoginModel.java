@@ -1,6 +1,7 @@
 package com.kerchin.yellownote.mvp;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.AVException;
@@ -11,14 +12,14 @@ import zj.remote.baselibrary.util.ThreadPool.ThreadPool;
 import zj.remote.baselibrary.util.Trace;
 
 /**
- * Model为具体实现，连接网络的service，方法一般运行在工作线程
+ * Model为具体实现，连接网络的service，方法一般运行在工作线程，结束后的callback运行在ui线程
  * Created by hkq325800 on 2017/2/23.
  */
 
 public class LoginModel {
     private UiCallback mainCallback;
 
-    public LoginModel(UiCallback mainCallback) {
+    public LoginModel(@NonNull UiCallback mainCallback) {
         this.mainCallback = mainCallback;
     }
 
@@ -58,7 +59,8 @@ public class LoginModel {
                                 if (user.getBoolean("isFrozen")) {
                                     callback.isFrozen();//账号冻结无法登陆
                                 } else {
-                                    callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon"), user.getString("user_read_pass"));//正常登陆
+                                    callback.loginSuccess(txtUser, user.getString("user_default_folderId"), user.getString("user_icon")
+                                            , user.getString("user_read_pass"));//正常登陆
                                 }
                             } else {
                                 //密码错误重新登录
@@ -188,12 +190,17 @@ public class LoginModel {
             @Override
             public void run() {
                 try {
-                    String userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
-                    if (!TextUtils.isEmpty(userDefaultFolderId)) {
-                        callback.isTrue(userDefaultFolderId);
-                    } else {
-                        callback.isFalse();
-                    }
+                    final String userDefaultFolderId = LoginService.createDefaultFolder(txtUser);
+                    doThisOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!TextUtils.isEmpty(userDefaultFolderId)) {
+                                callback.isTrue(userDefaultFolderId);
+                            } else {
+                                callback.isFalse();
+                            }
+                        }
+                    });
                 } catch (AVException e) {
                     callback.isException(e);
                 }

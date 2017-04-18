@@ -269,7 +269,7 @@ public class FolderFragment extends MyBaseFragment {
             getDataHelper.firstGet();//首次加载数据 dataGot
             Trace.d("getData status " + getDataHelper.statusName);
             MainActivity a = (MainActivity) getActivity();
-            primaryData = PrimaryData.getInstance(a.getHelper(), new PrimaryData.DoAfter() {
+            primaryData = PrimaryData.getInstance(PrimaryData.TYPE_EDIT, a.getHelper(), new PrimaryData.DoAfter() {
                 @Override
                 public void justNow() {
                     handler.sendEmptyMessage(
