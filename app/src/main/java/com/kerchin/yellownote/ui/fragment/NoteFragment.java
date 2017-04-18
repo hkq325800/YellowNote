@@ -171,13 +171,13 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                         Trace.d("explode date" + note.getShowDate() + "preview" + note.getPreview());
                         //Explosion Animation
                         ExplosionField mExplosionField = ExplosionField.attach2Window(getActivity());
-                        mExplosionField.explode(noteAdapter.getView(i));
+                        mExplosionField.explode(mNoteList.getRecyclerView().getChildAt(i));
                         break;
                     }
                 }
                 primaryData.getFolder(note.getFolderId()).decInList();
                 primaryData.listNote.remove(note);//从数据源中删除
-                noteAdapter.getListDelete().remove(note);
+                noteAdapter.removeDelete(note.getObjectId());
                 break;
             case handle4dismiss:
 //                    mSVProgressHUD.dismissImmediately();
@@ -262,7 +262,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 getDataHelper.refresh();//MainActivity dataGot
                 //重新获取mHeaders listNote和mItems
                 MainActivity a = (MainActivity) getActivity();
-                primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh
+                primaryData.initData(a.getHelper(), new PrimaryData.DoAfter() {//onRefresh 1，1
                     @Override
                     public void justNow() {
                         handler.sendEmptyMessage(GetDataHelper.handle4refresh);
@@ -581,12 +581,12 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 public void onItemClick(View itemView, int viewType, int position) {
                     final ImageView delete = (ImageView) itemView.findViewById(R.id.mNoteItemDeleteImg);
                     final Note note = primaryData.getNote(list.get(position).getObjectId());
-                    if (noteAdapter.getListDelete().contains(note)) {
+                    if (noteAdapter.isDeleteContain(note.getObjectId())) {
                         delete.setImageResource(R.mipmap.delete);
-                        noteAdapter.getListDelete().remove(note);
+                        noteAdapter.removeDelete(note.getObjectId());
                     } else {
                         delete.setImageResource(R.mipmap.delete_true);
-                        noteAdapter.getListDelete().add(note);
+                        noteAdapter.addDelete(note.getObjectId());
                     }
                 }
             });

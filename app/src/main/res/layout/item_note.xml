@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:background="@color/transparent">
 
-    <View
+    <!--<View
         android:id="@+id/mNoteItemView"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/transparent" />
+        android:background="@color/transparent" />-->
 
     <!--android:layout_marginRight="7dp"-->
     <RelativeLayout
         android:id="@+id/relative_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/mNoteItemView"
         android:background="?attr/clockNavBackground">
 
         <TextView
@@ -42,7 +42,6 @@
             android:paddingBottom="5dp"
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
-            android:text=""
             android:textColor="@color/white"
             android:textSize="18sp" />
 
@@ -63,7 +62,6 @@
         android:id="@+id/mNoteBlankReL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/relative_title"
         android:background="@color/transparent">
 
         <TextView
@@ -80,7 +78,6 @@
             android:maxWidth="80dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:text=""
             android:textColor="@color/white"
             android:textSize="14sp" />
 
@@ -95,9 +92,8 @@
             android:paddingBottom="10dp"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
-            android:text=""
             android:textColor="?attr/clockText"
             android:textSize="18sp" />
         <!--android:textStyle="italic"-->
     </RelativeLayout>
-</RelativeLayout>
+</LinearLayout>

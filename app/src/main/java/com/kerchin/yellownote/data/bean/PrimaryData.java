@@ -116,9 +116,9 @@ public class PrimaryData {
         mItems = new ArrayList<>();
         Trace.d("PrimaryData initDataWithDoAfter");
         status.clear();
-        if (type == 0)
-            initData(helper, null, doAfter);
-        else if(type == 1) {
+        if (type == TYPE_LAUNCH)
+            initData(helper, null, doAfter);//0, 1
+        else if(type == TYPE_EDIT) {
             initData(helper);//在首次手动调用 为了catch
             waitForFlag(doAfter);
         }
