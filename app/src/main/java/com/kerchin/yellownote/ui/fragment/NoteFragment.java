@@ -61,11 +61,11 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     PullLoadMoreRecyclerView mNoteList;
     TextView mEmptyTxt;
     private int currentPage;
-    private int maxPage;
+    private int pageSize = 10;
+    private int maxPage;//TODO 在第一次获取时赋值
     public static boolean isChanged4note = false;
     private int repeatCount = 0;
 
-    private int emptyClickCount = 0;//控制空白点击次数 三次则重新网络获取
     private PrimaryData primaryData;
     private NoteShrinkAdapter noteAdapter;
     private List<Note> list;//维护list 因为有搜索需要
@@ -126,12 +126,6 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                     mNoteList.animate().alpha(1).setDuration(500).start();
                 } else
                     mNoteList.animate().alpha(1).setDuration(500).start();//handle4firstGet
-                //借emptyClickCount做一个标志
-                if (emptyClickCount >= 3) {
-                    emptyClickCount = 0;
-                    if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                        Trace.show(getActivity().getApplicationContext(), "这个真没有");
-                }
                 break;
             case GetDataHelper.handle4refresh:
                 Trace.d("handlerInNote handle4refresh");
@@ -139,12 +133,6 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
                 if (noteAdapter != null) {
                     noteAdapter.setList(list);
                     mNoteList.setAdapter(noteAdapter);
-                }
-                //借emptyClickCount做一个标志
-                if (emptyClickCount >= 3) {
-                    emptyClickCount = 0;
-                    if (noteAdapter == null || noteAdapter.getItemCount() == 0)
-                        Trace.show(getActivity().getApplicationContext(), "这个真没有");
                 }
                 break;
             case GetDataHelper.handle4respond:
@@ -207,7 +195,7 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
         mEmptyTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                emptyClick();
+                onRefresh();
             }
         });
         mNoteList.setEmptyView(view);
@@ -306,15 +294,12 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
     }
 
     public void disableLoad() {
-//        mNoteWDList.setPullLoadEnable(false);
         mNoteList.setPullRefreshEnable(false);
     }
 
     public void stopRefresh() {
-//        hasClick = false;
 //        if (mNoteList.isRefresh()) {
         getDataHelper.none();
-        Trace.d("emptyClickCount" + emptyClickCount);
         mNoteList.setPullLoadMoreCompleted();
 //        }
     }
@@ -479,7 +464,6 @@ public class NoteFragment extends MyBaseFragment implements PullLoadMoreRecycler
 
     //从搜索状态中恢复
     public void restore() {
-//        mNoteWDList.setPullLoadEnable(true);
         Trace.d("restore true");
         mNoteList.setPullRefreshEnable(true);
         mSearchText = "";
