@@ -80,6 +80,7 @@ dependencies {
     compile 'com.isanwenyu.highlight:highlight:1.7.3'
     compile project(':global')
     //无需引入tinker的任何库,使用tinkerpatch sdk即可
+    provided("com.tencent.tinker:tinker-android-anno:1.7.9")
     compile("com.tinkerpatch.sdk:tinkerpatch-android-sdk:${TINKERPATCH_VERSION}") { changing = true }
     compile ('com.alibaba:arouter-api:1.2.0', {
         exclude group:'com.alibaba',module:'fastjson'

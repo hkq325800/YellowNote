@@ -60,10 +60,11 @@ public class MyApplication extends Application {
         TinkerPatch.init(tinkerApplicationLike)
                 .reflectPatchLibrary()
                 .setPatchRollbackOnScreenOff(true)
-                .setPatchRestartOnSrceenOff(true);
+                .setPatchRestartOnSrceenOff(true)
+                .setFetchPatchIntervalByHours(3);
 
         // 每隔3个小时去访问后台时候有更新,通过handler实现轮训的效果
-        new FetchPatchHandler().fetchPatchWithInterval(3);
+        TinkerPatch.with().fetchPatchUpdateAndPollWithInterval();
 //        }
         context = this;
         zj.remote.baselibrary.Config.isDebugMode = Config.isDebugMode;
